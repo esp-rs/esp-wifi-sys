@@ -1,0 +1,19 @@
+[package]
+name = "esp32c3-wifi-rs"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+riscv = "0.7.0"
+
+embedded-hal = "0.2.3"
+nb = "1.0.0"
+void = { version = "1.0.2", default-features = false }
+
+hal = { package="esp32c3-hal", git = "https://github.com/esp-rs/esp-hal", rev = "02c5f4564b0fca1321b18e98e66e124a0b276643", features = [ "normalboot" ] }
+riscv-rt = { version = "0.8.1" }
+smoltcp = { version = "0.7.3", default-features=false, features = ["proto-igmp", "proto-ipv4", "socket-tcp", "socket-icmp", "socket-udp", "ethernet", "proto-dhcpv4", "socket-raw"] }
+critical-section = "0.2.5"
+
+[build-dependencies]
+riscv-target = "0.1.2"
