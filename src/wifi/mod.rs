@@ -299,7 +299,7 @@ pub fn wifi_init() -> i32 {
                 scan_method: wifi_scan_method_t_WIFI_FAST_SCAN,
                 bssid_set: false,
                 bssid: [0; 6],
-                channel: 1,
+                channel: 0,
                 listen_interval: 3,
                 sort_method: wifi_sort_method_t_WIFI_CONNECT_AP_BY_SIGNAL,
                 threshold: wifi_scan_threshold_t {
@@ -422,7 +422,7 @@ pub fn wifi_connect(ssid: &str, password: &str) -> i32 {
                 scan_method: wifi_scan_method_t_WIFI_FAST_SCAN,
                 bssid_set: false,
                 bssid: [0; 6],
-                channel: 10,
+                channel: 0,
                 listen_interval: 3,
                 sort_method: wifi_sort_method_t_WIFI_CONNECT_AP_BY_SIGNAL,
                 threshold: wifi_scan_threshold_t {
