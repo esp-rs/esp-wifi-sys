@@ -16,10 +16,12 @@ use esp32c3_wifi_rs::{
 };
 use hal::{interrupt::TrapFrame, pac::Peripherals, RtcCntl, Serial};
 use riscv_rt::entry;
+use smoltcp::iface::{Interface, SocketStorage};
+use smoltcp::phy::Device;
+use smoltcp::socket::Dhcpv4Event;
 use smoltcp::{
-    dhcp::Dhcpv4Client,
     iface::{NeighborCache, Routes},
-    socket::{RawPacketMetadata, RawSocketBuffer, TcpSocket, TcpSocketBuffer},
+    socket::{Dhcpv4Socket, TcpSocket, TcpSocketBuffer},
     time::Instant,
     wire::{EthernetAddress, IpCidr, Ipv4Address, Ipv4Cidr},
 };
@@ -65,44 +67,29 @@ fn main() -> ! {
 
     init_buffer();
 
-    let mut socket_set_entries: [_; 2] = Default::default();
-    let mut sockets = smoltcp::socket::SocketSet::new(&mut socket_set_entries[..]);
+    let mut mac = [0u8; 6];
+    get_sta_mac(&mut mac);
+    println!("MAC address is {:x?}", mac);
+    let hw_address = EthernetAddress::from_bytes(&mac);
+
+    let mut socket_set_entries: [SocketStorage; 2] = Default::default();
     let mut neighbor_cache_storage = [None; 8];
     let neighbor_cache = NeighborCache::new(&mut neighbor_cache_storage[..]);
 
-    let hw_address = EthernetAddress::from_bytes(&[0, 0, 0, 0, 0, 0]);
     let device = WifiDevice::new();
 
     let ip_addr = IpCidr::new(Ipv4Address::UNSPECIFIED.into(), 0);
     let mut ip_addrs = [ip_addr];
 
-    let mut dhcp_rx_buff = [0u8; 900];
-    let mut dhcp_rx_metadata_storage = [RawPacketMetadata::EMPTY; 1];
-    let dhcp_rx_buffer =
-        RawSocketBuffer::new(&mut dhcp_rx_metadata_storage[..], &mut dhcp_rx_buff[..]);
-    let mut dhcp_tx_buff = [0u8; 600];
-    let mut dhcp_tx_metadata_storage = [RawPacketMetadata::EMPTY; 1];
-    let dhcp_tx_buffer =
-        RawSocketBuffer::new(&mut dhcp_tx_metadata_storage[..], &mut dhcp_tx_buff[..]);
-    let mut dhcp = Dhcpv4Client::new(&mut sockets, dhcp_rx_buffer, dhcp_tx_buffer, timestamp());
-    let mut prev_cidr = Ipv4Cidr::new(Ipv4Address::UNSPECIFIED, 0);
-
     let mut routes_storage = [None; 1];
     let routes = Routes::new(&mut routes_storage[..]);
 
-    let mut ethernet = smoltcp::iface::EthernetInterfaceBuilder::new(device)
-        .ethernet_addr(hw_address)
+    let mut ethernet = smoltcp::iface::InterfaceBuilder::new(device, &mut socket_set_entries[..])
+        .hardware_addr(smoltcp::wire::HardwareAddress::Ethernet(hw_address))
         .neighbor_cache(neighbor_cache)
         .ip_addrs(&mut ip_addrs[..])
         .routes(routes)
         .finalize();
-
-    // need to tell SmolTCP our MAC
-    let mut mac = [0u8; 6];
-    get_sta_mac(&mut mac);
-    println!("MAC address is {:x?}", mac);
-    let addr = EthernetAddress::from_bytes(&mac);
-    ethernet.set_ethernet_addr(addr);
 
     println!("Call wifi_connect");
     let res = wifi_connect(SSID, PASSWORD);
@@ -124,60 +111,51 @@ fn main() -> ! {
 
         TcpSocket::new(tcp_rx_buffer, tcp_tx_buffer)
     };
-    let greet_handle = sockets.add(greet_socket);
+    let greet_handle = ethernet.add_socket(greet_socket);
+
+    let dhcp_socket = Dhcpv4Socket::new();
+    let dhcp_handle = ethernet.add_socket(dhcp_socket);
 
     loop {
         let timestamp = timestamp();
         critical_section::with(|_| {
-            ethernet.poll(&mut sockets, timestamp).ok();
+            ethernet.poll(timestamp).ok();
         });
 
-        let config = dhcp
-            .poll(&mut ethernet, &mut sockets, timestamp)
-            .unwrap_or_else(|e| {
-                println!("DHCP Error: {:?}", e);
-                None
-            });
+        let event = ethernet.get_socket::<Dhcpv4Socket>(dhcp_handle).poll();
+        match event {
+            None => {}
+            Some(Dhcpv4Event::Configured(config)) => {
+                println!("IP address:      {}", config.address);
+                set_ipv4_addr(&mut ethernet, config.address);
 
-        config.map(|config| {
-            println!("DHCP config: {:?}", config);
-            if let Some(cidr) = config.address {
-                if cidr != prev_cidr {
-                    ethernet.update_ip_addrs(|addrs| {
-                        addrs.iter_mut().next().map(|addr| {
-                            *addr = IpCidr::Ipv4(cidr);
-                        });
-                    });
-                    prev_cidr = cidr;
-                    println!("Assigned a new IPv4 address: {}", cidr);
+                if let Some(router) = config.router {
+                    println!("Default gateway: {}", router);
+                    ethernet
+                        .routes_mut()
+                        .add_default_ipv4_route(router)
+                        .unwrap();
+                } else {
+                    println!("Default gateway: None");
+                    ethernet.routes_mut().remove_default_ipv4_route();
+                }
+
+                for (i, s) in config.dns_servers.iter().enumerate() {
+                    if let Some(s) = s {
+                        println!("DNS server {}:    {}", i, s);
+                    }
                 }
             }
-
-            config.router.map(|router| {
-                ethernet
-                    .routes_mut()
-                    .add_default_ipv4_route(router)
-                    .unwrap()
-            });
-            ethernet.routes_mut().update(|routes_map| {
-                routes_map
-                    .get(&IpCidr::new(Ipv4Address::UNSPECIFIED.into(), 0))
-                    .map(|default_route| {
-                        println!("Default gateway: {}", default_route.via_router);
-                    });
-            });
-
-            if config.dns_servers.iter().any(|s| s.is_some()) {
-                println!("DNS servers:");
-                for dns_server in config.dns_servers.iter().filter_map(|s| *s) {
-                    println!("- {}", dns_server);
-                }
+            Some(Dhcpv4Event::Deconfigured) => {
+                println!("DHCP lost config!");
+                set_ipv4_addr(&mut ethernet, Ipv4Cidr::new(Ipv4Address::UNSPECIFIED, 0));
+                ethernet.routes_mut().remove_default_ipv4_route();
             }
-        });
+        }
 
         // Control the "greeting" socket (:4321)
         {
-            let mut socket = sockets.get::<TcpSocket>(greet_handle);
+            let socket = ethernet.get_socket::<TcpSocket>(greet_handle);
             if !socket.is_open() {
                 println!(
                     "Listening to port 4321 for greeting, \
@@ -196,9 +174,17 @@ fn main() -> ! {
 }
 
 fn timestamp() -> Instant {
-    Instant {
-        millis: (get_systimer_count() / 16_000) as i64,
-    }
+    Instant::from_millis((get_systimer_count() / 16_000) as i64)
+}
+
+fn set_ipv4_addr<DeviceT>(iface: &mut Interface<'_, DeviceT>, cidr: Ipv4Cidr)
+where
+    DeviceT: for<'d> Device<'d>,
+{
+    iface.update_ip_addrs(|addrs| {
+        let dest = addrs.iter_mut().next().unwrap();
+        *dest = IpCidr::Ipv4(cidr);
+    });
 }
 
 #[allow(dead_code)]
