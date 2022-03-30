@@ -1,4 +1,4 @@
-# Wifi on ESP32C3 (on bare-metal Rust)
+# Wifi on ESP32C3 and ESP32 (on bare-metal Rust)
 
 ## About
 
@@ -21,30 +21,46 @@ https://github.com/espressif/esp-wireless-drivers-3rdparty/archive/45701c0.zip
     - it prints the ip address it gets
     - if everything works you should be able to ping and connect to port 4321
 
+|Command|Chip|
+|---|---|
+|`cargo "+nightly" run --example dhcp_esp32c3 --target riscv32i-unknown-none-elf --features esp32c3`|ESP32C3|
+|`cargo "+esp" run --example dhcp_esp32 --target xtensa-esp32-none-elf --features esp32`|ESP32|
+
 ## What works?
 
 - scanning for WiFi access points
 - connect to WiFi access point
 
+## Note on ESP32 support
+
+This is even more experimental than support for ESP32C3.
+
+- There are no wifi-logs so you have to be a bit more patient when trying it out since there is no indication of progress. 
+- Also there might be some packet loss and a bit worse performance than on ESP32C3 currently. 
+- The code runs on a single core and is currently not multi-core safe!
+
+On ESP32 currently TIMG1 is used as the main timer so you can't use it for anything else.
+
 ## Directory Structure
 
-- src/timer.rs: systimer code used for timing and task switching
-- src/preemt/: a bare minimum RISCV round-robin task scheduler
+- src/timer-espXXX.rs: systimer code used for timing and task switching
+- src/preemt/: a bare minimum RISCV and Xtensa round-robin task scheduler
 - src/log/: code used for logging
-- src/binary/: generated bindings to the WiFi driver
+- src/binary/: generated bindings to the WiFi driver (per chip)
 - src/compat/: code needed to emulate enough of an (RT)OS to use the driver
     - malloc.rs: a homegrown allocator - this is NOT used on the Rust side (the Rust side of this is currently no-alloc)
     - common.rs: basics like semaphores and recursive mutexes
     - timer_compat.rs: code to emulate timer related functionality
 - headers: headers found in the WiFi driver archive (bindings are generated from these)
-- libs: static libraries found in the WiFi driver archive (these get linked into the binary)
+- libs/espXXX: static libraries found in the WiFi driver archive (these get linked into the binary)
 - mkbindings.bat: generate the bindings / just calls `bindgen`
-- rom_functions.x: the WiFi driver uses some of these so it needs to get linked
-- esp32c3-wifi-link.x: the main linker script - needs to get cleaned up
-- examples/dhcp.rs: example using the code
+- espXXX_rom_functions.x: the WiFi driver uses some of these so it needs to get linked
+- esp32c3-wifi-link.x: the main linker script for ESP32C3 - needs to get cleaned up and ideally the changes move to ESP-HAL
+- esp32-wifi-link.x: the main linker script for ESP32 - needs to get cleaned up and ideally the changes move to ESP-HAL
+- examples/dhcp_espXXX/main.rs: example using the code (per chip)
 
 ## Missing / To be done
-- separating chip specific / architecture specific code (and create implementations for others)
+- lots of refactoring
 - Bluetooth (and coex)
 - esp-now
 - powersafe support

@@ -1,19 +1,26 @@
 [package]
-name = "esp32c3-wifi-rs"
+name = "esp-wifi-rs"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-riscv = "0.7.0"
-
 embedded-hal = "0.2.3"
 nb = "1.0.0"
 void = { version = "1.0.2", default-features = false }
 
-hal = { package="esp32c3-hal", git = "https://github.com/esp-rs/esp-hal", rev = "02c5f4564b0fca1321b18e98e66e124a0b276643", features = [ "normalboot" ] }
-riscv-rt = { version = "0.8.1" }
+esp32c3-hal = { package="esp32c3-hal", git = "https://github.com/esp-rs/esp-hal", rev = "43c8f34e5f532bf6edd5cc23fef8e27c7a60c571", optional = true }
+esp32-hal = { package="esp32-hal", git = "https://github.com/esp-rs/esp-hal", rev = "43c8f34e5f532bf6edd5cc23fef8e27c7a60c571", optional = true }
+riscv-rt = { version = "0.8.1", optional = true }
+riscv = { version = "0.7.0", optional = true }
+xtensa-lx-rt = { version = "0.11.0", optional = true }
+xtensa-lx = { version = "0.6.0", optional = true }
 smoltcp = { version = "0.8.0", default-features=false, features = ["proto-igmp", "proto-ipv4", "socket-tcp", "socket-icmp", "socket-udp", "medium-ethernet", "proto-dhcpv4", "socket-raw", "socket-dhcpv4"] }
-critical-section = "0.2.5"
+critical-section = "0.2.6"
 
 [build-dependencies]
-riscv-target = "0.1.2"
+riscv-target = { version = "0.1.2", optional = true }
+
+[features]
+default = []
+esp32c3 = [ "riscv-target", "riscv", "riscv-rt", "esp32c3-hal" ]
+esp32 = [ "esp32-hal", "xtensa-lx-rt", "xtensa-lx", "critical-section/custom-impl" ]

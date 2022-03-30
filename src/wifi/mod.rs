@@ -1,29 +1,49 @@
 pub mod os_adapter;
-use hal::Rng;
+#[cfg(feature = "esp32")]
+use esp32_hal as hal;
+#[cfg(feature = "esp32")]
+use esp32_hal::Rng;
+#[cfg(feature = "esp32c3")]
+use esp32c3_hal as hal;
+#[cfg(feature = "esp32c3")]
+use esp32c3_hal::Rng;
 pub use os_adapter::*;
 use smoltcp::phy::{Device, DeviceCapabilities, RxToken, TxToken};
-mod phy_init_data;
+#[cfg(feature = "esp32")]
+mod phy_init_data_esp32;
+#[cfg(feature = "esp32c3")]
+mod phy_init_data_esp32c3;
+
+#[cfg(feature = "esp32")] // TODO for ESP32 we should support multicore
+mod critical_section_xtensa_singlecore;
+
+#[cfg(feature = "esp32")]
+mod additional_esp32;
 
 use crate::{
     binary::include::{
         __BindgenBitfieldUnit, esp_err_t, esp_interface_t_ESP_IF_WIFI_STA, esp_supplicant_init,
         esp_wifi_connect, esp_wifi_init_internal, esp_wifi_internal_free_rx_buffer,
-        esp_wifi_internal_reg_rxcb, esp_wifi_internal_set_log_level, esp_wifi_internal_set_log_mod,
-        esp_wifi_internal_tx, esp_wifi_scan_start, esp_wifi_set_config, esp_wifi_set_country,
-        esp_wifi_set_mode, esp_wifi_set_ps, esp_wifi_set_tx_done_cb, esp_wifi_start, esp_wifi_stop,
-        g_wifi_default_wpa_crypto_funcs, u_int32_t, wifi_active_scan_time_t,
+        esp_wifi_internal_reg_rxcb, esp_wifi_internal_tx, esp_wifi_scan_start, esp_wifi_set_config,
+        esp_wifi_set_country, esp_wifi_set_mode, esp_wifi_set_ps, esp_wifi_set_tx_done_cb,
+        esp_wifi_start, esp_wifi_stop, g_wifi_default_wpa_crypto_funcs, wifi_active_scan_time_t,
         wifi_auth_mode_t_WIFI_AUTH_OPEN, wifi_config_t,
         wifi_country_policy_t_WIFI_COUNTRY_POLICY_MANUAL, wifi_country_t, wifi_init_config_t,
-        wifi_interface_t_WIFI_IF_STA, wifi_log_level_t, wifi_log_module_t_WIFI_LOG_MODULE_ALL,
-        wifi_mode_t_WIFI_MODE_STA, wifi_osi_funcs_t, wifi_pmf_config_t,
-        wifi_ps_type_t_WIFI_PS_NONE, wifi_scan_config_t, wifi_scan_method_t_WIFI_FAST_SCAN,
-        wifi_scan_threshold_t, wifi_scan_time_t, wifi_scan_type_t_WIFI_SCAN_TYPE_ACTIVE,
-        wifi_sort_method_t_WIFI_CONNECT_AP_BY_SIGNAL, wifi_sta_config_t, wpa_crypto_funcs_t,
-        ESP_WIFI_OS_ADAPTER_MAGIC, ESP_WIFI_OS_ADAPTER_VERSION, WIFI_INIT_CONFIG_MAGIC,
-        WIFI_LOG_SUBMODULE_ALL,
+        wifi_interface_t_WIFI_IF_STA, wifi_mode_t_WIFI_MODE_STA, wifi_osi_funcs_t,
+        wifi_pmf_config_t, wifi_ps_type_t_WIFI_PS_NONE, wifi_scan_config_t,
+        wifi_scan_method_t_WIFI_FAST_SCAN, wifi_scan_threshold_t, wifi_scan_time_t,
+        wifi_scan_type_t_WIFI_SCAN_TYPE_ACTIVE, wifi_sort_method_t_WIFI_CONNECT_AP_BY_SIGNAL,
+        wifi_sta_config_t, wpa_crypto_funcs_t, ESP_WIFI_OS_ADAPTER_MAGIC,
+        ESP_WIFI_OS_ADAPTER_VERSION, WIFI_INIT_CONFIG_MAGIC,
     },
     compat::queue::SimpleQueue,
     debug, print, println, verbose,
+};
+
+#[cfg(feature = "esp32c3")]
+use crate::binary::include::{
+    esp_wifi_internal_set_log_level, esp_wifi_internal_set_log_mod, u_int32_t, wifi_log_level_t,
+    wifi_log_module_t_WIFI_LOG_MODULE_ALL, WIFI_LOG_SUBMODULE_ALL,
 };
 
 extern "C" {
@@ -57,11 +77,17 @@ pub fn init_rng(rng: hal::pac::RNG) {
     }
 }
 
-pub fn wifi_set_log_verbose() {
-    let g_wifi_log_submodule: u_int32_t = WIFI_LOG_SUBMODULE_ALL;
-    let level: wifi_log_level_t = crate::binary::include::wifi_log_level_t_WIFI_LOG_VERBOSE;
+pub fn init_clocks() {
+    crate::wifi::os_adapter::os_adapter_chip_specific::init_clocks();
+}
 
+pub fn wifi_set_log_verbose() {
+    // really bad things happen on ESP32!
+    #[cfg(feature = "esp32c3")]
     unsafe {
+        let g_wifi_log_submodule: u_int32_t = WIFI_LOG_SUBMODULE_ALL;
+        let level: wifi_log_level_t = crate::binary::include::wifi_log_level_t_WIFI_LOG_VERBOSE;
+
         esp_wifi_internal_set_log_level(level);
         esp_wifi_internal_set_log_mod(
             wifi_log_module_t_WIFI_LOG_MODULE_ALL,
@@ -187,7 +213,16 @@ static g_wifi_osi_funcs: wifi_osi_funcs_t = wifi_osi_funcs_t {
     _coex_schm_curr_phase_get: Some(coex_schm_curr_phase_get),
     _coex_schm_curr_phase_idx_set: Some(coex_schm_curr_phase_idx_set),
     _coex_schm_curr_phase_idx_get: Some(coex_schm_curr_phase_idx_get),
+    #[cfg(feature = "esp32c3")]
     _slowclk_cal_get: Some(slowclk_cal_get),
+    #[cfg(feature = "esp32")]
+    _phy_common_clock_disable: Some(
+        crate::wifi::os_adapter::os_adapter_chip_specific::phy_common_clock_disable,
+    ),
+    #[cfg(feature = "esp32")]
+    _phy_common_clock_enable: Some(
+        crate::wifi::os_adapter::os_adapter_chip_specific::phy_common_clock_enable,
+    ),
     _magic: ESP_WIFI_OS_ADAPTER_MAGIC as i32,
 };
 
@@ -281,7 +316,6 @@ pub fn wifi_init() -> i32 {
         }
 
         wifi_set_log_verbose();
-
         let res = esp_supplicant_init();
         if res != 0 {
             return res;
@@ -340,6 +374,12 @@ pub fn wifi_init() -> i32 {
         debug!("s_wifi_task_hdl = {}", s_wifi_task_hdl);
         debug!("&s_wifi_task_hdl = {:p}", &s_wifi_task_hdl);
         s_wifi_task_hdl = 0;
+
+        #[cfg(feature = "esp32")]
+        {
+            static NVS_STRUCT: [u32; 12] = [0; 12];
+            additional_esp32::g_misc_nvs = &NVS_STRUCT as *const _ as *const u32 as u32;
+        }
 
         0
     }
@@ -452,30 +492,6 @@ pub fn wifi_connect(ssid: &str, password: &str) -> i32 {
 
 pub fn wifi_stop() -> i32 {
     unsafe { esp_wifi_stop() }
-}
-
-pub fn init_clocks() {
-    // CPU as 160Mhz
-    unsafe {
-        (*hal::pac::SYSTEM::PTR)
-            .cpu_per_conf
-            .modify(|_, w| w.cpuperiod_sel().bits(1).pll_freq_sel().set_bit());
-        (*hal::pac::SYSTEM::PTR)
-            .sysclk_conf
-            .modify(|_, w| w.soc_clk_sel().bits(1));
-    }
-
-    unsafe {
-        // PERIP_CLK_EN0
-        ((0x600c0000 + 0x10) as *mut u32).write_volatile(0xffffffff);
-        // PERIP_CLK_EN1
-        ((0x600c0000 + 0x14) as *mut u32).write_volatile(0xffffffff);
-    }
-
-    // APB_CTRL_WIFI_CLK_EN_REG
-    unsafe {
-        ((0x60026000 + 0x14) as *mut u32).write_volatile(0xffffffff);
-    }
 }
 
 pub struct WifiDevice {}

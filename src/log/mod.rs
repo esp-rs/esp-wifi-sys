@@ -17,7 +17,7 @@ macro_rules! trace {
                 use core::fmt::Write;
 
                 unsafe {
-                    write!(crate::Uart, "{}: ", $crate::preempt::current_task()).ok();
+                    write!(crate::Uart, "{}: ", $crate::preempt::preempt::current_task()).ok();
                 }
                 write!(crate::Uart, $($arg)*).ok();
                 write!(crate::Uart, "\r\n").ok();
@@ -35,7 +35,7 @@ macro_rules! verbose {
                 use core::fmt::Write;
 
                 unsafe {
-                    write!(crate::Uart, "{}: ", $crate::preempt::current_task()).ok();
+                    write!(crate::Uart, "{}: ", $crate::preempt::preempt::current_task()).ok();
                 }
                 write!(crate::Uart, $($arg)*).ok();
                 write!(crate::Uart, "\r\n").ok();
@@ -53,7 +53,7 @@ macro_rules! debug {
                 use core::fmt::Write;
 
                 unsafe {
-                    write!(crate::Uart, "{}: ", $crate::preempt::current_task()).ok();
+                    write!(crate::Uart, "{}: ", $crate::preempt::preempt::current_task()).ok();
                 }
                 write!(crate::Uart, $($arg)*).ok();
                 write!(crate::Uart, "\r\n").ok();
