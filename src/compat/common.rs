@@ -3,7 +3,7 @@
 use crate::{
     binary::{c_types::c_void, include::OSI_FUNCS_TIME_BLOCKING},
     log,
-    preempt::current_task,
+    preempt::preempt::current_task,
     print, trace,
 };
 use core::{ffi::VaListImpl, fmt::Write};

@@ -1,4 +1,7 @@
 use embedded_hal::prelude::_embedded_hal_blocking_rng_Read;
+#[cfg_attr(feature = "esp32c3", path = "os_adapter_esp32c3.rs")]
+#[cfg_attr(feature = "esp32", path = "os_adapter_esp32.rs")]
+pub(crate) mod os_adapter_chip_specific;
 
 use crate::{
     binary::include::*,
@@ -15,8 +18,8 @@ use crate::{
         },
         work_queue::queue_work,
     },
-    trace,
-    wifi::{phy_init_data::PHY_INIT_DATA_DEFAULT, RANDOM_GENERATOR},
+    debug, trace,
+    wifi::RANDOM_GENERATOR,
 };
 
 pub static mut WIFI_STATE: i32 = -1;
@@ -103,19 +106,12 @@ pub unsafe extern "C" fn set_intr(cpu_no: i32, intr_source: u32, intr_num: u32, 
         intr_prio
     );
 
-    // esp32c3_bind_irq(intr_num, intr_source, intr_prio, ESP32C3_INT_LEVEL);
-
-    /* Disable the CPU interrupt. */
-    // resetbits(1 << cpuint, INTERRUPT_CPU_INT_ENABLE_REG);
-
-    /* Set the interrupt priority. */
-    ((0x600c2000 + 0x114 + intr_num * 4) as *mut u32).write_volatile(intr_prio as u32);
-
-    /* Set the interrupt type (Edge or Level). */
-    // ----
-
-    /* Map the CPU interrupt ID to the peripheral. */
-    ((0x600c2000 + intr_source * 4) as *mut u32).write_volatile(intr_num as u32);
+    crate::wifi::os_adapter::os_adapter_chip_specific::set_intr(
+        cpu_no,
+        intr_source,
+        intr_num,
+        intr_prio,
+    );
 }
 
 /****************************************************************************
@@ -127,6 +123,7 @@ pub unsafe extern "C" fn set_intr(cpu_no: i32, intr_source: u32, intr_num: u32, 
  ****************************************************************************/
 pub unsafe extern "C" fn clear_intr(_intr_source: u32, _intr_num: u32) {
     // original code does nothing here
+    crate::debug!("clear_intr called {} {}", _intr_source, _intr_num);
 }
 
 pub static mut ISR_INTERRUPT_1: (
@@ -157,6 +154,9 @@ pub unsafe extern "C" fn set_isr(
     trace!("set_isr - interrupt {} function {:p} arg {:p}", n, f, arg);
 
     match n {
+        0 => {
+            ISR_INTERRUPT_1 = (f, arg);
+        }
         1 => {
             ISR_INTERRUPT_1 = (f, arg);
         }
@@ -180,16 +180,7 @@ pub unsafe extern "C" fn set_isr(
 pub unsafe extern "C" fn ints_on(mask: u32) {
     trace!("ints_on {:x}", mask);
 
-    let cpuint = match mask {
-        2 => 1,
-        _ => panic!("ints_on mask {} not handled", mask),
-    };
-
-    trace!("ints_on n={}", cpuint);
-
-    (*hal::pac::INTERRUPT_CORE0::PTR)
-        .cpu_int_enable
-        .modify(|r, w| w.bits(r.bits() | 1 << cpuint));
+    crate::wifi::os_adapter::os_adapter_chip_specific::chip_ints_on(mask);
 }
 
 /****************************************************************************
@@ -282,20 +273,7 @@ pub unsafe extern "C" fn spin_lock_delete(lock: *mut crate::binary::c_types::c_v
 pub unsafe extern "C" fn wifi_int_disable(
     wifi_int_mux: *mut crate::binary::c_types::c_void,
 ) -> u32 {
-    let res = if riscv::register::mstatus::read().mie() {
-        1
-    } else {
-        0
-    };
-    riscv::interrupt::disable();
-
-    trace!(
-        "wifi_int_disable wifi_int_mux {:p} - return {}",
-        wifi_int_mux,
-        res,
-    );
-
-    res
+    crate::wifi::os_adapter::os_adapter_chip_specific::wifi_int_disable(wifi_int_mux)
 }
 
 /****************************************************************************
@@ -317,15 +295,7 @@ pub unsafe extern "C" fn wifi_int_restore(
     wifi_int_mux: *mut crate::binary::c_types::c_void,
     tmp: u32,
 ) {
-    trace!(
-        "wifi_int_restore wifi_int_mux {:p} tmp {}",
-        wifi_int_mux,
-        tmp
-    );
-
-    if tmp == 1 {
-        riscv::interrupt::enable();
-    }
+    crate::wifi::os_adapter::os_adapter_chip_specific::wifi_int_restore(wifi_int_mux, tmp)
 }
 
 /****************************************************************************
@@ -803,7 +773,7 @@ pub unsafe extern "C" fn task_create_pinned_to_core(
         core_id
     );
 
-    *(task_handle as *mut usize) = crate::preempt::current_task();
+    *(task_handle as *mut usize) = crate::preempt::preempt::current_task();
 
     queue_work(
         task_func,
@@ -905,7 +875,7 @@ pub unsafe extern "C" fn task_delay(tick: u32) {
  ****************************************************************************/
 pub unsafe extern "C" fn task_ms_to_tick(ms: u32) -> i32 {
     trace!("task_ms_to_tick ms {}", ms);
-    (ms * 16_000) as i32
+    (ms * crate::timer::TICKS_PER_SECOND as u32 / 1000) as i32
 }
 
 /****************************************************************************
@@ -922,7 +892,7 @@ pub unsafe extern "C" fn task_ms_to_tick(ms: u32) -> i32 {
  *
  ****************************************************************************/
 pub unsafe extern "C" fn task_get_current_task() -> *mut crate::binary::c_types::c_void {
-    let res = crate::preempt::current_task() as *mut crate::binary::c_types::c_void;
+    let res = crate::preempt::preempt::current_task() as *mut crate::binary::c_types::c_void;
     trace!("task get current task - return {:p}", res);
 
     res
@@ -1053,7 +1023,7 @@ pub unsafe extern "C" fn rand() -> u32 {
  *
  ****************************************************************************/
 pub unsafe extern "C" fn dport_access_stall_other_cpu_start_wrap() {
-    todo!("dport_access_stall_other_cpu_start_wrap")
+    trace!("dport_access_stall_other_cpu_start_wrap")
 }
 
 /****************************************************************************
@@ -1064,7 +1034,7 @@ pub unsafe extern "C" fn dport_access_stall_other_cpu_start_wrap() {
  *
  ****************************************************************************/
 pub unsafe extern "C" fn dport_access_stall_other_cpu_end_wrap() {
-    todo!("dport_access_stall_other_cpu_end_wrap")
+    trace!("dport_access_stall_other_cpu_end_wrap")
 }
 /****************************************************************************
  * Name: wifi_apb80m_request
@@ -1121,55 +1091,7 @@ pub unsafe extern "C" fn phy_enable() {
     // quite some code needed here
     trace!("phy_enable - not fully implemented");
 
-    static mut G_IS_PHY_CALIBRATED: bool = false;
-
-    let mut cal_data: [u8; core::mem::size_of::<esp_phy_calibration_data_t>()] =
-        [0u8; core::mem::size_of::<esp_phy_calibration_data_t>()];
-
-    let phy_version = get_phy_version_str();
-    trace!("phy_version {}", StrBuf::from(phy_version).as_str_ref());
-
-    critical_section::with(|_| {
-        phy_enable_clock();
-        phy_set_wifi_mode_only(true);
-
-        if G_IS_PHY_CALIBRATED == false {
-            let init_data = &PHY_INIT_DATA_DEFAULT;
-
-            register_chipv7_phy(
-                init_data,
-                &mut cal_data as *mut _ as *mut crate::binary::include::esp_phy_calibration_data_t,
-                esp_phy_calibration_mode_t_PHY_RF_CAL_FULL,
-            );
-
-            G_IS_PHY_CALIBRATED = true;
-        } else {
-            trace!("implement phy_digital_regs_load");
-            phy_wakeup_init();
-            //phy_digital_regs_load();
-            /*
-            static inline void phy_digital_regs_load(void)
-            {
-            if (g_phy_digital_regs_mem != NULL)
-                {
-                phy_dig_reg_backup(false, g_phy_digital_regs_mem);
-                }
-            }
-            */
-        }
-    });
-}
-
-unsafe fn phy_enable_clock() {
-    //modifyreg32(SYSTEM_WIFI_CLK_EN_REG, 0, SYSTEM_WIFI_CLK_WIFI_BT_COMMON_M);
-    trace!("phy_enable_clock");
-    // const SYSTEM_WIFI_CLK_EN_REG: u32 = 0x60026000 + 0x014;
-    critical_section::with(|_| {
-        // something wrong here? with this things will block in phy_enable!!!!! find out what's going on here???
-        //    (SYSTEM_WIFI_CLK_EN_REG as *mut u32).write_volatile(0x78078F);
-    });
-
-    trace!("phy_enable_clock done!");
+    crate::wifi::os_adapter::os_adapter_chip_specific::phy_enable();
 }
 
 /****************************************************************************
@@ -1204,31 +1126,7 @@ pub unsafe extern "C" fn phy_update_country_info(
 pub unsafe extern "C" fn read_mac(mac: *mut u8, type_: u32) -> crate::binary::c_types::c_int {
     trace!("read_mac {:p} {}", mac, type_);
 
-    let mut regval = [0u32; 2];
-    let data = &regval as *const _ as *const u8;
-    regval[0] = ((0x60008800 + 0x44) as *const u32).read_volatile();
-    regval[1] = ((0x60008800 + 0x48) as *const u32).read_volatile();
-
-    for i in 0..6 {
-        mac.offset(i)
-            .write_volatile(data.offset(5 - i).read_volatile());
-    }
-
-    /* ESP_MAC_WIFI_SOFTAP */
-    if type_ == 1 {
-        let tmp = mac.offset(0).read_volatile();
-        for i in 0..64 {
-            mac.offset(0).write_volatile(tmp | 0x02);
-            mac.offset(0)
-                .write_volatile(mac.offset(0).read_volatile() ^ (i << 2));
-
-            if mac.offset(0).read_volatile() != tmp {
-                break;
-            }
-        }
-    }
-
-    0
+    crate::wifi::os_adapter::os_adapter_chip_specific::read_mac(mac, type_)
 }
 
 /****************************************************************************
@@ -1367,12 +1265,8 @@ pub unsafe extern "C" fn wifi_reset_mac() {
  *
  ****************************************************************************/
 pub unsafe extern "C" fn wifi_clock_enable() {
-    // modifyreg32(SYSTEM_WIFI_CLK_EN_REG, 0, SYSTEM_WIFI_CLK_WIFI_EN_M);
     trace!("wifi_clock_enable");
-    // const SYSTEM_WIFI_CLK_EN_REG: u32 = 0x60026000 + 0x014;
-    critical_section::with(|_| {
-        //    (SYSTEM_WIFI_CLK_EN_REG as *mut u32).write_volatile(0);
-    });
+    crate::wifi::os_adapter::os_adapter_chip_specific::wifi_clock_enable();
 }
 
 /****************************************************************************
@@ -1389,7 +1283,8 @@ pub unsafe extern "C" fn wifi_clock_enable() {
  *
  ****************************************************************************/
 pub unsafe extern "C" fn wifi_clock_disable() {
-    trace!("wifi_clock_disable")
+    trace!("wifi_clock_disable");
+    crate::wifi::os_adapter::os_adapter_chip_specific::wifi_clock_disable();
 }
 
 /****************************************************************************
@@ -1430,7 +1325,7 @@ pub unsafe extern "C" fn wifi_rtc_disable_iso() {
 #[no_mangle]
 pub unsafe extern "C" fn esp_timer_get_time() -> i64 {
     trace!("esp_timer_get_time");
-    (crate::timer::get_systimer_count() / 16_000) as i64
+    (crate::timer::get_systimer_count() / crate::timer::TICKS_PER_SECOND / 1_000) as i64
 }
 
 /****************************************************************************
@@ -1453,7 +1348,8 @@ pub unsafe extern "C" fn nvs_set_i8(
     _key: *const crate::binary::c_types::c_char,
     _value: i8,
 ) -> crate::binary::c_types::c_int {
-    todo!("nvs_set_i8")
+    crate::debug!("nvs_set_i8");
+    -1
 }
 
 /****************************************************************************
@@ -1761,12 +1657,16 @@ pub unsafe extern "C" fn random() -> crate::binary::c_types::c_ulong {
  *
  ****************************************************************************/
 pub unsafe extern "C" fn log_write(
-    level: u32,
+    _level: u32,
     _tag: *const crate::binary::c_types::c_char,
     format: *const crate::binary::c_types::c_char,
-    args: ...
+    _args: ...
 ) {
-    syslog(level, format, args);
+    let s = StrBuf::from(format);
+    debug!("LOG: {}", s.as_str_ref());
+
+    #[cfg(feature = "esp32c3")]
+    syslog(_level, format, _args);
 }
 
 /****************************************************************************
@@ -1786,13 +1686,20 @@ pub unsafe extern "C" fn log_write(
  *
  ****************************************************************************/
 pub unsafe extern "C" fn log_writev(
-    level: u32,
+    _level: u32,
     _tag: *const crate::binary::c_types::c_char,
     format: *const crate::binary::c_types::c_char,
-    args: va_list,
+    _args: va_list,
 ) {
-    let args = core::mem::transmute(args);
-    syslog(level, format, args);
+    let s = StrBuf::from(format);
+    debug!("LOGV: {}", s.as_str_ref());
+
+    // TODO va_list on xtensa?
+    #[cfg(feature = "esp32c3")]
+    {
+        let _args = core::mem::transmute(_args);
+        syslog(_level, format, _args);
+    }
 }
 
 /****************************************************************************
@@ -1809,7 +1716,7 @@ pub unsafe extern "C" fn log_writev(
  *
  ****************************************************************************/
 pub unsafe extern "C" fn log_timestamp() -> u32 {
-    (crate::timer::get_systimer_count() / 16_000) as u32
+    (crate::timer::get_systimer_count() / crate::timer::TICKS_PER_SECOND / 1_000) as u32
 }
 
 /****************************************************************************
@@ -2256,13 +2163,16 @@ pub unsafe extern "C" fn puts(s: *const u8) {
     trace!("{}", cstr.as_str_ref());
 }
 
-// fix signature
 #[no_mangle]
 pub unsafe extern "C" fn sprintf(dst: *mut u8, format: *const u8, args: ...) -> i32 {
     let str = StrBuf::from(format);
     trace!("sprintf {}", str.as_str_ref());
 
     let len = crate::compat::common::vsnprintf(dst, 511, format, args);
+
+    let s = StrBuf::from(dst);
+    trace!("sprintf {}", s.as_str_ref());
+
     len
 }
 
