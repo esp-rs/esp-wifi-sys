@@ -6,9 +6,9 @@
 use core::{arch::asm, fmt::Write};
 
 use esp32c3_hal::{interrupt::TrapFrame, pac::Peripherals, RtcCntl, Serial};
-use esp_wifi_rs::wifi::{get_sta_mac, init_clocks, init_rng};
-use esp_wifi_rs::Uart;
-use esp_wifi_rs::{
+use esp_wifi::wifi::{get_sta_mac, init_clocks, init_rng};
+use esp_wifi::Uart;
+use esp_wifi::{
     binary, compat, println,
     tasks::init_tasks,
     timer::{get_systimer_count, init_intr11, setup_timer_isr},

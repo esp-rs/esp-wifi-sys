@@ -7,14 +7,15 @@ use std::path::PathBuf;
 fn main() {
     // Put the linker script somewhere the linker can find it
     let out = &PathBuf::from(env::var_os("OUT_DIR").unwrap());
+
     File::create(out.join("esp32c3_rom_functions.x"))
         .unwrap()
-        .write_all(include_bytes!("esp32c3_rom_functions.x"))
+        .write_all(include_bytes!("ld/esp32c3/rom_functions.x"))
         .unwrap();
 
     File::create(out.join("esp32c3-wifi-link.x"))
         .unwrap()
-        .write_all(include_bytes!("esp32c3-wifi-link.x"))
+        .write_all(include_bytes!("ld/esp32c3/wifi-link.x"))
         .unwrap();
 
     println!("cargo:rustc-link-search={}", out.display());
@@ -28,14 +29,15 @@ fn main() {
 fn main() {
     // Put the linker script somewhere the linker can find it
     let out = &PathBuf::from(env::var_os("OUT_DIR").unwrap());
+
     File::create(out.join("esp32_rom_functions.x"))
         .unwrap()
-        .write_all(include_bytes!("esp32_rom_functions.x"))
+        .write_all(include_bytes!("ld/esp32/rom_functions.x"))
         .unwrap();
 
     File::create(out.join("esp32-wifi-link.x"))
         .unwrap()
-        .write_all(include_bytes!("esp32-wifi-link.x"))
+        .write_all(include_bytes!("ld/esp32/wifi-link.x"))
         .unwrap();
 
     println!("cargo:rustc-link-search={}", out.display());

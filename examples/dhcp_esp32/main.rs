@@ -2,9 +2,9 @@
 #![no_main]
 
 use esp32_hal::{pac::Peripherals, RtcCntl};
-use esp_wifi_rs::wifi::{get_sta_mac, init_rng};
-use esp_wifi_rs::Uart;
-use esp_wifi_rs::{
+use esp_wifi::wifi::{get_sta_mac, init_rng};
+use esp_wifi::Uart;
+use esp_wifi::{
     binary, compat, println,
     tasks::init_tasks,
     timer::{get_systimer_count, setup_timer_isr},

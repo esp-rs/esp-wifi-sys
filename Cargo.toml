@@ -1,5 +1,5 @@
 [package]
-name = "esp-wifi-rs"
+name = "esp-wifi"
 version = "0.1.0"
 edition = "2021"
 
