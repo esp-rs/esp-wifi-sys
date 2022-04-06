@@ -6,6 +6,7 @@ use crate::timer::get_systimer_count;
 use crate::wifi::send_data_if_needed;
 use crate::{
     compat::{self, timer_compat::TIMERS},
+    memory_fence::memory_fence,
     trace,
 };
 
@@ -32,6 +33,7 @@ pub extern "C" fn worker_task2() {
 
         critical_section::with(|_| unsafe {
             for i in 0..TIMERS.len() {
+                memory_fence();
                 TIMERS[i] = match &TIMERS[i] {
                     Some(old) => {
                         if old.active && get_systimer_count() >= old.expire {

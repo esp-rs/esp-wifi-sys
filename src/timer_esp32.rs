@@ -1,5 +1,7 @@
 use crate::preempt::preempt::task_switch;
 use crate::trace;
+use atomic_polyfill::AtomicU64;
+use atomic_polyfill::Ordering;
 use core::cell::RefCell;
 use esp32_hal::pac::{self, Peripherals, TIMG1};
 use esp32_hal::prelude::_embedded_hal_timer_CountDown;
@@ -8,17 +10,18 @@ use esp32_hal::{interrupt, Cpu};
 use xtensa_lx::mutex::{Mutex, SpinLockMutex};
 use xtensa_lx_rt::exception::Context;
 
-pub const TICKS_PER_SECOND: u64 = 40_000_000;
+// this CAN'T BE correct but this is how it works - figure this out
+pub const TICKS_PER_SECOND: u64 = 4_000_000;
 
 const TIMER_DELAY: u64 = 40_000u64;
 
 static mut TIMER1: SpinLockMutex<RefCell<Option<Timer<TIMG1>>>> =
     SpinLockMutex::new(RefCell::new(None));
 
-static mut TIME: u64 = 0;
+static mut TIME: AtomicU64 = AtomicU64::new(0);
 
 pub fn get_systimer_count() -> u64 {
-    unsafe { TIME + read_timer_value() }
+    unsafe { TIME.load(Ordering::Relaxed) + read_timer_value() }
 }
 
 fn read_timer_value() -> u64 {
@@ -57,6 +60,10 @@ pub fn setup_timer_isr(timg1: TIMG1) {
                 | xtensa_lx_rt::interrupt::CpuInterruptLevel::Level6.mask(),
         );
     }
+
+    while unsafe {
+        crate::preempt::preempt::FIRST_SWITCH.load(core::sync::atomic::Ordering::Relaxed)
+    } {}
 }
 
 #[no_mangle]
@@ -90,7 +97,10 @@ pub fn level2_interrupt(context: &mut Context) {
     );
 
     unsafe {
-        TIME += read_timer_value();
+        TIME.store(
+            TIME.load(Ordering::Relaxed) + read_timer_value(),
+            Ordering::Relaxed,
+        );
     }
 
     task_switch(context);

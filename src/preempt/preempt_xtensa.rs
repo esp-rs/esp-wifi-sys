@@ -1,3 +1,4 @@
+use atomic_polyfill::*;
 use xtensa_lx_rt::exception::Context;
 
 #[derive(Debug, Clone, Copy)]
@@ -10,7 +11,7 @@ const MAX_TASK: usize = 3;
 
 pub static mut TASK_STACK: [u8; STACK_SIZE * MAX_TASK] = [0x0u8; STACK_SIZE * MAX_TASK];
 
-pub static mut FIRST_SWITCH: bool = true;
+pub static mut FIRST_SWITCH: AtomicBool = AtomicBool::new(true);
 
 pub static mut TASK_TOP: usize = 0;
 
@@ -230,8 +231,8 @@ pub fn next_task() {
 
 pub fn task_switch(trap_frame: &mut Context) {
     unsafe {
-        if FIRST_SWITCH {
-            FIRST_SWITCH = false;
+        if FIRST_SWITCH.load(Ordering::Relaxed) {
+            FIRST_SWITCH.store(false, Ordering::Relaxed);
             TASK_TOP += 1;
             CTX_NOW = TASK_TOP - 1;
         }
