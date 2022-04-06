@@ -1,5 +1,6 @@
 #![no_std]
 #![feature(c_variadic)]
+#![cfg_attr(target_arch = "xtensa", feature(asm_experimental_arch))]
 
 pub mod binary;
 pub mod compat;
@@ -11,6 +12,8 @@ pub mod timer;
 pub mod wifi;
 
 pub mod tasks;
+
+pub(crate) mod memory_fence;
 
 extern "C" {
     // ROM functions, see esp32c3-link.x

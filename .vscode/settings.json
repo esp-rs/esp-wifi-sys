@@ -3,4 +3,5 @@
     "rust-analyzer.cargo.features": [
         "esp32"
     ],
+    "rust-analyzer.cargo.target": "xtensa-esp32-none-elf",
 }

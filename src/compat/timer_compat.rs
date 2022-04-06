@@ -1,5 +1,6 @@
 use crate::{
     binary::include::{esp_timer_create_args_t, esp_timer_handle_t},
+    memory_fence::memory_fence,
     trace,
 };
 
@@ -32,8 +33,12 @@ pub fn compat_timer_arm_us(ptimer: *mut crate::binary::c_types::c_void, us: u32,
     let ticks = us as u64 * (crate::timer::TICKS_PER_SECOND / 1_000_000);
     crate::debug!("timer_arm_us {:p} {} {}", ptimer, ticks, repeat);
     critical_section::with(|_| unsafe {
+        memory_fence();
+
         for i in 0..TIMERS.len() {
             if let Some(mut timer) = TIMERS[i] {
+                memory_fence();
+
                 if timer.ptimer == ptimer {
                     trace!("found timer ...");
                     timer.expire = ticks as u64 + crate::timer::get_systimer_count();
@@ -52,7 +57,10 @@ pub fn compat_timer_arm_us(ptimer: *mut crate::binary::c_types::c_void, us: u32,
 pub fn compat_timer_disarm(ptimer: *mut crate::binary::c_types::c_void) {
     crate::debug!("timer_disarm {:p}", ptimer);
     critical_section::with(|_| unsafe {
+        memory_fence();
+
         for i in 0..TIMERS.len() {
+            memory_fence();
             if let Some(mut timer) = TIMERS[i] {
                 if timer.ptimer == ptimer {
                     trace!("found timer ...");
@@ -68,7 +76,11 @@ pub fn compat_timer_disarm(ptimer: *mut crate::binary::c_types::c_void) {
 pub fn compat_timer_done(ptimer: *mut crate::binary::c_types::c_void) {
     crate::debug!("timer_done {:p}", ptimer);
     critical_section::with(|_| unsafe {
+        memory_fence();
+
         for i in 0..TIMERS.len() {
+            memory_fence();
+
             if let Some(timer) = TIMERS[i] {
                 if timer.ptimer == ptimer {
                     trace!("found timer ...");
@@ -93,7 +105,11 @@ pub fn compat_timer_setfn(
             (*ets_timer).priv_ = core::ptr::null_mut();
 
             let mut success = false;
+            memory_fence();
+
             for i in 0..TIMERS.len() {
+                memory_fence();
+
                 if TIMERS[i].is_none() {
                     TIMERS[i] = Some(Timer {
                         ptimer: ptimer,
@@ -134,7 +150,11 @@ pub fn compat_esp_timer_create(
 
     critical_section::with(|_| unsafe {
         let mut success = false;
+        memory_fence();
+
         for i in 0..TIMERS.len() {
+            memory_fence();
+
             crate::debug!("esp_timer_create {}", i);
             if TIMERS[i].is_none() {
                 TIMERS[i] = Some(Timer {

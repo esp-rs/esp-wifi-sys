@@ -1,3 +1,4 @@
+use crate::memory_fence::memory_fence;
 use crate::trace;
 
 extern "C" {
@@ -25,6 +26,7 @@ pub unsafe extern "C" fn malloc(size: u32) -> *const u8 {
         // try to find a previously freed block
         let mut reused = 0 as *const u8;
         for allocation in ALLOCATIONS.iter_mut() {
+            memory_fence();
             match allocation {
                 Some(ref mut allocation) => {
                     if allocation.free && aligned_size <= allocation.size as u32 {
@@ -73,10 +75,13 @@ pub unsafe extern "C" fn free(ptr: *const u8) {
     }
 
     critical_section::with(|_critical_section| {
-        let alloced_idx = ALLOCATIONS
-            .iter()
-            .enumerate()
-            .find(|(_, allocation)| allocation.is_some() && allocation.unwrap().address == ptr);
+        memory_fence();
+
+        let alloced_idx = ALLOCATIONS.iter().enumerate().find(|(_, allocation)| {
+            memory_fence();
+            let addr = allocation.unwrap().address;
+            allocation.is_some() && addr == ptr
+        });
 
         if alloced_idx.is_some() {
             let alloced_idx = alloced_idx.unwrap().0;
@@ -91,7 +96,7 @@ pub unsafe extern "C" fn free(ptr: *const u8) {
                     .and_then(|v| Some(Allocation { free: true, ..v }));
             }
         } else {
-            panic!("freeing a memory area we don't know of");
+            panic!("freeing a memory area we don't know of. {:?}", ALLOCATIONS);
         }
     });
 }

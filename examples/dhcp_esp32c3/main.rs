@@ -60,9 +60,9 @@ fn main() -> ! {
     let res = wifi_start();
     println!("\n\n\nwifi_start returned {}", res);
 
-    // println!("Call wifi_start_scan");
-    // let res = wifi::wifi_start_scan();
-    // println!("wifi_start_scan returned {}", res);
+    println!("Call wifi_start_scan");
+    let res = wifi::wifi_start_scan();
+    println!("wifi_start_scan returned {}", res);
     print_scan_result();
     println!("\n\n\n\n");
 
