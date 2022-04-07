@@ -61,10 +61,14 @@ pub fn task_create(task: extern "C" fn()) -> usize {
         let i = TASK_TOP;
         TASK_TOP += 1;
         CTX_TASKS[i].pc = task as usize;
-        CTX_TASKS[i].trap_frame.sp = &TASK_STACK as *const _ as usize
+
+        // stack must be aligned by 16
+        let task_stack_ptr = &TASK_STACK as *const _ as usize
             + (STACK_SIZE as usize * i as usize)
             + STACK_SIZE as usize
             - 4;
+        let stack_ptr = task_stack_ptr - (task_stack_ptr % 0x10);
+        CTX_TASKS[i].trap_frame.sp = stack_ptr;
 
         CTX_NOW = i;
         i
