@@ -1,85 +1,51 @@
 use esp32c3_hal as hal;
 use esp32c3_hal::interrupt::TrapFrame;
-use esp32c3_hal::pac::Peripherals;
+use esp32c3_hal::pac::INTERRUPT_CORE0;
+use esp32c3_hal::pac::SYSTIMER;
 
-use crate::{binary, preempt::preempt::task_switch, trace, Uart};
-use core::fmt::Write;
+use crate::{binary, preempt::preempt::task_switch, trace};
 
 pub const TICKS_PER_SECOND: u64 = 16_000_000;
 
-pub fn init_intr11(peripherals: &Peripherals) {
-    // esp32c3_wl_init sets an interrupt handler - not clear who generates the interrupt etc.
-    // seems unused - check and remove
-
-    peripherals
-        .INTERRUPT_CORE0
-        .cpu_int_pri_11
-        .write(|w| unsafe { w.bits(2) }); // PRIO = 2
-    peripherals
-        .INTERRUPT_CORE0
-        .cpu_int_enable
-        .modify(|r, w| unsafe { w.bits(r.bits() | (1 << 11)) }); // ENABLE INT 11
-
-    peripherals
-        .SYSTEM
-        .cpu_intr_from_cpu_0
-        .write(|w| unsafe { w.bits(1) });
-}
-
-pub fn setup_timer_isr(peripherals: &Peripherals) {
+pub fn setup_timer_isr(systimer: &mut SYSTIMER, interrupt_core0: &mut INTERRUPT_CORE0) {
     // set systimer to 0
-    peripherals
-        .SYSTIMER
-        .unit0_load_lo
-        .write(|w| unsafe { w.bits(0) });
-    peripherals
-        .SYSTIMER
-        .unit0_load_hi
-        .write(|w| unsafe { w.bits(0) });
-    peripherals
-        .SYSTIMER
-        .unit0_load
-        .write(|w| unsafe { w.bits(1) });
+    systimer.unit0_load_lo.write(|w| unsafe { w.bits(0) });
+    systimer.unit0_load_hi.write(|w| unsafe { w.bits(0) });
+    systimer.unit0_load.write(|w| unsafe { w.bits(1) });
 
     // PERIOD_MODE + PERIOD
-    peripherals
-        .SYSTIMER
+    systimer
         .target0_conf
         .write(|w| unsafe { w.bits((1 << 30) | 20_000) });
     // LOAD CONF VALUE
-    peripherals
-        .SYSTIMER
-        .comp0_load
-        .write(|w| unsafe { w.bits(1) });
+    systimer.comp0_load.write(|w| unsafe { w.bits(1) });
     // set SYSTIMER_TARGET0_WORK_EN + UNIT0_WORK_EN
-    peripherals
-        .SYSTIMER
+    systimer
         .conf
         .write(|w| unsafe { w.bits(1 << 24 | 1 << 30) });
 
-    peripherals
-        .SYSTIMER
-        .int_clr
-        .write(|w| unsafe { w.bits(1 << 0) });
+    systimer.int_clr.write(|w| unsafe { w.bits(1 << 0) });
 
     // TARGET0 INT ENA
-    peripherals
-        .SYSTIMER
-        .int_ena
-        .write(|w| unsafe { w.bits(1 << 0) });
+    systimer.int_ena.write(|w| unsafe { w.bits(1 << 0) });
 
-    peripherals
-        .INTERRUPT_CORE0
+    interrupt_core0
         .systimer_target0_int_map
         .write(|w| unsafe { w.bits(10) });
-    peripherals
-        .INTERRUPT_CORE0
+    interrupt_core0
         .cpu_int_pri_10
         .write(|w| unsafe { w.bits(1) }); // PRIO = 1
-    peripherals
-        .INTERRUPT_CORE0
+    interrupt_core0
         .cpu_int_enable
         .write(|w| unsafe { w.bits(1 << 10) }); // ENABLE INT 10
+
+    unsafe {
+        riscv::interrupt::enable();
+    }
+
+    while unsafe {
+        crate::preempt::preempt::FIRST_SWITCH.load(core::sync::atomic::Ordering::Relaxed)
+    } {}
 }
 
 #[no_mangle]
@@ -99,17 +65,6 @@ pub fn interrupt1(_trap_frame: &mut TrapFrame) {
 
         trace!("interrupt 1 done");
     };
-}
-
-#[no_mangle]
-pub fn interrupt2(_trap_frame: &mut TrapFrame) {
-    writeln!(Uart, "interrupt 2").ok();
-}
-
-// esp32c3_wl_init sets an interrupt handler - not clear who generates the interrupt etc.
-#[no_mangle]
-pub fn interrupt11(_trap_frame: &mut TrapFrame) {
-    writeln!(Uart, "interrupt 11").ok();
 }
 
 #[no_mangle]

@@ -1,3 +1,4 @@
+use atomic_polyfill::*;
 use esp32c3_hal::interrupt::TrapFrame;
 
 #[derive(Debug, Default, Clone, Copy)]
@@ -12,7 +13,7 @@ const MAX_TASK: usize = 3;
 
 static mut TASK_STACK: [u8; STACK_SIZE * MAX_TASK] = [0u8; STACK_SIZE * MAX_TASK];
 
-static mut FIRST_SWITCH: bool = true;
+pub static mut FIRST_SWITCH: AtomicBool = AtomicBool::new(true);
 
 static mut TASK_TOP: usize = 0;
 
@@ -171,8 +172,8 @@ pub fn task_switch(trap_frame: &mut TrapFrame) {
     unsafe {
         let old_mepc = riscv::register::mepc::read();
 
-        if FIRST_SWITCH {
-            FIRST_SWITCH = false;
+        if FIRST_SWITCH.load(Ordering::Relaxed) {
+            FIRST_SWITCH.store(false, Ordering::Relaxed);
             let main_task = task_create_from_mepc(old_mepc);
             CTX_NOW = main_task;
         }

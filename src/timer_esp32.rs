@@ -3,7 +3,7 @@ use crate::trace;
 use atomic_polyfill::AtomicU64;
 use atomic_polyfill::Ordering;
 use core::cell::RefCell;
-use esp32_hal::pac::{self, Peripherals, TIMG1};
+use esp32_hal::pac::{self, TIMG1};
 use esp32_hal::prelude::_embedded_hal_timer_CountDown;
 use esp32_hal::Timer;
 use esp32_hal::{interrupt, Cpu};
@@ -31,11 +31,6 @@ fn read_timer_value() -> u64 {
         (*timg1).t0lo.read().bits() as u64 | (((*timg1).t0hi.read().bits() as u64) << 32u64)
     };
     value
-}
-
-pub fn init_intr11(_peripherals: &Peripherals) {
-    // probably even not needed on ESP32C3
-    todo!("init_intr11")
 }
 
 pub fn setup_timer_isr(timg1: TIMG1) {
