@@ -35,7 +35,7 @@ https://github.com/espressif/esp-wireless-drivers-3rdparty/archive/45701c0.zip
 
 This is even more experimental than support for ESP32C3.
 
-- There are no wifi-logs so you have to be a bit more patient when trying it out since there is no indication of progress. 
+- The WiFi logs only print the format string - not the actual values. 
 - Also there might be some packet loss and a bit worse performance than on ESP32C3 currently. 
 - The code runs on a single core and is currently not multi-core safe!
 

@@ -1,8 +1,8 @@
 use crate::compat::queue::SimpleQueue;
 use crate::compat::timer_compat::Timer;
-use crate::debug;
 use crate::preempt::preempt::task_create;
 use crate::timer::get_systimer_count;
+use crate::verbose;
 use crate::wifi::send_data_if_needed;
 use crate::{
     compat::{self, timer_compat::TIMERS},
@@ -37,7 +37,7 @@ pub extern "C" fn worker_task2() {
                 TIMERS[i] = match &TIMERS[i] {
                     Some(old) => {
                         if old.active && get_systimer_count() >= old.expire {
-                            debug!("timer is due.... {:p}", old.ptimer);
+                            verbose!("timer is due.... {:p}", old.ptimer);
                             let fnctn: fn(*mut crate::binary::c_types::c_void) =
                                 core::mem::transmute(old.timer_ptr);
                             to_run.enqueue((fnctn, old.arg_ptr));

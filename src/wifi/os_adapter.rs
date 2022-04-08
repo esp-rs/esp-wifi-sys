@@ -18,7 +18,7 @@ use crate::{
         },
         work_queue::queue_work,
     },
-    debug, trace,
+    trace,
     wifi::RANDOM_GENERATOR,
 };
 
@@ -1662,9 +1662,6 @@ pub unsafe extern "C" fn log_write(
     format: *const crate::binary::c_types::c_char,
     _args: ...
 ) {
-    let s = StrBuf::from(format);
-    debug!("LOG: {}", s.as_str_ref());
-
     #[cfg(feature = "esp32c3")]
     syslog(_level, format, _args);
 }
@@ -1691,10 +1688,12 @@ pub unsafe extern "C" fn log_writev(
     format: *const crate::binary::c_types::c_char,
     _args: va_list,
 ) {
-    let s = StrBuf::from(format);
-    debug!("LOGV: {}", s.as_str_ref());
+    #[cfg(feature = "esp32")]
+    {
+        let s = StrBuf::from(format);
+        crate::println!("{}", s.as_str_ref());
+    }
 
-    // TODO va_list on xtensa?
     #[cfg(feature = "esp32c3")]
     {
         let _args = core::mem::transmute(_args);
