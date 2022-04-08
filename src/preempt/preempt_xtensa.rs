@@ -6,18 +6,18 @@ pub struct TaskContext {
     trap_frame: Context,
 }
 
-pub const STACK_SIZE: usize = 8192 * 2;
+const STACK_SIZE: usize = 8192 * 2;
 const MAX_TASK: usize = 3;
 
-pub static mut TASK_STACK: [u8; STACK_SIZE * MAX_TASK] = [0x0u8; STACK_SIZE * MAX_TASK];
+static mut TASK_STACK: [u8; STACK_SIZE * MAX_TASK] = [0x0u8; STACK_SIZE * MAX_TASK];
 
 pub static mut FIRST_SWITCH: AtomicBool = AtomicBool::new(true);
 
-pub static mut TASK_TOP: usize = 0;
+static mut TASK_TOP: usize = 0;
 
-pub static mut CTX_NOW: usize = 0;
+static mut CTX_NOW: usize = 0;
 
-pub static mut CTX_TASKS: [TaskContext; MAX_TASK] = [TaskContext {
+static mut CTX_TASKS: [TaskContext; MAX_TASK] = [TaskContext {
     trap_frame: Context {
         PC: 0,
         PS: 0,

@@ -31,7 +31,6 @@ fn main() -> ! {
 
     init_rng(peripherals.RNG);
 
-    //let mut timer0 = Timer::new(peripherals.TIMG0);
     let mut rtc_cntl = RtcCntl::new(peripherals.RTC_CNTL);
 
     // Disable MWDT and RWDT (Watchdog) flash boot protection

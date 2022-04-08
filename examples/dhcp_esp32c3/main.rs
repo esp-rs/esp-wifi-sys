@@ -5,13 +5,13 @@
 
 use core::{arch::asm, fmt::Write};
 
-use esp32c3_hal::{interrupt::TrapFrame, pac::Peripherals, RtcCntl, Serial};
+use esp32c3_hal::{interrupt::TrapFrame, pac::Peripherals, RtcCntl};
 use esp_wifi::wifi::{get_sta_mac, init_clocks, init_rng};
 use esp_wifi::Uart;
 use esp_wifi::{
     binary, compat, println,
     tasks::init_tasks,
-    timer::{get_systimer_count, init_intr11, setup_timer_isr},
+    timer::{get_systimer_count, setup_timer_isr},
     wifi::{
         self, init_buffer, wifi_connect, wifi_init, wifi_set_log_verbose, wifi_start, WifiDevice,
     },
@@ -32,21 +32,20 @@ const PASSWORD: &str = env!("PASSWORD");
 
 #[entry]
 fn main() -> ! {
-    let peripherals = Peripherals::take().unwrap();
-    setup_timer_isr(&peripherals);
-    init_intr11(&peripherals);
+    let mut peripherals = Peripherals::take().unwrap();
+
     init_rng(peripherals.RNG);
 
     let mut rtc_cntl = RtcCntl::new(peripherals.RTC_CNTL);
-    let mut serial0 = Serial::new(peripherals.UART0).unwrap();
 
     // Disable watchdog timers
     rtc_cntl.set_super_wdt_enable(false);
     rtc_cntl.set_wdt_enable(false);
 
     init_tasks();
+    setup_timer_isr(&mut peripherals.SYSTIMER, &mut peripherals.INTERRUPT_CORE0);
 
-    writeln!(serial0, "About to make the first call ...").unwrap();
+    println!("About to make the first call ...");
     println!("Start!");
 
     wifi_set_log_verbose();

@@ -46,10 +46,6 @@ use crate::binary::include::{
     wifi_log_module_t_WIFI_LOG_MODULE_ALL, WIFI_LOG_SUBMODULE_ALL,
 };
 
-extern "C" {
-    static mut s_wifi_task_hdl: u32;
-}
-
 static DUMP_PACKETS: bool = false;
 
 struct DataFrame {
@@ -367,13 +363,6 @@ pub fn wifi_init() -> i32 {
         if res != 0 {
             return res;
         }
-
-        // unclear why? it should get initialized correctly by the driver
-        // but apparently it gets the wrong - maybe we run init on the wrong task
-        // but seems to not work otherwise
-        debug!("s_wifi_task_hdl = {}", s_wifi_task_hdl);
-        debug!("&s_wifi_task_hdl = {:p}", &s_wifi_task_hdl);
-        s_wifi_task_hdl = 0;
 
         #[cfg(feature = "esp32")]
         {

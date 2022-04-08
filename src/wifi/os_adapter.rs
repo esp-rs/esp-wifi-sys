@@ -773,7 +773,7 @@ pub unsafe extern "C" fn task_create_pinned_to_core(
         core_id
     );
 
-    *(task_handle as *mut usize) = crate::preempt::preempt::current_task();
+    *(task_handle as *mut usize) = 0; // we will run it in task 0
 
     queue_work(
         task_func,
