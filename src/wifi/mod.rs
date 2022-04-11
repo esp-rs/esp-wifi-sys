@@ -40,7 +40,6 @@ use crate::{
     debug, print, println, verbose,
 };
 
-#[cfg(feature = "esp32c3")]
 use crate::binary::include::{
     esp_wifi_internal_set_log_level, esp_wifi_internal_set_log_mod, u_int32_t, wifi_log_level_t,
     wifi_log_module_t_WIFI_LOG_MODULE_ALL, WIFI_LOG_SUBMODULE_ALL,
@@ -78,8 +77,6 @@ pub fn init_clocks() {
 }
 
 pub fn wifi_set_log_verbose() {
-    // really bad things happen on ESP32!
-    #[cfg(feature = "esp32c3")]
     unsafe {
         let g_wifi_log_submodule: u_int32_t = WIFI_LOG_SUBMODULE_ALL;
         let level: wifi_log_level_t = crate::binary::include::wifi_log_level_t_WIFI_LOG_VERBOSE;
