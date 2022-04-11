@@ -1,9 +1,15 @@
 #![allow(unused_variables)]
 #![allow(dead_code)]
 #![allow(non_snake_case)]
+use esp32_hal::ram;
+
 use crate::binary::include::*;
 use crate::trace;
 use crate::wifi::phy_init_data_esp32::PHY_INIT_DATA_DEFAULT;
+
+extern "C" {
+    pub fn ets_delay_us(delay: u32);
+}
 
 pub(crate) fn chip_ints_on(mask: u32) {
     trace!("chip_ints_on esp32");
@@ -12,6 +18,7 @@ pub(crate) fn chip_ints_on(mask: u32) {
     }
 }
 
+#[ram]
 pub(crate) fn init_clocks() {
     unsafe {
         let mut regval = getreg32(0x6001f048); /* DR_REG_BB_BASE+48 */
@@ -22,19 +29,20 @@ pub(crate) fn init_clocks() {
     let xtal_freq = 40; // RTC_XTAL_FREQ_40M;
     let source_freq_mhz = 480; // RTC_PLL_FREQ_480M;
 
-    //esp32_rtc_update_to_xtal(xtal_freq, 1);
+    esp32_rtc_update_to_xtal(xtal_freq, 1);
     esp32_rtc_bbpll_enable();
     esp32_rtc_bbpll_configure(xtal_freq, source_freq_mhz);
     set_cpu_freq(240);
+    // esp32_rtc_wait_for_slow_cycle();
 
     // make debug output show up again
     extern "C" {
         fn uart_div_modify(uart: u32, value: u32);
     }
     unsafe {
-        const UART_CLOCK_MHZ: u32 = 40;
+        const UART_CLOCK_MHZ: u32 = 80;
         uart_div_modify(0, ((UART_CLOCK_MHZ * 1_000_000) << 4) / 115200);
-        for _ in 0..20_000 {}
+        ets_delay_us(10);
     }
 }
 
@@ -134,6 +142,9 @@ const I2C_BBPLL_OC_LREF: u32 = 2;
 const I2C_BBPLL_OC_DIV_7_0: u32 = 3;
 const I2C_BBPLL_OC_DCUR: u32 = 5;
 
+const DELAY_PLL_DBIAS_RAISE: u32 = 3;
+
+#[ram]
 #[allow(unreachable_patterns)]
 fn esp32_rtc_bbpll_configure(xtal_freq: u32, pll_freq: u32) {
     unsafe {
@@ -158,12 +169,12 @@ fn esp32_rtc_bbpll_configure(xtal_freq: u32, pll_freq: u32) {
         if pll_freq == RTC_PLL_FREQ_320M {
             /* Raise the voltage, if needed */
 
-            // REG_SET_FIELD(
-            //     RTC_CNTL_REG,
-            //     RTC_CNTL_DIG_DBIAS_WAK_S,
-            //     RTC_CNTL_DIG_DBIAS_WAK_V,
-            //     DIG_DBIAS_80M_160M,
-            // );
+            reg_set_field(
+                RTC_CNTL_REG,
+                RTC_CNTL_DIG_DBIAS_WAK_S,
+                RTC_CNTL_DIG_DBIAS_WAK_V,
+                DIG_DBIAS_80M_160M,
+            );
 
             /* Configure 320M PLL */
             match xtal_freq {
@@ -219,17 +230,15 @@ fn esp32_rtc_bbpll_configure(xtal_freq: u32, pll_freq: u32) {
         } else {
             /* Raise the voltage */
 
-            // REG_SET_FIELD(
-            //     RTC_CNTL_REG,
-            //     RTC_CNTL_DIG_DBIAS_WAK_S,
-            //     RTC_CNTL_DIG_DBIAS_WAK_V,
-            //     DIG_DBIAS_240M,
-            // );
-            //ets_delay_us(DELAY_PLL_DBIAS_RAISE);
-            for _ in 0..100_000 {}
+            reg_set_field(
+                RTC_CNTL_REG,
+                RTC_CNTL_DIG_DBIAS_WAK_S,
+                RTC_CNTL_DIG_DBIAS_WAK_V,
+                DIG_DBIAS_240M,
+            );
+            ets_delay_us(DELAY_PLL_DBIAS_RAISE);
 
             /* Configure 480M PLL */
-
             match xtal_freq {
                 RTC_XTAL_FREQ_40M => {
                     div_ref = 0;
@@ -309,16 +318,17 @@ fn esp32_rtc_bbpll_configure(xtal_freq: u32, pll_freq: u32) {
     }
 }
 
+#[ram]
 fn esp32_rtc_bbpll_enable() {
     unsafe {
-        // modifyreg32(
-        //     RTC_CNTL_OPTIONS0_REG,
-        //     RTC_CNTL_BIAS_I2C_FORCE_PD
-        //         | RTC_CNTL_BB_I2C_FORCE_PD
-        //         | RTC_CNTL_BBPLL_FORCE_PD
-        //         | RTC_CNTL_BBPLL_I2C_FORCE_PD,
-        //     0,
-        // );
+        modifyreg32(
+            RTC_CNTL_OPTIONS0_REG,
+            RTC_CNTL_BIAS_I2C_FORCE_PD
+                | RTC_CNTL_BB_I2C_FORCE_PD
+                | RTC_CNTL_BBPLL_FORCE_PD
+                | RTC_CNTL_BBPLL_I2C_FORCE_PD,
+            0,
+        );
 
         /* reset BBPLL configuration */
         I2C_WRITEREG_RTC(
@@ -363,11 +373,12 @@ unsafe fn I2C_WRITEREG_RTC(block: u32, block_hostid: u32, reg_add: u32, indata: 
     rom_i2c_writeReg(block, block_hostid, reg_add, indata);
 }
 
+#[ram]
 fn esp32_rtc_update_to_xtal(freq: u32, div: u32) {
     unsafe {
         let value =
             (((freq * MHZ) >> 12) & UINT16_MAX) | ((((freq * MHZ) >> 12) & UINT16_MAX) << 16);
-        // esp32_update_cpu_freq(freq); // just for ets_delay_us
+        esp32_update_cpu_freq(freq);
         /* set divider from XTAL to APB clock */
         reg_set_field(
             APB_CTRL_SYSCLK_CONF_REG,
@@ -414,6 +425,7 @@ fn esp32_rtc_update_to_xtal(freq: u32, div: u32) {
     }
 }
 
+#[ram]
 fn set_cpu_freq(cpu_freq_mhz: u32) {
     unsafe {
         const RTC_CNTL_DBIAS_1V10: u32 = 4;
@@ -493,7 +505,7 @@ fn set_cpu_freq(cpu_freq_mhz: u32) {
         putreg32(value, RTC_APB_FREQ_REG);
 
         esp32_update_cpu_freq(cpu_freq_mhz);
-        // esp32_rtc_wait_for_slow_cycle();
+        //esp32_rtc_wait_for_slow_cycle();
     }
 }
 
@@ -527,19 +539,18 @@ fn esp32_update_cpu_freq(ticks_per_us: u32) {
 
 #[inline(always)]
 unsafe fn putreg32(v: u32, r: u32) {
-    //(r as *mut u32).write_volatile(v);
-    *(r as *mut u32) = v;
+    (r as *mut u32).write_volatile(v);
 }
 
 #[inline(always)]
 unsafe fn getreg32(r: u32) -> u32 {
-    *(r as *mut u32)
+    (r as *mut u32).read_volatile()
 }
 
 #[inline(always)]
 unsafe fn reg_set_field(r: u32, f_s: u32, f_v: u32, v: u32) {
     putreg32(
-        (getreg32(r) & !(f_v.wrapping_shl(f_s))) | (v & (f_v.wrapping_shl(f_s))),
+        (getreg32(r) & !(f_v.wrapping_shl(f_s))) | (v & f_v).wrapping_shl(f_s),
         r,
     );
 }
@@ -555,7 +566,7 @@ unsafe fn modifyreg32(addr: u32, clearbits: u32, setbits: u32) {
         let mut regval = getreg32(addr);
         regval &= !clearbits;
         regval |= setbits;
-        putreg32(addr, regval);
+        putreg32(regval, addr);
     });
 }
 
@@ -607,8 +618,9 @@ pub(crate) unsafe extern "C" fn phy_enable() {
     //trace!("phy_version {}", StrBuf::from(phy_version).as_str_ref());
 
     critical_section::with(|_| {
-        /* Update WiFi MAC time before WiFi/BT common clock is enabled */
-        //phy_update_wifi_mac_time(false, g_phy_rf_en_ts);
+        let g_phy_rf_en_ts = 0; // TODO
+                                /* Update WiFi MAC time before WiFi/BT common clock is enabled */
+        phy_update_wifi_mac_time(false, g_phy_rf_en_ts);
 
         phy_enable_clock();
         phy_set_wifi_mode_only(true);
@@ -619,7 +631,7 @@ pub(crate) unsafe extern "C" fn phy_enable() {
             register_chipv7_phy(
                 init_data,
                 &mut cal_data as *mut _ as *mut crate::binary::include::esp_phy_calibration_data_t,
-                esp_phy_calibration_mode_t_PHY_RF_CAL_FULL,
+                esp_phy_calibration_mode_t_PHY_RF_CAL_NONE,
             );
 
             G_IS_PHY_CALIBRATED = true;
@@ -655,15 +667,35 @@ pub(crate) unsafe extern "C" fn phy_enable() {
  *
  ****************************************************************************/
 pub(crate) unsafe fn phy_update_wifi_mac_time(en_clock_stopped: bool, now: i64) {
-    trace!("phy_update_wifi_mac_time not implemented");
+    trace!("phy_update_wifi_mac_time");
+
+    static mut G_COMMON_CLOCK_DISABLE_TIME: u32 = 0;
+
+    let diff: u32;
+
+    if en_clock_stopped {
+        G_COMMON_CLOCK_DISABLE_TIME = now as u32;
+    } else {
+        if G_COMMON_CLOCK_DISABLE_TIME != 0 {
+            diff = now as u32 - G_COMMON_CLOCK_DISABLE_TIME;
+            esp_wifi_internal_update_mac_time(diff);
+            G_COMMON_CLOCK_DISABLE_TIME = 0;
+        }
+    }
 }
 
 pub(crate) unsafe fn phy_enable_clock() {
     trace!("phy_enable_clock");
 
-    let ptr = DPORT_WIFI_CLK_EN_REG as *mut u32;
-    let old = ptr.read_volatile();
-    ptr.write_volatile(old | DPORT_WIFI_CLK_WIFI_BT_COMMON_M);
+    static mut ENABLE_CNT: u32 = 0;
+
+    if ENABLE_CNT == 0 {
+        let ptr = DPORT_WIFI_CLK_EN_REG as *mut u32;
+        let old = ptr.read_volatile();
+        ptr.write_volatile(old | DPORT_WIFI_CLK_WIFI_BT_COMMON_M);
+
+        ENABLE_CNT += 1;
+    }
 }
 
 pub(crate) unsafe extern "C" fn read_mac(

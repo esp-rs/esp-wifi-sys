@@ -71,7 +71,7 @@ macro_rules! println {
 
             write!(crate::Uart, $($arg)*).ok();
             write!(crate::Uart, "\r\n").ok();
-        }
+          }
     };
 }
 

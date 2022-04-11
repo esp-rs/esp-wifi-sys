@@ -2,7 +2,7 @@
 
 use crate::{
     binary::{c_types::c_void, include::OSI_FUNCS_TIME_BLOCKING},
-    log,
+    log, memory_fence,
     preempt::preempt::current_task,
     print, trace,
 };
@@ -229,7 +229,9 @@ unsafe extern "C" fn strnlen(chars: *const u8, maxlen: usize) -> usize {
 pub fn sem_create(max: u32, init: u32) -> *mut crate::binary::c_types::c_void {
     critical_section::with(|_| unsafe {
         let mut res = 0xffff;
+        memory_fence::memory_fence();
         for (i, sem) in CURR_SEM.iter().enumerate() {
+            memory_fence::memory_fence();
             if let None = *sem {
                 res = i;
                 break;
@@ -239,6 +241,7 @@ pub fn sem_create(max: u32, init: u32) -> *mut crate::binary::c_types::c_void {
         trace!("sem created res = {} (+1)", res);
 
         if res != 0xffff {
+            memory_fence::memory_fence();
             CURR_SEM[res] = Some(init);
             (res + 1) as *mut crate::binary::c_types::c_void
         } else {

@@ -875,7 +875,7 @@ pub unsafe extern "C" fn task_delay(tick: u32) {
  ****************************************************************************/
 pub unsafe extern "C" fn task_ms_to_tick(ms: u32) -> i32 {
     trace!("task_ms_to_tick ms {}", ms);
-    (ms * crate::timer::TICKS_PER_SECOND as u32 / 1000) as i32
+    (ms as u64 * crate::timer::TICKS_PER_SECOND / 1000) as i32
 }
 
 /****************************************************************************
@@ -1659,11 +1659,11 @@ pub unsafe extern "C" fn random() -> crate::binary::c_types::c_ulong {
 pub unsafe extern "C" fn log_write(
     _level: u32,
     _tag: *const crate::binary::c_types::c_char,
-    format: *const crate::binary::c_types::c_char,
+    _format: *const crate::binary::c_types::c_char,
     _args: ...
 ) {
     #[cfg(feature = "esp32c3")]
-    syslog(_level, format, _args);
+    syslog(_level, _format, _args);
 }
 
 /****************************************************************************

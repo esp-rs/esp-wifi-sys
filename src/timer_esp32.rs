@@ -10,8 +10,7 @@ use esp32_hal::{interrupt, Cpu};
 use xtensa_lx::mutex::{Mutex, SpinLockMutex};
 use xtensa_lx_rt::exception::Context;
 
-// this CAN'T BE correct but this is how it works - figure this out
-pub const TICKS_PER_SECOND: u64 = 4_000_000;
+pub const TICKS_PER_SECOND: u64 = 40_000_000;
 
 const TIMER_DELAY: u64 = 40_000u64;
 
@@ -41,8 +40,8 @@ pub fn setup_timer_isr(timg1: TIMG1) {
         pac::Interrupt::TG1_T0_LEVEL,
         interrupt::CpuInterrupt::Interrupt20LevelPriority2,
     );
-    timer1.start(TIMER_DELAY);
     timer1.listen();
+    timer1.start(TIMER_DELAY);
 
     unsafe {
         (&TIMER1).lock(|data| (*data).replace(Some(timer1)));
@@ -93,7 +92,7 @@ pub fn level2_interrupt(context: &mut Context) {
 
     unsafe {
         TIME.store(
-            TIME.load(Ordering::Relaxed) + read_timer_value(),
+            TIME.load(Ordering::Relaxed) + TIMER_DELAY,
             Ordering::Relaxed,
         );
     }
@@ -102,6 +101,8 @@ pub fn level2_interrupt(context: &mut Context) {
 
     unsafe {
         (&TIMER1).lock(|data| {
+            crate::memory_fence::memory_fence();
+
             let mut timer1 = data.borrow_mut();
             let timer1 = timer1.as_mut().unwrap();
             timer1.clear_interrupt();
