@@ -174,7 +174,7 @@ dependencies = [
 [[package]]
 name = "esp-hal-common"
 version = "0.1.0"
-source = "git+https://github.com/esp-rs/esp-hal?rev=43c8f34e5f532bf6edd5cc23fef8e27c7a60c571#43c8f34e5f532bf6edd5cc23fef8e27c7a60c571"
+source = "git+https://github.com/esp-rs/esp-hal?rev=033824391dddb2b7e9e201d14d2e587b84dd628d#033824391dddb2b7e9e201d14d2e587b84dd628d"
 dependencies = [
  "cfg-if",
  "embedded-hal",
@@ -193,7 +193,7 @@ dependencies = [
 [[package]]
 name = "esp-hal-procmacros"
 version = "0.1.0"
-source = "git+https://github.com/esp-rs/esp-hal?rev=43c8f34e5f532bf6edd5cc23fef8e27c7a60c571#43c8f34e5f532bf6edd5cc23fef8e27c7a60c571"
+source = "git+https://github.com/esp-rs/esp-hal?rev=033824391dddb2b7e9e201d14d2e587b84dd628d#033824391dddb2b7e9e201d14d2e587b84dd628d"
 dependencies = [
  "darling",
  "proc-macro-error",
@@ -235,7 +235,7 @@ dependencies = [
 [[package]]
 name = "esp32-hal"
 version = "0.1.0"
-source = "git+https://github.com/esp-rs/esp-hal?rev=43c8f34e5f532bf6edd5cc23fef8e27c7a60c571#43c8f34e5f532bf6edd5cc23fef8e27c7a60c571"
+source = "git+https://github.com/esp-rs/esp-hal?rev=033824391dddb2b7e9e201d14d2e587b84dd628d#033824391dddb2b7e9e201d14d2e587b84dd628d"
 dependencies = [
  "bare-metal 1.0.0",
  "embedded-hal",
@@ -260,7 +260,7 @@ dependencies = [
 [[package]]
 name = "esp32c3-hal"
 version = "0.1.0"
-source = "git+https://github.com/esp-rs/esp-hal?rev=43c8f34e5f532bf6edd5cc23fef8e27c7a60c571#43c8f34e5f532bf6edd5cc23fef8e27c7a60c571"
+source = "git+https://github.com/esp-rs/esp-hal?rev=033824391dddb2b7e9e201d14d2e587b84dd628d#033824391dddb2b7e9e201d14d2e587b84dd628d"
 dependencies = [
  "bare-metal 1.0.0",
  "embedded-hal",
