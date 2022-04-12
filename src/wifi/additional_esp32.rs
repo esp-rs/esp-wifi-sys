@@ -1,3 +1,5 @@
+use esp32_hal::ram;
+
 use crate::trace;
 
 /****************************************************************************
@@ -14,6 +16,7 @@ use crate::trace;
  *
  ****************************************************************************/
 
+#[ram]
 #[no_mangle]
 unsafe extern "C" fn esp_dport_access_reg_read(reg: u32) -> u32 {
     let res = (reg as *mut u32).read_volatile();
@@ -34,6 +37,7 @@ unsafe extern "C" fn esp_dport_access_reg_read(reg: u32) -> u32 {
  *   CPU PS value
  *
  ****************************************************************************/
+#[ram]
 #[no_mangle]
 unsafe extern "C" fn phy_enter_critical() -> u32 {
     trace!("phy_enter_critical");
@@ -54,14 +58,15 @@ unsafe extern "C" fn phy_enter_critical() -> u32 {
  *   None
  *
  ****************************************************************************/
-
+#[ram]
 #[no_mangle]
 unsafe extern "C" fn phy_exit_critical(level: u32) {
-    trace!("phy_exit_critical");
+    trace!("phy_exit_critical {}", level);
 
     critical_section::release(level as u8);
 }
 
+#[ram]
 #[no_mangle]
 unsafe extern "C" fn rtc_get_xtal() -> u32 {
     trace!("rtc_get_xtal - just hardcoded value 40 for now");
@@ -70,7 +75,7 @@ unsafe extern "C" fn rtc_get_xtal() -> u32 {
 
 #[no_mangle]
 unsafe extern "C" fn misc_nvs_deinit() {
-    todo!("misc_nvs_deinit")
+    trace!("misc_nvs_deinit")
 }
 
 #[no_mangle]

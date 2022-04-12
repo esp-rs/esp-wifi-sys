@@ -2,7 +2,7 @@
 #![no_main]
 
 use esp32_hal::{pac::Peripherals, RtcCntl};
-use esp_wifi::wifi::{get_sta_mac, init_rng};
+use esp_wifi::wifi::{get_sta_mac, init_clocks, init_rng};
 use esp_wifi::Uart;
 use esp_wifi::{
     binary, compat, println,
@@ -36,9 +36,8 @@ fn main() -> ! {
     // Disable MWDT and RWDT (Watchdog) flash boot protection
     rtc_cntl.set_wdt_global_enable(false);
 
-    // TODO this breaks things currently in phy_enable
-    //init_clocks();
-    //println!("init clocks done");
+    init_clocks();
+    println!("init clocks done");
 
     init_tasks();
     setup_timer_isr(peripherals.TIMG1);

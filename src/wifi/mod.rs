@@ -40,10 +40,7 @@ use crate::{
     debug, print, println, verbose,
 };
 
-use crate::binary::include::{
-    esp_wifi_internal_set_log_level, esp_wifi_internal_set_log_mod, u_int32_t, wifi_log_level_t,
-    wifi_log_module_t_WIFI_LOG_MODULE_ALL, WIFI_LOG_SUBMODULE_ALL,
-};
+use crate::binary::include::{esp_wifi_internal_set_log_level, wifi_log_level_t};
 
 static DUMP_PACKETS: bool = false;
 
@@ -78,15 +75,8 @@ pub fn init_clocks() {
 
 pub fn wifi_set_log_verbose() {
     unsafe {
-        let g_wifi_log_submodule: u_int32_t = WIFI_LOG_SUBMODULE_ALL;
         let level: wifi_log_level_t = crate::binary::include::wifi_log_level_t_WIFI_LOG_VERBOSE;
-
         esp_wifi_internal_set_log_level(level);
-        esp_wifi_internal_set_log_mod(
-            wifi_log_module_t_WIFI_LOG_MODULE_ALL,
-            g_wifi_log_submodule,
-            true,
-        );
     }
 }
 
@@ -363,7 +353,7 @@ pub fn wifi_init() -> i32 {
 
         #[cfg(feature = "esp32")]
         {
-            static NVS_STRUCT: [u32; 12] = [0; 12];
+            static mut NVS_STRUCT: [u32; 12] = [0; 12];
             additional_esp32::g_misc_nvs = &NVS_STRUCT as *const _ as *const u32 as u32;
         }
 
