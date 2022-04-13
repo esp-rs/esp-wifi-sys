@@ -2,24 +2,8 @@
 runner = "espflash --speed 921600 --monitor"
 
 rustflags = [
-    "-C", "link-arg=-Tesp32c3-wifi-link.x",
-    "-C", "link-arg=-Thal-defaults.x",
+    "-C", "link-arg=-Tlinkall.x",
     "-C", "link-arg=-Tesp32c3_rom_functions.x",
-
-    "-C", "link-arg=-L",
-    "-C", "link-arg=./libs/esp32c3/",
-    "-C", "link-arg=-lbtbb",
-    "-C", "link-arg=-lbtdm_app",
-    "-C", "link-arg=-lcoexist",
-    "-C", "link-arg=-lcore",
-    "-C", "link-arg=-lespnow",
-    "-C", "link-arg=-lmesh",
-    "-C", "link-arg=-lnet80211",
-    "-C", "link-arg=-lphy",
-    "-C", "link-arg=-lpp",
-    "-C", "link-arg=-lsmartconfig",
-    "-C", "link-arg=-lwapi",
-    "-C", "link-arg=-lwpa_supplicant",
 
     "-C", "force-frame-pointers",
 ]
@@ -28,24 +12,8 @@ rustflags = [
 runner = "espflash --speed 921600 --monitor"
 
 rustflags = [
-    "-C", "link-arg=-Tesp32-wifi-link.x",
-    "-C", "link-arg=-Thal-defaults.x",
+    "-C", "link-arg=-Tlinkall.x",
     "-C", "link-arg=-Tesp32_rom_functions.x",
-
-    "-C", "link-arg=-L",
-    "-C", "link-arg=./libs/esp32/",
-    #"-C", "link-arg=-lbtdm_app",
-    "-C", "link-arg=-lcoexist",
-    "-C", "link-arg=-lcore",
-    "-C", "link-arg=-lespnow",
-    #"-C", "link-arg=-lmesh",
-    "-C", "link-arg=-lnet80211",
-    "-C", "link-arg=-lphy",
-    "-C", "link-arg=-lpp",
-    "-C", "link-arg=-lrtc",
-    "-C", "link-arg=-lsmartconfig",
-    #"-C", "link-arg=-lwapi",
-    "-C", "link-arg=-lwpa_supplicant",
 ]
 
 [build]

@@ -31,7 +31,13 @@ https://github.com/espressif/esp-wireless-drivers-3rdparty/archive/45701c0.zip
 - scanning for WiFi access points
 - connect to WiFi access point
 
-## Note on ESP32 support
+## Notes on ESP32C3 support
+
+- uses SYSTIMER as the main timer
+- doesn't work in direct-boot mode
+- only works with target `riscv32i-unknown-none-elf`
+
+## Notes on ESP32 support
 
 This is even more experimental than support for ESP32C3.
 
@@ -55,7 +61,6 @@ On ESP32 currently TIMG1 is used as the main timer so you can't use it for anyth
 - `libs/espXXX`: static libraries found in the WiFi driver archive (these get linked into the binary)
 - `mkbindings.bat`: generate the bindings / just calls `bindgen`
 - `ld/espXXX/rom_functions.x`: the WiFi driver uses some of these so it needs to get linked
-- `ld/esp32c3/wifi-link.x`: the main linker script for ESP32C3 - needs to get cleaned up and ideally the changes move to ESP-HAL
 - `ld/esp32/wifi-link.x`: the main linker script for ESP32 - needs to get cleaned up and ideally the changes move to ESP-HAL
 - `examples/dhcp_espXXX/main.rs`: example using the code (per chip)
 

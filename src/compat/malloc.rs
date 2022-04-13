@@ -2,7 +2,7 @@ use crate::memory_fence::memory_fence;
 use crate::trace;
 
 extern "C" {
-    static _sheap: u8;
+    static _heap_start: u8;
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -18,7 +18,7 @@ static mut ALLOC_INDEX: isize = -1;
 pub unsafe extern "C" fn malloc(size: u32) -> *const u8 {
     trace!("malloc called {}", size);
 
-    let mut candidate_addr = &_sheap as *const u8;
+    let mut candidate_addr = &_heap_start as *const u8;
 
     critical_section::with(|_critical_section| {
         let aligned_size = size + if size % 8 != 0 { 8 - size % 8 } else { 0 };
