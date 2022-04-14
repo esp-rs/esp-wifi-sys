@@ -20,6 +20,9 @@ mod critical_section_xtensa_singlecore;
 #[cfg(feature = "esp32")]
 mod additional_esp32;
 
+#[cfg(feature = "utils")]
+pub mod utils;
+
 use crate::{
     binary::include::{
         __BindgenBitfieldUnit, esp_err_t, esp_interface_t_ESP_IF_WIFI_STA, esp_supplicant_init,
@@ -37,11 +40,13 @@ use crate::{
         ESP_WIFI_OS_ADAPTER_VERSION, WIFI_INIT_CONFIG_MAGIC,
     },
     compat::queue::SimpleQueue,
-    debug, print, println, verbose,
 };
+use crate::{tasks::init_tasks, timer::setup_timer_isr};
+use log::{debug, info};
 
-use crate::binary::include::{esp_wifi_internal_set_log_level, wifi_log_level_t};
-
+#[cfg(feature = "dump_packets")]
+static DUMP_PACKETS: bool = true;
+#[cfg(not(feature = "dump_packets"))]
 static DUMP_PACKETS: bool = false;
 
 struct DataFrame {
@@ -56,6 +61,55 @@ pub static mut TX_QUEUED: bool = false;
 pub static mut TX_QUEUED_DATA_LEN: u16 = 0;
 
 static mut RANDOM_GENERATOR: Option<Rng> = None;
+
+#[derive(Debug, Clone, Copy)]
+pub enum WifiError {
+    General(i32),
+}
+
+#[cfg(feature = "esp32c3")]
+pub fn initialize(
+    systimer: &mut esp32c3_hal::pac::SYSTIMER,
+    interrupt_core0: &mut esp32c3_hal::pac::INTERRUPT_CORE0,
+    rng: hal::pac::RNG,
+) -> Result<(), WifiError> {
+    init_rng(rng);
+    init_tasks();
+    setup_timer_isr(systimer, interrupt_core0);
+    wifi_set_log_verbose();
+    init_clocks();
+    init_buffer();
+    let res = wifi_init();
+    if res != 0 {
+        return Err(WifiError::General(res));
+    }
+    let res = wifi_start();
+    if res != 0 {
+        return Err(WifiError::General(res));
+    }
+
+    Ok(())
+}
+
+#[cfg(feature = "esp32")]
+pub fn initialize(timg1: esp32_hal::pac::TIMG1, rng: hal::pac::RNG) -> Result<(), WifiError> {
+    init_rng(rng);
+    init_tasks();
+    setup_timer_isr(timg1);
+    wifi_set_log_verbose();
+    init_clocks();
+    init_buffer();
+    let res = wifi_init();
+    if res != 0 {
+        return Err(WifiError::General(res));
+    }
+    let res = wifi_start();
+    if res != 0 {
+        return Err(WifiError::General(res));
+    }
+
+    Ok(())
+}
 
 pub fn init_buffer() {
     unsafe {
@@ -74,7 +128,10 @@ pub fn init_clocks() {
 }
 
 pub fn wifi_set_log_verbose() {
+    #[cfg(feature = "wifi_logs")]
     unsafe {
+        use crate::binary::include::{esp_wifi_internal_set_log_level, wifi_log_level_t};
+
         let level: wifi_log_level_t = crate::binary::include::wifi_log_level_t_WIFI_LOG_VERBOSE;
         esp_wifi_internal_set_log_level(level);
     }
@@ -378,7 +435,7 @@ unsafe extern "C" fn recv_cb(
                 });
 
                 esp_wifi_internal_free_rx_buffer(eb);
-                verbose!("esp_wifi_internal_free_rx_buffer done");
+                debug!("esp_wifi_internal_free_rx_buffer done");
             }
         }
     });
@@ -530,7 +587,7 @@ impl RxToken for WifiRxToken {
                         Some(mut data) => {
                             let buffer =
                                 core::slice::from_raw_parts(&data.data as *const u8, data.len);
-                            verbose!("received {:?}", _timestamp);
+                            debug!("received {:?}", _timestamp);
                             dump_packet_info(&buffer);
                             Some(f(&mut data.data[..]))
                         }
@@ -564,20 +621,17 @@ impl TxToken for WifiTxToken {
         let res = unsafe { f(&mut TX_BUFFER[..len]) };
 
         match res {
-            Ok(_) => {
-                critical_section::with(|_| unsafe {
-                    if !TX_QUEUED {
-                        TX_QUEUED_DATA_LEN = len as u16;
-                        TX_QUEUED = true;
-                    } else {
-                        // Err(smoltcp::Error::Exhausted)
-                    }
-                });
-            }
-            Err(_) => (),
-        };
-
-        res
+            Ok(_) => critical_section::with(|_| unsafe {
+                if !TX_QUEUED {
+                    TX_QUEUED_DATA_LEN = len as u16;
+                    TX_QUEUED = true;
+                    res
+                } else {
+                    Err(smoltcp::Error::Exhausted)
+                }
+            }),
+            Err(_) => res,
+        }
     }
 }
 
@@ -611,7 +665,7 @@ fn dump_packet_info(buffer: &[u8]) {
     }
 
     let ef = smoltcp::wire::EthernetFrame::new_unchecked(buffer);
-    println!(
+    info!(
         "src={:x?} dst={:x?} type={:x?}",
         ef.src_addr(),
         ef.dst_addr(),
@@ -620,7 +674,7 @@ fn dump_packet_info(buffer: &[u8]) {
     match ef.ethertype() {
         smoltcp::wire::EthernetProtocol::Ipv4 => {
             let ip = smoltcp::wire::Ipv4Packet::new_unchecked(ef.payload());
-            println!(
+            info!(
                 "src={:?} dst={:?} proto={:x?}",
                 ip.src_addr(),
                 ip.dst_addr(),
@@ -633,19 +687,11 @@ fn dump_packet_info(buffer: &[u8]) {
                 smoltcp::wire::IpProtocol::Igmp => {}
                 smoltcp::wire::IpProtocol::Tcp => {
                     let tp = smoltcp::wire::TcpPacket::new_unchecked(ip.payload());
-                    println!("src={:?} dst={:?}", tp.src_port(), tp.dst_port());
+                    info!("src={:?} dst={:?}", tp.src_port(), tp.dst_port());
                 }
                 smoltcp::wire::IpProtocol::Udp => {
                     let up = smoltcp::wire::UdpPacket::new_unchecked(ip.payload());
-                    println!("src={:?} dst={:?}", up.src_port(), up.dst_port());
-
-                    for c in up.payload() {
-                        if *c >= 32 {
-                            print!("{}", *c as char);
-                        } else {
-                            print!(".");
-                        }
-                    }
+                    info!("src={:?} dst={:?}", up.src_port(), up.dst_port());
                 }
                 smoltcp::wire::IpProtocol::Ipv6Route => {}
                 smoltcp::wire::IpProtocol::Ipv6Frag => {}
@@ -657,7 +703,7 @@ fn dump_packet_info(buffer: &[u8]) {
         }
         smoltcp::wire::EthernetProtocol::Arp => {
             let ap = smoltcp::wire::ArpPacket::new_unchecked(ef.payload());
-            println!(
+            info!(
                 "src={:x?} dst={:x?} src proto addr={:x?}",
                 ap.source_hardware_addr(),
                 ap.target_hardware_addr(),

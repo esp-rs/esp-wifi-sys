@@ -4,8 +4,8 @@
 use esp32_hal::ram;
 
 use crate::binary::include::*;
-use crate::trace;
 use crate::wifi::phy_init_data_esp32::PHY_INIT_DATA_DEFAULT;
+use log::trace;
 
 extern "C" {
     pub fn ets_delay_us(delay: u32);

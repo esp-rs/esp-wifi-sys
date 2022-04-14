@@ -1,5 +1,5 @@
 use crate::memory_fence::memory_fence;
-use crate::trace;
+use log::trace;
 
 extern "C" {
     static _heap_start: u8;

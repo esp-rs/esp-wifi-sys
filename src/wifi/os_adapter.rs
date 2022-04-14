@@ -18,9 +18,9 @@ use crate::{
         },
         work_queue::queue_work,
     },
-    trace,
     wifi::RANDOM_GENERATOR,
 };
+use log::{debug, trace};
 
 pub static mut WIFI_STATE: i32 = -1;
 
@@ -123,7 +123,7 @@ pub unsafe extern "C" fn set_intr(cpu_no: i32, intr_source: u32, intr_num: u32, 
  ****************************************************************************/
 pub unsafe extern "C" fn clear_intr(_intr_source: u32, _intr_num: u32) {
     // original code does nothing here
-    crate::debug!("clear_intr called {} {}", _intr_source, _intr_num);
+    debug!("clear_intr called {} {}", _intr_source, _intr_num);
 }
 
 pub static mut ISR_INTERRUPT_1: (
@@ -1348,7 +1348,7 @@ pub unsafe extern "C" fn nvs_set_i8(
     _key: *const crate::binary::c_types::c_char,
     _value: i8,
 ) -> crate::binary::c_types::c_int {
-    crate::debug!("nvs_set_i8");
+    debug!("nvs_set_i8");
     -1
 }
 
@@ -1656,12 +1656,16 @@ pub unsafe extern "C" fn random() -> crate::binary::c_types::c_ulong {
  *   None
  *
  ****************************************************************************/
+#[allow(unreachable_code)]
 pub unsafe extern "C" fn log_write(
     _level: u32,
     _tag: *const crate::binary::c_types::c_char,
     _format: *const crate::binary::c_types::c_char,
     _args: ...
 ) {
+    #[cfg(not(feature = "wifi_logs"))]
+    return;
+
     #[cfg(feature = "esp32c3")]
     syslog(_level, _format, _args);
 }
@@ -1685,19 +1689,24 @@ pub unsafe extern "C" fn log_write(
 pub unsafe extern "C" fn log_writev(
     _level: u32,
     _tag: *const crate::binary::c_types::c_char,
-    format: *const crate::binary::c_types::c_char,
+    _format: *const crate::binary::c_types::c_char,
     _args: va_list,
 ) {
+    #[cfg(not(feature = "wifi_logs"))]
+    return;
+
     #[cfg(feature = "esp32")]
+    #[allow(unreachable_code)]
     {
-        let s = StrBuf::from(format);
-        crate::println!("{}", s.as_str_ref());
+        let s = StrBuf::from(_format);
+        log::info!("{}", s.as_str_ref());
     }
 
     #[cfg(feature = "esp32c3")]
+    #[allow(unreachable_code)]
     {
         let _args = core::mem::transmute(_args);
-        syslog(_level, format, _args);
+        syslog(_level, _format, _args);
     }
 }
 

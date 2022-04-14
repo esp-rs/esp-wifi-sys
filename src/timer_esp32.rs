@@ -1,5 +1,4 @@
 use crate::preempt::preempt::task_switch;
-use crate::trace;
 use atomic_polyfill::AtomicU64;
 use atomic_polyfill::Ordering;
 use core::cell::RefCell;
@@ -7,12 +6,16 @@ use esp32_hal::pac::{self, TIMG1};
 use esp32_hal::prelude::_embedded_hal_timer_CountDown;
 use esp32_hal::Timer;
 use esp32_hal::{interrupt, Cpu};
+use log::trace;
 use xtensa_lx::mutex::{Mutex, SpinLockMutex};
 use xtensa_lx_rt::exception::Context;
 
 pub const TICKS_PER_SECOND: u64 = 40_000_000;
 
-const TIMER_DELAY: u64 = 40_000u64;
+#[cfg(debug_assertions)]
+const TIMER_DELAY: u64 = 20_000u64;
+#[cfg(not(debug_assertions))]
+const TIMER_DELAY: u64 = 500u64;
 
 static mut TIMER1: SpinLockMutex<RefCell<Option<Timer<TIMG1>>>> =
     SpinLockMutex::new(RefCell::new(None));
