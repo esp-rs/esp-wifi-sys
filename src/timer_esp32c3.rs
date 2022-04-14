@@ -3,9 +3,15 @@ use esp32c3_hal::interrupt::TrapFrame;
 use esp32c3_hal::pac::INTERRUPT_CORE0;
 use esp32c3_hal::pac::SYSTIMER;
 
-use crate::{binary, preempt::preempt::task_switch, trace};
+use crate::{binary, preempt::preempt::task_switch};
+use log::trace;
 
 pub const TICKS_PER_SECOND: u64 = 16_000_000;
+
+#[cfg(debug_assertions)]
+const TIMER_DELAY: u32 = 8_000u32;
+#[cfg(not(debug_assertions))]
+const TIMER_DELAY: u32 = 500u32;
 
 pub fn setup_timer_isr(systimer: &mut SYSTIMER, interrupt_core0: &mut INTERRUPT_CORE0) {
     // set systimer to 0
@@ -16,7 +22,7 @@ pub fn setup_timer_isr(systimer: &mut SYSTIMER, interrupt_core0: &mut INTERRUPT_
     // PERIOD_MODE + PERIOD
     systimer
         .target0_conf
-        .write(|w| unsafe { w.bits((1 << 30) | 20_000) });
+        .write(|w| unsafe { w.bits((1 << 30) | TIMER_DELAY) });
     // LOAD CONF VALUE
     systimer.comp0_load.write(|w| unsafe { w.bits(1) });
     // set SYSTIMER_TARGET0_WORK_EN + UNIT0_WORK_EN

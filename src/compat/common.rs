@@ -1,12 +1,14 @@
 #![allow(unused)]
 
+use log::trace;
+
 use crate::{
     binary::{c_types::c_void, include::OSI_FUNCS_TIME_BLOCKING},
-    log, memory_fence,
+    memory_fence,
     preempt::preempt::current_task,
-    print, trace,
 };
 use core::{ffi::VaListImpl, fmt::Write};
+use log::info;
 
 use super::queue::SimpleQueue;
 
@@ -104,10 +106,13 @@ impl Write for StrBuf {
 }
 
 pub unsafe extern "C" fn syslog(_priority: u32, format: *const u8, mut args: VaListImpl) {
-    let mut buf = [0u8; 512];
-    vsnprintf(&mut buf as *mut u8, 511, format, args);
-    let res_str = StrBuf::from(&buf as *const u8);
-    print!("{}", res_str.as_str_ref());
+    #[cfg(feature = "wifi_logs")]
+    {
+        let mut buf = [0u8; 512];
+        vsnprintf(&mut buf as *mut u8, 511, format, args);
+        let res_str = StrBuf::from(&buf as *const u8);
+        info!("{}", res_str.as_str_ref());
+    }
 }
 
 pub(crate) unsafe fn vsnprintf(

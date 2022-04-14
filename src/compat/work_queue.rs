@@ -1,5 +1,5 @@
 use super::queue::SimpleQueue;
-use crate::trace;
+use log::trace;
 
 static mut WORKER_HIGH: Option<
     SimpleQueue<
@@ -70,7 +70,7 @@ pub fn do_work() {
 
                     f(*p);
 
-                    crate::println!("after worker");
+                    trace!("after worker");
                 }
                 core::option::Option::None => {}
             }

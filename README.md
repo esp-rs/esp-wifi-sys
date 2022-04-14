@@ -18,13 +18,20 @@ https://github.com/espressif/esp-wireless-drivers-3rdparty/archive/45701c0.zip
 - dhcp
     - set SSID and PASSWORD env variable
     - gets an ip address via DHCP
-    - it prints the ip address it gets
-    - if everything works you should be able to ping and connect to port 4321
+    - performs an HTTP get request to some "random" server
 
 |Command|Chip|
 |---|---|
-|`cargo "+nightly" run --example dhcp_esp32c3 --target riscv32i-unknown-none-elf --features esp32c3`|ESP32C3|
-|`cargo "+esp" run --example dhcp_esp32 --target xtensa-esp32-none-elf --features esp32`|ESP32|
+|`cargo "+nightly" run --example dhcp_esp32c3 --release --target riscv32i-unknown-none-elf --features esp32c3`|ESP32C3|
+|`cargo "+esp" run --example dhcp_esp32 --release --target xtensa-esp32-none-elf --features esp32`|ESP32|
+
+Additional you can specify these features
+|Feature|Meaning|
+|---|---|
+|wifi_logs|logs the WiFi logs from the driver at log level info|
+|dump_packets|dumps some packet info at log level info|
+
+In general you should use the release profile since otherwise the performance is quite bad.
 
 ## What works?
 

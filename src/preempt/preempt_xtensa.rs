@@ -248,7 +248,7 @@ pub fn task_switch(trap_frame: &mut Context) {
         //         CNT += 1;
         //     } else {
         //         CNT = 0;
-        //         crate::println!("@@@ Task {} {:x?} ", 1, CTX_TASKS[1].trap_frame.PC);
+        //         log::info!("@@@ Task {} {:x?} ", 1, CTX_TASKS[1].trap_frame.PC);
         //     }
         // }
     };

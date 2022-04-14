@@ -6,26 +6,17 @@
 use core::{arch::asm, fmt::Write};
 
 use esp32c3_hal::{interrupt::TrapFrame, pac::Peripherals, RtcCntl};
-use esp_wifi::wifi::{get_sta_mac, init_clocks, init_rng};
-use esp_wifi::Uart;
+use esp_wifi::wifi::initialize;
+use esp_wifi::wifi::utils::create_network_stack;
 use esp_wifi::{
     binary, compat, println,
-    tasks::init_tasks,
-    timer::{get_systimer_count, setup_timer_isr},
-    wifi::{
-        self, init_buffer, wifi_connect, wifi_init, wifi_set_log_verbose, wifi_start, WifiDevice,
-    },
+    wifi::{self, wifi_connect},
 };
+use esp_wifi::{create_network_stack_storage, network_stack_storage, Uart};
 use riscv_rt::entry;
-use smoltcp::iface::{Interface, SocketStorage};
-use smoltcp::phy::Device;
-use smoltcp::socket::Dhcpv4Event;
-use smoltcp::{
-    iface::{NeighborCache, Routes},
-    socket::{Dhcpv4Socket, TcpSocket, TcpSocketBuffer},
-    time::Instant,
-    wire::{EthernetAddress, IpCidr, Ipv4Address, Ipv4Cidr},
-};
+
+use embedded_nal::SocketAddrV4;
+use embedded_nal::TcpClientStack;
 
 const SSID: &str = env!("SSID");
 const PASSWORD: &str = env!("PASSWORD");
@@ -34,30 +25,20 @@ const PASSWORD: &str = env!("PASSWORD");
 fn main() -> ! {
     let mut peripherals = Peripherals::take().unwrap();
 
-    init_rng(peripherals.RNG);
-
     let mut rtc_cntl = RtcCntl::new(peripherals.RTC_CNTL);
 
     // Disable watchdog timers
     rtc_cntl.set_super_wdt_enable(false);
     rtc_cntl.set_wdt_enable(false);
 
-    init_tasks();
-    setup_timer_isr(&mut peripherals.SYSTIMER, &mut peripherals.INTERRUPT_CORE0);
+    init_logger();
 
-    println!("About to make the first call ...");
-    println!("Start!");
-
-    wifi_set_log_verbose();
-
-    init_clocks();
-
-    let res = wifi_init();
-    println!("\n\n\nesp_wifi_init_internal returned {}", res);
-
-    println!("\n\n\nCall wifi_start");
-    let res = wifi_start();
-    println!("\n\n\nwifi_start returned {}", res);
+    initialize(
+        &mut peripherals.SYSTIMER,
+        &mut peripherals.INTERRUPT_CORE0,
+        peripherals.RNG,
+    )
+    .unwrap();
 
     println!("Call wifi_start_scan");
     let res = wifi::wifi_start_scan();
@@ -65,31 +46,8 @@ fn main() -> ! {
     print_scan_result();
     println!("\n\n\n\n");
 
-    init_buffer();
-
-    let mut mac = [0u8; 6];
-    get_sta_mac(&mut mac);
-    println!("MAC address is {:x?}", mac);
-    let hw_address = EthernetAddress::from_bytes(&mac);
-
-    let mut socket_set_entries: [SocketStorage; 2] = Default::default();
-    let mut neighbor_cache_storage = [None; 8];
-    let neighbor_cache = NeighborCache::new(&mut neighbor_cache_storage[..]);
-
-    let device = WifiDevice::new();
-
-    let ip_addr = IpCidr::new(Ipv4Address::UNSPECIFIED.into(), 0);
-    let mut ip_addrs = [ip_addr];
-
-    let mut routes_storage = [None; 1];
-    let routes = Routes::new(&mut routes_storage[..]);
-
-    let mut ethernet = smoltcp::iface::InterfaceBuilder::new(device, &mut socket_set_entries[..])
-        .hardware_addr(smoltcp::wire::HardwareAddress::Ethernet(hw_address))
-        .neighbor_cache(neighbor_cache)
-        .ip_addrs(&mut ip_addrs[..])
-        .routes(routes)
-        .finalize();
+    let mut storage = create_network_stack_storage!(3, 8, 1);
+    let mut network_stack = create_network_stack(network_stack_storage!(storage));
 
     println!("Call wifi_connect");
     let res = wifi_connect(SSID, PASSWORD);
@@ -102,89 +60,75 @@ fn main() -> ! {
     }
 
     println!("Start busy loop on main");
-    let greet_socket = {
-        static mut TCP_SERVER_RX_DATA: [u8; 32] = [0; 32];
-        static mut TCP_SERVER_TX_DATA: [u8; 32] = [0; 32];
-
-        let tcp_rx_buffer = unsafe { TcpSocketBuffer::new(&mut TCP_SERVER_RX_DATA[..]) };
-        let tcp_tx_buffer = unsafe { TcpSocketBuffer::new(&mut TCP_SERVER_TX_DATA[..]) };
-
-        TcpSocket::new(tcp_rx_buffer, tcp_tx_buffer)
-    };
-    let greet_handle = ethernet.add_socket(greet_socket);
-
-    let dhcp_socket = Dhcpv4Socket::new();
-    let dhcp_handle = ethernet.add_socket(dhcp_socket);
-
+    let mut stage = 0;
+    let mut socket = None;
+    let mut idx = 0;
+    let mut buffer = [0u8; 8000];
+    let mut waiter = 50000;
     loop {
-        let timestamp = timestamp();
-        critical_section::with(|_| {
-            ethernet.poll(timestamp).ok();
-        });
+        network_stack.poll().ok();
 
-        let event = ethernet.get_socket::<Dhcpv4Socket>(dhcp_handle).poll();
-        match event {
-            None => {}
-            Some(Dhcpv4Event::Configured(config)) => {
-                println!("IP address:      {}", config.address);
-                set_ipv4_addr(&mut ethernet, config.address);
+        if let Some(ipv4_addr) = network_stack.interface().ipv4_addr() {
+            if !ipv4_addr.is_unspecified() {
+                match stage {
+                    0 => {
+                        println!("My IP is {}", ipv4_addr);
+                        println!("Lets connect");
+                        let mut sock = network_stack.socket().unwrap();
+                        let addr =
+                            SocketAddrV4::new(embedded_nal::Ipv4Addr::new(142, 250, 185, 115), 80);
+                        network_stack.connect(&mut sock, addr.into()).unwrap();
 
-                if let Some(router) = config.router {
-                    println!("Default gateway: {}", router);
-                    ethernet
-                        .routes_mut()
-                        .add_default_ipv4_route(router)
-                        .unwrap();
-                } else {
-                    println!("Default gateway: None");
-                    ethernet.routes_mut().remove_default_ipv4_route();
-                }
-
-                for (i, s) in config.dns_servers.iter().enumerate() {
-                    if let Some(s) = s {
-                        println!("DNS server {}:    {}", i, s);
+                        socket = Some(sock);
+                        stage = 1;
+                        println!("Lets send");
                     }
+                    1 => {
+                        if network_stack
+                            .send(
+                                &mut socket.unwrap(),
+                                &b"GET / HTTP/1.0\r\nHost: www.mobile-j.de\r\n\r\n"[..],
+                            )
+                            .is_ok()
+                        {
+                            stage = 2;
+                            println!("Lets receive");
+                        }
+                    }
+                    2 => {
+                        if let Ok(s) =
+                            network_stack.receive(&mut socket.unwrap(), &mut buffer[idx..])
+                        {
+                            if s > 0 {
+                                idx += s;
+                            }
+                        } else {
+                            stage = 3;
+
+                            for c in &buffer[..idx] {
+                                esp_wifi::print!("{}", *c as char);
+                            }
+                            println!("");
+                        }
+                    }
+                    3 => {
+                        println!("Close");
+                        network_stack.close(socket.unwrap()).ok();
+                        stage = 4;
+                    }
+                    4 => {
+                        waiter -= 1;
+                        if waiter == 0 {
+                            idx = 0;
+                            waiter = 50000;
+                            stage = 0;
+                        }
+                    }
+                    _ => (),
                 }
-            }
-            Some(Dhcpv4Event::Deconfigured) => {
-                println!("DHCP lost config!");
-                set_ipv4_addr(&mut ethernet, Ipv4Cidr::new(Ipv4Address::UNSPECIFIED, 0));
-                ethernet.routes_mut().remove_default_ipv4_route();
-            }
-        }
-
-        // Control the "greeting" socket (:4321)
-        {
-            let socket = ethernet.get_socket::<TcpSocket>(greet_handle);
-            if !socket.is_open() {
-                println!(
-                    "Listening to port 4321 for greeting, \
-                        please connect to the port"
-                );
-                socket.listen(4321).unwrap();
-            }
-
-            if socket.can_send() {
-                println!("Send and close.");
-                socket.send_slice(&b"Hello World"[..]).ok();
-                socket.close();
             }
         }
     }
-}
-
-fn timestamp() -> Instant {
-    Instant::from_millis((get_systimer_count() / 16_000) as i64)
-}
-
-fn set_ipv4_addr<DeviceT>(iface: &mut Interface<'_, DeviceT>, cidr: Ipv4Cidr)
-where
-    DeviceT: for<'d> Device<'d>,
-{
-    iface.update_ip_addrs(|addrs| {
-        let dest = addrs.iter_mut().next().unwrap();
-        *dest = IpCidr::Ipv4(cidr);
-    });
 }
 
 #[allow(dead_code)]
@@ -324,4 +268,26 @@ fn print_backtrace_addresses_internal(fp: u32, suppress: i32) {
             }
         }
     }
+}
+
+pub fn init_logger() {
+    unsafe {
+        log::set_logger_racy(&LOGGER).unwrap();
+        log::set_max_level(log::LevelFilter::Info);
+    }
+}
+
+static LOGGER: SimpleLogger = SimpleLogger;
+struct SimpleLogger;
+
+impl log::Log for SimpleLogger {
+    fn enabled(&self, _metadata: &log::Metadata) -> bool {
+        true
+    }
+
+    fn log(&self, record: &log::Record) {
+        println!("{} - {}", record.level(), record.args());
+    }
+
+    fn flush(&self) {}
 }

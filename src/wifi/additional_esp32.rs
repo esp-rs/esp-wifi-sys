@@ -1,6 +1,6 @@
 use esp32_hal::ram;
 
-use crate::trace;
+use log::trace;
 
 /****************************************************************************
  * Name: esp_dport_access_reg_read

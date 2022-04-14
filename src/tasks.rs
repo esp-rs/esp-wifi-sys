@@ -2,13 +2,12 @@ use crate::compat::queue::SimpleQueue;
 use crate::compat::timer_compat::Timer;
 use crate::preempt::preempt::task_create;
 use crate::timer::get_systimer_count;
-use crate::verbose;
 use crate::wifi::send_data_if_needed;
 use crate::{
     compat::{self, timer_compat::TIMERS},
     memory_fence::memory_fence,
-    trace,
 };
+use log::{debug, trace};
 
 pub fn init_tasks() {
     task_create(worker_task1);
@@ -37,7 +36,7 @@ pub extern "C" fn worker_task2() {
                 TIMERS[i] = match &TIMERS[i] {
                     Some(old) => {
                         if old.active && get_systimer_count() >= old.expire {
-                            verbose!("timer is due.... {:p}", old.ptimer);
+                            debug!("timer is due.... {:p}", old.ptimer);
                             let fnctn: fn(*mut crate::binary::c_types::c_void) =
                                 core::mem::transmute(old.timer_ptr);
                             to_run.enqueue((fnctn, old.arg_ptr));

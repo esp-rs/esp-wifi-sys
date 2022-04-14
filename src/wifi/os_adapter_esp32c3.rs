@@ -1,8 +1,8 @@
 use crate::binary::include::*;
 use crate::compat::common::StrBuf;
-use crate::trace;
 use crate::wifi::phy_init_data_esp32c3::PHY_INIT_DATA_DEFAULT;
 use esp32c3_hal as hal;
+use log::trace;
 
 pub(crate) fn chip_ints_on(mask: u32) {
     let cpuint = match mask {
