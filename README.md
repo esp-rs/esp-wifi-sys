@@ -2,7 +2,7 @@
 
 ## About
 
-This is experimental and work-in-progress! You are welcome to contribute but probably shouldn't use this for something real yet.
+This is experimental and work-in-progress! You are welcome to experiment with it and contribute but probably shouldn't use this for something real yet.
 
 This uses the WiFi driver found in https://github.com/espressif/esp-wireless-drivers-3rdparty
 
@@ -22,14 +22,17 @@ https://github.com/espressif/esp-wireless-drivers-3rdparty/archive/45701c0.zip
 
 |Command|Chip|
 |---|---|
-|`cargo "+nightly" run --example dhcp_esp32c3 --release --target riscv32i-unknown-none-elf --features esp32c3`|ESP32C3|
-|`cargo "+esp" run --example dhcp_esp32 --release --target xtensa-esp32-none-elf --features esp32`|ESP32|
+|`cargo "+nightly" run --example dhcp_esp32c3 --release --target riscv32i-unknown-none-elf --features "esp32c3,embedded-svc"`|ESP32C3|
+|`cargo "+esp" run --example dhcp_esp32 --release --target xtensa-esp32-none-elf --features "esp32,embedded-svc"`|ESP32|
 
 Additional you can specify these features
 |Feature|Meaning|
 |---|---|
 |wifi_logs|logs the WiFi logs from the driver at log level info|
 |dump_packets|dumps some packet info at log level info|
+|utils|Provide utilities to use `embedded-nal`, this is a default feature|
+|allocator|Provides a global allocator which just uses the internal `malloc` - it doesn't honor special alignments|
+|embedded-svc|Provides a (very limited) implementation of the `embedded-svc` WiFi trait, includes `utils` and `allocator` feature|
 
 In general you should use the release profile since otherwise the performance is quite bad.
 

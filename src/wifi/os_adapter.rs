@@ -18,6 +18,7 @@ use crate::{
         },
         work_queue::queue_work,
     },
+    memory_fence::memory_fence,
     wifi::RANDOM_GENERATOR,
 };
 use log::{debug, trace};
@@ -26,6 +27,28 @@ pub static mut WIFI_STATE: i32 = -1;
 
 pub fn is_connected() -> bool {
     unsafe { WIFI_STATE == wifi_event_t_WIFI_EVENT_STA_CONNECTED as i32 }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum WifiState {
+    WifiReady,
+    StaStart,
+    StaStop,
+    StaConnected,
+    StaDisconnected,
+    Invalid,
+}
+
+#[allow(non_upper_case_globals)]
+pub fn get_wifi_state() -> WifiState {
+    match unsafe { WIFI_STATE as u32 } {
+        wifi_event_t_WIFI_EVENT_WIFI_READY => WifiState::WifiReady,
+        wifi_event_t_WIFI_EVENT_STA_START => WifiState::StaStart,
+        wifi_event_t_WIFI_EVENT_STA_STOP => WifiState::StaStop,
+        wifi_event_t_WIFI_EVENT_STA_CONNECTED => WifiState::StaConnected,
+        wifi_event_t_WIFI_EVENT_STA_DISCONNECTED => WifiState::StaDisconnected,
+        _ => WifiState::Invalid,
+    }
 }
 
 /****************************************************************************
@@ -62,7 +85,21 @@ pub unsafe extern "C" fn esp_event_send_internal(
     );
 
     // probably also need to look at event_base
-    WIFI_STATE = event_id;
+    #[allow(non_upper_case_globals)]
+    let take_state = match event_id as u32 {
+        wifi_event_t_WIFI_EVENT_WIFI_READY => true,
+        wifi_event_t_WIFI_EVENT_STA_START => true,
+        wifi_event_t_WIFI_EVENT_STA_STOP => true,
+        wifi_event_t_WIFI_EVENT_STA_CONNECTED => true,
+        wifi_event_t_WIFI_EVENT_STA_DISCONNECTED => true,
+        _ => false,
+    };
+
+    if take_state {
+        WIFI_STATE = event_id;
+    }
+
+    memory_fence();
 
     0
 }

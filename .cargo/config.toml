@@ -20,4 +20,4 @@ rustflags = [
 target = "riscv32i-unknown-none-elf"
  
 [unstable]
-build-std = [ "core" ]
+build-std = [ "core", "alloc" ]
