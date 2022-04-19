@@ -38,6 +38,11 @@ macro_rules! network_stack_storage {
     }};
 }
 
+/// Convenient way to create an `embedded-nal` implementation using `smoltcp-nal`
+/// You can use the provided macros to create and pass a suitable backing storage.
+///
+/// Currently `smoltcp-nal` only implements client stacks. If you need server functionality
+/// you need to fall back to `smoltcp` itself.
 pub fn create_network_stack<'a>(
     storage: (
         &'a mut [SocketStorage<'a>],
@@ -90,6 +95,7 @@ pub fn create_network_stack<'a>(
     network_stack
 }
 
+/// The clock used by `smoltcp-nal`
 pub struct WifiClock {}
 
 impl embedded_time::Clock for WifiClock {

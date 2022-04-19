@@ -1,3 +1,4 @@
+#[doc(hidden)]
 pub mod os_adapter;
 #[cfg(feature = "esp32")]
 use esp32_hal as hal;
@@ -7,6 +8,8 @@ use esp32_hal::Rng;
 use esp32c3_hal as hal;
 #[cfg(feature = "esp32c3")]
 use esp32c3_hal::Rng;
+
+#[doc(hidden)]
 pub use os_adapter::*;
 use smoltcp::phy::{Device, DeviceCapabilities, RxToken, TxToken};
 #[cfg(feature = "esp32")]
@@ -527,6 +530,7 @@ pub fn wifi_stop() -> i32 {
     unsafe { esp_wifi_stop() }
 }
 
+/// A wifi device implementing smoltcp's Device trait.
 pub struct WifiDevice {}
 
 impl WifiDevice {

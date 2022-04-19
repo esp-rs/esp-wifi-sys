@@ -5,18 +5,21 @@
 
 use core::{arch::asm, fmt::Write};
 
+use embedded_svc::wifi::{
+    ClientConfiguration, ClientConnectionStatus, ClientIpStatus, ClientStatus, Configuration,
+    Status, Wifi,
+};
 use esp32c3_hal::{interrupt::TrapFrame, pac::Peripherals, RtcCntl};
+use esp_wifi::println;
 use esp_wifi::wifi::initialize;
 use esp_wifi::wifi::utils::create_network_stack;
-use esp_wifi::{
-    binary, compat, println,
-    wifi::{self, wifi_connect},
-};
 use esp_wifi::{create_network_stack_storage, network_stack_storage, Uart};
 use riscv_rt::entry;
 
 use embedded_nal::SocketAddrV4;
 use embedded_nal::TcpClientStack;
+
+extern crate alloc;
 
 const SSID: &str = env!("SSID");
 const PASSWORD: &str = env!("PASSWORD");
@@ -31,6 +34,11 @@ fn main() -> ! {
     rtc_cntl.set_super_wdt_enable(false);
     rtc_cntl.set_wdt_enable(false);
 
+    let mut storage = create_network_stack_storage!(3, 8, 1);
+    let network_stack = create_network_stack(network_stack_storage!(storage));
+
+    let mut wifi_interface = esp_wifi::wifi_interface::Wifi::new(network_stack);
+
     init_logger();
 
     initialize(
@@ -40,146 +48,112 @@ fn main() -> ! {
     )
     .unwrap();
 
-    println!("Call wifi_start_scan");
-    let res = wifi::wifi_start_scan();
-    println!("wifi_start_scan returned {}", res);
-    print_scan_result();
-    println!("\n\n\n\n");
+    println!("{:?}", wifi_interface.get_status());
 
-    let mut storage = create_network_stack_storage!(3, 8, 1);
-    let mut network_stack = create_network_stack(network_stack_storage!(storage));
-
-    println!("Call wifi_connect");
-    let res = wifi_connect(SSID, PASSWORD);
-    println!("wifi_connect returned {}", res);
-
-    loop {
-        if wifi::is_connected() {
-            break;
+    println!("Start Wifi Scan");
+    let res = wifi_interface.scan();
+    if let Ok(res) = res {
+        for ap in res {
+            println!("{:?}", ap);
         }
     }
 
+    println!("Call wifi_connect");
+    let client_config = Configuration::Client(ClientConfiguration {
+        ssid: SSID.into(),
+        password: PASSWORD.into(),
+        ..Default::default()
+    });
+    let res = wifi_interface.set_configuration(&client_config);
+    println!("wifi_connect returned {:?}", res);
+
+    println!("{:?}", wifi_interface.get_capabilities());
+    println!("{:?}", wifi_interface.get_status());
+
+    // wait to get connected
+    loop {
+        if let Status(ClientStatus::Started(_), _) = wifi_interface.get_status() {
+            break;
+        }
+    }
+    println!("{:?}", wifi_interface.get_status());
+
     println!("Start busy loop on main");
+
     let mut stage = 0;
     let mut socket = None;
     let mut idx = 0;
     let mut buffer = [0u8; 8000];
     let mut waiter = 50000;
     loop {
-        network_stack.poll().ok();
+        wifi_interface.network_stack().poll().ok();
 
-        if let Some(ipv4_addr) = network_stack.interface().ipv4_addr() {
-            if !ipv4_addr.is_unspecified() {
-                match stage {
-                    0 => {
-                        println!("My IP is {}", ipv4_addr);
-                        println!("Lets connect");
-                        let mut sock = network_stack.socket().unwrap();
-                        let addr =
-                            SocketAddrV4::new(embedded_nal::Ipv4Addr::new(142, 250, 185, 115), 80);
-                        network_stack.connect(&mut sock, addr.into()).unwrap();
+        if let Status(
+            ClientStatus::Started(ClientConnectionStatus::Connected(ClientIpStatus::Done(config))),
+            _,
+        ) = wifi_interface.get_status()
+        {
+            match stage {
+                0 => {
+                    println!("My IP config is {:?}", config);
+                    println!("Lets connect");
+                    let mut sock = wifi_interface.network_stack().socket().unwrap();
+                    let addr =
+                        SocketAddrV4::new(embedded_nal::Ipv4Addr::new(142, 250, 185, 115), 80);
+                    wifi_interface
+                        .network_stack()
+                        .connect(&mut sock, addr.into())
+                        .unwrap();
 
-                        socket = Some(sock);
-                        stage = 1;
-                        println!("Lets send");
-                    }
-                    1 => {
-                        if network_stack
-                            .send(
-                                &mut socket.unwrap(),
-                                &b"GET / HTTP/1.0\r\nHost: www.mobile-j.de\r\n\r\n"[..],
-                            )
-                            .is_ok()
-                        {
-                            stage = 2;
-                            println!("Lets receive");
-                        }
-                    }
-                    2 => {
-                        if let Ok(s) =
-                            network_stack.receive(&mut socket.unwrap(), &mut buffer[idx..])
-                        {
-                            if s > 0 {
-                                idx += s;
-                            }
-                        } else {
-                            stage = 3;
-
-                            for c in &buffer[..idx] {
-                                esp_wifi::print!("{}", *c as char);
-                            }
-                            println!("");
-                        }
-                    }
-                    3 => {
-                        println!("Close");
-                        network_stack.close(socket.unwrap()).ok();
-                        stage = 4;
-                    }
-                    4 => {
-                        waiter -= 1;
-                        if waiter == 0 {
-                            idx = 0;
-                            waiter = 50000;
-                            stage = 0;
-                        }
-                    }
-                    _ => (),
+                    socket = Some(sock);
+                    stage = 1;
+                    println!("Lets send");
                 }
+                1 => {
+                    if wifi_interface
+                        .network_stack()
+                        .send(
+                            &mut socket.unwrap(),
+                            &b"GET / HTTP/1.0\r\nHost: www.mobile-j.de\r\n\r\n"[..],
+                        )
+                        .is_ok()
+                    {
+                        stage = 2;
+                        println!("Lets receive");
+                    }
+                }
+                2 => {
+                    if let Ok(s) = wifi_interface
+                        .network_stack()
+                        .receive(&mut socket.unwrap(), &mut buffer[idx..])
+                    {
+                        if s > 0 {
+                            idx += s;
+                        }
+                    } else {
+                        stage = 3;
+
+                        for c in &buffer[..idx] {
+                            esp_wifi::print!("{}", *c as char);
+                        }
+                        println!("");
+                    }
+                }
+                3 => {
+                    println!("Close");
+                    wifi_interface.network_stack().close(socket.unwrap()).ok();
+                    stage = 4;
+                }
+                4 => {
+                    waiter -= 1;
+                    if waiter == 0 {
+                        idx = 0;
+                        waiter = 50000;
+                        stage = 0;
+                    }
+                }
+                _ => (),
             }
-        }
-    }
-}
-
-#[allow(dead_code)]
-fn print_scan_result() {
-    unsafe {
-        let mut bss_total: u16 = 0;
-        binary::include::esp_wifi_scan_get_ap_num(&mut bss_total);
-        crate::println!("Found {} APs.", bss_total);
-        if bss_total > 10 {
-            bss_total = 10;
-        }
-
-        crate::println!("...");
-        let mut records = [binary::include::wifi_ap_record_t {
-            bssid: [0u8; 6],
-            ssid: [0u8; 33],
-            primary: 0u8,
-            second: 0u32,
-            rssi: 0i8,
-            authmode: 0u32,
-            pairwise_cipher: 0u32,
-            group_cipher: 0u32,
-            ant: 0u32,
-            _bitfield_align_1: [0u32; 0],
-            _bitfield_1: binary::include::__BindgenBitfieldUnit::new([0u8; 4usize]),
-            country: binary::include::wifi_country_t {
-                cc: [0; 3],
-                schan: 0u8,
-                nchan: 0u8,
-                max_tx_power: 0i8,
-                policy: 0u32,
-            },
-        }; 10];
-
-        crate::println!("calling esp_wifi_scan_get_ap_records");
-        binary::include::esp_wifi_scan_get_ap_records(
-            &mut bss_total,
-            &mut records as *mut binary::include::wifi_ap_record_t,
-        );
-
-        crate::println!("printing {} records", bss_total);
-        for i in 0..bss_total {
-            let record = records[i as usize];
-            let ssid = compat::common::StrBuf::from(&record.ssid as *const u8);
-            crate::println!(
-                "{} {} {:x?} {}",
-                ssid.as_str_ref(),
-                record.rssi,
-                record.bssid,
-                record.primary
-            );
         }
     }
 }
