@@ -6,14 +6,16 @@ use embedded_svc::wifi::{
     Status, Wifi,
 };
 use esp32_hal::{pac::Peripherals, RtcCntl};
-use esp_wifi::println;
+use esp_println::{print, println};
 use esp_wifi::wifi::initialize;
 use esp_wifi::wifi::utils::create_network_interface;
 use esp_wifi::wifi_interface::timestamp;
-use esp_wifi::{create_network_stack_storage, network_stack_storage, Uart};
+use esp_wifi::{create_network_stack_storage, network_stack_storage};
 use smoltcp::iface::SocketHandle;
 use smoltcp::socket::{Socket, TcpSocket};
 use xtensa_lx_rt::entry;
+
+use esp_backtrace as _;
 
 extern crate alloc;
 
@@ -133,7 +135,7 @@ fn main() -> ! {
                         stage = 3;
 
                         for c in &buffer[..idx] {
-                            esp_wifi::print!("{}", *c as char);
+                            print!("{}", *c as char);
                         }
                         println!("");
                     }
@@ -159,21 +161,6 @@ fn main() -> ! {
             }
         }
     }
-}
-
-#[panic_handler]
-fn panic(info: &core::panic::PanicInfo) -> ! {
-    println!("\n\n*** {:?}", info);
-    loop {}
-}
-
-#[no_mangle]
-unsafe extern "C" fn __exception(
-    cause: xtensa_lx_rt::exception::ExceptionCause,
-    context: &xtensa_lx_rt::exception::Context,
-) {
-    println!("\n\n*** {:?} {:x?}", cause, context);
-    loop {}
 }
 
 pub fn init_logger() {

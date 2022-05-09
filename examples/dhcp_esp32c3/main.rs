@@ -3,21 +3,21 @@
 #![feature(c_variadic)]
 #![feature(const_mut_refs)]
 
-use core::{arch::asm, fmt::Write};
-
 use embedded_svc::wifi::{
     ClientConfiguration, ClientConnectionStatus, ClientIpStatus, ClientStatus, Configuration,
     Status, Wifi,
 };
-use esp32c3_hal::{interrupt::TrapFrame, pac::Peripherals, RtcCntl};
-use esp_wifi::println;
+use esp32c3_hal::{pac::Peripherals, RtcCntl};
+use esp_println::{print, println};
 use esp_wifi::wifi::initialize;
 use esp_wifi::wifi::utils::create_network_interface;
 use esp_wifi::wifi_interface::timestamp;
-use esp_wifi::{create_network_stack_storage, network_stack_storage, Uart};
+use esp_wifi::{create_network_stack_storage, network_stack_storage};
 use riscv_rt::entry;
 use smoltcp::iface::SocketHandle;
 use smoltcp::socket::{Socket, TcpSocket};
+
+use esp_backtrace as _;
 
 extern crate alloc;
 
@@ -143,7 +143,7 @@ fn main() -> ! {
                         stage = 3;
 
                         for c in &buffer[..idx] {
-                            esp_wifi::print!("{}", *c as char);
+                            print!("{}", *c as char);
                         }
                         println!("");
                     }
@@ -174,87 +174,6 @@ fn main() -> ! {
 #[export_name = "DefaultHandler"]
 pub fn default_handler() {
     println!("DefaultHandler called!");
-}
-
-#[export_name = "ExceptionHandler"]
-fn custom_exception_handler(_trap_frame: &TrapFrame) -> ! {
-    let mepc = riscv::register::mepc::read();
-    let code = riscv::register::mcause::read().code() & 0xff;
-    let mtval = riscv::register::mtval::read();
-
-    let code = match code {
-        0 => "Instruction address misaligned",
-        1 => "Instruction access fault",
-        2 => "Illegal instruction",
-        3 => "Breakpoint",
-        4 => "Load address misaligned",
-        5 => "Load access fault",
-        6 => "Store/AMO address misaligned",
-        7 => "Store/AMO access fault",
-        8 => "Environment call from U-mode",
-        9 => "Environment call from S-mode",
-        10 => "Reserved",
-        11 => "Environment call from M-mode",
-        12 => "Instruction page fault",
-        13 => "Load page fault",
-        14 => "Reserved",
-        15 => "Store/AMO page fault",
-        _ => "UNKNOWN",
-    };
-    println!("exception '{}' mepc={:x}, mtval={:x}", code, mepc, mtval);
-    println!("{:#x?}", _trap_frame);
-
-    print_backtrace_addresses_internal(_trap_frame.s0 as u32, 0);
-    loop {}
-}
-
-#[panic_handler]
-fn panic_handler(info: &core::panic::PanicInfo) -> ! {
-    unsafe {
-        riscv::interrupt::disable();
-    }
-    writeln!(Uart, "{}", info).ok();
-    print_backtrace_addresses();
-    loop {}
-}
-
-fn print_backtrace_addresses() {
-    let fp = unsafe {
-        let mut _tmp: u32;
-        asm!("mv {0}, x8", out(reg) _tmp);
-        _tmp
-    };
-
-    print_backtrace_addresses_internal(fp, 2);
-}
-
-fn print_backtrace_addresses_internal(fp: u32, suppress: i32) {
-    let mut fp = fp;
-    let mut suppress = suppress;
-    let mut old_address = 0;
-    loop {
-        unsafe {
-            let address = (fp as *const u32).offset(-1).read(); // RA/PC
-            fp = (fp as *const u32).offset(-2).read(); // next FP
-
-            if old_address == address {
-                break;
-            }
-
-            old_address = address;
-
-            // currently this only supports code in flash
-            if !(0x42000000..=0x42800000).contains(&address) {
-                break;
-            }
-
-            if suppress == 0 {
-                write!(Uart, "0x{:x} \r\n", address).ok();
-            } else {
-                suppress -= 1;
-            }
-        }
-    }
 }
 
 pub fn init_logger() {
