@@ -1,9 +1,8 @@
 use smoltcp::{
-    iface::{InterfaceBuilder, Neighbor, NeighborCache, Route, Routes, SocketStorage},
+    iface::{Interface, InterfaceBuilder, Neighbor, NeighborCache, Route, Routes, SocketStorage},
     socket::{Dhcpv4Socket, TcpSocket, TcpSocketBuffer},
     wire::{EthernetAddress, IpAddress, IpCidr},
 };
-use smoltcp_nal::NetworkStack;
 
 use crate::wifi::get_sta_mac;
 
@@ -38,19 +37,16 @@ macro_rules! network_stack_storage {
     }};
 }
 
-/// Convenient way to create an `embedded-nal` implementation using `smoltcp-nal`
+/// Convenient way to create an `smoltcp` ethernet interface
 /// You can use the provided macros to create and pass a suitable backing storage.
-///
-/// Currently `smoltcp-nal` only implements client stacks. If you need server functionality
-/// you need to fall back to `smoltcp` itself.
-pub fn create_network_stack<'a>(
+pub fn create_network_interface<'a>(
     storage: (
         &'a mut [SocketStorage<'a>],
         &'a mut [Option<(IpAddress, Neighbor)>],
         &'a mut [Option<(IpCidr, Route)>],
         &'a mut [IpCidr; 1],
     ),
-) -> NetworkStack<'a, WifiDevice, WifiClock> {
+) -> Interface<WifiDevice> {
     let socket_set_entries = storage.0;
     let neighbor_cache_storage = storage.1;
     let routes_storage = storage.2;
@@ -89,24 +85,5 @@ pub fn create_network_stack<'a>(
     let dhcp_socket = Dhcpv4Socket::new();
     ethernet.add_socket(dhcp_socket);
 
-    let clock = WifiClock {};
-    let network_stack = NetworkStack::new(ethernet, clock);
-
-    network_stack
-}
-
-/// The clock used by `smoltcp-nal`
-pub struct WifiClock {}
-
-impl embedded_time::Clock for WifiClock {
-    type T = u32;
-
-    const SCALING_FACTOR: embedded_time::rate::Fraction =
-        embedded_time::rate::Fraction::new(1, (crate::timer::TICKS_PER_SECOND / 1000) as u32);
-
-    fn try_now(&self) -> Result<embedded_time::Instant<Self>, embedded_time::clock::Error> {
-        Ok(embedded_time::Instant::new(
-            (crate::timer::get_systimer_count() / 1000) as u32,
-        ))
-    }
+    ethernet
 }

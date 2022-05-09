@@ -27,6 +27,7 @@ pub mod tasks;
 pub(crate) mod memory_fence;
 
 pub use critical_section;
+use timer::{get_systimer_count, TICKS_PER_SECOND};
 
 #[cfg(feature = "allocator")]
 pub mod allocator;
@@ -46,4 +47,8 @@ impl core::fmt::Write for Uart {
             unsafe { uart_tx_one_char(b) };
         })
     }
+}
+
+pub fn current_millis() -> u64 {
+    get_systimer_count() / TICKS_PER_SECOND
 }

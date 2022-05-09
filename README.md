@@ -30,7 +30,7 @@ Additional you can specify these features
 |---|---|
 |wifi_logs|logs the WiFi logs from the driver at log level info|
 |dump_packets|dumps some packet info at log level info|
-|utils|Provide utilities to use `embedded-nal`, this is a default feature|
+|utils|Provide utilities for smoltcp initialization, this is a default feature|
 |allocator|Provides a global allocator which just uses the internal `malloc` - it doesn't honor special alignments|
 |embedded-svc|Provides a (very limited) implementation of the `embedded-svc` WiFi trait, includes `utils` and `allocator` feature|
 
