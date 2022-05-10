@@ -1,6 +1,6 @@
 use core::fmt::Display;
+use embedded_svc::ipv4::Ipv4Addr;
 
-use embedded_nal::Ipv4Addr;
 use embedded_svc::{
     ipv4::{ClientSettings, Mask, Subnet},
     wifi::{
@@ -9,9 +9,13 @@ use embedded_svc::{
     },
 };
 use enumset::EnumSet;
-use smoltcp_nal::NetworkStack;
+use smoltcp::iface::{Interface, SocketHandle};
+use smoltcp::socket::{Dhcpv4Socket, Socket};
+use smoltcp::time::Instant;
+use smoltcp::wire::{IpAddress, IpCidr};
 
-use crate::wifi::{utils::WifiClock, WifiDevice};
+use crate::current_millis;
+use crate::wifi::WifiDevice;
 
 extern crate alloc;
 
@@ -19,28 +23,91 @@ const MAX_SCAN_RESULT: u16 = 10;
 
 /// An implementation of `embedded-svc`'s wifi trait.
 pub struct Wifi<'a> {
-    network_stack: NetworkStack<'a, WifiDevice, WifiClock>,
+    network_interface: Interface<'a, WifiDevice>,
     current_config: embedded_svc::wifi::Configuration,
+    network_config: Option<smoltcp::socket::Dhcpv4Config>,
+    dhcp_socket_handle: Option<SocketHandle>,
 }
 
 impl<'a> Wifi<'a> {
     /// Create a new instance from a `NetworkStack`
-    pub fn new(network_stack: NetworkStack<'a, WifiDevice, WifiClock>) -> Wifi<'a> {
+    pub fn new(mut network_interface: Interface<'a, WifiDevice>) -> Wifi<'a> {
+        let mut dhcp_socket_handle: Option<SocketHandle> = None;
+
+        for (handle, socket) in network_interface.sockets_mut() {
+            match socket {
+                Socket::Dhcpv4(_) => dhcp_socket_handle = Some(handle),
+                _ => {}
+            }
+        }
+
         Wifi {
-            network_stack,
+            network_interface,
             current_config: embedded_svc::wifi::Configuration::default(),
+            network_config: None,
+            dhcp_socket_handle,
         }
     }
 
     /// Get a mutable reference to the `NetworkStack`
-    pub fn network_stack(&mut self) -> &mut NetworkStack<'a, WifiDevice, WifiClock> {
-        &mut self.network_stack
+    pub fn network_interface(&mut self) -> &mut Interface<'a, WifiDevice> {
+        &mut self.network_interface
+    }
+
+    /// Convenience function to poll the DHCP socket.
+    pub fn poll_dhcp(&mut self) -> Result<(), WifiError> {
+        if let Some(dhcp_handle) = self.dhcp_socket_handle {
+            let dhcp_socket = self
+                .network_interface
+                .get_socket::<Dhcpv4Socket>(dhcp_handle);
+            let event = dhcp_socket.poll();
+            if let Some(event) = event {
+                match event {
+                    smoltcp::socket::Dhcpv4Event::Deconfigured => {
+                        self.network_config = None;
+                        self.network_interface
+                            .routes_mut()
+                            .remove_default_ipv4_route();
+                    }
+                    smoltcp::socket::Dhcpv4Event::Configured(config) => {
+                        self.network_config = Some(config);
+                        let address = config.address;
+                        self.network_interface.update_ip_addrs(|addrs| {
+                            let addr = addrs
+                                .iter_mut()
+                                .filter(|cidr| match cidr.address() {
+                                    IpAddress::Ipv4(_) => true,
+                                    _ => false,
+                                })
+                                .next()
+                                .unwrap();
+
+                            *addr = IpCidr::Ipv4(address);
+                        });
+                        if let Some(route) = config.router {
+                            self.network_interface
+                                .routes_mut()
+                                .add_default_ipv4_route(route)?;
+                        }
+                    }
+                }
+            }
+        }
+
+        Ok(())
     }
 }
 
 #[derive(Debug, Copy, Clone)]
 pub enum WifiError {
     Unknown(i32),
+    SmolTcpError(smoltcp::Error),
+}
+
+impl From<smoltcp::Error> for WifiError {
+    fn from(error: smoltcp::Error) -> Self {
+        WifiError::SmolTcpError(error)
+    }
 }
 
 impl Display for WifiError {
@@ -64,28 +131,37 @@ impl<'a> embedded_svc::wifi::Wifi for Wifi<'a> {
 
     /// Get the wifi status.
     /// Please note: To ever get into the state of an assigned IP address you need to make sure
-    /// that `poll` is called frequently on the network stack.
-    /// Subnet and DNS - while present under the hood - is unsupported for now.
+    /// that `poll` is called frequently on the network stack and dhcp socket.
     fn get_status(&self) -> Status {
         match crate::wifi::get_wifi_state() {
             crate::wifi::WifiState::WifiReady => Status(ClientStatus::Stopped, ApStatus::Stopped),
             crate::wifi::WifiState::StaStart => Status(ClientStatus::Starting, ApStatus::Stopped),
             crate::wifi::WifiState::StaStop => Status(ClientStatus::Stopped, ApStatus::Stopped),
             crate::wifi::WifiState::StaConnected => {
-                let client_ip_status = if let Some(ip) = self.network_stack.interface().ipv4_addr()
-                {
+                let client_ip_status = if let Some(ip) = self.network_interface.ipv4_addr() {
                     if !ip.is_unspecified() {
                         let mut ip_bytes: [u8; 4] = [0; 4];
                         ip_bytes.copy_from_slice(ip.as_bytes());
 
-                        // TODO how to get gateway / mask and nameservers here?
+                        let mut gw_bytes: [u8; 4] = [0; 4];
+                        let mut dns_bytes: [u8; 4] = [0; 4];
+                        if let Some(config) = self.network_config {
+                            if let Some(router) = config.router {
+                                gw_bytes.copy_from_slice(router.as_bytes());
+                            }
+
+                            if let Some(dns_server) = config.dns_servers[0] {
+                                dns_bytes.copy_from_slice(dns_server.as_bytes());
+                            }
+                        }
+
                         ClientIpStatus::Done(ClientSettings {
                             ip: Ipv4Addr::from(ip_bytes),
                             subnet: Subnet {
-                                gateway: Ipv4Addr::new(0, 0, 0, 0),
-                                mask: Mask(24),
+                                gateway: Ipv4Addr::from(gw_bytes),
+                                mask: Mask(24), // where to get this from?
                             },
-                            dns: Some(Ipv4Addr::new(0, 0, 0, 0)),
+                            dns: Some(Ipv4Addr::from(dns_bytes)),
                             secondary_dns: Some(Ipv4Addr::new(0, 0, 0, 0)),
                         })
                     } else {
@@ -235,4 +311,8 @@ impl<'a> embedded_svc::wifi::Wifi for Wifi<'a> {
             Ok(())
         }
     }
+}
+
+pub fn timestamp() -> Instant {
+    Instant::from_millis(current_millis() as i64)
 }

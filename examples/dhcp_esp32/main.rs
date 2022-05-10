@@ -6,14 +6,16 @@ use embedded_svc::wifi::{
     Status, Wifi,
 };
 use esp32_hal::{pac::Peripherals, RtcCntl};
-use esp_wifi::println;
+use esp_println::{print, println};
 use esp_wifi::wifi::initialize;
-use esp_wifi::wifi::utils::create_network_stack;
-use esp_wifi::{create_network_stack_storage, network_stack_storage, Uart};
+use esp_wifi::wifi::utils::create_network_interface;
+use esp_wifi::wifi_interface::timestamp;
+use esp_wifi::{create_network_stack_storage, network_stack_storage};
+use smoltcp::iface::SocketHandle;
+use smoltcp::socket::{Socket, TcpSocket};
 use xtensa_lx_rt::entry;
 
-use embedded_nal::SocketAddrV4;
-use embedded_nal::TcpClientStack;
+use esp_backtrace as _;
 
 extern crate alloc;
 
@@ -30,9 +32,8 @@ fn main() -> ! {
     rtc_cntl.set_wdt_global_enable(false);
 
     let mut storage = create_network_stack_storage!(3, 8, 1);
-    let network_stack = create_network_stack(network_stack_storage!(storage));
-
-    let mut wifi_interface = esp_wifi::wifi_interface::Wifi::new(network_stack);
+    let ethernet = create_network_interface(network_stack_storage!(storage));
+    let mut wifi_interface = esp_wifi::wifi_interface::Wifi::new(ethernet);
 
     init_logger();
 
@@ -71,13 +72,22 @@ fn main() -> ! {
     println!("Start busy loop on main");
 
     let mut stage = 0;
-    let mut socket = None;
     let mut idx = 0;
     let mut buffer = [0u8; 8000];
     let mut waiter = 50000;
 
+    let mut http_socket_handle: Option<SocketHandle> = None;
+
+    for (handle, socket) in wifi_interface.network_interface().sockets_mut() {
+        match socket {
+            Socket::Tcp(_) => http_socket_handle = Some(handle),
+            _ => {}
+        }
+    }
+
     loop {
-        wifi_interface.network_stack().poll().ok();
+        wifi_interface.poll_dhcp().ok();
+        wifi_interface.network_interface().poll(timestamp()).ok();
 
         if let Status(
             ClientStatus::Started(ClientConnectionStatus::Connected(ClientIpStatus::Done(config))),
@@ -88,25 +98,24 @@ fn main() -> ! {
                 0 => {
                     println!("My IP config is {:?}", config);
                     println!("Lets connect");
-                    let mut sock = wifi_interface.network_stack().socket().unwrap();
-                    let addr =
-                        SocketAddrV4::new(embedded_nal::Ipv4Addr::new(142, 250, 185, 115), 80);
-                    wifi_interface
-                        .network_stack()
-                        .connect(&mut sock, addr.into())
-                        .unwrap();
+                    let (socket, cx) = wifi_interface
+                        .network_interface()
+                        .get_socket_and_context::<TcpSocket>(http_socket_handle.unwrap());
 
-                    socket = Some(sock);
+                    let address = smoltcp::wire::Ipv4Address::new(142, 250, 185, 115);
+                    let remote_endpoint = (address, 80);
+                    socket.connect(cx, remote_endpoint, 41000).unwrap();
+
                     stage = 1;
                     println!("Lets send");
                 }
                 1 => {
-                    if wifi_interface
-                        .network_stack()
-                        .send(
-                            &mut socket.unwrap(),
-                            &b"GET / HTTP/1.0\r\nHost: www.mobile-j.de\r\n\r\n"[..],
-                        )
+                    let socket = wifi_interface
+                        .network_interface()
+                        .get_socket::<TcpSocket>(http_socket_handle.unwrap());
+
+                    if socket
+                        .send_slice(&b"GET / HTTP/1.0\r\nHost: www.mobile-j.de\r\n\r\n"[..])
                         .is_ok()
                     {
                         stage = 2;
@@ -114,10 +123,11 @@ fn main() -> ! {
                     }
                 }
                 2 => {
-                    if let Ok(s) = wifi_interface
-                        .network_stack()
-                        .receive(&mut socket.unwrap(), &mut buffer[idx..])
-                    {
+                    let socket = wifi_interface
+                        .network_interface()
+                        .get_socket::<TcpSocket>(http_socket_handle.unwrap());
+
+                    if let Ok(s) = socket.recv_slice(&mut buffer[idx..]) {
                         if s > 0 {
                             idx += s;
                         }
@@ -125,14 +135,18 @@ fn main() -> ! {
                         stage = 3;
 
                         for c in &buffer[..idx] {
-                            esp_wifi::print!("{}", *c as char);
+                            print!("{}", *c as char);
                         }
                         println!("");
                     }
                 }
                 3 => {
                     println!("Close");
-                    wifi_interface.network_stack().close(socket.unwrap()).ok();
+                    let socket = wifi_interface
+                        .network_interface()
+                        .get_socket::<TcpSocket>(http_socket_handle.unwrap());
+
+                    socket.close();
                     stage = 4;
                 }
                 4 => {
@@ -147,21 +161,6 @@ fn main() -> ! {
             }
         }
     }
-}
-
-#[panic_handler]
-fn panic(info: &core::panic::PanicInfo) -> ! {
-    println!("\n\n*** {:?}", info);
-    loop {}
-}
-
-#[no_mangle]
-unsafe extern "C" fn __exception(
-    cause: xtensa_lx_rt::exception::ExceptionCause,
-    context: &xtensa_lx_rt::exception::Context,
-) {
-    println!("\n\n*** {:?} {:x?}", cause, context);
-    loop {}
 }
 
 pub fn init_logger() {

@@ -13,9 +13,6 @@ pub mod compat;
 pub mod preempt;
 
 #[doc(hidden)]
-pub mod print;
-
-#[doc(hidden)]
 #[cfg_attr(feature = "esp32c3", path = "timer_esp32c3.rs")]
 #[cfg_attr(feature = "esp32", path = "timer_esp32.rs")]
 pub mod timer;
@@ -27,6 +24,7 @@ pub mod tasks;
 pub(crate) mod memory_fence;
 
 pub use critical_section;
+use timer::{get_systimer_count, TICKS_PER_SECOND};
 
 #[cfg(feature = "allocator")]
 pub mod allocator;
@@ -34,16 +32,6 @@ pub mod allocator;
 #[cfg(feature = "embedded-svc")]
 pub mod wifi_interface;
 
-extern "C" {
-    // ROM functions, see esp32c3-link.x
-    pub fn uart_tx_one_char(byte: u8) -> i32;
-}
-pub struct Uart;
-
-impl core::fmt::Write for Uart {
-    fn write_str(&mut self, s: &str) -> core::fmt::Result {
-        Ok(for &b in s.as_bytes() {
-            unsafe { uart_tx_one_char(b) };
-        })
-    }
+pub fn current_millis() -> u64 {
+    get_systimer_count() / TICKS_PER_SECOND
 }
