@@ -258,6 +258,7 @@ pub fn sem_create(max: u32, init: u32) -> *mut crate::binary::c_types::c_void {
 pub fn sem_delete(semphr: *mut crate::binary::c_types::c_void) {
     critical_section::with(|_| unsafe {
         CURR_SEM[semphr as usize - 1] = None;
+        memory_fence::memory_fence();
     })
 }
 
@@ -275,6 +276,7 @@ pub fn sem_take(semphr: *mut crate::binary::c_types::c_void, tick: u32) -> i32 {
     loop {
         loop {
             let res = critical_section::with(|_| unsafe {
+                memory_fence::memory_fence();
                 if let Some(cnt) = CURR_SEM[semphr as usize - 1] {
                     if cnt > 0 {
                         CURR_SEM[semphr as usize - 1] = Some(cnt - 1);
@@ -310,6 +312,7 @@ pub fn sem_give(semphr: *mut crate::binary::c_types::c_void) -> i32 {
     let res = critical_section::with(|_| unsafe {
         if let Some(cnt) = CURR_SEM[semphr as usize - 1] {
             CURR_SEM[semphr as usize - 1] = Some(cnt + 1);
+            memory_fence::memory_fence();
             1
         } else {
             0
@@ -341,6 +344,7 @@ pub fn create_recursive_mutex() -> *mut crate::binary::c_types::c_void {
         let ptr = &mut MUTEXES[MUTEX_IDX_CURRENT] as *mut _ as *mut Mutex;
         (*ptr).recursive = true;
         MUTEX_IDX_CURRENT += 1;
+        memory_fence::memory_fence();
         trace!("recursive_mutex_create called {:p}", ptr);
         ptr as *mut crate::binary::c_types::c_void
     })
@@ -367,6 +371,7 @@ pub fn lock_mutex(mutex: *mut crate::binary::c_types::c_void) -> i32 {
                     (false, false)
                 }
             });
+            memory_fence::memory_fence();
 
             if should_break {
                 break success;
@@ -386,6 +391,7 @@ pub fn unlock_mutex(mutex: *mut crate::binary::c_types::c_void) -> i32 {
 
     let ptr = mutex as *mut Mutex;
     critical_section::with(|_| unsafe {
+        memory_fence::memory_fence();
         if (*ptr).count > 0 {
             (*ptr).count -= 1;
             1
@@ -449,6 +455,7 @@ pub fn send_queued(
                 trace!("queue posting {:x?}", data);
 
                 REAL_WIFI_QUEUE.as_mut().unwrap().enqueue(data);
+                memory_fence::memory_fence();
             });
         }
     }
@@ -475,6 +482,7 @@ pub fn receive_queued(
         if queue == &mut REAL_WIFI_QUEUE as *mut _ as *mut crate::binary::c_types::c_void {
             loop {
                 let res = critical_section::with(|_| {
+                    memory_fence::memory_fence();
                     let message = REAL_WIFI_QUEUE.as_mut().unwrap().dequeue();
                     if message.is_some() {
                         let message = message.unwrap();
