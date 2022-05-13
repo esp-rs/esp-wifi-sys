@@ -3,6 +3,9 @@ use embedded_hal::prelude::_embedded_hal_blocking_rng_Read;
 #[cfg_attr(feature = "esp32", path = "os_adapter_esp32.rs")]
 pub(crate) mod os_adapter_chip_specific;
 
+use esp_alloc::{calloc, memory_fence};
+use log::{debug, trace};
+
 use crate::{
     binary::include::*,
     compat::{
@@ -11,17 +14,14 @@ use crate::{
             sem_delete, sem_give, sem_take, send_queued, syslog, thread_sem_get, unlock_mutex,
             StrBuf,
         },
-        malloc::calloc,
         timer_compat::{
             compat_esp_timer_create, compat_timer_arm, compat_timer_arm_us, compat_timer_disarm,
             compat_timer_done, compat_timer_setfn,
         },
         work_queue::queue_work,
     },
-    memory_fence::memory_fence,
     wifi::RANDOM_GENERATOR,
 };
-use log::{debug, trace};
 
 pub static mut WIFI_STATE: i32 = -1;
 
@@ -970,7 +970,7 @@ pub unsafe extern "C" fn task_get_max_priority() -> i32 {
 pub unsafe extern "C" fn malloc(
     size: crate::binary::c_types::c_uint,
 ) -> *mut crate::binary::c_types::c_void {
-    crate::compat::malloc::malloc(size as u32) as *mut crate::binary::c_types::c_void
+    esp_alloc::malloc(size as u32) as *mut crate::binary::c_types::c_void
 }
 
 /****************************************************************************
@@ -988,7 +988,7 @@ pub unsafe extern "C" fn malloc(
  ****************************************************************************/
 #[no_mangle]
 pub unsafe extern "C" fn free(p: *mut crate::binary::c_types::c_void) {
-    crate::compat::malloc::free(p as *const _ as *const u8);
+    esp_alloc::free(p as *const _ as *const u8);
 }
 
 /****************************************************************************
@@ -1778,7 +1778,7 @@ pub unsafe extern "C" fn log_timestamp() -> u32 {
  *
  ****************************************************************************/
 pub unsafe extern "C" fn malloc_internal(size: size_t) -> *mut crate::binary::c_types::c_void {
-    crate::compat::malloc::malloc(size as u32) as *mut crate::binary::c_types::c_void
+    esp_alloc::malloc(size as u32) as *mut crate::binary::c_types::c_void
 }
 
 /****************************************************************************

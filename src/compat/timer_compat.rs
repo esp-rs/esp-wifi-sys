@@ -1,8 +1,7 @@
-use crate::{
-    binary::include::{esp_timer_create_args_t, esp_timer_handle_t},
-    memory_fence::memory_fence,
-};
+use esp_alloc::memory_fence;
 use log::{debug, trace};
+
+use crate::binary::include::{esp_timer_create_args_t, esp_timer_handle_t};
 
 static ESP_FAKE_TIMER: () = ();
 

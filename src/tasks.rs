@@ -1,13 +1,16 @@
-use crate::compat::queue::SimpleQueue;
-use crate::compat::timer_compat::Timer;
-use crate::preempt::preempt::task_create;
-use crate::timer::get_systimer_count;
-use crate::wifi::send_data_if_needed;
-use crate::{
-    compat::{self, timer_compat::TIMERS},
-    memory_fence::memory_fence,
-};
+use esp_alloc::memory_fence;
 use log::{debug, trace};
+
+use crate::{
+    compat::{
+        self,
+        queue::SimpleQueue,
+        timer_compat::{Timer, TIMERS},
+    },
+    preempt::preempt::task_create,
+    timer::get_systimer_count,
+    wifi::send_data_if_needed,
+};
 
 pub fn init_tasks() {
     task_create(worker_task1);
