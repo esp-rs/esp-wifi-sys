@@ -16,7 +16,11 @@ pub mod preempt;
 #[cfg_attr(feature = "esp32c3", path = "timer_esp32c3.rs")]
 #[cfg_attr(feature = "esp32", path = "timer_esp32.rs")]
 pub mod timer;
+
 pub mod wifi;
+
+#[cfg(feature = "esp32c3")]
+pub mod ble;
 
 #[doc(hidden)]
 pub mod tasks;

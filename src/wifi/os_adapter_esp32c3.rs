@@ -120,7 +120,7 @@ pub(crate) unsafe extern "C" fn phy_enable() {
 
     critical_section::with(|_| {
         phy_enable_clock();
-        phy_set_wifi_mode_only(true);
+        phy_set_wifi_mode_only(!crate::wifi::BLE_ENABLED);
 
         if G_IS_PHY_CALIBRATED == false {
             let init_data = &PHY_INIT_DATA_DEFAULT;
@@ -145,6 +145,14 @@ pub(crate) unsafe extern "C" fn phy_enable() {
                 }
             }
             */
+        }
+
+        extern "C" {
+            fn coex_pti_v2();
+        }
+
+        if crate::wifi::BLE_ENABLED {
+            coex_pti_v2();
         }
     });
 }
@@ -189,6 +197,23 @@ pub(crate) unsafe extern "C" fn read_mac(
                 break;
             }
         }
+    }
+
+    // ESP_MAC_BT
+    if type_ == 2 {
+        let tmp = mac.offset(0).read_volatile();
+        for i in 0..64 {
+            mac.offset(0).write_volatile(tmp | 0x02);
+            mac.offset(0)
+                .write_volatile(mac.offset(0).read_volatile() ^ (i << 2));
+
+            if mac.offset(0).read_volatile() != tmp {
+                break;
+            }
+        }
+
+        mac.offset(5)
+            .write_volatile(mac.offset(5).read_volatile() + 1);
     }
 
     0

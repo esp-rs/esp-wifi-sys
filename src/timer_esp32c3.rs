@@ -74,6 +74,44 @@ pub fn interrupt1(_trap_frame: &mut TrapFrame) {
 }
 
 #[no_mangle]
+pub fn interrupt5(_trap_frame: &mut TrapFrame) {
+    unsafe {
+        let intr = &*hal::pac::INTERRUPT_CORE0::ptr();
+        intr.cpu_int_clear.write(|w| w.bits(1 << 1));
+
+        let (fnc, arg) = crate::ble::BT_INTERRUPT_FUNCTION5;
+
+        trace!("interrupt 5 {:p} {:p}", fnc, arg);
+
+        if !fnc.is_null() {
+            let fnc: fn(*mut binary::c_types::c_void) = core::mem::transmute(fnc);
+            fnc(arg);
+        }
+
+        trace!("interrupt 5 done");
+    };
+}
+
+#[no_mangle]
+pub fn interrupt8(_trap_frame: &mut TrapFrame) {
+    unsafe {
+        let intr = &*hal::pac::INTERRUPT_CORE0::ptr();
+        intr.cpu_int_clear.write(|w| w.bits(1 << 1));
+
+        let (fnc, arg) = crate::ble::BT_INTERRUPT_FUNCTION8;
+
+        trace!("interrupt 8 {:p} {:p}", fnc, arg);
+
+        if !fnc.is_null() {
+            let fnc: fn(*mut binary::c_types::c_void) = core::mem::transmute(fnc);
+            fnc(arg);
+        }
+
+        trace!("interrupt 8 done");
+    };
+}
+
+#[no_mangle]
 pub fn interrupt10(trap_frame: &mut TrapFrame) {
     unsafe {
         // clear the systimer intr

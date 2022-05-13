@@ -21,6 +21,7 @@ log = "0.4.17"
 embedded-svc = { version = "0.20.3", default-features = false, features = [ "alloc" ], optional = true }
 enumset = { version = "1", default-features = false, optional = true }
 esp-alloc = { git = "https://github.com/esp-rs/esp-alloc" }
+embedded-io = "0.2.0"
 
 [build-dependencies]
 riscv-target = { version = "0.1.2", optional = true }
@@ -32,6 +33,9 @@ esp-backtrace = { git = "https://github.com/bjoernQ/esp-backtrace.git", features
 [target.riscv32i-unknown-none-elf.dev-dependencies]
 esp-println = { git = "https://github.com/esp-rs/esp-println.git", features = [ "esp32c3" ] }
 esp-backtrace = { git = "https://github.com/bjoernQ/esp-backtrace.git", features = [ "esp32c3", "panic-handler", "exception-handler" ] }
+
+[dev-dependencies]
+ble-hci = { git = "https://github.com/bjoernQ/ble-hci", branch = "embedded-io" }
 
 [features]
 default = [ "utils" ]

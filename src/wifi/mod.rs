@@ -67,7 +67,12 @@ pub enum WifiError {
     General(i32),
 }
 
+#[allow(unused)]
+static mut BLE_ENABLED: bool = false;
+
 #[cfg(feature = "esp32c3")]
+/// Initialize for using WiFi
+/// This will initialize internals and also initialize WiFi
 pub fn initialize(
     systimer: &mut esp32c3_hal::pac::SYSTIMER,
     interrupt_core0: &mut esp32c3_hal::pac::INTERRUPT_CORE0,
@@ -91,7 +96,31 @@ pub fn initialize(
     Ok(())
 }
 
+#[cfg(feature = "esp32c3")]
+/// Initialize for using Bluetooth LE
+/// This will just initialize internals.
+pub fn initialize_ble(
+    systimer: &mut esp32c3_hal::pac::SYSTIMER,
+    interrupt_core0: &mut esp32c3_hal::pac::INTERRUPT_CORE0,
+    rng: hal::pac::RNG,
+) -> Result<(), WifiError> {
+    init_rng(rng);
+    init_tasks();
+    setup_timer_isr(systimer, interrupt_core0);
+    wifi_set_log_verbose();
+    init_clocks();
+    init_buffer();
+
+    unsafe {
+        BLE_ENABLED = true;
+    }
+
+    Ok(())
+}
+
 #[cfg(feature = "esp32")]
+/// Initialize for using WiFi
+/// This will initialize internals and also initialize WiFi
 pub fn initialize(timg1: esp32_hal::pac::TIMG1, rng: hal::pac::RNG) -> Result<(), WifiError> {
     init_rng(rng);
     init_tasks();
