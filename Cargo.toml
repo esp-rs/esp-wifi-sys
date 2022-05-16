@@ -30,7 +30,7 @@ riscv-target = { version = "0.1.2", optional = true }
 esp-println = { git = "https://github.com/esp-rs/esp-println.git", features = [ "esp32" ] }
 esp-backtrace = { git = "https://github.com/bjoernQ/esp-backtrace.git", features = [ "esp32", "panic-handler", "exception-handler" ] }
 
-[target.riscv32i-unknown-none-elf.dev-dependencies]
+[target.riscv32imc-unknown-none-elf.dev-dependencies]
 esp-println = { git = "https://github.com/esp-rs/esp-println.git", features = [ "esp32c3" ] }
 esp-backtrace = { git = "https://github.com/bjoernQ/esp-backtrace.git", features = [ "esp32c3", "panic-handler", "exception-handler" ] }
 

@@ -29,8 +29,8 @@ https://github.com/espressif/esp-wireless-drivers-3rdparty/archive/45701c0.zip
 
 | Command                                                                                                                      | Chip    |
 | ---------------------------------------------------------------------------------------------------------------------------- | ------- |
-| `cargo "+nightly" run --example ble_esp32c3 --release --target riscv32i-unknown-none-elf --features "esp32c3,embedded-svc"`  | ESP32C3 |
-| `cargo "+nightly" run --example dhcp_esp32c3 --release --target riscv32i-unknown-none-elf --features "esp32c3,embedded-svc"` | ESP32C3 |
+| `cargo "+nightly" run --example ble_esp32c3 --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc"`  | ESP32C3 |
+| `cargo "+nightly" run --example dhcp_esp32c3 --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc"` | ESP32C3 |
 | `cargo "+esp" run --example dhcp_esp32 --release --target xtensa-esp32-none-elf --features "esp32,embedded-svc"`             | ESP32   |
 
 Additional you can specify these features
@@ -53,7 +53,6 @@ In general you should use the release profile since otherwise the performance is
 
 - uses SYSTIMER as the main timer
 - doesn't work in direct-boot mode
-- only works with target `riscv32i-unknown-none-elf`
 
 ## Notes on ESP32 support
 
