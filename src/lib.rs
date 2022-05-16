@@ -21,13 +21,8 @@ pub mod wifi;
 #[doc(hidden)]
 pub mod tasks;
 
-pub(crate) mod memory_fence;
-
 pub use critical_section;
 use timer::{get_systimer_count, TICKS_PER_SECOND};
-
-#[cfg(feature = "allocator")]
-pub mod allocator;
 
 #[cfg(feature = "embedded-svc")]
 pub mod wifi_interface;

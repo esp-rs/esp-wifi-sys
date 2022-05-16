@@ -17,9 +17,6 @@ mod phy_init_data_esp32;
 #[cfg(feature = "esp32c3")]
 mod phy_init_data_esp32c3;
 
-#[cfg(feature = "esp32")] // TODO for ESP32 we should support multicore
-mod critical_section_xtensa_singlecore;
-
 #[cfg(feature = "esp32")]
 mod additional_esp32;
 

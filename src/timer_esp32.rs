@@ -1,14 +1,18 @@
-use crate::preempt::preempt::task_switch;
-use atomic_polyfill::AtomicU64;
-use atomic_polyfill::Ordering;
 use core::cell::RefCell;
-use esp32_hal::pac::{self, TIMG1};
-use esp32_hal::prelude::_embedded_hal_timer_CountDown;
-use esp32_hal::Timer;
-use esp32_hal::{interrupt, Cpu};
+
+use atomic_polyfill::{AtomicU64, Ordering};
+use esp32_hal::{
+    interrupt,
+    pac::{self, TIMG1},
+    prelude::_embedded_hal_timer_CountDown,
+    Cpu,
+    Timer,
+};
 use log::trace;
 use xtensa_lx::mutex::{Mutex, SpinLockMutex};
 use xtensa_lx_rt::exception::Context;
+
+use crate::preempt::preempt::task_switch;
 
 pub const TICKS_PER_SECOND: u64 = 40_000_000;
 
@@ -104,7 +108,7 @@ pub fn level2_interrupt(context: &mut Context) {
 
     unsafe {
         (&TIMER1).lock(|data| {
-            crate::memory_fence::memory_fence();
+            esp_alloc::memory_fence();
 
             let mut timer1 = data.borrow_mut();
             let timer1 = timer1.as_mut().unwrap();
