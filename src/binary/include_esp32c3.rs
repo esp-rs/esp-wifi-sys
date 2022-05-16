@@ -386,6 +386,642 @@ pub const WIFI_LOG_SUBMODULE_IOCTL: u32 = 2;
 pub const WIFI_LOG_SUBMODULE_CONN: u32 = 4;
 pub const WIFI_LOG_SUBMODULE_SCAN: u32 = 8;
 pub const ESP_CAL_DATA_CHECK_FAIL: u32 = 1;
+pub const CONFIG_IDF_CMAKE: u32 = 1;
+pub const CONFIG_IDF_TARGET_ARCH_RISCV: u32 = 1;
+pub const CONFIG_IDF_TARGET: &[u8; 8usize] = b"esp32c3\0";
+pub const CONFIG_IDF_TARGET_ESP32C3: u32 = 1;
+pub const CONFIG_IDF_FIRMWARE_CHIP_ID: u32 = 5;
+pub const CONFIG_SDK_TOOLPREFIX: &[u8; 17usize] = b"riscv32-esp-elf-\0";
+pub const CONFIG_APP_BUILD_TYPE_APP_2NDBOOT: u32 = 1;
+pub const CONFIG_APP_BUILD_GENERATE_BINARIES: u32 = 1;
+pub const CONFIG_APP_BUILD_BOOTLOADER: u32 = 1;
+pub const CONFIG_APP_BUILD_USE_FLASH_SECTIONS: u32 = 1;
+pub const CONFIG_APP_COMPILE_TIME_DATE: u32 = 1;
+pub const CONFIG_APP_RETRIEVE_LEN_ELF_SHA: u32 = 16;
+pub const CONFIG_BOOTLOADER_OFFSET_IN_FLASH: u32 = 0;
+pub const CONFIG_BOOTLOADER_COMPILER_OPTIMIZATION_SIZE: u32 = 1;
+pub const CONFIG_BOOTLOADER_LOG_LEVEL_INFO: u32 = 1;
+pub const CONFIG_BOOTLOADER_LOG_LEVEL: u32 = 3;
+pub const CONFIG_BOOTLOADER_VDDSDIO_BOOST_1_9V: u32 = 1;
+pub const CONFIG_BOOTLOADER_WDT_ENABLE: u32 = 1;
+pub const CONFIG_BOOTLOADER_WDT_TIME_MS: u32 = 9000;
+pub const CONFIG_BOOTLOADER_RESERVE_RTC_SIZE: u32 = 0;
+pub const CONFIG_SECURE_BOOT_SUPPORTS_RSA: u32 = 1;
+pub const CONFIG_SECURE_TARGET_HAS_SECURE_ROM_DL_MODE: u32 = 1;
+pub const CONFIG_ESPTOOLPY_BAUD_OTHER_VAL: u32 = 115200;
+pub const CONFIG_ESPTOOLPY_FLASHMODE_DIO: u32 = 1;
+pub const CONFIG_ESPTOOLPY_FLASHMODE: &[u8; 4usize] = b"dio\0";
+pub const CONFIG_ESPTOOLPY_FLASHFREQ_80M: u32 = 1;
+pub const CONFIG_ESPTOOLPY_FLASHFREQ: &[u8; 4usize] = b"80m\0";
+pub const CONFIG_ESPTOOLPY_FLASHSIZE_2MB: u32 = 1;
+pub const CONFIG_ESPTOOLPY_FLASHSIZE: &[u8; 4usize] = b"2MB\0";
+pub const CONFIG_ESPTOOLPY_FLASHSIZE_DETECT: u32 = 1;
+pub const CONFIG_ESPTOOLPY_BEFORE_RESET: u32 = 1;
+pub const CONFIG_ESPTOOLPY_BEFORE: &[u8; 14usize] = b"default_reset\0";
+pub const CONFIG_ESPTOOLPY_AFTER_RESET: u32 = 1;
+pub const CONFIG_ESPTOOLPY_AFTER: &[u8; 11usize] = b"hard_reset\0";
+pub const CONFIG_ESPTOOLPY_MONITOR_BAUD_115200B: u32 = 1;
+pub const CONFIG_ESPTOOLPY_MONITOR_BAUD_OTHER_VAL: u32 = 115200;
+pub const CONFIG_ESPTOOLPY_MONITOR_BAUD: u32 = 115200;
+pub const CONFIG_PARTITION_TABLE_SINGLE_APP: u32 = 1;
+pub const CONFIG_PARTITION_TABLE_CUSTOM_FILENAME: &[u8; 15usize] = b"partitions.csv\0";
+pub const CONFIG_PARTITION_TABLE_FILENAME: &[u8; 25usize] = b"partitions_singleapp.csv\0";
+pub const CONFIG_PARTITION_TABLE_OFFSET: u32 = 32768;
+pub const CONFIG_PARTITION_TABLE_MD5: u32 = 1;
+pub const CONFIG_COMPILER_OPTIMIZATION_DEFAULT: u32 = 1;
+pub const CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS_ENABLE: u32 = 1;
+pub const CONFIG_COMPILER_STACK_CHECK_MODE_NONE: u32 = 1;
+pub const CONFIG_APPTRACE_DEST_NONE: u32 = 1;
+pub const CONFIG_APPTRACE_LOCK_ENABLE: u32 = 1;
+pub const CONFIG_BT_ENABLED: u32 = 1;
+pub const CONFIG_BT_CTRL_ESP32C3: u32 = 1;
+pub const CONFIG_BT_SOC_SUPPORT_5_0: u32 = 1;
+pub const CONFIG_BTDM_CTRL_BR_EDR_SCO_DATA_PATH_EFF: u32 = 0;
+pub const CONFIG_BTDM_CTRL_PCM_ROLE_EFF: u32 = 0;
+pub const CONFIG_BTDM_CTRL_PCM_POLAR_EFF: u32 = 0;
+pub const CONFIG_BTDM_CTRL_BLE_MAX_CONN_EFF: u32 = 0;
+pub const CONFIG_BTDM_CTRL_BR_EDR_MAX_ACL_CONN_EFF: u32 = 0;
+pub const CONFIG_BTDM_CTRL_BR_EDR_MAX_SYNC_CONN_EFF: u32 = 0;
+pub const CONFIG_BTDM_CTRL_PINNED_TO_CORE: u32 = 0;
+pub const CONFIG_BTDM_BLE_SLEEP_CLOCK_ACCURACY_INDEX_EFF: u32 = 1;
+pub const CONFIG_BT_CTRL_MODE_EFF: u32 = 1;
+pub const CONFIG_BT_CTRL_BLE_MAX_ACT: u32 = 10;
+pub const CONFIG_BT_CTRL_BLE_MAX_ACT_EFF: u32 = 10;
+pub const CONFIG_BT_CTRL_BLE_STATIC_ACL_TX_BUF_NB: u32 = 0;
+pub const CONFIG_BT_CTRL_PINNED_TO_CORE: u32 = 0;
+pub const CONFIG_BT_CTRL_HCI_MODE_VHCI: u32 = 1;
+pub const CONFIG_BT_CTRL_HCI_TL: u32 = 1;
+pub const CONFIG_BT_CTRL_ADV_DUP_FILT_MAX: u32 = 30;
+pub const CONFIG_BT_CTRL_HW_CCA_EFF: u32 = 0;
+pub const CONFIG_BT_CTRL_CE_LENGTH_TYPE_ORIG: u32 = 1;
+pub const CONFIG_BT_CTRL_CE_LENGTH_TYPE_EFF: u32 = 0;
+pub const CONFIG_BT_CTRL_TX_ANTENNA_INDEX_0: u32 = 1;
+pub const CONFIG_BT_CTRL_TX_ANTENNA_INDEX_EFF: u32 = 0;
+pub const CONFIG_BT_CTRL_RX_ANTENNA_INDEX_0: u32 = 1;
+pub const CONFIG_BT_CTRL_RX_ANTENNA_INDEX_EFF: u32 = 0;
+pub const CONFIG_BT_CTRL_DFT_TX_POWER_LEVEL_P3: u32 = 1;
+pub const CONFIG_BT_CTRL_DFT_TX_POWER_LEVEL_EFF: u32 = 10;
+pub const CONFIG_BT_CTRL_BLE_ADV_REPORT_FLOW_CTRL_SUPP: u32 = 1;
+pub const CONFIG_BT_CTRL_BLE_ADV_REPORT_FLOW_CTRL_NUM: u32 = 100;
+pub const CONFIG_BT_CTRL_BLE_ADV_REPORT_DISCARD_THRSHOLD: u32 = 20;
+pub const CONFIG_BT_CTRL_BLE_SCAN_DUPL: u32 = 1;
+pub const CONFIG_BT_CTRL_SCAN_DUPL_TYPE_DEVICE: u32 = 1;
+pub const CONFIG_BT_CTRL_SCAN_DUPL_TYPE: u32 = 0;
+pub const CONFIG_BT_CTRL_SCAN_DUPL_CACHE_SIZE: u32 = 100;
+pub const CONFIG_BT_CTRL_COEX_PHY_CODED_TX_RX_TLIM_DIS: u32 = 1;
+pub const CONFIG_BT_CTRL_COEX_PHY_CODED_TX_RX_TLIM_EFF: u32 = 0;
+pub const CONFIG_BT_CTRL_SLEEP_MODE_EFF: u32 = 0;
+pub const CONFIG_BT_CTRL_SLEEP_CLOCK_EFF: u32 = 0;
+pub const CONFIG_BT_CTRL_HCI_TL_EFF: u32 = 1;
+pub const CONFIG_BT_BLUEDROID_ENABLED: u32 = 1;
+pub const CONFIG_BT_BTC_TASK_STACK_SIZE: u32 = 3072;
+pub const CONFIG_BT_BLUEDROID_PINNED_TO_CORE: u32 = 0;
+pub const CONFIG_BT_BTU_TASK_STACK_SIZE: u32 = 4096;
+pub const CONFIG_BT_BLE_ENABLED: u32 = 1;
+pub const CONFIG_BT_GATTS_ENABLE: u32 = 1;
+pub const CONFIG_BT_GATT_SR_PROFILES: u32 = 8;
+pub const CONFIG_BT_GATTS_SEND_SERVICE_CHANGE_AUTO: u32 = 1;
+pub const CONFIG_BT_GATTS_SEND_SERVICE_CHANGE_MODE: u32 = 0;
+pub const CONFIG_BT_GATTC_ENABLE: u32 = 1;
+pub const CONFIG_BT_GATTC_CONNECT_RETRY_COUNT: u32 = 3;
+pub const CONFIG_BT_BLE_SMP_ENABLE: u32 = 1;
+pub const CONFIG_BT_LOG_HCI_TRACE_LEVEL_WARNING: u32 = 1;
+pub const CONFIG_BT_LOG_HCI_TRACE_LEVEL: u32 = 2;
+pub const CONFIG_BT_LOG_BTM_TRACE_LEVEL_WARNING: u32 = 1;
+pub const CONFIG_BT_LOG_BTM_TRACE_LEVEL: u32 = 2;
+pub const CONFIG_BT_LOG_L2CAP_TRACE_LEVEL_WARNING: u32 = 1;
+pub const CONFIG_BT_LOG_L2CAP_TRACE_LEVEL: u32 = 2;
+pub const CONFIG_BT_LOG_RFCOMM_TRACE_LEVEL_WARNING: u32 = 1;
+pub const CONFIG_BT_LOG_RFCOMM_TRACE_LEVEL: u32 = 2;
+pub const CONFIG_BT_LOG_SDP_TRACE_LEVEL_WARNING: u32 = 1;
+pub const CONFIG_BT_LOG_SDP_TRACE_LEVEL: u32 = 2;
+pub const CONFIG_BT_LOG_GAP_TRACE_LEVEL_WARNING: u32 = 1;
+pub const CONFIG_BT_LOG_GAP_TRACE_LEVEL: u32 = 2;
+pub const CONFIG_BT_LOG_BNEP_TRACE_LEVEL_WARNING: u32 = 1;
+pub const CONFIG_BT_LOG_BNEP_TRACE_LEVEL: u32 = 2;
+pub const CONFIG_BT_LOG_PAN_TRACE_LEVEL_WARNING: u32 = 1;
+pub const CONFIG_BT_LOG_PAN_TRACE_LEVEL: u32 = 2;
+pub const CONFIG_BT_LOG_A2D_TRACE_LEVEL_WARNING: u32 = 1;
+pub const CONFIG_BT_LOG_A2D_TRACE_LEVEL: u32 = 2;
+pub const CONFIG_BT_LOG_AVDT_TRACE_LEVEL_WARNING: u32 = 1;
+pub const CONFIG_BT_LOG_AVDT_TRACE_LEVEL: u32 = 2;
+pub const CONFIG_BT_LOG_AVCT_TRACE_LEVEL_WARNING: u32 = 1;
+pub const CONFIG_BT_LOG_AVCT_TRACE_LEVEL: u32 = 2;
+pub const CONFIG_BT_LOG_AVRC_TRACE_LEVEL_WARNING: u32 = 1;
+pub const CONFIG_BT_LOG_AVRC_TRACE_LEVEL: u32 = 2;
+pub const CONFIG_BT_LOG_MCA_TRACE_LEVEL_WARNING: u32 = 1;
+pub const CONFIG_BT_LOG_MCA_TRACE_LEVEL: u32 = 2;
+pub const CONFIG_BT_LOG_HID_TRACE_LEVEL_WARNING: u32 = 1;
+pub const CONFIG_BT_LOG_HID_TRACE_LEVEL: u32 = 2;
+pub const CONFIG_BT_LOG_APPL_TRACE_LEVEL_WARNING: u32 = 1;
+pub const CONFIG_BT_LOG_APPL_TRACE_LEVEL: u32 = 2;
+pub const CONFIG_BT_LOG_GATT_TRACE_LEVEL_WARNING: u32 = 1;
+pub const CONFIG_BT_LOG_GATT_TRACE_LEVEL: u32 = 2;
+pub const CONFIG_BT_LOG_SMP_TRACE_LEVEL_WARNING: u32 = 1;
+pub const CONFIG_BT_LOG_SMP_TRACE_LEVEL: u32 = 2;
+pub const CONFIG_BT_LOG_BTIF_TRACE_LEVEL_WARNING: u32 = 1;
+pub const CONFIG_BT_LOG_BTIF_TRACE_LEVEL: u32 = 2;
+pub const CONFIG_BT_LOG_BTC_TRACE_LEVEL_WARNING: u32 = 1;
+pub const CONFIG_BT_LOG_BTC_TRACE_LEVEL: u32 = 2;
+pub const CONFIG_BT_LOG_OSI_TRACE_LEVEL_WARNING: u32 = 1;
+pub const CONFIG_BT_LOG_OSI_TRACE_LEVEL: u32 = 2;
+pub const CONFIG_BT_LOG_BLUFI_TRACE_LEVEL_WARNING: u32 = 1;
+pub const CONFIG_BT_LOG_BLUFI_TRACE_LEVEL: u32 = 2;
+pub const CONFIG_BT_ACL_CONNECTIONS: u32 = 4;
+pub const CONFIG_BT_MULTI_CONNECTION_ENBALE: u32 = 1;
+pub const CONFIG_BT_SMP_ENABLE: u32 = 1;
+pub const CONFIG_BT_BLE_ESTAB_LINK_CONN_TOUT: u32 = 30;
+pub const CONFIG_BT_BLE_RPA_SUPPORTED: u32 = 1;
+pub const CONFIG_BT_BLE_50_FEATURES_SUPPORTED: u32 = 1;
+pub const CONFIG_BT_RESERVE_DRAM: u32 = 56156;
+pub const CONFIG_COAP_MBEDTLS_PSK: u32 = 1;
+pub const CONFIG_COAP_LOG_DEFAULT_LEVEL: u32 = 0;
+pub const CONFIG_ADC_DISABLE_DAC: u32 = 1;
+pub const CONFIG_SPI_MASTER_ISR_IN_IRAM: u32 = 1;
+pub const CONFIG_SPI_SLAVE_ISR_IN_IRAM: u32 = 1;
+pub const CONFIG_EFUSE_MAX_BLK_LEN: u32 = 256;
+pub const CONFIG_ESP_TLS_USING_MBEDTLS: u32 = 1;
+pub const CONFIG_ESP_TLS_USE_DS_PERIPHERAL: u32 = 1;
+pub const CONFIG_ESP32C3_DEFAULT_CPU_FREQ_160: u32 = 1;
+pub const CONFIG_ESP32C3_REV_MIN_3: u32 = 1;
+pub const CONFIG_ESP32C3_REV_MIN: u32 = 3;
+pub const CONFIG_ESP32C3_UNIVERSAL_MAC_ADDRESSES_FOUR: u32 = 1;
+pub const CONFIG_ESP32C3_UNIVERSAL_MAC_ADDRESSES: u32 = 4;
+pub const CONFIG_ESP_MAC_ADDR_UNIVERSE_BT_OFFSET: u32 = 2;
+pub const CONFIG_ESP32C3_DEBUG_OCDAWARE: u32 = 1;
+pub const CONFIG_ESP32C3_BROWNOUT_DET: u32 = 1;
+pub const CONFIG_ESP32C3_BROWNOUT_DET_LVL_SEL_7: u32 = 1;
+pub const CONFIG_ESP32C3_BROWNOUT_DET_LVL: u32 = 7;
+pub const CONFIG_ESP32C3_TIME_SYSCALL_USE_RTC_SYSTIMER: u32 = 1;
+pub const CONFIG_ESP32C3_RTC_CLK_SRC_INT_RC: u32 = 1;
+pub const CONFIG_ESP32C3_RTC_CLK_CAL_CYCLES: u32 = 1024;
+pub const CONFIG_ESP32C3_LIGHTSLEEP_GPIO_RESET_WORKAROUND: u32 = 1;
+pub const CONFIG_ESP_ERR_TO_NAME_LOOKUP: u32 = 1;
+pub const CONFIG_ESP_SYSTEM_EVENT_QUEUE_SIZE: u32 = 32;
+pub const CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE: u32 = 2304;
+pub const CONFIG_ESP_MAIN_TASK_STACK_SIZE: u32 = 3584;
+pub const CONFIG_ESP_IPC_TASK_STACK_SIZE: u32 = 1024;
+pub const CONFIG_ESP_MINIMAL_SHARED_STACK_SIZE: u32 = 2048;
+pub const CONFIG_ESP_CONSOLE_UART_DEFAULT: u32 = 1;
+pub const CONFIG_ESP_CONSOLE_UART: u32 = 1;
+pub const CONFIG_ESP_CONSOLE_UART_NUM: u32 = 0;
+pub const CONFIG_ESP_CONSOLE_UART_BAUDRATE: u32 = 115200;
+pub const CONFIG_ESP_INT_WDT: u32 = 1;
+pub const CONFIG_ESP_INT_WDT_TIMEOUT_MS: u32 = 300;
+pub const CONFIG_ESP_TASK_WDT: u32 = 1;
+pub const CONFIG_ESP_TASK_WDT_TIMEOUT_S: u32 = 5;
+pub const CONFIG_ESP_TASK_WDT_CHECK_IDLE_TASK_CPU0: u32 = 1;
+pub const CONFIG_ESP_MAC_ADDR_UNIVERSE_WIFI_STA: u32 = 1;
+pub const CONFIG_ESP_MAC_ADDR_UNIVERSE_WIFI_AP: u32 = 1;
+pub const CONFIG_ESP_MAC_ADDR_UNIVERSE_BT: u32 = 1;
+pub const CONFIG_ESP_MAC_ADDR_UNIVERSE_ETH: u32 = 1;
+pub const CONFIG_ETH_ENABLED: u32 = 1;
+pub const CONFIG_ETH_USE_SPI_ETHERNET: u32 = 1;
+pub const CONFIG_ESP_EVENT_POST_FROM_ISR: u32 = 1;
+pub const CONFIG_ESP_EVENT_POST_FROM_IRAM_ISR: u32 = 1;
+pub const CONFIG_ESP_HTTP_CLIENT_ENABLE_HTTPS: u32 = 1;
+pub const CONFIG_HTTPD_MAX_REQ_HDR_LEN: u32 = 512;
+pub const CONFIG_HTTPD_MAX_URI_LEN: u32 = 512;
+pub const CONFIG_HTTPD_ERR_RESP_NO_DELAY: u32 = 1;
+pub const CONFIG_HTTPD_PURGE_BUF_LEN: u32 = 32;
+pub const CONFIG_ESP_NETIF_IP_LOST_TIMER_INTERVAL: u32 = 120;
+pub const CONFIG_ESP_NETIF_TCPIP_LWIP: u32 = 1;
+pub const CONFIG_ESP_NETIF_TCPIP_ADAPTER_COMPATIBLE_LAYER: u32 = 1;
+pub const CONFIG_ESP_SYSTEM_PANIC_PRINT_REBOOT: u32 = 1;
+pub const CONFIG_ESP_SYSTEM_SINGLE_CORE_MODE: u32 = 1;
+pub const CONFIG_ESP_SYSTEM_RTC_FAST_MEM_AS_HEAP_DEPCHECK: u32 = 1;
+pub const CONFIG_ESP_SYSTEM_ALLOW_RTC_FAST_MEM_AS_HEAP: u32 = 1;
+pub const CONFIG_ESP_SYSTEM_PD_FLASH: u32 = 1;
+pub const CONFIG_ESP_SYSTEM_PM_POWER_DOWN_CPU: u32 = 1;
+pub const CONFIG_ESP_SYSTEM_MEMPROT_FEATURE: u32 = 1;
+pub const CONFIG_ESP_SYSTEM_MEMPROT_FEATURE_LOCK: u32 = 1;
+pub const CONFIG_ESP_TIME_FUNCS_USE_RTC_TIMER: u32 = 1;
+pub const CONFIG_ESP_TIME_FUNCS_USE_ESP_TIMER: u32 = 1;
+pub const CONFIG_ESP_TIMER_TASK_STACK_SIZE: u32 = 3584;
+pub const CONFIG_ESP_TIMER_IMPL_SYSTIMER: u32 = 1;
+pub const CONFIG_ESP32_WIFI_SW_COEXIST_ENABLE: u32 = 1;
+pub const CONFIG_ESP32_WIFI_STATIC_RX_BUFFER_NUM: u32 = 10;
+pub const CONFIG_ESP32_WIFI_DYNAMIC_RX_BUFFER_NUM: u32 = 32;
+pub const CONFIG_ESP32_WIFI_DYNAMIC_TX_BUFFER: u32 = 1;
+pub const CONFIG_ESP32_WIFI_TX_BUFFER_TYPE: u32 = 1;
+pub const CONFIG_ESP32_WIFI_DYNAMIC_TX_BUFFER_NUM: u32 = 32;
+pub const CONFIG_ESP32_WIFI_AMPDU_TX_ENABLED: u32 = 1;
+pub const CONFIG_ESP32_WIFI_TX_BA_WIN: u32 = 6;
+pub const CONFIG_ESP32_WIFI_AMPDU_RX_ENABLED: u32 = 1;
+pub const CONFIG_ESP32_WIFI_RX_BA_WIN: u32 = 6;
+pub const CONFIG_ESP32_WIFI_NVS_ENABLED: u32 = 1;
+pub const CONFIG_ESP32_WIFI_SOFTAP_BEACON_MAX_LEN: u32 = 752;
+pub const CONFIG_ESP32_WIFI_MGMT_SBUF_NUM: u32 = 32;
+pub const CONFIG_ESP32_WIFI_IRAM_OPT: u32 = 1;
+pub const CONFIG_ESP32_WIFI_RX_IRAM_OPT: u32 = 1;
+pub const CONFIG_ESP32_WIFI_ENABLE_WPA3_SAE: u32 = 1;
+pub const CONFIG_ESP32_PHY_MAX_WIFI_TX_POWER: u32 = 20;
+pub const CONFIG_ESP32_PHY_MAX_TX_POWER: u32 = 20;
+pub const CONFIG_ESP_COREDUMP_ENABLE_TO_NONE: u32 = 1;
+pub const CONFIG_FATFS_CODEPAGE_437: u32 = 1;
+pub const CONFIG_FATFS_CODEPAGE: u32 = 437;
+pub const CONFIG_FATFS_LFN_NONE: u32 = 1;
+pub const CONFIG_FATFS_FS_LOCK: u32 = 0;
+pub const CONFIG_FATFS_TIMEOUT_MS: u32 = 10000;
+pub const CONFIG_FATFS_PER_FILE_CACHE: u32 = 1;
+pub const CONFIG_FMB_COMM_MODE_TCP_EN: u32 = 1;
+pub const CONFIG_FMB_TCP_PORT_DEFAULT: u32 = 502;
+pub const CONFIG_FMB_TCP_PORT_MAX_CONN: u32 = 5;
+pub const CONFIG_FMB_TCP_CONNECTION_TOUT_SEC: u32 = 20;
+pub const CONFIG_FMB_COMM_MODE_RTU_EN: u32 = 1;
+pub const CONFIG_FMB_COMM_MODE_ASCII_EN: u32 = 1;
+pub const CONFIG_FMB_MASTER_TIMEOUT_MS_RESPOND: u32 = 150;
+pub const CONFIG_FMB_MASTER_DELAY_MS_CONVERT: u32 = 200;
+pub const CONFIG_FMB_QUEUE_LENGTH: u32 = 20;
+pub const CONFIG_FMB_PORT_TASK_STACK_SIZE: u32 = 4096;
+pub const CONFIG_FMB_SERIAL_BUF_SIZE: u32 = 256;
+pub const CONFIG_FMB_SERIAL_ASCII_BITS_PER_SYMB: u32 = 8;
+pub const CONFIG_FMB_SERIAL_ASCII_TIMEOUT_RESPOND_MS: u32 = 1000;
+pub const CONFIG_FMB_PORT_TASK_PRIO: u32 = 10;
+pub const CONFIG_FMB_CONTROLLER_SLAVE_ID_SUPPORT: u32 = 1;
+pub const CONFIG_FMB_CONTROLLER_SLAVE_ID: u32 = 1122867;
+pub const CONFIG_FMB_CONTROLLER_NOTIFY_TIMEOUT: u32 = 20;
+pub const CONFIG_FMB_CONTROLLER_NOTIFY_QUEUE_SIZE: u32 = 20;
+pub const CONFIG_FMB_CONTROLLER_STACK_SIZE: u32 = 4096;
+pub const CONFIG_FMB_EVENT_QUEUE_TIMEOUT: u32 = 20;
+pub const CONFIG_FMB_TIMER_PORT_ENABLED: u32 = 1;
+pub const CONFIG_FMB_TIMER_GROUP: u32 = 0;
+pub const CONFIG_FMB_TIMER_INDEX: u32 = 0;
+pub const CONFIG_FREERTOS_UNICORE: u32 = 1;
+pub const CONFIG_FREERTOS_NO_AFFINITY: u32 = 2147483647;
+pub const CONFIG_FREERTOS_CORETIMER_0: u32 = 1;
+pub const CONFIG_FREERTOS_OPTIMIZED_SCHEDULER: u32 = 1;
+pub const CONFIG_FREERTOS_HZ: u32 = 100;
+pub const CONFIG_FREERTOS_ASSERT_ON_UNTESTED_FUNCTION: u32 = 1;
+pub const CONFIG_FREERTOS_CHECK_STACKOVERFLOW_CANARY: u32 = 1;
+pub const CONFIG_FREERTOS_INTERRUPT_BACKTRACE: u32 = 1;
+pub const CONFIG_FREERTOS_THREAD_LOCAL_STORAGE_POINTERS: u32 = 1;
+pub const CONFIG_FREERTOS_ASSERT_FAIL_ABORT: u32 = 1;
+pub const CONFIG_FREERTOS_IDLE_TASK_STACKSIZE: u32 = 2304;
+pub const CONFIG_FREERTOS_ISR_STACKSIZE: u32 = 1536;
+pub const CONFIG_FREERTOS_MAX_TASK_NAME_LEN: u32 = 16;
+pub const CONFIG_FREERTOS_SUPPORT_STATIC_ALLOCATION: u32 = 1;
+pub const CONFIG_FREERTOS_TIMER_TASK_PRIORITY: u32 = 1;
+pub const CONFIG_FREERTOS_TIMER_TASK_STACK_DEPTH: u32 = 2048;
+pub const CONFIG_FREERTOS_TIMER_QUEUE_LENGTH: u32 = 10;
+pub const CONFIG_FREERTOS_QUEUE_REGISTRY_SIZE: u32 = 0;
+pub const CONFIG_FREERTOS_TASK_FUNCTION_WRAPPER: u32 = 1;
+pub const CONFIG_FREERTOS_CHECK_MUTEX_GIVEN_BY_OWNER: u32 = 1;
+pub const CONFIG_FREERTOS_DEBUG_OCDAWARE: u32 = 1;
+pub const CONFIG_HEAP_POISONING_DISABLED: u32 = 1;
+pub const CONFIG_HEAP_TRACING_OFF: u32 = 1;
+pub const CONFIG_LOG_DEFAULT_LEVEL_INFO: u32 = 1;
+pub const CONFIG_LOG_DEFAULT_LEVEL: u32 = 3;
+pub const CONFIG_LOG_COLORS: u32 = 1;
+pub const CONFIG_LOG_TIMESTAMP_SOURCE_RTOS: u32 = 1;
+pub const CONFIG_LWIP_LOCAL_HOSTNAME: &[u8; 10usize] = b"espressif\0";
+pub const CONFIG_LWIP_DNS_SUPPORT_MDNS_QUERIES: u32 = 1;
+pub const CONFIG_LWIP_TIMERS_ONDEMAND: u32 = 1;
+pub const CONFIG_LWIP_MAX_SOCKETS: u32 = 10;
+pub const CONFIG_LWIP_SO_REUSE: u32 = 1;
+pub const CONFIG_LWIP_SO_REUSE_RXTOALL: u32 = 1;
+pub const CONFIG_LWIP_IP4_FRAG: u32 = 1;
+pub const CONFIG_LWIP_IP6_FRAG: u32 = 1;
+pub const CONFIG_LWIP_ESP_GRATUITOUS_ARP: u32 = 1;
+pub const CONFIG_LWIP_GARP_TMR_INTERVAL: u32 = 60;
+pub const CONFIG_LWIP_TCPIP_RECVMBOX_SIZE: u32 = 32;
+pub const CONFIG_LWIP_DHCP_DOES_ARP_CHECK: u32 = 1;
+pub const CONFIG_LWIP_DHCPS_LEASE_UNIT: u32 = 60;
+pub const CONFIG_LWIP_DHCPS_MAX_STATION_NUM: u32 = 8;
+pub const CONFIG_LWIP_IPV6: u32 = 1;
+pub const CONFIG_LWIP_NETIF_LOOPBACK: u32 = 1;
+pub const CONFIG_LWIP_LOOPBACK_MAX_PBUFS: u32 = 8;
+pub const CONFIG_LWIP_MAX_ACTIVE_TCP: u32 = 16;
+pub const CONFIG_LWIP_MAX_LISTENING_TCP: u32 = 16;
+pub const CONFIG_LWIP_TCP_HIGH_SPEED_RETRANSMISSION: u32 = 1;
+pub const CONFIG_LWIP_TCP_MAXRTX: u32 = 12;
+pub const CONFIG_LWIP_TCP_SYNMAXRTX: u32 = 12;
+pub const CONFIG_LWIP_TCP_MSS: u32 = 1440;
+pub const CONFIG_LWIP_TCP_TMR_INTERVAL: u32 = 250;
+pub const CONFIG_LWIP_TCP_MSL: u32 = 60000;
+pub const CONFIG_LWIP_TCP_SND_BUF_DEFAULT: u32 = 5744;
+pub const CONFIG_LWIP_TCP_WND_DEFAULT: u32 = 5744;
+pub const CONFIG_LWIP_TCP_RECVMBOX_SIZE: u32 = 6;
+pub const CONFIG_LWIP_TCP_QUEUE_OOSEQ: u32 = 1;
+pub const CONFIG_LWIP_TCP_OVERSIZE_MSS: u32 = 1;
+pub const CONFIG_LWIP_TCP_RTO_TIME: u32 = 1500;
+pub const CONFIG_LWIP_MAX_UDP_PCBS: u32 = 16;
+pub const CONFIG_LWIP_UDP_RECVMBOX_SIZE: u32 = 6;
+pub const CONFIG_LWIP_CHECKSUM_CHECK_ICMP: u32 = 1;
+pub const CONFIG_LWIP_TCPIP_TASK_STACK_SIZE: u32 = 3072;
+pub const CONFIG_LWIP_TCPIP_TASK_AFFINITY_NO_AFFINITY: u32 = 1;
+pub const CONFIG_LWIP_TCPIP_TASK_AFFINITY: u32 = 2147483647;
+pub const CONFIG_LWIP_IPV6_MEMP_NUM_ND6_QUEUE: u32 = 3;
+pub const CONFIG_LWIP_IPV6_ND6_NUM_NEIGHBORS: u32 = 5;
+pub const CONFIG_LWIP_MAX_RAW_PCBS: u32 = 16;
+pub const CONFIG_LWIP_DHCP_MAX_NTP_SERVERS: u32 = 1;
+pub const CONFIG_LWIP_SNTP_UPDATE_DELAY: u32 = 3600000;
+pub const CONFIG_LWIP_ESP_LWIP_ASSERT: u32 = 1;
+pub const CONFIG_LWIP_HOOK_TCP_ISN_DEFAULT: u32 = 1;
+pub const CONFIG_LWIP_HOOK_IP6_ROUTE_NONE: u32 = 1;
+pub const CONFIG_LWIP_HOOK_NETCONN_EXT_RESOLVE_NONE: u32 = 1;
+pub const CONFIG_MBEDTLS_INTERNAL_MEM_ALLOC: u32 = 1;
+pub const CONFIG_MBEDTLS_ASYMMETRIC_CONTENT_LEN: u32 = 1;
+pub const CONFIG_MBEDTLS_SSL_IN_CONTENT_LEN: u32 = 16384;
+pub const CONFIG_MBEDTLS_SSL_OUT_CONTENT_LEN: u32 = 4096;
+pub const CONFIG_MBEDTLS_CERTIFICATE_BUNDLE: u32 = 1;
+pub const CONFIG_MBEDTLS_CERTIFICATE_BUNDLE_DEFAULT_FULL: u32 = 1;
+pub const CONFIG_MBEDTLS_HARDWARE_AES: u32 = 1;
+pub const CONFIG_MBEDTLS_HARDWARE_MPI: u32 = 1;
+pub const CONFIG_MBEDTLS_HARDWARE_SHA: u32 = 1;
+pub const CONFIG_MBEDTLS_ROM_MD5: u32 = 1;
+pub const CONFIG_MBEDTLS_HAVE_TIME: u32 = 1;
+pub const CONFIG_MBEDTLS_ECDSA_DETERMINISTIC: u32 = 1;
+pub const CONFIG_MBEDTLS_SHA512_C: u32 = 1;
+pub const CONFIG_MBEDTLS_TLS_SERVER_AND_CLIENT: u32 = 1;
+pub const CONFIG_MBEDTLS_TLS_SERVER: u32 = 1;
+pub const CONFIG_MBEDTLS_TLS_CLIENT: u32 = 1;
+pub const CONFIG_MBEDTLS_TLS_ENABLED: u32 = 1;
+pub const CONFIG_MBEDTLS_KEY_EXCHANGE_RSA: u32 = 1;
+pub const CONFIG_MBEDTLS_KEY_EXCHANGE_DHE_RSA: u32 = 1;
+pub const CONFIG_MBEDTLS_KEY_EXCHANGE_ELLIPTIC_CURVE: u32 = 1;
+pub const CONFIG_MBEDTLS_KEY_EXCHANGE_ECDHE_RSA: u32 = 1;
+pub const CONFIG_MBEDTLS_KEY_EXCHANGE_ECDHE_ECDSA: u32 = 1;
+pub const CONFIG_MBEDTLS_KEY_EXCHANGE_ECDH_ECDSA: u32 = 1;
+pub const CONFIG_MBEDTLS_KEY_EXCHANGE_ECDH_RSA: u32 = 1;
+pub const CONFIG_MBEDTLS_SSL_RENEGOTIATION: u32 = 1;
+pub const CONFIG_MBEDTLS_SSL_PROTO_TLS1: u32 = 1;
+pub const CONFIG_MBEDTLS_SSL_PROTO_TLS1_1: u32 = 1;
+pub const CONFIG_MBEDTLS_SSL_PROTO_TLS1_2: u32 = 1;
+pub const CONFIG_MBEDTLS_SSL_ALPN: u32 = 1;
+pub const CONFIG_MBEDTLS_CLIENT_SSL_SESSION_TICKETS: u32 = 1;
+pub const CONFIG_MBEDTLS_SERVER_SSL_SESSION_TICKETS: u32 = 1;
+pub const CONFIG_MBEDTLS_AES_C: u32 = 1;
+pub const CONFIG_MBEDTLS_RC4_DISABLED: u32 = 1;
+pub const CONFIG_MBEDTLS_CCM_C: u32 = 1;
+pub const CONFIG_MBEDTLS_GCM_C: u32 = 1;
+pub const CONFIG_MBEDTLS_PEM_PARSE_C: u32 = 1;
+pub const CONFIG_MBEDTLS_PEM_WRITE_C: u32 = 1;
+pub const CONFIG_MBEDTLS_X509_CRL_PARSE_C: u32 = 1;
+pub const CONFIG_MBEDTLS_X509_CSR_PARSE_C: u32 = 1;
+pub const CONFIG_MBEDTLS_ECP_C: u32 = 1;
+pub const CONFIG_MBEDTLS_ECDH_C: u32 = 1;
+pub const CONFIG_MBEDTLS_ECDSA_C: u32 = 1;
+pub const CONFIG_MBEDTLS_ECP_DP_SECP192R1_ENABLED: u32 = 1;
+pub const CONFIG_MBEDTLS_ECP_DP_SECP224R1_ENABLED: u32 = 1;
+pub const CONFIG_MBEDTLS_ECP_DP_SECP256R1_ENABLED: u32 = 1;
+pub const CONFIG_MBEDTLS_ECP_DP_SECP384R1_ENABLED: u32 = 1;
+pub const CONFIG_MBEDTLS_ECP_DP_SECP521R1_ENABLED: u32 = 1;
+pub const CONFIG_MBEDTLS_ECP_DP_SECP192K1_ENABLED: u32 = 1;
+pub const CONFIG_MBEDTLS_ECP_DP_SECP224K1_ENABLED: u32 = 1;
+pub const CONFIG_MBEDTLS_ECP_DP_SECP256K1_ENABLED: u32 = 1;
+pub const CONFIG_MBEDTLS_ECP_DP_BP256R1_ENABLED: u32 = 1;
+pub const CONFIG_MBEDTLS_ECP_DP_BP384R1_ENABLED: u32 = 1;
+pub const CONFIG_MBEDTLS_ECP_DP_BP512R1_ENABLED: u32 = 1;
+pub const CONFIG_MBEDTLS_ECP_DP_CURVE25519_ENABLED: u32 = 1;
+pub const CONFIG_MBEDTLS_ECP_NIST_OPTIM: u32 = 1;
+pub const CONFIG_MBEDTLS_LARGE_KEY_SOFTWARE_MPI: u32 = 1;
+pub const CONFIG_MDNS_MAX_SERVICES: u32 = 10;
+pub const CONFIG_MDNS_TASK_PRIORITY: u32 = 1;
+pub const CONFIG_MDNS_TASK_STACK_SIZE: u32 = 4096;
+pub const CONFIG_MDNS_TASK_AFFINITY_CPU0: u32 = 1;
+pub const CONFIG_MDNS_TASK_AFFINITY: u32 = 0;
+pub const CONFIG_MDNS_SERVICE_ADD_TIMEOUT_MS: u32 = 2000;
+pub const CONFIG_MDNS_TIMER_PERIOD_MS: u32 = 100;
+pub const CONFIG_MQTT_PROTOCOL_311: u32 = 1;
+pub const CONFIG_MQTT_TRANSPORT_SSL: u32 = 1;
+pub const CONFIG_MQTT_TRANSPORT_WEBSOCKET: u32 = 1;
+pub const CONFIG_MQTT_TRANSPORT_WEBSOCKET_SECURE: u32 = 1;
+pub const CONFIG_NEWLIB_STDOUT_LINE_ENDING_CRLF: u32 = 1;
+pub const CONFIG_NEWLIB_STDIN_LINE_ENDING_CR: u32 = 1;
+pub const CONFIG_OPENSSL_ERROR_STACK: u32 = 1;
+pub const CONFIG_OPENSSL_ASSERT_EXIT: u32 = 1;
+pub const CONFIG_PTHREAD_TASK_PRIO_DEFAULT: u32 = 5;
+pub const CONFIG_PTHREAD_TASK_STACK_SIZE_DEFAULT: u32 = 3072;
+pub const CONFIG_PTHREAD_TASK_CORE_DEFAULT: i32 = -1;
+pub const CONFIG_PTHREAD_TASK_NAME_DEFAULT: &[u8; 8usize] = b"pthread\0";
+pub const CONFIG_SPI_FLASH_ROM_DRIVER_PATCH: u32 = 1;
+pub const CONFIG_SPI_FLASH_DANGEROUS_WRITE_ABORTS: u32 = 1;
+pub const CONFIG_SPI_FLASH_YIELD_DURING_ERASE: u32 = 1;
+pub const CONFIG_SPI_FLASH_ERASE_YIELD_DURATION_MS: u32 = 20;
+pub const CONFIG_SPI_FLASH_ERASE_YIELD_TICKS: u32 = 1;
+pub const CONFIG_SPI_FLASH_WRITE_CHUNK_SIZE: u32 = 8192;
+pub const CONFIG_SPI_FLASH_SUPPORT_ISSI_CHIP: u32 = 1;
+pub const CONFIG_SPI_FLASH_SUPPORT_MXIC_CHIP: u32 = 1;
+pub const CONFIG_SPI_FLASH_SUPPORT_GD_CHIP: u32 = 1;
+pub const CONFIG_SPI_FLASH_SUPPORT_WINBOND_CHIP: u32 = 1;
+pub const CONFIG_SPI_FLASH_SUPPORT_BOYA_CHIP: u32 = 1;
+pub const CONFIG_SPI_FLASH_ENABLE_ENCRYPTED_READ_WRITE: u32 = 1;
+pub const CONFIG_SPIFFS_MAX_PARTITIONS: u32 = 3;
+pub const CONFIG_SPIFFS_CACHE: u32 = 1;
+pub const CONFIG_SPIFFS_CACHE_WR: u32 = 1;
+pub const CONFIG_SPIFFS_PAGE_CHECK: u32 = 1;
+pub const CONFIG_SPIFFS_GC_MAX_RUNS: u32 = 10;
+pub const CONFIG_SPIFFS_PAGE_SIZE: u32 = 256;
+pub const CONFIG_SPIFFS_OBJ_NAME_LEN: u32 = 32;
+pub const CONFIG_SPIFFS_USE_MAGIC: u32 = 1;
+pub const CONFIG_SPIFFS_USE_MAGIC_LENGTH: u32 = 1;
+pub const CONFIG_SPIFFS_META_LENGTH: u32 = 4;
+pub const CONFIG_SPIFFS_USE_MTIME: u32 = 1;
+pub const CONFIG_WS_BUFFER_SIZE: u32 = 1024;
+pub const CONFIG_UNITY_ENABLE_FLOAT: u32 = 1;
+pub const CONFIG_UNITY_ENABLE_DOUBLE: u32 = 1;
+pub const CONFIG_UNITY_ENABLE_IDF_TEST_RUNNER: u32 = 1;
+pub const CONFIG_VFS_SUPPORT_IO: u32 = 1;
+pub const CONFIG_VFS_SUPPORT_DIR: u32 = 1;
+pub const CONFIG_VFS_SUPPORT_SELECT: u32 = 1;
+pub const CONFIG_VFS_SUPPRESS_SELECT_DEBUG_OUTPUT: u32 = 1;
+pub const CONFIG_VFS_SUPPORT_TERMIOS: u32 = 1;
+pub const CONFIG_VFS_SEMIHOSTFS_MAX_MOUNT_POINTS: u32 = 1;
+pub const CONFIG_VFS_SEMIHOSTFS_HOST_PATH_MAX_LEN: u32 = 128;
+pub const CONFIG_WL_SECTOR_SIZE_4096: u32 = 1;
+pub const CONFIG_WL_SECTOR_SIZE: u32 = 4096;
+pub const CONFIG_WIFI_PROV_SCAN_MAX_ENTRIES: u32 = 16;
+pub const CONFIG_WIFI_PROV_AUTOSTOP_TIMEOUT: u32 = 30;
+pub const CONFIG_ESPSUPP_INTERNAL_MEM_ALLOC: u32 = 1;
+pub const CONFIG_ESPSUPP_ASYMMETRIC_CONTENT_LEN: u32 = 1;
+pub const CONFIG_ESPSUPP_SSL_IN_CONTENT_LEN: u32 = 16384;
+pub const CONFIG_ESPSUPP_SSL_OUT_CONTENT_LEN: u32 = 4096;
+pub const CONFIG_ESPSUPP_HAVE_TIME: u32 = 1;
+pub const CONFIG_ESPSUPP_ECDSA_DETERMINISTIC: u32 = 1;
+pub const CONFIG_ESPSUPP_SHA512_C: u32 = 1;
+pub const CONFIG_ESPSUPP_TLS_SERVER_AND_CLIENT: u32 = 1;
+pub const CONFIG_ESPSUPP_TLS_SERVER: u32 = 1;
+pub const CONFIG_ESPSUPP_TLS_CLIENT: u32 = 1;
+pub const CONFIG_ESPSUPP_TLS_ENABLED: u32 = 1;
+pub const CONFIG_ESPSUPP_KEY_EXCHANGE_RSA: u32 = 1;
+pub const CONFIG_ESPSUPP_KEY_EXCHANGE_DHE_RSA: u32 = 1;
+pub const CONFIG_ESPSUPP_KEY_EXCHANGE_ELLIPTIC_CURVE: u32 = 1;
+pub const CONFIG_ESPSUPP_KEY_EXCHANGE_ECDHE_RSA: u32 = 1;
+pub const CONFIG_ESPSUPP_KEY_EXCHANGE_ECDHE_ECDSA: u32 = 1;
+pub const CONFIG_ESPSUPP_KEY_EXCHANGE_ECDH_ECDSA: u32 = 1;
+pub const CONFIG_ESPSUPP_KEY_EXCHANGE_ECDH_RSA: u32 = 1;
+pub const CONFIG_ESPSUPP_SSL_RENEGOTIATION: u32 = 1;
+pub const CONFIG_ESPSUPP_SSL_PROTO_TLS1: u32 = 1;
+pub const CONFIG_ESPSUPP_SSL_PROTO_TLS1_1: u32 = 1;
+pub const CONFIG_ESPSUPP_SSL_PROTO_TLS1_2: u32 = 1;
+pub const CONFIG_ESPSUPP_SSL_ALPN: u32 = 1;
+pub const CONFIG_ESPSUPP_CLIENT_SSL_SESSION_TICKETS: u32 = 1;
+pub const CONFIG_ESPSUPP_SERVER_SSL_SESSION_TICKETS: u32 = 1;
+pub const CONFIG_ESPSUPP_AES_C: u32 = 1;
+pub const CONFIG_ESPSUPP_RC4_DISABLED: u32 = 1;
+pub const CONFIG_ESPSUPP_CCM_C: u32 = 1;
+pub const CONFIG_ESPSUPP_GCM_C: u32 = 1;
+pub const CONFIG_ESPSUPP_PEM_PARSE_C: u32 = 1;
+pub const CONFIG_ESPSUPP_PEM_WRITE_C: u32 = 1;
+pub const CONFIG_ESPSUPP_X509_CRL_PARSE_C: u32 = 1;
+pub const CONFIG_ESPSUPP_X509_CSR_PARSE_C: u32 = 1;
+pub const CONFIG_ESPSUPP_ECP_C: u32 = 1;
+pub const CONFIG_ESPSUPP_ECDH_C: u32 = 1;
+pub const CONFIG_ESPSUPP_ECDSA_C: u32 = 1;
+pub const CONFIG_ESPSUPP_ECP_DP_SECP192R1_ENABLED: u32 = 1;
+pub const CONFIG_ESPSUPP_ECP_DP_SECP224R1_ENABLED: u32 = 1;
+pub const CONFIG_ESPSUPP_ECP_DP_SECP256R1_ENABLED: u32 = 1;
+pub const CONFIG_ESPSUPP_ECP_DP_SECP384R1_ENABLED: u32 = 1;
+pub const CONFIG_ESPSUPP_ECP_DP_SECP521R1_ENABLED: u32 = 1;
+pub const CONFIG_ESPSUPP_ECP_DP_SECP192K1_ENABLED: u32 = 1;
+pub const CONFIG_ESPSUPP_ECP_DP_SECP224K1_ENABLED: u32 = 1;
+pub const CONFIG_ESPSUPP_ECP_DP_SECP256K1_ENABLED: u32 = 1;
+pub const CONFIG_ESPSUPP_ECP_DP_BP256R1_ENABLED: u32 = 1;
+pub const CONFIG_ESPSUPP_ECP_DP_BP384R1_ENABLED: u32 = 1;
+pub const CONFIG_ESPSUPP_ECP_DP_BP512R1_ENABLED: u32 = 1;
+pub const CONFIG_ESPSUPP_ECP_DP_CURVE25519_ENABLED: u32 = 1;
+pub const CONFIG_ESPSUPP_ECP_NIST_OPTIM: u32 = 1;
+pub const CONFIG_WPA_ESPSUPP_CRYPTO: u32 = 1;
+pub const CONFIG_A2D_TRACE_LEVEL_WARNING: u32 = 1;
+pub const CONFIG_ADC2_DISABLE_DAC: u32 = 1;
+pub const CONFIG_APPL_TRACE_LEVEL_WARNING: u32 = 1;
+pub const CONFIG_AVCT_TRACE_LEVEL_WARNING: u32 = 1;
+pub const CONFIG_AVDT_TRACE_LEVEL_WARNING: u32 = 1;
+pub const CONFIG_AVRC_TRACE_LEVEL_WARNING: u32 = 1;
+pub const CONFIG_BLE_ESTABLISH_LINK_CONNECTION_TIMEOUT: u32 = 30;
+pub const CONFIG_BLE_SMP_ENABLE: u32 = 1;
+pub const CONFIG_BLUEDROID_ENABLED: u32 = 1;
+pub const CONFIG_BLUFI_TRACE_LEVEL_WARNING: u32 = 1;
+pub const CONFIG_BTC_TASK_STACK_SIZE: u32 = 3072;
+pub const CONFIG_BTC_TRACE_LEVEL_WARNING: u32 = 1;
+pub const CONFIG_BTIF_TRACE_LEVEL_WARNING: u32 = 1;
+pub const CONFIG_BTM_TRACE_LEVEL_WARNING: u32 = 1;
+pub const CONFIG_BTU_TASK_STACK_SIZE: u32 = 4096;
+pub const CONFIG_COMPILER_OPTIMIZATION_LEVEL_DEBUG: u32 = 1;
+pub const CONFIG_CONSOLE_UART_DEFAULT: u32 = 1;
+pub const CONFIG_ESP32C3_MEMPROT_FEATURE: u32 = 1;
+pub const CONFIG_ESP32C3_MEMPROT_FEATURE_LOCK: u32 = 1;
+pub const CONFIG_ESP32S2_ALLOW_RTC_FAST_MEM_AS_HEAP: u32 = 1;
+pub const CONFIG_ESP32S2_MEMPROT_FEATURE: u32 = 1;
+pub const CONFIG_ESP32S2_MEMPROT_FEATURE_LOCK: u32 = 1;
+pub const CONFIG_ESP32S2_PANIC_PRINT_REBOOT: u32 = 1;
+pub const CONFIG_ESP32_ALLOW_RTC_FAST_MEM_AS_HEAP: u32 = 1;
+pub const CONFIG_ESP32_APPTRACE_DEST_NONE: u32 = 1;
+pub const CONFIG_ESP32_ENABLE_COREDUMP_TO_NONE: u32 = 1;
+pub const CONFIG_ESP32_PANIC_PRINT_REBOOT: u32 = 1;
+pub const CONFIG_ESP32_PTHREAD_TASK_NAME_DEFAULT: &[u8; 8usize] = b"pthread\0";
+pub const CONFIG_ESP32_PTHREAD_TASK_PRIO_DEFAULT: u32 = 5;
+pub const CONFIG_ESP32_PTHREAD_TASK_STACK_SIZE_DEFAULT: u32 = 3072;
+pub const CONFIG_ESP_GRATUITOUS_ARP: u32 = 1;
+pub const CONFIG_FLASHMODE_DIO: u32 = 1;
+pub const CONFIG_GAP_TRACE_LEVEL_WARNING: u32 = 1;
+pub const CONFIG_GARP_TMR_INTERVAL: u32 = 60;
+pub const CONFIG_GATTC_ENABLE: u32 = 1;
+pub const CONFIG_GATTS_ENABLE: u32 = 1;
+pub const CONFIG_GATTS_SEND_SERVICE_CHANGE_AUTO: u32 = 1;
+pub const CONFIG_GATT_TRACE_LEVEL_WARNING: u32 = 1;
+pub const CONFIG_HCI_TRACE_LEVEL_WARNING: u32 = 1;
+pub const CONFIG_HID_TRACE_LEVEL_WARNING: u32 = 1;
+pub const CONFIG_INT_WDT: u32 = 1;
+pub const CONFIG_INT_WDT_TIMEOUT_MS: u32 = 300;
+pub const CONFIG_IPC_TASK_STACK_SIZE: u32 = 1024;
+pub const CONFIG_L2CAP_TRACE_LEVEL_WARNING: u32 = 1;
+pub const CONFIG_LOG_BOOTLOADER_LEVEL_INFO: u32 = 1;
+pub const CONFIG_MAIN_TASK_STACK_SIZE: u32 = 3584;
+pub const CONFIG_MB_CONTROLLER_NOTIFY_QUEUE_SIZE: u32 = 20;
+pub const CONFIG_MB_CONTROLLER_NOTIFY_TIMEOUT: u32 = 20;
+pub const CONFIG_MB_CONTROLLER_SLAVE_ID: u32 = 1122867;
+pub const CONFIG_MB_CONTROLLER_SLAVE_ID_SUPPORT: u32 = 1;
+pub const CONFIG_MB_CONTROLLER_STACK_SIZE: u32 = 4096;
+pub const CONFIG_MB_EVENT_QUEUE_TIMEOUT: u32 = 20;
+pub const CONFIG_MB_MASTER_DELAY_MS_CONVERT: u32 = 200;
+pub const CONFIG_MB_MASTER_TIMEOUT_MS_RESPOND: u32 = 150;
+pub const CONFIG_MB_QUEUE_LENGTH: u32 = 20;
+pub const CONFIG_MB_SERIAL_BUF_SIZE: u32 = 256;
+pub const CONFIG_MB_SERIAL_TASK_PRIO: u32 = 10;
+pub const CONFIG_MB_SERIAL_TASK_STACK_SIZE: u32 = 4096;
+pub const CONFIG_MB_TIMER_GROUP: u32 = 0;
+pub const CONFIG_MB_TIMER_INDEX: u32 = 0;
+pub const CONFIG_MB_TIMER_PORT_ENABLED: u32 = 1;
+pub const CONFIG_MCA_TRACE_LEVEL_WARNING: u32 = 1;
+pub const CONFIG_MONITOR_BAUD_115200B: u32 = 1;
+pub const CONFIG_OPTIMIZATION_ASSERTIONS_ENABLED: u32 = 1;
+pub const CONFIG_OPTIMIZATION_LEVEL_DEBUG: u32 = 1;
+pub const CONFIG_OSI_TRACE_LEVEL_WARNING: u32 = 1;
+pub const CONFIG_PAN_TRACE_LEVEL_WARNING: u32 = 1;
+pub const CONFIG_POST_EVENTS_FROM_IRAM_ISR: u32 = 1;
+pub const CONFIG_POST_EVENTS_FROM_ISR: u32 = 1;
+pub const CONFIG_RFCOMM_TRACE_LEVEL_WARNING: u32 = 1;
+pub const CONFIG_SDP_TRACE_LEVEL_WARNING: u32 = 1;
+pub const CONFIG_SEMIHOSTFS_HOST_PATH_MAX_LEN: u32 = 128;
+pub const CONFIG_SEMIHOSTFS_MAX_MOUNT_POINTS: u32 = 1;
+pub const CONFIG_SMP_TRACE_LEVEL_WARNING: u32 = 1;
+pub const CONFIG_SPI_FLASH_WRITING_DANGEROUS_REGIONS_ABORTS: u32 = 1;
+pub const CONFIG_STACK_CHECK_NONE: u32 = 1;
+pub const CONFIG_SUPPORT_TERMIOS: u32 = 1;
+pub const CONFIG_SUPPRESS_SELECT_DEBUG_OUTPUT: u32 = 1;
+pub const CONFIG_SW_COEXIST_ENABLE: u32 = 1;
+pub const CONFIG_SYSTEM_EVENT_QUEUE_SIZE: u32 = 32;
+pub const CONFIG_SYSTEM_EVENT_TASK_STACK_SIZE: u32 = 2304;
+pub const CONFIG_TASK_WDT: u32 = 1;
+pub const CONFIG_TASK_WDT_CHECK_IDLE_TASK_CPU0: u32 = 1;
+pub const CONFIG_TASK_WDT_TIMEOUT_S: u32 = 5;
+pub const CONFIG_TCPIP_RECVMBOX_SIZE: u32 = 32;
+pub const CONFIG_TCPIP_TASK_AFFINITY_NO_AFFINITY: u32 = 1;
+pub const CONFIG_TCPIP_TASK_STACK_SIZE: u32 = 3072;
+pub const CONFIG_TCP_MAXRTX: u32 = 12;
+pub const CONFIG_TCP_MSL: u32 = 60000;
+pub const CONFIG_TCP_MSS: u32 = 1440;
+pub const CONFIG_TCP_OVERSIZE_MSS: u32 = 1;
+pub const CONFIG_TCP_QUEUE_OOSEQ: u32 = 1;
+pub const CONFIG_TCP_RECVMBOX_SIZE: u32 = 6;
+pub const CONFIG_TCP_SND_BUF_DEFAULT: u32 = 5744;
+pub const CONFIG_TCP_SYNMAXRTX: u32 = 12;
+pub const CONFIG_TCP_WND_DEFAULT: u32 = 5744;
+pub const CONFIG_TIMER_QUEUE_LENGTH: u32 = 10;
+pub const CONFIG_TIMER_TASK_PRIORITY: u32 = 1;
+pub const CONFIG_TIMER_TASK_STACK_DEPTH: u32 = 2048;
+pub const CONFIG_TIMER_TASK_STACK_SIZE: u32 = 3584;
+pub const CONFIG_TOOLPREFIX: &[u8; 17usize] = b"riscv32-esp-elf-\0";
+pub const CONFIG_UDP_RECVMBOX_SIZE: u32 = 6;
+pub const CONFIG_MAC_BB_PD: u32 = 0;
+pub const SOC_WIFI_HW_TSF: u32 = 1;
+pub const CONFIG_ESP32_WIFI_AMSDU_TX_ENABLED: u32 = 0;
+pub const CONFIG_WPA_MBEDTLS_CRYPTO: u32 = 0;
+pub const CONFIG_ESP32_ECO3_CACHE_LOCK_FIX: u32 = 0;
+pub const CONFIG_IDF_TARGET_ESP32: u32 = 0;
+pub const CONFIG_IDF_TARGET_ESP32S2: u32 = 0;
+pub const CONFIG_IDF_TARGET_ESP32S3: u32 = 0;
+pub const CONFIG_ESP32_SUPPORT_MULTIPLE_PHY_INIT_DATA_BIN: u32 = 0;
+pub const CONFIG_ESP32_WIFI_CSI_ENABLED: u32 = 0;
+pub const CONFIG_NEWLIB_NANO_FORMAT: u32 = 0;
+pub const CONFIG_ESP32_WIFI_TASK_PINNED_TO_CORE_1: u32 = 0;
+pub const CONFIG_ESP32_SPIRAM_SUPPORT: u32 = 0;
+pub const CONFIG_ESP32S2_SPIRAM_SUPPORT: u32 = 0;
+pub const CONFIG_ESP32S3_SPIRAM_SUPPORT: u32 = 0;
+pub const CONFIG_ESP_WIFI_STA_DISCONNECTED_PM_ENABLE: u32 = 0;
+pub const SOC_COEX_HW_PTI: u32 = 1;
+pub const ESP_TASK_BT_CONTROLLER_STACK: u32 = 0;
+pub const ESP_TASK_BT_CONTROLLER_PRIO: u32 = 0;
+pub const ESP_BT_CTRL_CONFIG_MAGIC_VAL: u32 = 1515890085;
+pub const ESP_BT_CTRL_CONFIG_VERSION: u32 = 34620016;
+pub const ESP_BT_HCI_TL_MAGIC_VALUE: u32 = 4208901805;
+pub const ESP_BT_HCI_TL_VERSION: u32 = 65536;
+pub const BT_CTRL_BLE_MAX_ACT_LIMIT: u32 = 10;
+pub const SLAVE_CE_LEN_MIN_DEFAULT: u32 = 5;
+pub const SCAN_DUPLICATE_TYPE_VALUE: u32 = 0;
+pub const NORMAL_SCAN_DUPLICATE_CACHE_SIZE: u32 = 100;
+pub const SCAN_DUPLICATE_MODE_NORMAL_ADV_ONLY: u32 = 0;
+pub const SCAN_DUPLICATE_MODE_NORMAL_ADV_MESH_ADV: u32 = 1;
+pub const SCAN_DUPLICATE_MODE: u32 = 0;
+pub const MESH_DUPLICATE_SCAN_CACHE_SIZE: u32 = 0;
+pub const BT_CTRL_AGC_RECORRECT_EN: u32 = 0;
+pub const BT_CTRL_CODED_AGC_RECORRECT: u32 = 0;
+pub const AGC_RECORRECT_EN: u32 = 0;
+pub const CFG_MASK_BIT_SCAN_DUPLICATE_OPTION: u32 = 1;
+pub const CFG_NASK: u32 = 1;
+pub const BLE_HW_TARGET_CODE_ESP32C3_CHIP_ECO0: u32 = 16842752;
 pub type __int8_t = crate::binary::c_types::c_schar;
 pub type __uint8_t = crate::binary::c_types::c_uchar;
 pub type __int16_t = crate::binary::c_types::c_short;
@@ -7261,6 +7897,454 @@ extern "C" {
     #[doc = "      - ESP_OK on success"]
     #[doc = "      - ESP_ERR_NO_MEM if can not allocate temporary buffer for the output"]
     pub fn esp_timer_dump(stream: *mut FILE) -> esp_err_t;
+}
+#[doc = "< Bluetooth is not running"]
+pub const esp_bt_mode_t_ESP_BT_MODE_IDLE: esp_bt_mode_t = 0;
+#[doc = "< Run BLE mode"]
+pub const esp_bt_mode_t_ESP_BT_MODE_BLE: esp_bt_mode_t = 1;
+#[doc = "< Run Classic BT mode"]
+pub const esp_bt_mode_t_ESP_BT_MODE_CLASSIC_BT: esp_bt_mode_t = 2;
+#[doc = "< Run dual mode"]
+pub const esp_bt_mode_t_ESP_BT_MODE_BTDM: esp_bt_mode_t = 3;
+#[doc = " @brief Bluetooth mode for controller enable/disable"]
+pub type esp_bt_mode_t = crate::binary::c_types::c_uint;
+#[doc = "< HCI UART h4 transport layer"]
+pub const esp_bt_ctrl_hci_tl_t_ESP_BT_CTRL_HCI_TL_UART: esp_bt_ctrl_hci_tl_t = 0;
+#[doc = "< VHCI interface"]
+pub const esp_bt_ctrl_hci_tl_t_ESP_BT_CTRL_HCI_TL_VHCI: esp_bt_ctrl_hci_tl_t = 1;
+#[doc = " @brief Type of controller HCI transport layer"]
+pub type esp_bt_ctrl_hci_tl_t = crate::binary::c_types::c_uint;
+#[doc = "< original"]
+pub const esp_ble_ce_len_t_ESP_BLE_CE_LEN_TYPE_ORIG: esp_ble_ce_len_t = 0;
+#[doc = "< use CE_LEN parameter from HCI commands"]
+pub const esp_ble_ce_len_t_ESP_BLE_CE_LEN_TYPE_CE: esp_ble_ce_len_t = 1;
+#[doc = "< Espressif vendor defined"]
+pub const esp_ble_ce_len_t_ESP_BLE_CE_LEN_TYPE_SD: esp_ble_ce_len_t = 1;
+#[doc = " @breif type of BLE connection event length computation"]
+pub type esp_ble_ce_len_t = crate::binary::c_types::c_uint;
+#[doc = "< Bluetooth sleep mode disabled"]
+pub const esp_bt_sleep_mode_t_ESP_BT_SLEEP_MODE_NONE: esp_bt_sleep_mode_t = 0;
+#[doc = "< Bluetooth sleep mode 1"]
+pub const esp_bt_sleep_mode_t_ESP_BT_SLEEP_MODE_1: esp_bt_sleep_mode_t = 1;
+#[doc = " @brief Bluetooth sleep mode"]
+pub type esp_bt_sleep_mode_t = crate::binary::c_types::c_uint;
+#[doc = "< Sleep clock not configured"]
+pub const esp_bt_sleep_clock_t_ESP_BT_SLEEP_CLOCK_NONE: esp_bt_sleep_clock_t = 0;
+#[doc = "< SoC main crystal"]
+pub const esp_bt_sleep_clock_t_ESP_BT_SLEEP_CLOCK_MAIN_XTAL: esp_bt_sleep_clock_t = 1;
+#[doc = "< External 32.768kHz crystal"]
+pub const esp_bt_sleep_clock_t_ESP_BT_SLEEP_CLOCK_EXT_32K_XTAL: esp_bt_sleep_clock_t = 2;
+#[doc = "< Internal 150kHz RC oscillator"]
+pub const esp_bt_sleep_clock_t_ESP_BT_SLEEP_CLOCK_RTC_SLOW: esp_bt_sleep_clock_t = 3;
+#[doc = "< Hardwired 32KHz clock temporarily used for FPGA"]
+pub const esp_bt_sleep_clock_t_ESP_BT_SLEEP_CLOCK_FPGA_32K: esp_bt_sleep_clock_t = 4;
+#[doc = " @brief Bluetooth sleep clock"]
+pub type esp_bt_sleep_clock_t = crate::binary::c_types::c_uint;
+#[doc = "< anntena NO 0"]
+pub const ESP_BT_ANT_IDX_0: crate::binary::c_types::c_uint = 0;
+#[doc = "< anntena NO 1"]
+pub const ESP_BT_ANT_IDX_1: crate::binary::c_types::c_uint = 1;
+#[doc = " @brief antenna index used for bluetooth"]
+pub type _bindgen_ty_1 = crate::binary::c_types::c_uint;
+#[doc = "< Disable the limit"]
+pub const ESP_BT_COEX_PHY_CODED_TX_RX_TIME_LIMIT_FORCE_DISABLE: crate::binary::c_types::c_uint = 0;
+#[doc = "< Always Enable the limit"]
+pub const ESP_BT_COEX_PHY_CODED_TX_RX_TIME_LIMIT_FORCE_ENABLE: crate::binary::c_types::c_uint = 1;
+#[doc = " @brief Maximum Tx/Rx time limit on Coded-PHY connection"]
+pub type _bindgen_ty_2 = crate::binary::c_types::c_uint;
+#[doc = " @brief Controller HCI transport layer function structure"]
+#[doc = "        This structure shall be registered when HCI transport layer is UART"]
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct esp_bt_hci_tl_t {
+    pub _magic: u32,
+    pub _version: u32,
+    pub _reserved: u32,
+    pub _open: ::core::option::Option<unsafe extern "C" fn() -> crate::binary::c_types::c_int>,
+    pub _close: ::core::option::Option<unsafe extern "C" fn()>,
+    pub _finish_transfers: ::core::option::Option<unsafe extern "C" fn()>,
+    pub _recv: ::core::option::Option<
+        unsafe extern "C" fn(
+            buf: *mut u8,
+            len: u32,
+            callback: ::core::option::Option<
+                unsafe extern "C" fn(arg1: *mut crate::binary::c_types::c_void, arg2: u8),
+            >,
+            dummy: *mut crate::binary::c_types::c_void,
+        ),
+    >,
+    pub _send: ::core::option::Option<
+        unsafe extern "C" fn(
+            buf: *mut u8,
+            len: u32,
+            callback: ::core::option::Option<
+                unsafe extern "C" fn(arg1: *mut crate::binary::c_types::c_void, arg2: u8),
+            >,
+            dummy: *mut crate::binary::c_types::c_void,
+        ),
+    >,
+    pub _flow_off: ::core::option::Option<unsafe extern "C" fn() -> bool>,
+    pub _flow_on: ::core::option::Option<unsafe extern "C" fn()>,
+}
+#[doc = " @brief Controller config options, depend on config mask."]
+#[doc = "        Config mask indicate which functions enabled, this means"]
+#[doc = "        some options or parameters of some functions enabled by config mask."]
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct esp_bt_controller_config_t {
+    #[doc = "< Magic number"]
+    pub magic: u32,
+    #[doc = "< version number of the defined structure"]
+    pub version: u32,
+    #[doc = "< Bluetooth controller task stack size"]
+    pub controller_task_stack_size: u16,
+    #[doc = "< Bluetooth controller task priority"]
+    pub controller_task_prio: u8,
+    #[doc = "< CPU num that Bluetooth controller task runs on"]
+    pub controller_task_run_cpu: u8,
+    #[doc = "< Controller mode: BR/EDR, BLE or Dual Mode"]
+    pub bluetooth_mode: u8,
+    #[doc = "< BLE maximum number of air activities"]
+    pub ble_max_act: u8,
+    #[doc = "< controller sleep mode"]
+    pub sleep_mode: u8,
+    #[doc = "< controller sleep clock"]
+    pub sleep_clock: u8,
+    #[doc = "< controller static ACL TX BUFFER number"]
+    pub ble_st_acl_tx_buf_nb: u8,
+    #[doc = "< controller hardware triggered CCA check"]
+    pub ble_hw_cca_check: u8,
+    #[doc = "< maxinum number of duplicate scan filter"]
+    pub ble_adv_dup_filt_max: u16,
+    #[doc = "< deprecated"]
+    pub coex_param_en: bool,
+    #[doc = "< connection event length computation method"]
+    pub ce_len_type: u8,
+    #[doc = "< deprecated"]
+    pub coex_use_hooks: bool,
+    #[doc = "< HCI transport layer, UART, VHCI, etc"]
+    pub hci_tl_type: u8,
+    #[doc = "< hci transport functions used, must be set when hci_tl_type is UART"]
+    pub hci_tl_funcs: *mut esp_bt_hci_tl_t,
+    #[doc = "< default Tx antenna"]
+    pub txant_dft: u8,
+    #[doc = "< default Rx antenna"]
+    pub rxant_dft: u8,
+    #[doc = "< default Tx power"]
+    pub txpwr_dft: u8,
+    pub cfg_mask: u32,
+    #[doc = "< scan duplicate mode"]
+    pub scan_duplicate_mode: u8,
+    #[doc = "< scan duplicate type"]
+    pub scan_duplicate_type: u8,
+    #[doc = "< Normal adv size for scan duplicate"]
+    pub normal_adv_size: u16,
+    #[doc = "< Mesh adv size for scan duplicate"]
+    pub mesh_adv_size: u16,
+    #[doc = "< limit on max tx/rx time in case of connection using CODED-PHY with Wi-Fi coexistence"]
+    pub coex_phy_coded_tx_rx_time_limit: u8,
+    #[doc = "< hardware target"]
+    pub hw_target_code: u32,
+    pub slave_ce_len_min: u8,
+    pub hw_recorrect_en: u8,
+}
+pub const esp_bt_controller_status_t_ESP_BT_CONTROLLER_STATUS_IDLE: esp_bt_controller_status_t = 0;
+pub const esp_bt_controller_status_t_ESP_BT_CONTROLLER_STATUS_INITED: esp_bt_controller_status_t =
+    1;
+pub const esp_bt_controller_status_t_ESP_BT_CONTROLLER_STATUS_ENABLED: esp_bt_controller_status_t =
+    2;
+pub const esp_bt_controller_status_t_ESP_BT_CONTROLLER_STATUS_NUM: esp_bt_controller_status_t = 3;
+#[doc = " @brief Bluetooth controller enable/disable/initialised/de-initialised status"]
+pub type esp_bt_controller_status_t = crate::binary::c_types::c_uint;
+#[doc = "< For connection handle 0"]
+pub const esp_ble_power_type_t_ESP_BLE_PWR_TYPE_CONN_HDL0: esp_ble_power_type_t = 0;
+#[doc = "< For connection handle 1"]
+pub const esp_ble_power_type_t_ESP_BLE_PWR_TYPE_CONN_HDL1: esp_ble_power_type_t = 1;
+#[doc = "< For connection handle 2"]
+pub const esp_ble_power_type_t_ESP_BLE_PWR_TYPE_CONN_HDL2: esp_ble_power_type_t = 2;
+#[doc = "< For connection handle 3"]
+pub const esp_ble_power_type_t_ESP_BLE_PWR_TYPE_CONN_HDL3: esp_ble_power_type_t = 3;
+#[doc = "< For connection handle 4"]
+pub const esp_ble_power_type_t_ESP_BLE_PWR_TYPE_CONN_HDL4: esp_ble_power_type_t = 4;
+#[doc = "< For connection handle 5"]
+pub const esp_ble_power_type_t_ESP_BLE_PWR_TYPE_CONN_HDL5: esp_ble_power_type_t = 5;
+#[doc = "< For connection handle 6"]
+pub const esp_ble_power_type_t_ESP_BLE_PWR_TYPE_CONN_HDL6: esp_ble_power_type_t = 6;
+#[doc = "< For connection handle 7"]
+pub const esp_ble_power_type_t_ESP_BLE_PWR_TYPE_CONN_HDL7: esp_ble_power_type_t = 7;
+#[doc = "< For connection handle 8"]
+pub const esp_ble_power_type_t_ESP_BLE_PWR_TYPE_CONN_HDL8: esp_ble_power_type_t = 8;
+#[doc = "< For advertising"]
+pub const esp_ble_power_type_t_ESP_BLE_PWR_TYPE_ADV: esp_ble_power_type_t = 9;
+#[doc = "< For scan"]
+pub const esp_ble_power_type_t_ESP_BLE_PWR_TYPE_SCAN: esp_ble_power_type_t = 10;
+#[doc = "< For default, if not set other, it will use default value"]
+pub const esp_ble_power_type_t_ESP_BLE_PWR_TYPE_DEFAULT: esp_ble_power_type_t = 11;
+#[doc = "< TYPE numbers"]
+pub const esp_ble_power_type_t_ESP_BLE_PWR_TYPE_NUM: esp_ble_power_type_t = 12;
+#[doc = " @brief BLE tx power type"]
+#[doc = "        ESP_BLE_PWR_TYPE_CONN_HDL0-8: for each connection, and only be set after connection completed."]
+#[doc = "                                      when disconnect, the correspond TX power is not effected."]
+#[doc = "        ESP_BLE_PWR_TYPE_ADV : for advertising/scan response."]
+#[doc = "        ESP_BLE_PWR_TYPE_SCAN : for scan."]
+#[doc = "        ESP_BLE_PWR_TYPE_DEFAULT : if each connection's TX power is not set, it will use this default value."]
+#[doc = "                                   if neither in scan mode nor in adv mode, it will use this default value."]
+#[doc = "        If none of power type is set, system will use ESP_PWR_LVL_P3 as default for ADV/SCAN/CONN0-9."]
+pub type esp_ble_power_type_t = crate::binary::c_types::c_uint;
+#[doc = "< Corresponding to -27dbm"]
+pub const esp_power_level_t_ESP_PWR_LVL_N27: esp_power_level_t = 0;
+#[doc = "< Corresponding to -24dbm"]
+pub const esp_power_level_t_ESP_PWR_LVL_N24: esp_power_level_t = 1;
+#[doc = "< Corresponding to -21dbm"]
+pub const esp_power_level_t_ESP_PWR_LVL_N21: esp_power_level_t = 2;
+#[doc = "< Corresponding to -18dbm"]
+pub const esp_power_level_t_ESP_PWR_LVL_N18: esp_power_level_t = 3;
+#[doc = "< Corresponding to -15dbm"]
+pub const esp_power_level_t_ESP_PWR_LVL_N15: esp_power_level_t = 4;
+#[doc = "< Corresponding to -12dbm"]
+pub const esp_power_level_t_ESP_PWR_LVL_N12: esp_power_level_t = 5;
+#[doc = "< Corresponding to  -9dbm"]
+pub const esp_power_level_t_ESP_PWR_LVL_N9: esp_power_level_t = 6;
+#[doc = "< Corresponding to  -6dbm"]
+pub const esp_power_level_t_ESP_PWR_LVL_N6: esp_power_level_t = 7;
+#[doc = "< Corresponding to  -3dbm"]
+pub const esp_power_level_t_ESP_PWR_LVL_N3: esp_power_level_t = 8;
+#[doc = "< Corresponding to   0dbm"]
+pub const esp_power_level_t_ESP_PWR_LVL_N0: esp_power_level_t = 9;
+#[doc = "< Corresponding to  +3dbm"]
+pub const esp_power_level_t_ESP_PWR_LVL_P3: esp_power_level_t = 10;
+#[doc = "< Corresponding to  +6dbm"]
+pub const esp_power_level_t_ESP_PWR_LVL_P6: esp_power_level_t = 11;
+#[doc = "< Corresponding to  +9dbm"]
+pub const esp_power_level_t_ESP_PWR_LVL_P9: esp_power_level_t = 12;
+#[doc = "< Corresponding to  +12dbm"]
+pub const esp_power_level_t_ESP_PWR_LVL_P12: esp_power_level_t = 13;
+#[doc = "< Corresponding to  +15dbm"]
+pub const esp_power_level_t_ESP_PWR_LVL_P15: esp_power_level_t = 14;
+#[doc = "< Corresponding to  +18dbm"]
+pub const esp_power_level_t_ESP_PWR_LVL_P18: esp_power_level_t = 15;
+#[doc = "< Indicates an invalid value"]
+pub const esp_power_level_t_ESP_PWR_LVL_INVALID: esp_power_level_t = 255;
+#[doc = " @brief Bluetooth TX power level(index), it's just a index corresponding to power(dbm)."]
+pub type esp_power_level_t = crate::binary::c_types::c_uint;
+extern "C" {
+    #[doc = " @brief  Set BLE TX power"]
+    #[doc = "         Connection Tx power should only be set after connection created."]
+    #[doc = " @param  power_type : The type of which tx power, could set Advertising/Connection/Default and etc"]
+    #[doc = " @param  power_level: Power level(index) corresponding to absolute value(dbm)"]
+    #[doc = " @return              ESP_OK - success, other - failed"]
+    pub fn esp_ble_tx_power_set(
+        power_type: esp_ble_power_type_t,
+        power_level: esp_power_level_t,
+    ) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief  Get BLE TX power"]
+    #[doc = "         Connection Tx power should only be get after connection created."]
+    #[doc = " @param  power_type : The type of which tx power, could set Advertising/Connection/Default and etc"]
+    #[doc = " @return             >= 0 - Power level, < 0 - Invalid"]
+    pub fn esp_ble_tx_power_get(power_type: esp_ble_power_type_t) -> esp_power_level_t;
+}
+extern "C" {
+    #[doc = " @brief       Initialize BT controller to allocate task and other resource."]
+    #[doc = "              This function should be called only once, before any other BT functions are called."]
+    #[doc = " @param  cfg: Initial configuration of BT controller. Different from previous version, there's a mode and some"]
+    #[doc = "              connection configuration in \"cfg\" to configure controller work mode and allocate the resource which is needed."]
+    #[doc = " @return      ESP_OK - success, other - failed"]
+    pub fn esp_bt_controller_init(cfg: *mut esp_bt_controller_config_t) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief  De-initialize BT controller to free resource and delete task."]
+    #[doc = ""]
+    #[doc = " This function should be called only once, after any other BT functions are called."]
+    #[doc = " This function is not whole completed, esp_bt_controller_init cannot called after this function."]
+    #[doc = " @return  ESP_OK - success, other - failed"]
+    pub fn esp_bt_controller_deinit() -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Enable BT controller."]
+    #[doc = "               Due to a known issue, you cannot call esp_bt_controller_enable() a second time"]
+    #[doc = "               to change the controller mode dynamically. To change controller mode, call"]
+    #[doc = "               esp_bt_controller_disable() and then call esp_bt_controller_enable() with the new mode."]
+    #[doc = " @param mode : the mode(BLE/BT/BTDM) to enable. For compatible of API, retain this argument. This mode must be"]
+    #[doc = "               equal as the mode in \"cfg\" of esp_bt_controller_init()."]
+    #[doc = " @return       ESP_OK - success, other - failed"]
+    pub fn esp_bt_controller_enable(mode: esp_bt_mode_t) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief  Disable BT controller"]
+    #[doc = " @return       ESP_OK - success, other - failed"]
+    pub fn esp_bt_controller_disable() -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief  Get BT controller is initialised/de-initialised/enabled/disabled"]
+    #[doc = " @return status value"]
+    pub fn esp_bt_controller_get_status() -> esp_bt_controller_status_t;
+}
+extern "C" {
+    pub fn esp_bt_get_tx_buf_num() -> u16;
+}
+#[doc = " @brief esp_vhci_host_callback"]
+#[doc = "  used for vhci call host function to notify what host need to do"]
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct esp_vhci_host_callback {
+    #[doc = "< callback used to notify that the host can send packet to controller"]
+    pub notify_host_send_available: ::core::option::Option<unsafe extern "C" fn()>,
+    #[doc = "< callback used to notify that the controller has a packet to send to the host"]
+    pub notify_host_recv: ::core::option::Option<
+        unsafe extern "C" fn(data: *mut u8, len: u16) -> crate::binary::c_types::c_int,
+    >,
+}
+#[doc = " @brief esp_vhci_host_callback"]
+#[doc = "  used for vhci call host function to notify what host need to do"]
+pub type esp_vhci_host_callback_t = esp_vhci_host_callback;
+extern "C" {
+    #[doc = " @brief esp_vhci_host_check_send_available"]
+    #[doc = "  used for check actively if the host can send packet to controller or not."]
+    #[doc = "  @return true for ready to send, false means cannot send packet"]
+    pub fn esp_vhci_host_check_send_available() -> bool;
+}
+extern "C" {
+    #[doc = " @brief esp_vhci_host_send_packet"]
+    #[doc = " host send packet to controller"]
+    #[doc = ""]
+    #[doc = " Should not call this function from within a critical section"]
+    #[doc = " or when the scheduler is suspended."]
+    #[doc = ""]
+    #[doc = " @param data the packet point"]
+    #[doc = " @param len the packet length"]
+    pub fn esp_vhci_host_send_packet(data: *mut u8, len: u16);
+}
+extern "C" {
+    #[doc = " @brief esp_vhci_host_register_callback"]
+    #[doc = " register the vhci reference callback"]
+    #[doc = " struct defined by vhci_host_callback structure."]
+    #[doc = " @param callback esp_vhci_host_callback type variable"]
+    #[doc = " @return ESP_OK - success, ESP_FAIL - failed"]
+    pub fn esp_vhci_host_register_callback(callback: *const esp_vhci_host_callback_t) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief esp_bt_controller_mem_release"]
+    #[doc = " release the controller memory as per the mode"]
+    #[doc = ""]
+    #[doc = " This function releases the BSS, data and other sections of the controller to heap. The total size is about 70k bytes."]
+    #[doc = ""]
+    #[doc = " esp_bt_controller_mem_release(mode) should be called only before esp_bt_controller_init()"]
+    #[doc = " or after esp_bt_controller_deinit()."]
+    #[doc = ""]
+    #[doc = " Note that once BT controller memory is released, the process cannot be reversed. It means you cannot use the bluetooth"]
+    #[doc = " mode which you have released by this function."]
+    #[doc = ""]
+    #[doc = " If your firmware will later upgrade the Bluetooth controller mode (BLE -> BT Classic or disabled -> enabled)"]
+    #[doc = " then do not call this function."]
+    #[doc = ""]
+    #[doc = " If the app calls esp_bt_controller_enable(ESP_BT_MODE_BLE) to use BLE only then it is safe to call"]
+    #[doc = " esp_bt_controller_mem_release(ESP_BT_MODE_CLASSIC_BT) at initialization time to free unused BT Classic memory."]
+    #[doc = ""]
+    #[doc = " If the mode is ESP_BT_MODE_BTDM, then it may be useful to call API esp_bt_mem_release(ESP_BT_MODE_BTDM) instead,"]
+    #[doc = " which internally calls esp_bt_controller_mem_release(ESP_BT_MODE_BTDM) and additionally releases the BSS and data"]
+    #[doc = " consumed by the BT/BLE host stack to heap. For more details about usage please refer to the documentation of"]
+    #[doc = " esp_bt_mem_release() function"]
+    #[doc = ""]
+    #[doc = " @param mode : the mode want to release memory"]
+    #[doc = " @return ESP_OK - success, other - failed"]
+    pub fn esp_bt_controller_mem_release(mode: esp_bt_mode_t) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief esp_bt_mem_release"]
+    #[doc = " release controller memory and BSS and data section of the BT/BLE host stack as per the mode"]
+    #[doc = ""]
+    #[doc = " This function first releases controller memory by internally calling esp_bt_controller_mem_release()."]
+    #[doc = " Additionally, if the mode is set to ESP_BT_MODE_BTDM, it also releases the BSS and data consumed by the BT/BLE host stack to heap"]
+    #[doc = ""]
+    #[doc = " Note that once BT memory is released, the process cannot be reversed. It means you cannot use the bluetooth"]
+    #[doc = " mode which you have released by this function."]
+    #[doc = ""]
+    #[doc = " If your firmware will later upgrade the Bluetooth controller mode (BLE -> BT Classic or disabled -> enabled)"]
+    #[doc = " then do not call this function."]
+    #[doc = ""]
+    #[doc = " If you never intend to use bluetooth in a current boot-up cycle, you can call esp_bt_mem_release(ESP_BT_MODE_BTDM)"]
+    #[doc = " before esp_bt_controller_init or after esp_bt_controller_deinit."]
+    #[doc = ""]
+    #[doc = " For example, if a user only uses bluetooth for setting the WiFi configuration, and does not use bluetooth in the rest of the product operation\"."]
+    #[doc = " In such cases, after receiving the WiFi configuration, you can disable/deinit bluetooth and release its memory."]
+    #[doc = " Below is the sequence of APIs to be called for such scenarios:"]
+    #[doc = ""]
+    #[doc = "      esp_bluedroid_disable();"]
+    #[doc = "      esp_bluedroid_deinit();"]
+    #[doc = "      esp_bt_controller_disable();"]
+    #[doc = "      esp_bt_controller_deinit();"]
+    #[doc = "      esp_bt_mem_release(ESP_BT_MODE_BTDM);"]
+    #[doc = ""]
+    #[doc = " @param mode : the mode whose memory is to be released"]
+    #[doc = " @return ESP_OK - success, other - failed"]
+    pub fn esp_bt_mem_release(mode: esp_bt_mode_t) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief enable bluetooth to enter modem sleep"]
+    #[doc = ""]
+    #[doc = " Note that this function shall not be invoked before esp_bt_controller_enable()"]
+    #[doc = ""]
+    #[doc = " There are currently two options for bluetooth modem sleep, one is ORIG mode, and another is EVED Mode. EVED Mode is intended for BLE only."]
+    #[doc = ""]
+    #[doc = " For ORIG mode:"]
+    #[doc = " Bluetooth modem sleep is enabled in controller start up by default if CONFIG_BTDM_CONTROLLER_MODEM_SLEEP is set and \"ORIG mode\" is selected. In ORIG modem sleep mode, bluetooth controller will switch off some components and pause to work every now and then, if there is no event to process; and wakeup according to the scheduled interval and resume the work. It can also wakeup earlier upon external request using function \"esp_bt_controller_wakeup_request\"."]
+    #[doc = ""]
+    #[doc = " @return"]
+    #[doc = "                  - ESP_OK : success"]
+    #[doc = "                  - other  : failed"]
+    pub fn esp_bt_sleep_enable() -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief disable bluetooth modem sleep"]
+    #[doc = ""]
+    #[doc = " Note that this function shall not be invoked before esp_bt_controller_enable()"]
+    #[doc = ""]
+    #[doc = " If esp_bt_sleep_disable() is called, bluetooth controller will not be allowed to enter modem sleep;"]
+    #[doc = ""]
+    #[doc = " If ORIG modem sleep mode is in use, if this function is called, bluetooth controller may not immediately wake up if it is dormant then."]
+    #[doc = " In this case, esp_bt_controller_wakeup_request() can be used to shorten the time for wakeup."]
+    #[doc = ""]
+    #[doc = " @return"]
+    #[doc = "                  - ESP_OK : success"]
+    #[doc = "                  - other  : failed"]
+    pub fn esp_bt_sleep_disable() -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief to check whether bluetooth controller is sleeping at the instant, if modem sleep is enabled"]
+    #[doc = ""]
+    #[doc = " Note that this function shall not be invoked before esp_bt_controller_enable()"]
+    #[doc = " This function is supposed to be used ORIG mode of modem sleep"]
+    #[doc = ""]
+    #[doc = " @return  true if in modem sleep state, false otherwise"]
+    pub fn esp_bt_controller_is_sleeping() -> bool;
+}
+extern "C" {
+    #[doc = " @brief request controller to wakeup from sleeping state during sleep mode"]
+    #[doc = ""]
+    #[doc = " Note that this function shall not be invoked before esp_bt_controller_enable()"]
+    #[doc = " Note that this function is supposed to be used ORIG mode of modem sleep"]
+    #[doc = " Note that after this request, bluetooth controller may again enter sleep as long as the modem sleep is enabled"]
+    #[doc = ""]
+    #[doc = " Profiling shows that it takes several milliseconds to wakeup from modem sleep after this request."]
+    #[doc = " Generally it takes longer if 32kHz XTAL is used than the main XTAL, due to the lower frequency of the former as the bluetooth low power clock source."]
+    pub fn esp_bt_controller_wakeup_request();
+}
+extern "C" {
+    #[doc = " @brief notify bluetooth controller task to process the event upon Tx or Rx done"]
+    #[doc = ""]
+    #[doc = " Note that this function shall not be invoked before esp_bt_controller_enable()"]
+    #[doc = " This function can be called in both ISR and non-ISR context"]
+    #[doc = ""]
+    pub fn esp_bt_h4tl_eif_io_event_notify(
+        event: crate::binary::c_types::c_int,
+    ) -> crate::binary::c_types::c_int;
+}
+extern "C" {
+    #[doc = " @brief  Get BT MAC address."]
+    #[doc = " @return Array pointer of length 6 storing MAC address value."]
+    pub fn esp_bt_get_mac() -> *mut u8;
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
