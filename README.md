@@ -1,10 +1,10 @@
-# Wifi and Bluetooth LE on ESP32C3 and ESP32 (not BLE yet) (on bare-metal Rust)
+# Wifi and Bluetooth LE on ESP32C3 and ESP32 (on bare-metal Rust)
 
 ## About
 
 This is experimental and work-in-progress! You are welcome to experiment with it and contribute but probably shouldn't use this for something real yet.
 
-For now Bluetooth LE is only available on ESP32C3. It is currently _NOT_ possible to use Bluetooth and WiFi together.
+It is currently _NOT_ possible to use Bluetooth and WiFi together.
 
 This uses the WiFi driver found in https://github.com/espressif/esp-wireless-drivers-3rdparty
 
@@ -31,6 +31,7 @@ https://github.com/espressif/esp-wireless-drivers-3rdparty/archive/45701c0.zip
 | ---------------------------------------------------------------------------------------------------------------------------- | ------- |
 | `cargo "+nightly" run --example ble_esp32c3 --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc"`  | ESP32C3 |
 | `cargo "+nightly" run --example dhcp_esp32c3 --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc"` | ESP32C3 |
+| `cargo "+esp" run --example ble_esp32 --release --target xtensa-esp32-none-elf --features "esp32,embedded-svc"`              | ESP32   |
 | `cargo "+esp" run --example dhcp_esp32 --release --target xtensa-esp32-none-elf --features "esp32,embedded-svc"`             | ESP32   |
 
 Additional you can specify these features
@@ -47,7 +48,7 @@ In general you should use the release profile since otherwise the performance is
 
 - scanning for WiFi access points
 - connect to WiFi access point
-- providing an HCI interface (ESP32C3 only for now)
+- providing an HCI interface
 
 ## Notes on ESP32C3 support
 
@@ -83,7 +84,6 @@ On ESP32 currently TIMG1 is used as the main timer so you can't use it for anyth
 ## Missing / To be done
 
 - lots of refactoring
-- Bluetooth for ESP32
 - CoEx
 - esp-now
 - powersafe support

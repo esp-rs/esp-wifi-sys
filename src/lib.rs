@@ -19,7 +19,6 @@ pub mod timer;
 
 pub mod wifi;
 
-#[cfg(feature = "esp32c3")]
 pub mod ble;
 
 #[doc(hidden)]

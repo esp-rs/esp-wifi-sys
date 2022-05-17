@@ -5,8 +5,7 @@ use esp32_hal::{
     interrupt,
     pac::{self, TIMG1},
     prelude::_embedded_hal_timer_CountDown,
-    Cpu,
-    Timer,
+    Cpu, Timer,
 };
 use log::trace;
 use xtensa_lx::mutex::{Mutex, SpinLockMutex};
@@ -72,12 +71,50 @@ pub fn level1_interrupt(_context: &mut Context) {
     trace!("Interrupt 1");
 
     unsafe {
-        interrupt::clear(
-            Cpu::ProCpu,
-            interrupt::CpuInterrupt::Interrupt0LevelPriority1,
-        );
+        let mut interrupt = 0;
 
-        let (fnc, arg) = crate::wifi::os_adapter::ISR_INTERRUPT_1;
+        let mut cpu_int: u32;
+        core::arch::asm!("rsr.226  {0}", out(reg) cpu_int, options(nostack)); // 226 = "intset"
+                                                                              //let status = interrupt::get_status(Cpu::ProCpu);
+        trace!("interrupt 1 status = {:b}", cpu_int);
+
+        if cpu_int & 0b10000000 != 0 {
+            interrupt = 7;
+            let clear = 1 << 7;
+            core::arch::asm!("wsr.227  {0}", in(reg) clear, options(nostack)); // 227 = "intclear"
+        } else if cpu_int & 0b100000000 != 0 {
+            interrupt = 8;
+            let clear = 1 << 8;
+            core::arch::asm!("wsr.227  {0}", in(reg) clear, options(nostack)); // 227 = "intclear"
+
+            interrupt::clear(
+                Cpu::ProCpu,
+                interrupt::CpuInterrupt::Interrupt8LevelPriority1,
+            );
+        } else if cpu_int & 0b100000 != 0 {
+            interrupt = 5;
+            let clear = 1 << 5;
+            core::arch::asm!("wsr.227  {0}", in(reg) clear, options(nostack)); // 227 = "intclear"
+
+            interrupt::clear(
+                Cpu::ProCpu,
+                interrupt::CpuInterrupt::Interrupt5LevelPriority1,
+            );
+        } else {
+            interrupt::clear(
+                Cpu::ProCpu,
+                interrupt::CpuInterrupt::Interrupt0LevelPriority1,
+            );
+        }
+        trace!("interrupt no = {}", interrupt);
+
+        let (fnc, arg) = match interrupt {
+            0 => crate::wifi::os_adapter::ISR_INTERRUPT_1,
+            5 => crate::ble::ble_os_adapter_chip_specific::ISR_INTERRUPT_5,
+            7 => crate::ble::ble_os_adapter_chip_specific::ISR_INTERRUPT_7,
+            8 => crate::ble::ble_os_adapter_chip_specific::ISR_INTERRUPT_8,
+            _ => panic!("Don't know how to handle interrupt {}", interrupt),
+        };
 
         trace!("interrupt 1 {:p} {:p}", fnc, arg);
 

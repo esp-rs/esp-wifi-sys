@@ -140,6 +140,24 @@ pub fn initialize(timg1: esp32_hal::pac::TIMG1, rng: hal::pac::RNG) -> Result<()
     Ok(())
 }
 
+#[cfg(feature = "esp32")]
+/// Initialize for using Bluetooth LE
+/// This will just initialize internals.
+pub fn initialize_ble(timg1: esp32_hal::pac::TIMG1, rng: hal::pac::RNG) -> Result<(), WifiError> {
+    init_rng(rng);
+    init_tasks();
+    setup_timer_isr(timg1);
+    wifi_set_log_verbose();
+    init_clocks();
+    init_buffer();
+
+    unsafe {
+        BLE_ENABLED = true;
+    }
+
+    Ok(())
+}
+
 pub fn init_buffer() {
     unsafe {
         DATA_QUEUE_RX = Some(SimpleQueue::new());
