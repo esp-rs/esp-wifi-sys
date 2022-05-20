@@ -1,5 +1,6 @@
 use core::mem::MaybeUninit;
 use log::trace;
+use Option;
 
 use crate::compat::common::StrBuf;
 use crate::compat::queue::SimpleQueue;
@@ -8,7 +9,9 @@ use crate::binary::include::*;
 use crate::compat::work_queue::queue_work;
 use esp_alloc::memory_fence;
 
-use esp32c3_hal as hal;
+#[cfg_attr(feature = "esp32c3", path = "os_adapter_esp32c3.rs")]
+#[cfg_attr(feature = "esp32", path = "os_adapter_esp32.rs")]
+pub(crate) mod ble_os_adapter_chip_specific;
 
 pub mod controller;
 
@@ -30,10 +33,17 @@ struct vhci_host_callback_s {
 }
 
 extern "C" {
-    fn btdm_controller_rom_data_init() -> i32;
     fn btdm_osi_funcs_register(osi_funcs: *const ()) -> i32;
     fn btdm_controller_get_compile_version() -> *const u8;
+
+    #[cfg(feature = "esp32c3")]
     fn btdm_controller_init(config_opts: *const esp_bt_controller_config_t) -> i32;
+
+    #[cfg(feature = "esp32")]
+    fn btdm_controller_init(
+        config_mask: u32,
+        config_opts: *const esp_bt_controller_config_t,
+    ) -> i32;
 
     fn btdm_controller_enable(mode: esp_bt_mode_t);
 
@@ -72,37 +82,35 @@ extern "C" fn notify_host_recv(data: *mut u8, len: u16) -> i32 {
     0
 }
 
+#[cfg(feature = "esp32c3")]
 #[repr(C)]
 struct osi_funcs_s {
     magic: u32,
     version: u32,
-    interrupt_set: ::core::option::Option<unsafe extern "C" fn(i32, i32, i32, i32) -> ()>,
-    interrupt_clear: ::core::option::Option<unsafe extern "C" fn(i32, i32) -> ()>,
-    interrupt_handler_set:
-        ::core::option::Option<unsafe extern "C" fn(i32, extern "C" fn(), *const ()) -> ()>,
-    interrupt_disable: ::core::option::Option<unsafe extern "C" fn() -> ()>,
-    interrupt_enable: ::core::option::Option<unsafe extern "C" fn() -> ()>,
-    task_yield: ::core::option::Option<unsafe extern "C" fn() -> ()>,
-    task_yield_from_isr: ::core::option::Option<unsafe extern "C" fn() -> ()>,
-    semphr_create: ::core::option::Option<unsafe extern "C" fn(u32, u32) -> *const ()>,
-    semphr_delete: ::core::option::Option<unsafe extern "C" fn(*const ()) -> ()>,
-    semphr_take_from_isr: ::core::option::Option<unsafe extern "C" fn(*const (), *const ()) -> i32>,
-    semphr_give_from_isr: ::core::option::Option<unsafe extern "C" fn(*const (), *const ()) -> i32>,
-    semphr_take: ::core::option::Option<unsafe extern "C" fn(*const (), u32) -> i32>,
-    semphr_give: ::core::option::Option<unsafe extern "C" fn(*const ()) -> i32>,
-    mutex_create: ::core::option::Option<unsafe extern "C" fn() -> *const ()>,
-    mutex_delete: ::core::option::Option<unsafe extern "C" fn(*const ()) -> ()>,
-    mutex_lock: ::core::option::Option<unsafe extern "C" fn(*const ()) -> i32>,
-    mutex_unlock: ::core::option::Option<unsafe extern "C" fn(*const ()) -> i32>,
-    queue_create: ::core::option::Option<unsafe extern "C" fn(u32, u32) -> *const ()>,
-    queue_delete: ::core::option::Option<unsafe extern "C" fn(*const ()) -> ()>,
-    queue_send: ::core::option::Option<unsafe extern "C" fn(*const (), *const (), u32) -> i32>,
-    queue_send_from_isr:
-        ::core::option::Option<unsafe extern "C" fn(*const (), *const (), *const ()) -> i32>,
-    queue_recv: ::core::option::Option<unsafe extern "C" fn(*const (), *const (), u32) -> i32>,
-    queue_recv_from_isr:
-        ::core::option::Option<unsafe extern "C" fn(*const (), *const (), *const ()) -> i32>,
-    task_create: ::core::option::Option<
+    interrupt_set: Option<unsafe extern "C" fn(i32, i32, i32, i32) -> ()>,
+    interrupt_clear: Option<unsafe extern "C" fn(i32, i32) -> ()>,
+    interrupt_handler_set: Option<unsafe extern "C" fn(i32, extern "C" fn(), *const ()) -> ()>,
+    interrupt_disable: Option<unsafe extern "C" fn() -> ()>,
+    interrupt_enable: Option<unsafe extern "C" fn() -> ()>,
+    task_yield: Option<unsafe extern "C" fn() -> ()>,
+    task_yield_from_isr: Option<unsafe extern "C" fn() -> ()>,
+    semphr_create: Option<unsafe extern "C" fn(u32, u32) -> *const ()>,
+    semphr_delete: Option<unsafe extern "C" fn(*const ()) -> ()>,
+    semphr_take_from_isr: Option<unsafe extern "C" fn(*const (), *const ()) -> i32>,
+    semphr_give_from_isr: Option<unsafe extern "C" fn(*const (), *const ()) -> i32>,
+    semphr_take: Option<unsafe extern "C" fn(*const (), u32) -> i32>,
+    semphr_give: Option<unsafe extern "C" fn(*const ()) -> i32>,
+    mutex_create: Option<unsafe extern "C" fn() -> *const ()>,
+    mutex_delete: Option<unsafe extern "C" fn(*const ()) -> ()>,
+    mutex_lock: Option<unsafe extern "C" fn(*const ()) -> i32>,
+    mutex_unlock: Option<unsafe extern "C" fn(*const ()) -> i32>,
+    queue_create: Option<unsafe extern "C" fn(u32, u32) -> *const ()>,
+    queue_delete: Option<unsafe extern "C" fn(*const ()) -> ()>,
+    queue_send: Option<unsafe extern "C" fn(*const (), *const (), u32) -> i32>,
+    queue_send_from_isr: Option<unsafe extern "C" fn(*const (), *const (), *const ()) -> i32>,
+    queue_recv: Option<unsafe extern "C" fn(*const (), *const (), u32) -> i32>,
+    queue_recv_from_isr: Option<unsafe extern "C" fn(*const (), *const (), *const ()) -> i32>,
+    task_create: Option<
         unsafe extern "C" fn(
             *mut crate::binary::c_types::c_void,
             *const u8,
@@ -113,41 +121,41 @@ struct osi_funcs_s {
             u32,
         ) -> i32,
     >,
-    task_delete: ::core::option::Option<unsafe extern "C" fn(*const ()) -> ()>,
-    is_in_isr: ::core::option::Option<unsafe extern "C" fn() -> i32>,
-    cause_sw_intr_to_core: ::core::option::Option<unsafe extern "C" fn(i32, i32) -> i32>,
-    malloc: ::core::option::Option<unsafe extern "C" fn(u32) -> *const ()>,
-    malloc_internal: ::core::option::Option<unsafe extern "C" fn(u32) -> *const ()>,
-    free: ::core::option::Option<unsafe extern "C" fn(*const ()) -> ()>,
-    read_efuse_mac: ::core::option::Option<unsafe extern "C" fn(*const ()) -> i32>,
-    srand: ::core::option::Option<unsafe extern "C" fn(u32) -> ()>,
-    rand: ::core::option::Option<unsafe extern "C" fn() -> i32>,
-    btdm_lpcycles_2_hus: ::core::option::Option<unsafe extern "C" fn(u32, u32) -> u32>,
-    btdm_hus_2_lpcycles: ::core::option::Option<unsafe extern "C" fn(u32) -> u32>,
-    btdm_sleep_check_duration: ::core::option::Option<unsafe extern "C" fn(i32) -> i32>,
-    btdm_sleep_enter_phase1: ::core::option::Option<unsafe extern "C" fn(i32) -> ()>,
-    btdm_sleep_enter_phase2: ::core::option::Option<unsafe extern "C" fn() -> ()>,
-    btdm_sleep_exit_phase1: ::core::option::Option<unsafe extern "C" fn() -> ()>,
-    btdm_sleep_exit_phase2: ::core::option::Option<unsafe extern "C" fn() -> ()>,
-    btdm_sleep_exit_phase3: ::core::option::Option<unsafe extern "C" fn() -> ()>,
-    coex_wifi_sleep_set: ::core::option::Option<unsafe extern "C" fn(i32) -> ()>,
-    coex_core_ble_conn_dyn_prio_get:
-        ::core::option::Option<unsafe extern "C" fn(*mut i32, *mut i32) -> i32>,
-    coex_schm_status_bit_set: ::core::option::Option<unsafe extern "C" fn(i32, i32) -> ()>,
-    coex_schm_status_bit_clear: ::core::option::Option<unsafe extern "C" fn(i32, i32) -> ()>,
-    interrupt_on: ::core::option::Option<unsafe extern "C" fn(i32) -> ()>,
-    interrupt_off: ::core::option::Option<unsafe extern "C" fn(i32) -> ()>,
-    esp_hw_power_down: ::core::option::Option<unsafe extern "C" fn() -> ()>,
-    esp_hw_power_up: ::core::option::Option<unsafe extern "C" fn() -> ()>,
-    ets_backup_dma_copy: ::core::option::Option<unsafe extern "C" fn(u32, u32, u32, i32) -> ()>,
+    task_delete: Option<unsafe extern "C" fn(*const ()) -> ()>,
+    is_in_isr: Option<unsafe extern "C" fn() -> i32>,
+    cause_sw_intr_to_core: Option<unsafe extern "C" fn(i32, i32) -> i32>,
+    malloc: Option<unsafe extern "C" fn(u32) -> *const ()>,
+    malloc_internal: Option<unsafe extern "C" fn(u32) -> *const ()>,
+    free: Option<unsafe extern "C" fn(*const ()) -> ()>,
+    read_efuse_mac: Option<unsafe extern "C" fn(*const ()) -> i32>,
+    srand: Option<unsafe extern "C" fn(u32) -> ()>,
+    rand: Option<unsafe extern "C" fn() -> i32>,
+    btdm_lpcycles_2_hus: Option<unsafe extern "C" fn(u32, u32) -> u32>,
+    btdm_hus_2_lpcycles: Option<unsafe extern "C" fn(u32) -> u32>,
+    btdm_sleep_check_duration: Option<unsafe extern "C" fn(i32) -> i32>,
+    btdm_sleep_enter_phase1: Option<unsafe extern "C" fn(i32) -> ()>,
+    btdm_sleep_enter_phase2: Option<unsafe extern "C" fn() -> ()>,
+    btdm_sleep_exit_phase1: Option<unsafe extern "C" fn() -> ()>,
+    btdm_sleep_exit_phase2: Option<unsafe extern "C" fn() -> ()>,
+    btdm_sleep_exit_phase3: Option<unsafe extern "C" fn() -> ()>,
+    coex_wifi_sleep_set: Option<unsafe extern "C" fn(i32) -> ()>,
+    coex_core_ble_conn_dyn_prio_get: Option<unsafe extern "C" fn(*mut i32, *mut i32) -> i32>,
+    coex_schm_status_bit_set: Option<unsafe extern "C" fn(i32, i32) -> ()>,
+    coex_schm_status_bit_clear: Option<unsafe extern "C" fn(i32, i32) -> ()>,
+    interrupt_on: Option<unsafe extern "C" fn(i32) -> ()>,
+    interrupt_off: Option<unsafe extern "C" fn(i32) -> ()>,
+    esp_hw_power_down: Option<unsafe extern "C" fn() -> ()>,
+    esp_hw_power_up: Option<unsafe extern "C" fn() -> ()>,
+    ets_backup_dma_copy: Option<unsafe extern "C" fn(u32, u32, u32, i32) -> ()>,
 }
 
+#[cfg(feature = "esp32c3")]
 static G_OSI_FUNCS: osi_funcs_s = osi_funcs_s {
     magic: 0xfadebead,
     version: 0x00010006,
-    interrupt_set: Some(interrupt_set),
-    interrupt_clear: Some(interrupt_clear),
-    interrupt_handler_set: Some(interrupt_handler_set),
+    interrupt_set: Some(ble_os_adapter_chip_specific::interrupt_set),
+    interrupt_clear: Some(ble_os_adapter_chip_specific::interrupt_clear),
+    interrupt_handler_set: Some(ble_os_adapter_chip_specific::interrupt_handler_set),
     interrupt_disable: Some(interrupt_disable),
     interrupt_enable: Some(interrupt_enable),
     task_yield: Some(task_yield),
@@ -186,81 +194,156 @@ static G_OSI_FUNCS: osi_funcs_s = osi_funcs_s {
     btdm_sleep_exit_phase1: Some(btdm_sleep_exit_phase1),
     btdm_sleep_exit_phase2: Some(btdm_sleep_exit_phase2),
     btdm_sleep_exit_phase3: Some(btdm_sleep_exit_phase3),
-    coex_wifi_sleep_set: Some(coex_wifi_sleep_set),
-    coex_core_ble_conn_dyn_prio_get: Some(coex_core_ble_conn_dyn_prio_get),
+    coex_wifi_sleep_set: Some(ble_os_adapter_chip_specific::coex_wifi_sleep_set),
+    coex_core_ble_conn_dyn_prio_get: Some(
+        ble_os_adapter_chip_specific::coex_core_ble_conn_dyn_prio_get,
+    ),
     coex_schm_status_bit_set: Some(coex_schm_status_bit_set),
     coex_schm_status_bit_clear: Some(coex_schm_status_bit_clear),
-    interrupt_on: Some(interrupt_on),
-    interrupt_off: Some(interrupt_off),
-    esp_hw_power_down: Some(esp_hw_power_down),
-    esp_hw_power_up: Some(esp_hw_power_up),
-    ets_backup_dma_copy: Some(ets_backup_dma_copy),
+    interrupt_on: Some(ble_os_adapter_chip_specific::interrupt_on),
+    interrupt_off: Some(ble_os_adapter_chip_specific::interrupt_off),
+    esp_hw_power_down: Some(ble_os_adapter_chip_specific::esp_hw_power_down),
+    esp_hw_power_up: Some(ble_os_adapter_chip_specific::esp_hw_power_up),
+    ets_backup_dma_copy: Some(ble_os_adapter_chip_specific::ets_backup_dma_copy),
 };
 
-pub(crate) static mut BT_INTERRUPT_FUNCTION5: (
-    *mut crate::binary::c_types::c_void,
-    *mut crate::binary::c_types::c_void,
-) = (core::ptr::null_mut(), core::ptr::null_mut());
-
-pub(crate) static mut BT_INTERRUPT_FUNCTION8: (
-    *mut crate::binary::c_types::c_void,
-    *mut crate::binary::c_types::c_void,
-) = (core::ptr::null_mut(), core::ptr::null_mut());
-
-unsafe extern "C" fn interrupt_set(
-    cpu_no: i32,
-    intr_source: i32,
-    interrupt_no: i32,
-    interrupt_prio: i32,
-) {
-    trace!(
-        "interrupt_set {} {} {} {}",
-        cpu_no,
-        intr_source,
-        interrupt_no,
-        interrupt_prio
-    );
-
-    ((0x600c2000 + 0x114 + interrupt_no * 4) as *mut u32).write_volatile(interrupt_prio as u32);
-
-    /* Set the interrupt type (Edge or Level). */
-    // ----
-
-    /* Map the CPU interrupt ID to the peripheral. */
-    ((0x600c2000 + intr_source * 4) as *mut u32).write_volatile(interrupt_no as u32);
+#[cfg(feature = "esp32")]
+#[repr(C)]
+struct osi_funcs_s {
+    version: u32,
+    set_isr: Option<unsafe extern "C" fn(i32, unsafe extern "C" fn(), *const ()) -> i32>,
+    ints_on: Option<unsafe extern "C" fn(u32)>,
+    interrupt_disable: Option<unsafe extern "C" fn() -> ()>,
+    interrupt_restore: Option<unsafe extern "C" fn() -> ()>,
+    task_yield: Option<unsafe extern "C" fn() -> ()>,
+    task_yield_from_isr: Option<unsafe extern "C" fn() -> ()>,
+    semphr_create: Option<unsafe extern "C" fn(u32, u32) -> *const ()>,
+    semphr_delete: Option<unsafe extern "C" fn(*const ()) -> ()>,
+    semphr_take_from_isr: Option<unsafe extern "C" fn(*const (), *const ()) -> i32>,
+    semphr_give_from_isr: Option<unsafe extern "C" fn(*const (), *const ()) -> i32>,
+    semphr_take: Option<unsafe extern "C" fn(*const (), u32) -> i32>,
+    semphr_give: Option<unsafe extern "C" fn(*const ()) -> i32>,
+    mutex_create: Option<unsafe extern "C" fn() -> *const ()>,
+    mutex_delete: Option<unsafe extern "C" fn(*const ()) -> ()>,
+    mutex_lock: Option<unsafe extern "C" fn(*const ()) -> i32>,
+    mutex_unlock: Option<unsafe extern "C" fn(*const ()) -> i32>,
+    queue_create: Option<unsafe extern "C" fn(u32, u32) -> *const ()>,
+    queue_delete: Option<unsafe extern "C" fn(*const ()) -> ()>,
+    queue_send: Option<unsafe extern "C" fn(*const (), *const (), u32) -> i32>,
+    queue_send_from_isr: Option<unsafe extern "C" fn(*const (), *const (), *const ()) -> i32>,
+    queue_recv: Option<unsafe extern "C" fn(*const (), *const (), u32) -> i32>,
+    queue_recv_from_isr: Option<unsafe extern "C" fn(*const (), *const (), *const ()) -> i32>,
+    task_create: Option<
+        unsafe extern "C" fn(
+            *mut crate::binary::c_types::c_void,
+            *const u8,
+            u32,
+            *mut crate::binary::c_types::c_void,
+            u32,
+            *mut crate::binary::c_types::c_void,
+            u32,
+        ) -> i32,
+    >,
+    task_delete: Option<unsafe extern "C" fn(*const ()) -> ()>,
+    is_in_isr: Option<unsafe extern "C" fn() -> i32>,
+    cause_sw_intr_to_core: Option<unsafe extern "C" fn(i32, i32) -> i32>,
+    malloc: Option<unsafe extern "C" fn(u32) -> *const ()>,
+    malloc_internal: Option<unsafe extern "C" fn(u32) -> *const ()>,
+    free: Option<unsafe extern "C" fn(*const ()) -> ()>,
+    read_efuse_mac: Option<unsafe extern "C" fn(*const ()) -> i32>,
+    srand: Option<unsafe extern "C" fn(u32) -> ()>,
+    rand: Option<unsafe extern "C" fn() -> i32>,
+    btdm_lpcycles_2_hus: Option<unsafe extern "C" fn(u32, u32) -> u32>,
+    btdm_hus_2_lpcycles: Option<unsafe extern "C" fn(u32) -> u32>,
+    btdm_sleep_check_duration: Option<unsafe extern "C" fn(i32) -> i32>,
+    btdm_sleep_enter_phase1: Option<unsafe extern "C" fn(i32) -> ()>,
+    btdm_sleep_enter_phase2: Option<unsafe extern "C" fn() -> ()>,
+    btdm_sleep_exit_phase1: Option<unsafe extern "C" fn() -> ()>,
+    btdm_sleep_exit_phase2: Option<unsafe extern "C" fn() -> ()>,
+    btdm_sleep_exit_phase3: Option<unsafe extern "C" fn() -> ()>,
+    coex_bt_wakeup_request: Option<unsafe extern "C" fn() -> bool>,
+    coex_bt_wakeup_request_end: Option<unsafe extern "C" fn() -> ()>,
+    coex_bt_request: Option<unsafe extern "C" fn(u32, u32, u32) -> i32>,
+    coex_bt_release: Option<unsafe extern "C" fn(u32) -> i32>,
+    coex_register_bt_cb: Option<unsafe extern "C" fn(unsafe extern "C" fn()) -> i32>,
+    coex_bb_reset_lock: Option<unsafe extern "C" fn() -> u32>,
+    coex_bb_reset_unlock: Option<unsafe extern "C" fn(u32)>,
+    coex_schm_register_btdm_callback: Option<unsafe extern "C" fn(unsafe extern "C" fn()) -> i32>,
+    coex_schm_status_bit_clear: Option<unsafe extern "C" fn(i32, i32) -> ()>,
+    coex_schm_status_bit_set: Option<unsafe extern "C" fn(i32, i32) -> ()>,
+    coex_schm_interval_get: Option<unsafe extern "C" fn() -> u32>,
+    coex_schm_curr_period_get: Option<unsafe extern "C" fn() -> u8>,
+    coex_schm_curr_phase_get: Option<unsafe extern "C" fn() -> *const ()>,
+    coex_wifi_channel_get: Option<unsafe extern "C" fn(*mut u8, *mut u8) -> i32>,
+    coex_register_wifi_channel_change_callback:
+        Option<unsafe extern "C" fn(unsafe extern "C" fn()) -> i32>,
+    magic: u32,
 }
 
-unsafe extern "C" fn interrupt_clear(_interrupt_source: i32, _interrupt_no: i32) {
-    todo!();
-}
-
-unsafe extern "C" fn interrupt_handler_set(
-    interrupt_no: i32,
-    func: extern "C" fn(),
-    arg: *const (),
-) {
-    trace!(
-        "interrupt_handler_set {} {:p} {:p}",
-        interrupt_no,
-        func,
-        arg
-    );
-    match interrupt_no {
-        5 => {
-            BT_INTERRUPT_FUNCTION5 = (
-                func as *mut crate::binary::c_types::c_void,
-                arg as *mut crate::binary::c_types::c_void,
-            )
-        }
-        8 => {
-            BT_INTERRUPT_FUNCTION8 = (
-                func as *mut crate::binary::c_types::c_void,
-                arg as *mut crate::binary::c_types::c_void,
-            )
-        }
-        _ => panic!("Unsupported interrupt number {}", interrupt_no),
-    }
-}
+#[cfg(feature = "esp32")]
+static G_OSI_FUNCS: osi_funcs_s = osi_funcs_s {
+    version: 0x00010002,
+    set_isr: Some(ble_os_adapter_chip_specific::set_isr),
+    ints_on: Some(ble_os_adapter_chip_specific::ints_on),
+    interrupt_disable: Some(interrupt_disable),
+    interrupt_restore: Some(interrupt_enable),
+    task_yield: Some(task_yield),
+    task_yield_from_isr: Some(task_yield_from_isr),
+    semphr_create: Some(semphr_create),
+    semphr_delete: Some(semphr_delete),
+    semphr_take_from_isr: Some(semphr_take_from_isr),
+    semphr_give_from_isr: Some(semphr_give_from_isr),
+    semphr_take: Some(semphr_take),
+    semphr_give: Some(semphr_give),
+    mutex_create: Some(mutex_create),
+    mutex_delete: Some(mutex_delete),
+    mutex_lock: Some(mutex_lock),
+    mutex_unlock: Some(mutex_unlock),
+    queue_create: Some(queue_create),
+    queue_delete: Some(queue_delete),
+    queue_send: Some(queue_send),
+    queue_send_from_isr: Some(queue_send_from_isr),
+    queue_recv: Some(queue_recv),
+    queue_recv_from_isr: Some(queue_recv_from_isr),
+    task_create: Some(task_create),
+    task_delete: Some(task_delete),
+    is_in_isr: Some(is_in_isr),
+    cause_sw_intr_to_core: Some(cause_sw_intr_to_core),
+    malloc: Some(malloc),
+    malloc_internal: Some(malloc_internal),
+    free: Some(free),
+    read_efuse_mac: Some(read_efuse_mac),
+    srand: Some(srand),
+    rand: Some(rand),
+    btdm_lpcycles_2_hus: Some(btdm_lpcycles_2_hus),
+    btdm_hus_2_lpcycles: Some(btdm_hus_2_lpcycles),
+    btdm_sleep_check_duration: Some(btdm_sleep_check_duration),
+    btdm_sleep_enter_phase1: Some(btdm_sleep_enter_phase1),
+    btdm_sleep_enter_phase2: Some(btdm_sleep_enter_phase2),
+    btdm_sleep_exit_phase1: Some(btdm_sleep_exit_phase1),
+    btdm_sleep_exit_phase2: Some(btdm_sleep_exit_phase2),
+    btdm_sleep_exit_phase3: Some(btdm_sleep_exit_phase3),
+    coex_bt_wakeup_request: Some(ble_os_adapter_chip_specific::coex_bt_wakeup_request),
+    coex_bt_wakeup_request_end: Some(ble_os_adapter_chip_specific::coex_bt_wakeup_request_end),
+    coex_bt_request: Some(ble_os_adapter_chip_specific::coex_bt_request),
+    coex_bt_release: Some(ble_os_adapter_chip_specific::coex_bt_release),
+    coex_register_bt_cb: Some(ble_os_adapter_chip_specific::coex_register_bt_cb),
+    coex_bb_reset_lock: Some(ble_os_adapter_chip_specific::coex_bb_reset_lock),
+    coex_bb_reset_unlock: Some(ble_os_adapter_chip_specific::coex_bb_reset_unlock),
+    coex_schm_register_btdm_callback: Some(
+        ble_os_adapter_chip_specific::coex_schm_register_btdm_callback,
+    ),
+    coex_schm_status_bit_clear: Some(coex_schm_status_bit_clear),
+    coex_schm_status_bit_set: Some(coex_schm_status_bit_set),
+    coex_schm_interval_get: Some(ble_os_adapter_chip_specific::coex_schm_interval_get),
+    coex_schm_curr_period_get: Some(ble_os_adapter_chip_specific::coex_schm_curr_period_get),
+    coex_schm_curr_phase_get: Some(ble_os_adapter_chip_specific::coex_schm_curr_phase_get),
+    coex_wifi_channel_get: Some(ble_os_adapter_chip_specific::coex_wifi_channel_get),
+    coex_register_wifi_channel_change_callback: Some(
+        ble_os_adapter_chip_specific::coex_register_wifi_channel_change_callback,
+    ),
+    magic: 0xfadebead,
+};
 
 unsafe extern "C" fn interrupt_enable() {
     trace!("!!!! unimplemented interrupt_enable");
@@ -356,7 +439,10 @@ unsafe extern "C" fn queue_send_from_isr(
     _item: *const (),
     _hptw: *const (),
 ) -> i32 {
-    todo!();
+    log::trace!("queue_send_from_isr {:p} {:p} {:p}", _queue, _item, _hptw);
+    // Force to set the value to be false
+    *(_hptw as *mut bool) = false;
+    queue_send(_queue, _item, 0)
 }
 
 unsafe extern "C" fn queue_recv(queue: *const (), item: *const (), block_time_ms: u32) -> i32 {
@@ -424,7 +510,7 @@ unsafe extern "C" fn task_create(
 ) -> i32 {
     let n = StrBuf::from(name);
     trace!(
-        "unimplemented task_create {:p} {:p} {} {} {:p} {} {:p} {}",
+        "recheck implementation: task_create {:p} {:p} {} {} {:p} {} {:p} {}",
         func,
         name,
         n.as_str_ref(),
@@ -450,7 +536,16 @@ unsafe extern "C" fn is_in_isr() -> i32 {
 }
 
 unsafe extern "C" fn cause_sw_intr_to_core(_core: i32, _intr_no: i32) -> i32 {
-    todo!();
+    #[cfg(feature = "esp32c3")]
+    todo!("cause_sw_intr_to_core is not implemented for ESP32C3");
+
+    #[cfg(feature = "esp32")]
+    {
+        log::trace!("cause_sw_intr_to_core {} {}", _core, _intr_no);
+        let intr = 1 << _intr_no;
+        core::arch::asm!("wsr.226  {0}", in(reg) intr, options(nostack)); // 226 = "intset"
+        0
+    }
 }
 
 unsafe extern "C" fn malloc(size: u32) -> *const () {
@@ -478,8 +573,17 @@ unsafe extern "C" fn btdm_lpcycles_2_hus(_cycles: u32, _error_corr: u32) -> u32 
     todo!();
 }
 
-unsafe extern "C" fn btdm_hus_2_lpcycles(_us: u32) -> u32 {
-    todo!();
+unsafe extern "C" fn btdm_hus_2_lpcycles(us: u32) -> u32 {
+    const RTC_CLK_CAL_FRACT: u32 = 19;
+    let g_btdm_lpcycle_us_frac = RTC_CLK_CAL_FRACT;
+    let g_btdm_lpcycle_us = 2 << (g_btdm_lpcycle_us_frac);
+
+    // Converts a duration in half us into a number of low power clock cycles.
+    let cycles: u64 = (us as u64) << (g_btdm_lpcycle_us_frac as u64 / g_btdm_lpcycle_us as u64);
+    log::warn!("*** NOT implemented btdm_hus_2_lpcycles {} {}", us, cycles);
+    // probably not right ... NX returns half of the values we calculate here
+
+    cycles as u32
 }
 
 unsafe extern "C" fn btdm_sleep_check_duration(_slot_cnt: i32) -> i32 {
@@ -506,44 +610,12 @@ unsafe extern "C" fn btdm_sleep_exit_phase3() {
     todo!();
 }
 
-unsafe extern "C" fn coex_wifi_sleep_set(sleep: i32) {
-    trace!("!!!! unimplemented coex_wifi_sleep_set {}", sleep);
-}
-
-unsafe extern "C" fn coex_core_ble_conn_dyn_prio_get(_low: *mut i32, _high: *mut i32) -> i32 {
-    todo!();
-}
-
 unsafe extern "C" fn coex_schm_status_bit_set(_typ: i32, _status: i32) {
     trace!("!!! unimplemented coex_schm_status_bit_set");
 }
 
 unsafe extern "C" fn coex_schm_status_bit_clear(_typ: i32, _status: i32) {
     trace!("!!! unimplemented coex_schm_status_bit_clear");
-}
-
-unsafe extern "C" fn interrupt_on(intr_num: i32) {
-    trace!("interrupt_on {}", intr_num);
-
-    (*hal::pac::INTERRUPT_CORE0::PTR)
-        .cpu_int_enable
-        .modify(|r, w| w.bits(r.bits() | 1 << intr_num));
-}
-
-unsafe extern "C" fn interrupt_off(_intr_num: i32) {
-    todo!();
-}
-
-unsafe extern "C" fn esp_hw_power_down() {
-    todo!();
-}
-
-unsafe extern "C" fn esp_hw_power_up() {
-    todo!();
-}
-
-unsafe extern "C" fn ets_backup_dma_copy(_reg: u32, _mem_addr: u32, _num: u32, _to_rem: i32) {
-    todo!();
 }
 
 unsafe extern "C" fn read_efuse_mac(mac: *const ()) -> i32 {
@@ -557,39 +629,20 @@ pub fn ble_init() {
 
         *(HCI_OUT_COLLECTOR.as_mut_ptr()) = HciOutCollector::new();
 
-        let mut cfg = esp_bt_controller_config_t {
-            magic: 0x5A5AA5A5,
-            version: 0x02104270,
-            controller_task_stack_size: 8192,
-            controller_task_prio: 200,
-            controller_task_run_cpu: 0,
-            bluetooth_mode: 1,
-            ble_max_act: 10,
-            sleep_mode: 0,
-            sleep_clock: 0,
-            ble_st_acl_tx_buf_nb: 0,
-            ble_hw_cca_check: 0,
-            ble_adv_dup_filt_max: 30,
-            coex_param_en: false,
-            ce_len_type: 0,
-            coex_use_hooks: false,
-            hci_tl_type: 1,
-            hci_tl_funcs: core::ptr::null_mut(),
-            txant_dft: 0,
-            rxant_dft: 0,
-            txpwr_dft: 7,
-            cfg_mask: 1,
-            scan_duplicate_mode: 0,
-            scan_duplicate_type: 0,
-            normal_adv_size: 20,
-            mesh_adv_size: 0,
-            coex_phy_coded_tx_rx_time_limit: 0,
-            hw_target_code: 0x01010000,
-            slave_ce_len_min: 5,
-            hw_recorrect_en: 1 << 0,
-        };
+        // turn on logging
+        #[cfg(feature = "wifi_logs")]
+        {
+            extern "C" {
+                static mut g_bt_plf_log_level: u32;
+            }
 
-        btdm_controller_rom_data_init();
+            log::info!("g_bt_plf_log_level = {}", g_bt_plf_log_level);
+            g_bt_plf_log_level = 10;
+        }
+
+        // esp32_bt_controller_init
+
+        let mut cfg = ble_os_adapter_chip_specific::create_ble_config();
 
         let res = btdm_osi_funcs_register(&G_OSI_FUNCS as *const _ as *const ());
         if res != 0 {
@@ -598,20 +651,57 @@ pub fn ble_init() {
 
         let version = btdm_controller_get_compile_version();
         let version_str = StrBuf::from(version);
-        trace!("BT controller compile version {}", version_str.as_str_ref());
+        log::debug!("BT controller compile version {}", version_str.as_str_ref());
+
+        ble_os_adapter_chip_specific::btdm_controller_mem_init();
+
+        ble_os_adapter_chip_specific::bt_periph_module_enable();
+
+        ble_os_adapter_chip_specific::disable_sleep_mode();
+
+        #[cfg(feature = "esp32c3")]
+        let res = btdm_controller_init(&mut cfg as *mut esp_bt_controller_config_t);
+
+        #[cfg(feature = "esp32")]
+        let res = btdm_controller_init(
+            (1 << 3) | (1 << 4),
+            &mut cfg as *mut esp_bt_controller_config_t,
+        ); // see btdm_config_mask_load for mask
+
+        if res != 0 {
+            panic!("btdm_controller_init returned {}", res);
+        }
+
+        log::debug!("The btdm_controller_init was initialized");
+
+        #[cfg(feature = "esp32")]
+        {
+            extern "C" {
+                fn coex_ble_adv_priority_high_set(high: bool);
+            }
+
+            coex_ble_adv_priority_high_set(false);
+        }
+
+        // esp32_bt_controller_enable
 
         // modifyreg32(SYSTEM_WIFI_CLK_EN_REG, 0, UINT32_MAX);
         // bt_phy_enable();
         crate::wifi::os_adapter::phy_enable();
 
-        let res = btdm_controller_init(&mut cfg as *mut esp_bt_controller_config_t);
-        if res != 0 {
-            panic!("btdm_controller_init returned {}", res);
+        #[cfg(feature = "esp32")]
+        {
+            extern "C" {
+                fn btdm_rf_bb_init_phase2();
+            }
+
+            btdm_rf_bb_init_phase2();
+            coex_bt_high_prio();
         }
 
-        API_vhci_host_register_callback(&VHCI_HOST_CALLBACK);
+        btdm_controller_enable(esp_bt_mode_t_ESP_BT_MODE_BLE); // fails with assertion
 
-        btdm_controller_enable(esp_bt_mode_t_ESP_BT_MODE_BLE);
+        API_vhci_host_register_callback(&VHCI_HOST_CALLBACK);
 
         critical_section::with(|_| {
             BLE_INITIALIZED = true;
@@ -631,10 +721,13 @@ pub fn send_hci(data: &[u8]) {
                 let can_send = API_vhci_host_check_send_available();
 
                 if !can_send {
+                    log::trace!("can_send is false");
                     continue;
                 }
 
                 API_vhci_host_send_packet(packet.as_ptr() as *const u8, packet.len() as u16);
+                log::trace!("sent vhci host packet");
+
                 break;
             }
         }
@@ -656,12 +749,6 @@ pub fn read_hci(data: &mut [u8]) -> usize {
                     for i in 0..(packet.len as usize + 0/*1*/) {
                         BLE_HCI_READ_DATA[i] = packet.data[i];
                     }
-
-                    // BLE_HCI_READ_DATA[0] = match packet.packet_type {
-                    //     1 /*BtPacketType::BT_EVT*/ => 4,
-                    //     3 /*BtPacketType::BT_ACL_IN*/ => 2,
-                    //     _ => 4,
-                    // };
 
                     BLE_HCI_READ_DATA_LEN = packet.len as usize + 0 /*1*/;
                     BLE_HCI_READ_DATA_INDEX = 0;

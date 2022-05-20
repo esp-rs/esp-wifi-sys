@@ -79,7 +79,7 @@ pub fn interrupt5(_trap_frame: &mut TrapFrame) {
         let intr = &*hal::pac::INTERRUPT_CORE0::ptr();
         intr.cpu_int_clear.write(|w| w.bits(1 << 1));
 
-        let (fnc, arg) = crate::ble::BT_INTERRUPT_FUNCTION5;
+        let (fnc, arg) = crate::ble::ble_os_adapter_chip_specific::BT_INTERRUPT_FUNCTION5;
 
         trace!("interrupt 5 {:p} {:p}", fnc, arg);
 
@@ -98,7 +98,7 @@ pub fn interrupt8(_trap_frame: &mut TrapFrame) {
         let intr = &*hal::pac::INTERRUPT_CORE0::ptr();
         intr.cpu_int_clear.write(|w| w.bits(1 << 1));
 
-        let (fnc, arg) = crate::ble::BT_INTERRUPT_FUNCTION8;
+        let (fnc, arg) = crate::ble::ble_os_adapter_chip_specific::BT_INTERRUPT_FUNCTION8;
 
         trace!("interrupt 8 {:p} {:p}", fnc, arg);
 

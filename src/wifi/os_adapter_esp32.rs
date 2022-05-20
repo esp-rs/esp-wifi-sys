@@ -367,10 +367,10 @@ fn esp32_rtc_bbpll_enable() {
 #[inline(always)]
 unsafe fn I2C_WRITEREG_RTC(block: u32, block_hostid: u32, reg_add: u32, indata: u32) {
     extern "C" {
-        pub fn rom_i2c_writeReg(block: u32, block_hostid: u32, reg_add: u32, indata: u32) -> i32;
+        pub fn rom_i2c_writereg(block: u32, block_hostid: u32, reg_add: u32, indata: u32) -> i32;
     }
 
-    rom_i2c_writeReg(block, block_hostid, reg_add, indata);
+    rom_i2c_writereg(block, block_hostid, reg_add, indata);
 }
 
 #[ram]
@@ -614,16 +614,17 @@ pub(crate) unsafe extern "C" fn phy_enable() {
     let mut cal_data: [u8; core::mem::size_of::<esp_phy_calibration_data_t>()] =
         [0u8; core::mem::size_of::<esp_phy_calibration_data_t>()];
 
+    // `get_phy_version_str` will break things - so keep it commented out
     //let phy_version = get_phy_version_str();
     //trace!("phy_version {}", StrBuf::from(phy_version).as_str_ref());
 
     critical_section::with(|_| {
         let g_phy_rf_en_ts = 0; // TODO
-                                /* Update WiFi MAC time before WiFi/BT common clock is enabled */
+                                // Update WiFi MAC time before WiFi/BT common clock is enabled */
         phy_update_wifi_mac_time(false, g_phy_rf_en_ts);
 
         phy_enable_clock();
-        phy_set_wifi_mode_only(true);
+        phy_set_wifi_mode_only(!crate::wifi::BLE_ENABLED);
 
         if G_IS_PHY_CALIBRATED == false {
             let init_data = &PHY_INIT_DATA_DEFAULT;
@@ -631,7 +632,7 @@ pub(crate) unsafe extern "C" fn phy_enable() {
             register_chipv7_phy(
                 init_data,
                 &mut cal_data as *mut _ as *mut crate::binary::include::esp_phy_calibration_data_t,
-                esp_phy_calibration_mode_t_PHY_RF_CAL_NONE,
+                esp_phy_calibration_mode_t_PHY_RF_CAL_FULL,
             );
 
             G_IS_PHY_CALIBRATED = true;
@@ -726,6 +727,23 @@ pub(crate) unsafe extern "C" fn read_mac(
                 break;
             }
         }
+    }
+
+    // ESP_MAC_BT
+    if type_ == 2 {
+        let tmp = mac.offset(0).read_volatile();
+        for i in 0..64 {
+            mac.offset(0).write_volatile(tmp | 0x02);
+            mac.offset(0)
+                .write_volatile(mac.offset(0).read_volatile() ^ (i << 2));
+
+            if mac.offset(0).read_volatile() != tmp {
+                break;
+            }
+        }
+
+        mac.offset(5)
+            .write_volatile(mac.offset(5).read_volatile() + 1);
     }
 
     0

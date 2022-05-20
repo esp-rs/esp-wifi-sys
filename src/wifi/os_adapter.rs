@@ -408,7 +408,6 @@ pub unsafe extern "C" fn semphr_take(
     semphr: *mut crate::binary::c_types::c_void,
     tick: u32,
 ) -> i32 {
-    trace!(">>>> semphr_take {:p} block_time_tick {}", semphr, tick);
     sem_take(semphr, tick)
 }
 
