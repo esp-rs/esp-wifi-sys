@@ -20,7 +20,7 @@ atomic-polyfill = "0.1.7"
 log = "0.4.17"
 embedded-svc = { version = "0.21.2", default-features = false, features = [ "alloc" ], optional = true }
 enumset = { version = "1", default-features = false, optional = true }
-esp-alloc = { git = "https://github.com/esp-rs/esp-alloc" }
+esp-alloc = { git = "https://github.com/esp-rs/esp-alloc", rev = "b613bd8" }
 embedded-io = "0.3.0"
 
 [build-dependencies]
