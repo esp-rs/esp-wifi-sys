@@ -20,7 +20,7 @@ atomic-polyfill = "0.1.7"
 log = "0.4.17"
 embedded-svc = { version = "0.22.0", default-features = false, features = [], optional = true }
 enumset = { version = "1", default-features = false, optional = true }
-esp-alloc = { git = "https://github.com/esp-rs/esp-alloc", branch = "legacy" }
+esp-alloc = { git = "https://github.com/jessebraham/esp-alloc", branch = "feature/linked-list-allocator" }
 embedded-io = "0.3.0"
 fugit = "0.3.6"
 heapless = { version = "0.7.14", default-features = false }

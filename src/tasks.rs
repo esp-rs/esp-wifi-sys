@@ -1,4 +1,3 @@
-use esp_alloc::memory_fence;
 use log::{debug, trace};
 
 use crate::{
@@ -7,6 +6,7 @@ use crate::{
         queue::SimpleQueue,
         timer_compat::{Timer, TIMERS},
     },
+    memory_fence::memory_fence,
     preempt::preempt::task_create,
     timer::get_systimer_count,
     wifi::send_data_if_needed,

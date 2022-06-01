@@ -1,13 +1,12 @@
 use core::mem::MaybeUninit;
+
 use log::trace;
-use Option;
 
-use crate::compat::common::StrBuf;
-use crate::compat::queue::SimpleQueue;
-
-use crate::binary::include::*;
-use crate::compat::work_queue::queue_work;
-use esp_alloc::memory_fence;
+use crate::{
+    binary::include::*,
+    compat::{common::StrBuf, queue::SimpleQueue, work_queue::queue_work},
+    memory_fence::memory_fence,
+};
 
 #[cfg_attr(feature = "esp32c3", path = "os_adapter_esp32c3.rs")]
 #[cfg_attr(feature = "esp32", path = "os_adapter_esp32.rs")]
@@ -549,15 +548,15 @@ unsafe extern "C" fn cause_sw_intr_to_core(_core: i32, _intr_no: i32) -> i32 {
 }
 
 unsafe extern "C" fn malloc(size: u32) -> *const () {
-    esp_alloc::malloc(size) as *const ()
+    crate::compat::malloc::malloc(size) as *const ()
 }
 
 unsafe extern "C" fn malloc_internal(size: u32) -> *const () {
-    esp_alloc::malloc(size) as *const ()
+    crate::compat::malloc::malloc(size) as *const ()
 }
 
 unsafe extern "C" fn free(ptr: *const ()) {
-    esp_alloc::free(ptr as *const u8);
+    crate::compat::malloc::free(ptr as *const u8);
 }
 
 unsafe extern "C" fn srand(seed: u32) {

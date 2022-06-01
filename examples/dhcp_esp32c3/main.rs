@@ -1,5 +1,6 @@
 #![no_std]
 #![no_main]
+#![feature(alloc_error_handler)]
 #![feature(c_variadic)]
 #![feature(const_mut_refs)]
 
@@ -8,24 +9,47 @@ use embedded_svc::wifi::{
     Configuration, Status, Wifi,
 };
 use esp32c3_hal::{pac::Peripherals, RtcCntl};
+use esp_backtrace as _;
 use esp_println::{print, println};
 use esp_wifi::wifi::initialize;
 use esp_wifi::wifi::utils::create_network_interface;
 use esp_wifi::wifi_interface::{timestamp, WifiError};
 use esp_wifi::{create_network_stack_storage, network_stack_storage};
 use riscv_rt::entry;
-use smoltcp::iface::SocketHandle;
-use smoltcp::socket::{Socket, TcpSocket};
-
-use esp_backtrace as _;
+use smoltcp::{
+    iface::SocketHandle,
+    socket::{Socket, TcpSocket},
+};
 
 extern crate alloc;
 
 const SSID: &str = env!("SSID");
 const PASSWORD: &str = env!("PASSWORD");
 
+#[global_allocator]
+static ALLOCATOR: esp_alloc::EspHeap = esp_alloc::EspHeap::empty();
+
+fn init_heap() {
+    use core::mem::MaybeUninit;
+
+    const HEAP_SIZE: usize = 4 * 1024;
+    static mut HEAP: [MaybeUninit<u8>; HEAP_SIZE] = [MaybeUninit::uninit(); HEAP_SIZE];
+
+    unsafe {
+        ALLOCATOR.init(HEAP.as_ptr() as usize, HEAP_SIZE);
+    }
+}
+
+#[alloc_error_handler]
+fn oom(_: core::alloc::Layout) -> ! {
+    loop {}
+}
+
 #[entry]
 fn main() -> ! {
+    esp_wifi::init_heap();
+    init_heap();
+
     let mut peripherals = Peripherals::take().unwrap();
 
     let mut rtc_cntl = RtcCntl::new(peripherals.RTC_CNTL);
