@@ -44,7 +44,7 @@ pub(crate) static ALLOCATOR: esp_alloc::EspHeap = esp_alloc::EspHeap::empty();
 pub fn init_heap() {
     use core::mem::MaybeUninit;
 
-    const HEAP_SIZE: usize = 4 * 1024;
+    const HEAP_SIZE: usize = 64 * 1024;
     static mut HEAP: [MaybeUninit<u8>; HEAP_SIZE] = [MaybeUninit::uninit(); HEAP_SIZE];
 
     unsafe {
