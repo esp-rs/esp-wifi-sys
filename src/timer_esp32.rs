@@ -2,6 +2,7 @@ use core::cell::RefCell;
 
 use atomic_polyfill::{AtomicU64, Ordering};
 use esp32_hal::{
+    clock::Clocks,
     interrupt,
     pac::{self, TIMG1},
     prelude::_embedded_hal_timer_CountDown,
@@ -16,9 +17,9 @@ use crate::preempt::preempt::task_switch;
 pub const TICKS_PER_SECOND: u64 = 40_000_000;
 
 #[cfg(debug_assertions)]
-const TIMER_DELAY: u64 = 20_000u64;
+const TIMER_DELAY: fugit::MicrosDurationU64 = fugit::MicrosDurationU64::millis(13);
 #[cfg(not(debug_assertions))]
-const TIMER_DELAY: u64 = 500u64;
+const TIMER_DELAY: fugit::MicrosDurationU64 = fugit::MicrosDurationU64::millis(3);
 
 static mut TIMER1: SpinLockMutex<RefCell<Option<Timer<TIMG1>>>> =
     SpinLockMutex::new(RefCell::new(None));
@@ -38,17 +39,15 @@ fn read_timer_value() -> u64 {
     value
 }
 
-pub fn setup_timer_isr(timg1: TIMG1) {
-    let mut timer1 = Timer::new(timg1);
-
+pub fn setup_timer_isr(timg1: TIMG1, clocks: &Clocks) {
+    let mut timer1 = Timer::new(timg1, clocks.apb_clock);
     interrupt::enable(
         Cpu::ProCpu,
         pac::Interrupt::TG1_T0_LEVEL,
         interrupt::CpuInterrupt::Interrupt20LevelPriority2,
     );
     timer1.listen();
-    timer1.start(TIMER_DELAY);
-
+    timer1.start(TIMER_DELAY.convert());
     unsafe {
         (&TIMER1).lock(|data| (*data).replace(Some(timer1)));
     }
@@ -134,13 +133,6 @@ pub fn level2_interrupt(context: &mut Context) {
         interrupt::CpuInterrupt::Interrupt20LevelPriority2,
     );
 
-    unsafe {
-        TIME.store(
-            TIME.load(Ordering::Relaxed) + TIMER_DELAY,
-            Ordering::Relaxed,
-        );
-    }
-
     task_switch(context);
 
     unsafe {
@@ -149,8 +141,12 @@ pub fn level2_interrupt(context: &mut Context) {
 
             let mut timer1 = data.borrow_mut();
             let timer1 = timer1.as_mut().unwrap();
+
+            let ticks = timer1.read_raw();
+            TIME.store(TIME.load(Ordering::Relaxed) + ticks, Ordering::Relaxed);
+
             timer1.clear_interrupt();
-            timer1.start(TIMER_DELAY);
+            timer1.start(TIMER_DELAY.convert());
         });
     }
 }

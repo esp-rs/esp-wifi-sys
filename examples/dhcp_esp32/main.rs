@@ -5,6 +5,8 @@ use embedded_svc::wifi::{
     ClientConfiguration, ClientConnectionStatus, ClientIpStatus, ClientStatus, Configuration,
     Status, Wifi,
 };
+use esp32_hal::clock::ClockControl;
+use esp32_hal::prelude::*;
 use esp32_hal::{pac::Peripherals, RtcCntl};
 use esp_println::{print, println};
 use esp_wifi::wifi::initialize;
@@ -25,6 +27,8 @@ const PASSWORD: &str = env!("PASSWORD");
 #[entry]
 fn main() -> ! {
     let peripherals = Peripherals::take().unwrap();
+    let system = peripherals.DPORT.split();
+    let clocks = ClockControl::boot_defaults(system.clock_control).freeze();
 
     let mut rtc_cntl = RtcCntl::new(peripherals.RTC_CNTL);
 
@@ -36,8 +40,7 @@ fn main() -> ! {
     let mut wifi_interface = esp_wifi::wifi_interface::Wifi::new(ethernet);
 
     init_logger();
-
-    initialize(peripherals.TIMG1, peripherals.RNG).unwrap();
+    initialize(peripherals.TIMG1, peripherals.RNG, &clocks).unwrap();
 
     println!("{:?}", wifi_interface.get_status());
 

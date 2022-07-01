@@ -9,6 +9,9 @@ use esp32c3_hal as hal;
 #[cfg(feature = "esp32c3")]
 use esp32c3_hal::Rng;
 
+#[cfg(feature = "esp32")]
+use hal::clock::Clocks;
+
 #[doc(hidden)]
 pub use os_adapter::*;
 use smoltcp::phy::{Device, DeviceCapabilities, RxToken, TxToken};
@@ -121,10 +124,14 @@ pub fn initialize_ble(
 #[cfg(feature = "esp32")]
 /// Initialize for using WiFi
 /// This will initialize internals and also initialize WiFi
-pub fn initialize(timg1: esp32_hal::pac::TIMG1, rng: hal::pac::RNG) -> Result<(), WifiError> {
+pub fn initialize(
+    timg1: esp32_hal::pac::TIMG1,
+    rng: hal::pac::RNG,
+    clocks: &Clocks,
+) -> Result<(), WifiError> {
     init_rng(rng);
     init_tasks();
-    setup_timer_isr(timg1);
+    setup_timer_isr(timg1, clocks);
     wifi_set_log_verbose();
     init_clocks();
     init_buffer();
@@ -143,10 +150,14 @@ pub fn initialize(timg1: esp32_hal::pac::TIMG1, rng: hal::pac::RNG) -> Result<()
 #[cfg(feature = "esp32")]
 /// Initialize for using Bluetooth LE
 /// This will just initialize internals.
-pub fn initialize_ble(timg1: esp32_hal::pac::TIMG1, rng: hal::pac::RNG) -> Result<(), WifiError> {
+pub fn initialize_ble(
+    timg1: esp32_hal::pac::TIMG1,
+    rng: hal::pac::RNG,
+    clocks: &Clocks,
+) -> Result<(), WifiError> {
     init_rng(rng);
     init_tasks();
-    setup_timer_isr(timg1);
+    setup_timer_isr(timg1, clocks);
     wifi_set_log_verbose();
     init_clocks();
     init_buffer();
