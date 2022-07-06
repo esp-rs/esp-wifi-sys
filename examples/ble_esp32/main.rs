@@ -1,29 +1,62 @@
 #![no_std]
 #![no_main]
+#![feature(alloc_error_handler)]
 #![feature(c_variadic)]
 #![feature(const_mut_refs)]
 
-use ble_hci::ad_structure::{
-    create_advertising_data, AdStructure, BR_EDR_NOT_SUPPORTED, LE_GENERAL_DISCOVERABLE,
+use ble_hci::{
+    ad_structure::{
+        create_advertising_data,
+        AdStructure,
+        BR_EDR_NOT_SUPPORTED,
+        LE_GENERAL_DISCOVERABLE,
+    },
+    att::Uuid,
+    attribute_server::{AttributeServer, Service, WorkResult, ATT_READABLE, ATT_WRITEABLE},
+    Ble,
+    Data,
+    HciConnector,
 };
-use ble_hci::att::Uuid;
-use ble_hci::attribute_server::{
-    AttributeServer, Service, WorkResult, ATT_READABLE, ATT_WRITEABLE,
-};
-use ble_hci::{Ble, Data, HciConnector};
-use esp32_hal::clock::ClockControl;
-use esp32_hal::prelude::*;
-use esp32_hal::{pac::Peripherals, RtcCntl};
+use esp32_hal::{clock::ClockControl, pac::Peripherals, prelude::*, RtcCntl};
+// use esp_backtrace as _;
 use esp_println::println;
-use esp_wifi::ble::ble_init;
-use esp_wifi::ble::controller::BleConnector;
-use esp_wifi::wifi::initialize_ble;
+use esp_wifi::{
+    ble::{ble_init, controller::BleConnector},
+    wifi::initialize_ble,
+};
 use xtensa_lx_rt::entry;
 
-use esp_backtrace as _;
+extern crate alloc;
+
+#[global_allocator]
+static ALLOCATOR: esp_alloc::EspHeap = esp_alloc::EspHeap::empty();
+
+fn init_heap() {
+    use core::mem::MaybeUninit;
+
+    const HEAP_SIZE: usize = 4 * 1024;
+    static mut HEAP: [MaybeUninit<u8>; HEAP_SIZE] = [MaybeUninit::uninit(); HEAP_SIZE];
+
+    unsafe {
+        ALLOCATOR.init(HEAP.as_ptr() as usize, HEAP_SIZE);
+    }
+}
+
+#[alloc_error_handler]
+fn oom(_: core::alloc::Layout) -> ! {
+    loop {}
+}
+
+#[panic_handler]
+fn panic(_info: &core::panic::PanicInfo) -> ! {
+    loop {}
+}
 
 #[entry]
 fn main() -> ! {
+    esp_wifi::init_heap();
+    init_heap();
+
     let peripherals = Peripherals::take().unwrap();
     let system = peripherals.DPORT.split();
     let clocks = ClockControl::boot_defaults(system.clock_control).freeze();

@@ -1,31 +1,66 @@
 #![no_std]
 #![no_main]
+#![feature(alloc_error_handler)]
+
+use core::panic::PanicInfo;
 
 use embedded_svc::wifi::{
-    ClientConfiguration, ClientConnectionStatus, ClientIpStatus, ClientStatus, Configuration,
-    Status, Wifi,
+    ClientConfiguration,
+    ClientConnectionStatus,
+    ClientIpStatus,
+    ClientStatus,
+    Configuration,
+    Status,
+    Wifi,
 };
-use esp32_hal::clock::ClockControl;
-use esp32_hal::prelude::*;
-use esp32_hal::{pac::Peripherals, RtcCntl};
+use esp32_hal::{clock::ClockControl, pac::Peripherals, prelude::*, RtcCntl};
 use esp_println::{print, println};
-use esp_wifi::wifi::initialize;
-use esp_wifi::wifi::utils::create_network_interface;
-use esp_wifi::wifi_interface::timestamp;
-use esp_wifi::{create_network_stack_storage, network_stack_storage};
-use smoltcp::iface::SocketHandle;
-use smoltcp::socket::{Socket, TcpSocket};
+use esp_wifi::{
+    create_network_stack_storage,
+    network_stack_storage,
+    wifi::{initialize, utils::create_network_interface},
+    wifi_interface::timestamp,
+};
+use smoltcp::{
+    iface::SocketHandle,
+    socket::{Socket, TcpSocket},
+};
 use xtensa_lx_rt::entry;
-
-use esp_backtrace as _;
 
 extern crate alloc;
 
 const SSID: &str = env!("SSID");
 const PASSWORD: &str = env!("PASSWORD");
 
+#[global_allocator]
+static ALLOCATOR: esp_alloc::EspHeap = esp_alloc::EspHeap::empty();
+
+fn init_heap() {
+    use core::mem::MaybeUninit;
+
+    const HEAP_SIZE: usize = 4 * 1024;
+    static mut HEAP: [MaybeUninit<u8>; HEAP_SIZE] = [MaybeUninit::uninit(); HEAP_SIZE];
+
+    unsafe {
+        ALLOCATOR.init(HEAP.as_ptr() as usize, HEAP_SIZE);
+    }
+}
+
+#[alloc_error_handler]
+fn oom(_: core::alloc::Layout) -> ! {
+    loop {}
+}
+
+#[panic_handler]
+fn panic(_info: &PanicInfo) -> ! {
+    loop {}
+}
+
 #[entry]
 fn main() -> ! {
+    esp_wifi::init_heap();
+    init_heap();
+
     let peripherals = Peripherals::take().unwrap();
     let system = peripherals.DPORT.split();
     let clocks = ClockControl::boot_defaults(system.clock_control).freeze();
