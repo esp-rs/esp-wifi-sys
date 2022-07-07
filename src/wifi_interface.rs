@@ -188,6 +188,7 @@ impl<'a> embedded_svc::wifi::Wifi for Wifi<'a> {
 
         let mut scanned = heapless::Vec::<AccessPointInfo, N>::new();
         let mut bss_total: u16 = N as u16;
+        let total;
 
         unsafe {
             crate::binary::include::esp_wifi_scan_get_ap_num(&mut bss_total);
@@ -218,7 +219,8 @@ impl<'a> embedded_svc::wifi::Wifi for Wifi<'a> {
                 &mut records as *mut crate::binary::include::wifi_ap_record_t,
             );
 
-            for i in 0..bss_total {
+            total = usize::min(bss_total as usize, N);
+            for i in 0..total {
                 let record = records[i as usize];
                 let ssid_strbuf = crate::compat::common::StrBuf::from(&record.ssid as *const u8);
 
@@ -275,7 +277,7 @@ impl<'a> embedded_svc::wifi::Wifi for Wifi<'a> {
             }
         }
 
-        Ok((scanned, bss_total as usize))
+        Ok((scanned, total))
     }
 
     /// Get the currently used configuration.
