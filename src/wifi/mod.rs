@@ -528,8 +528,8 @@ pub fn wifi_start() -> i32 {
 
 pub fn wifi_start_scan() -> i32 {
     let scan_time = wifi_scan_time_t {
-        active: wifi_active_scan_time_t { min: 0, max: 0 },
-        passive: 0,
+        active: wifi_active_scan_time_t { min: 10, max: 20 },
+        passive: 20,
     };
 
     let scan_config = wifi_scan_config_t {
