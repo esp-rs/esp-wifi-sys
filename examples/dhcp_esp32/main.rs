@@ -45,8 +45,8 @@ fn main() -> ! {
     println!("{:?}", wifi_interface.get_status());
 
     println!("Start Wifi Scan");
-    let res = wifi_interface.scan();
-    if let Ok(res) = res {
+    let res = wifi_interface.scan_n::<10>();
+    if let Ok((res, _count)) = res {
         for ap in res {
             println!("{:?}", ap);
         }
@@ -149,7 +149,7 @@ fn main() -> ! {
                         .network_interface()
                         .get_socket::<TcpSocket>(http_socket_handle.unwrap());
 
-                    socket.close();
+                    socket.abort();
                     stage = 4;
                 }
                 4 => {

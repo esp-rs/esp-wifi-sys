@@ -19,8 +19,6 @@ use crate::wifi::WifiDevice;
 
 extern crate alloc;
 
-const MAX_SCAN_RESULT: u16 = 10;
-
 /// An implementation of `embedded-svc`'s wifi trait.
 pub struct Wifi<'a> {
     network_interface: Interface<'a, WifiDevice>,
@@ -116,11 +114,9 @@ impl Display for WifiError {
     }
 }
 
-impl<'a> embedded_svc::errors::Errors for Wifi<'a> {
-    type Error = WifiError;
-}
-
 impl<'a> embedded_svc::wifi::Wifi for Wifi<'a> {
+    type Error = WifiError;
+
     /// This currently only supports the `Client` capability.
     fn get_capabilities(&self) -> Result<EnumSet<embedded_svc::wifi::Capability>, Self::Error> {
         // for now we only support STA mode
@@ -185,16 +181,18 @@ impl<'a> embedded_svc::wifi::Wifi for Wifi<'a> {
     }
 
     /// A blocking wifi network scan.
-    fn scan(&mut self) -> Result<alloc::vec::Vec<AccessPointInfo>, Self::Error> {
+    fn scan_n<const N: usize>(
+        &mut self,
+    ) -> Result<(heapless::Vec<AccessPointInfo, N>, usize), Self::Error> {
         crate::wifi::wifi_start_scan();
 
-        let mut scanned = alloc::vec::Vec::new();
+        let mut scanned = heapless::Vec::<AccessPointInfo, N>::new();
+        let mut bss_total: u16 = N as u16;
 
         unsafe {
-            let mut bss_total: u16 = 0;
             crate::binary::include::esp_wifi_scan_get_ap_num(&mut bss_total);
-            if bss_total > MAX_SCAN_RESULT {
-                bss_total = MAX_SCAN_RESULT;
+            if bss_total as usize > N {
+                bss_total = N as u16;
             }
 
             let mut records = [crate::binary::include::wifi_ap_record_t {
@@ -216,7 +214,7 @@ impl<'a> embedded_svc::wifi::Wifi for Wifi<'a> {
                     max_tx_power: 0i8,
                     policy: 0u32,
                 },
-            }; MAX_SCAN_RESULT as usize];
+            }; N];
 
             crate::binary::include::esp_wifi_scan_get_ap_records(
                 &mut bss_total,
@@ -252,8 +250,8 @@ impl<'a> embedded_svc::wifi::Wifi for Wifi<'a> {
                     _ => panic!(),
                 };
 
-                let mut ssid = alloc::string::String::new();
-                ssid.push_str(ssid_strbuf.as_str_ref());
+                let mut ssid = heapless::String::<30>::new();
+                ssid.push_str(ssid_strbuf.as_str_ref()).ok();
 
                 let ap_info = AccessPointInfo {
                     ssid: ssid,
@@ -276,11 +274,11 @@ impl<'a> embedded_svc::wifi::Wifi for Wifi<'a> {
                     auth_method: auth_method,
                 };
 
-                scanned.push(ap_info);
+                scanned.push(ap_info).ok();
             }
         }
 
-        Ok(scanned)
+        Ok((scanned, bss_total as usize))
     }
 
     /// Get the currently used configuration.

@@ -4,14 +4,14 @@
 #![feature(const_mut_refs)]
 
 use embedded_svc::wifi::{
-    ClientConfiguration, ClientConnectionStatus, ClientIpStatus, ClientStatus, Configuration,
-    Status, Wifi,
+    AccessPointInfo, ClientConfiguration, ClientConnectionStatus, ClientIpStatus, ClientStatus,
+    Configuration, Status, Wifi,
 };
 use esp32c3_hal::{pac::Peripherals, RtcCntl};
 use esp_println::{print, println};
 use esp_wifi::wifi::initialize;
 use esp_wifi::wifi::utils::create_network_interface;
-use esp_wifi::wifi_interface::timestamp;
+use esp_wifi::wifi_interface::{timestamp, WifiError};
 use esp_wifi::{create_network_stack_storage, network_stack_storage};
 use riscv_rt::entry;
 use smoltcp::iface::SocketHandle;
@@ -50,8 +50,9 @@ fn main() -> ! {
     println!("{:?}", wifi_interface.get_status());
 
     println!("Start Wifi Scan");
-    let res = wifi_interface.scan();
-    if let Ok(res) = res {
+    let res: Result<(heapless::Vec<AccessPointInfo, 10>, usize), WifiError> =
+        wifi_interface.scan_n();
+    if let Ok((res, _count)) = res {
         for ap in res {
             println!("{:?}", ap);
         }
@@ -154,7 +155,7 @@ fn main() -> ! {
                         .network_interface()
                         .get_socket::<TcpSocket>(http_socket_handle.unwrap());
 
-                    socket.close();
+                    socket.abort();
                     stage = 4;
                 }
                 4 => {
