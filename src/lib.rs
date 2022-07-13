@@ -36,8 +36,7 @@ pub fn current_millis() -> u64 {
     get_systimer_count() / TICKS_PER_SECOND
 }
 
-// ---------------------------------------------------------------------------
-// Cursed...
+// TODO: should the below code live somewhere else, in its own module maybe? Or is it fine here?
 
 #[global_allocator]
 pub(crate) static ALLOCATOR: esp_alloc::EspHeap = esp_alloc::EspHeap::empty();
@@ -46,7 +45,7 @@ pub fn init_heap() {
     const HEAP_SIZE: usize = 64 * 1024;
     extern "C" {
         static mut _heap_start: u32;
-        //static mut _heap_end: u32; // XXX we don't have it on ESP32-C3 currently 
+        //static mut _heap_end: u32; // XXX we don't have it on ESP32-C3 currently
     }
 
     unsafe {
@@ -55,6 +54,6 @@ pub fn init_heap() {
         //let heap_end = &_heap_end as *const _ as usize;
         //assert!(heap_end - heap_start > HEAP_SIZE, "Not enough available heap memory.");
 
-        ALLOCATOR.init(heap_start, HEAP_SIZE);
+        ALLOCATOR.init(heap_start as *mut u8, HEAP_SIZE);
     }
 }
