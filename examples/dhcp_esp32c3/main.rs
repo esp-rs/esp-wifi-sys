@@ -26,20 +26,6 @@ extern crate alloc;
 const SSID: &str = env!("SSID");
 const PASSWORD: &str = env!("PASSWORD");
 
-#[global_allocator]
-static ALLOCATOR: esp_alloc::EspHeap = esp_alloc::EspHeap::empty();
-
-fn init_heap() {
-    use core::mem::MaybeUninit;
-
-    const HEAP_SIZE: usize = 4 * 1024;
-    static mut HEAP: [MaybeUninit<u8>; HEAP_SIZE] = [MaybeUninit::uninit(); HEAP_SIZE];
-
-    unsafe {
-        ALLOCATOR.init(HEAP.as_ptr() as usize, HEAP_SIZE);
-    }
-}
-
 #[alloc_error_handler]
 fn oom(_: core::alloc::Layout) -> ! {
     loop {}
@@ -47,8 +33,8 @@ fn oom(_: core::alloc::Layout) -> ! {
 
 #[entry]
 fn main() -> ! {
+    init_logger();
     esp_wifi::init_heap();
-    init_heap();
 
     let mut peripherals = Peripherals::take().unwrap();
 
@@ -61,8 +47,6 @@ fn main() -> ! {
     let mut storage = create_network_stack_storage!(3, 8, 1);
     let ethernet = create_network_interface(network_stack_storage!(storage));
     let mut wifi_interface = esp_wifi::wifi_interface::Wifi::new(ethernet);
-
-    init_logger();
 
     initialize(
         &mut peripherals.SYSTIMER,

@@ -6,16 +6,11 @@
 
 use ble_hci::{
     ad_structure::{
-        create_advertising_data,
-        AdStructure,
-        BR_EDR_NOT_SUPPORTED,
-        LE_GENERAL_DISCOVERABLE,
+        create_advertising_data, AdStructure, BR_EDR_NOT_SUPPORTED, LE_GENERAL_DISCOVERABLE,
     },
     att::Uuid,
     attribute_server::{AttributeServer, Service, WorkResult, ATT_READABLE, ATT_WRITEABLE},
-    Ble,
-    Data,
-    HciConnector,
+    Ble, Data, HciConnector,
 };
 use esp32_hal::{clock::ClockControl, pac::Peripherals, prelude::*, RtcCntl};
 // use esp_backtrace as _;
@@ -28,34 +23,23 @@ use xtensa_lx_rt::entry;
 
 extern crate alloc;
 
-#[global_allocator]
-static ALLOCATOR: esp_alloc::EspHeap = esp_alloc::EspHeap::empty();
-
-fn init_heap() {
-    use core::mem::MaybeUninit;
-
-    const HEAP_SIZE: usize = 4 * 1024;
-    static mut HEAP: [MaybeUninit<u8>; HEAP_SIZE] = [MaybeUninit::uninit(); HEAP_SIZE];
-
-    unsafe {
-        ALLOCATOR.init(HEAP.as_ptr() as usize, HEAP_SIZE);
-    }
-}
-
 #[alloc_error_handler]
 fn oom(_: core::alloc::Layout) -> ! {
     loop {}
 }
 
+// TODO why can't we just use esp-backtrace here?
 #[panic_handler]
 fn panic(_info: &core::panic::PanicInfo) -> ! {
+    println!("Panic {:?}", _info);
     loop {}
 }
 
 #[entry]
 fn main() -> ! {
+    init_logger();
+
     esp_wifi::init_heap();
-    init_heap();
 
     let peripherals = Peripherals::take().unwrap();
     let system = peripherals.DPORT.split();
@@ -65,8 +49,6 @@ fn main() -> ! {
 
     // Disable MWDT and RWDT (Watchdog) flash boot protection
     rtc_cntl.set_wdt_global_enable(false);
-
-    init_logger();
 
     initialize_ble(peripherals.TIMG1, peripherals.RNG, &clocks).unwrap();
 

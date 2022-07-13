@@ -8,7 +8,7 @@ embedded-hal = "0.2.3"
 nb = "1.0.0"
 void = { version = "1.0.2", default-features = false }
 esp32c3-hal = { package="esp32c3-hal", git = "https://github.com/esp-rs/esp-hal", optional = true }
-esp32-hal = { package="esp32-hal", git = "https://github.com/esp-rs/esp-hal", optional = true, features = [ "bluetooth" ], branch = "feature/xtensa-cs-impl" }
+esp32-hal = { package="esp32-hal", git = "https://github.com/esp-rs/esp-hal", optional = true, features = [ "bluetooth" ] }
 riscv-rt = { version = "0.9.0", optional = true }
 riscv = { version = "0.8.0", optional = true }
 xtensa-lx-rt = { version = "0.12.0", optional = true }
@@ -31,11 +31,11 @@ riscv-target = { version = "0.1.2", optional = true }
 ble-hci = { git = "https://github.com/bjoernQ/ble-hci", branch = "embedded-io" }
 
 [target.xtensa-esp32-none-elf.dev-dependencies]
-esp-println = { git = "https://github.com/esp-rs/esp-println.git", features = [ "esp32" ] }
+esp-println = { version = "0.2.0", features = [ "esp32" ] }
 esp-backtrace = { git = "https://github.com/esp-rs/esp-backtrace.git", features = [ "esp32", "panic-handler", "exception-handler", "print-uart" ] }
 
 [target.riscv32imc-unknown-none-elf.dev-dependencies]
-esp-println = { git = "https://github.com/esp-rs/esp-println.git", features = [ "esp32c3" ] }
+esp-println = { version = "0.2.0", features = [ "esp32c3" ] }
 esp-backtrace = { git = "https://github.com/esp-rs/esp-backtrace.git", features = [ "esp32c3", "panic-handler", "exception-handler", "print-uart" ] }
 
 [features]

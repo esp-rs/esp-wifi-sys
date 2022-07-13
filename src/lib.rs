@@ -39,15 +39,22 @@ pub fn current_millis() -> u64 {
 // ---------------------------------------------------------------------------
 // Cursed...
 
+#[global_allocator]
 pub(crate) static ALLOCATOR: esp_alloc::EspHeap = esp_alloc::EspHeap::empty();
 
 pub fn init_heap() {
-    use core::mem::MaybeUninit;
-
     const HEAP_SIZE: usize = 64 * 1024;
-    static mut HEAP: [MaybeUninit<u8>; HEAP_SIZE] = [MaybeUninit::uninit(); HEAP_SIZE];
+    extern "C" {
+        static mut _heap_start: u32;
+        //static mut _heap_end: u32; // XXX we don't have it on ESP32-C3 currently 
+    }
 
     unsafe {
-        ALLOCATOR.init(HEAP.as_ptr() as usize, HEAP_SIZE);
+        let heap_start = &_heap_start as *const _ as usize;
+
+        //let heap_end = &_heap_end as *const _ as usize;
+        //assert!(heap_end - heap_start > HEAP_SIZE, "Not enough available heap memory.");
+
+        ALLOCATOR.init(heap_start, HEAP_SIZE);
     }
 }

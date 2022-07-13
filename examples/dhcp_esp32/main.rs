@@ -5,19 +5,13 @@
 use core::panic::PanicInfo;
 
 use embedded_svc::wifi::{
-    ClientConfiguration,
-    ClientConnectionStatus,
-    ClientIpStatus,
-    ClientStatus,
-    Configuration,
-    Status,
-    Wifi,
+    ClientConfiguration, ClientConnectionStatus, ClientIpStatus, ClientStatus, Configuration,
+    Status, Wifi,
 };
 use esp32_hal::{clock::ClockControl, pac::Peripherals, prelude::*, RtcCntl};
 use esp_println::{print, println};
 use esp_wifi::{
-    create_network_stack_storage,
-    network_stack_storage,
+    create_network_stack_storage, network_stack_storage,
     wifi::{initialize, utils::create_network_interface},
     wifi_interface::timestamp,
 };
@@ -32,25 +26,12 @@ extern crate alloc;
 const SSID: &str = env!("SSID");
 const PASSWORD: &str = env!("PASSWORD");
 
-#[global_allocator]
-static ALLOCATOR: esp_alloc::EspHeap = esp_alloc::EspHeap::empty();
-
-fn init_heap() {
-    use core::mem::MaybeUninit;
-
-    const HEAP_SIZE: usize = 4 * 1024;
-    static mut HEAP: [MaybeUninit<u8>; HEAP_SIZE] = [MaybeUninit::uninit(); HEAP_SIZE];
-
-    unsafe {
-        ALLOCATOR.init(HEAP.as_ptr() as usize, HEAP_SIZE);
-    }
-}
-
 #[alloc_error_handler]
 fn oom(_: core::alloc::Layout) -> ! {
     loop {}
 }
 
+// TODO why can't we just use esp-backtrace here?
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
     loop {}
@@ -58,8 +39,8 @@ fn panic(_info: &PanicInfo) -> ! {
 
 #[entry]
 fn main() -> ! {
+    init_logger();
     esp_wifi::init_heap();
-    init_heap();
 
     let peripherals = Peripherals::take().unwrap();
     let system = peripherals.DPORT.split();
@@ -74,7 +55,6 @@ fn main() -> ! {
     let ethernet = create_network_interface(network_stack_storage!(storage));
     let mut wifi_interface = esp_wifi::wifi_interface::Wifi::new(ethernet);
 
-    init_logger();
     initialize(peripherals.TIMG1, peripherals.RNG, &clocks).unwrap();
 
     println!("{:?}", wifi_interface.get_status());

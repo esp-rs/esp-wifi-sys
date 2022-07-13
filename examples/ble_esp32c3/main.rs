@@ -6,16 +6,11 @@
 
 use ble_hci::{
     ad_structure::{
-        create_advertising_data,
-        AdStructure,
-        BR_EDR_NOT_SUPPORTED,
-        LE_GENERAL_DISCOVERABLE,
+        create_advertising_data, AdStructure, BR_EDR_NOT_SUPPORTED, LE_GENERAL_DISCOVERABLE,
     },
     att::Uuid,
     attribute_server::{AttributeServer, Service, WorkResult, ATT_READABLE, ATT_WRITEABLE},
-    Ble,
-    Data,
-    HciConnector,
+    Ble, Data, HciConnector,
 };
 use esp32c3_hal::{pac::Peripherals, RtcCntl};
 use esp_backtrace as _;
@@ -28,20 +23,6 @@ use riscv_rt::entry;
 
 extern crate alloc;
 
-#[global_allocator]
-static ALLOCATOR: esp_alloc::EspHeap = esp_alloc::EspHeap::empty();
-
-fn init_heap() {
-    use core::mem::MaybeUninit;
-
-    const HEAP_SIZE: usize = 4 * 1024;
-    static mut HEAP: [MaybeUninit<u8>; HEAP_SIZE] = [MaybeUninit::uninit(); HEAP_SIZE];
-
-    unsafe {
-        ALLOCATOR.init(HEAP.as_ptr() as usize, HEAP_SIZE);
-    }
-}
-
 #[alloc_error_handler]
 fn oom(_: core::alloc::Layout) -> ! {
     loop {}
@@ -49,8 +30,8 @@ fn oom(_: core::alloc::Layout) -> ! {
 
 #[entry]
 fn main() -> ! {
+    init_logger();
     esp_wifi::init_heap();
-    init_heap();
 
     let mut peripherals = Peripherals::take().unwrap();
 
@@ -59,8 +40,6 @@ fn main() -> ! {
     // Disable watchdog timers
     rtc_cntl.set_super_wdt_enable(false);
     rtc_cntl.set_wdt_enable(false);
-
-    init_logger();
 
     initialize_ble(
         &mut peripherals.SYSTIMER,
