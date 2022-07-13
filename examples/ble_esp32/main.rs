@@ -1,6 +1,5 @@
 #![no_std]
 #![no_main]
-#![feature(alloc_error_handler)]
 #![feature(c_variadic)]
 #![feature(const_mut_refs)]
 
@@ -22,11 +21,6 @@ use esp_wifi::{
 use xtensa_lx_rt::entry;
 
 extern crate alloc;
-
-#[alloc_error_handler]
-fn oom(_: core::alloc::Layout) -> ! {
-    loop {}
-}
 
 // TODO why can't we just use esp-backtrace here?
 #[panic_handler]

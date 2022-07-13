@@ -19,7 +19,7 @@ atomic-polyfill = "0.1.7"
 log = "0.4.17"
 embedded-svc = { version = "0.22.0", default-features = false, features = [], optional = true }
 enumset = { version = "1", default-features = false, optional = true }
-esp-alloc = { git = "https://github.com/esp-rs/esp-alloc" }
+esp-alloc = { git = "https://github.com/esp-rs/esp-alloc", rev = "c2a1a2e", features = ["oom-handler"] }
 embedded-io = "0.3.0"
 fugit = "0.3.6"
 heapless = { version = "0.7.14", default-features = false }

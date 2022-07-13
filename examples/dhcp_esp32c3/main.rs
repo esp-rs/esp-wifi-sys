@@ -1,6 +1,5 @@
 #![no_std]
 #![no_main]
-#![feature(alloc_error_handler)]
 #![feature(c_variadic)]
 #![feature(const_mut_refs)]
 
@@ -25,11 +24,6 @@ extern crate alloc;
 
 const SSID: &str = env!("SSID");
 const PASSWORD: &str = env!("PASSWORD");
-
-#[alloc_error_handler]
-fn oom(_: core::alloc::Layout) -> ! {
-    loop {}
-}
 
 #[entry]
 fn main() -> ! {
