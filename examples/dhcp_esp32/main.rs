@@ -1,13 +1,12 @@
 #![no_std]
 #![no_main]
 
-use core::panic::PanicInfo;
-
 use embedded_svc::wifi::{
     ClientConfiguration, ClientConnectionStatus, ClientIpStatus, ClientStatus, Configuration,
     Status, Wifi,
 };
 use esp32_hal::{clock::ClockControl, pac::Peripherals, prelude::*, RtcCntl};
+use esp_backtrace as _;
 use esp_println::{print, println};
 use esp_wifi::{
     create_network_stack_storage, network_stack_storage,
@@ -24,12 +23,6 @@ extern crate alloc;
 
 const SSID: &str = env!("SSID");
 const PASSWORD: &str = env!("PASSWORD");
-
-// TODO why can't we just use esp-backtrace here?
-#[panic_handler]
-fn panic(_info: &PanicInfo) -> ! {
-    loop {}
-}
 
 #[entry]
 fn main() -> ! {

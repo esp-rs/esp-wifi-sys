@@ -12,7 +12,7 @@ use ble_hci::{
     Ble, Data, HciConnector,
 };
 use esp32_hal::{clock::ClockControl, pac::Peripherals, prelude::*, RtcCntl};
-// use esp_backtrace as _;
+use esp_backtrace as _;
 use esp_println::println;
 use esp_wifi::{
     ble::{ble_init, controller::BleConnector},
@@ -21,13 +21,6 @@ use esp_wifi::{
 use xtensa_lx_rt::entry;
 
 extern crate alloc;
-
-// TODO why can't we just use esp-backtrace here?
-#[panic_handler]
-fn panic(_info: &core::panic::PanicInfo) -> ! {
-    println!("Panic {:?}", _info);
-    loop {}
-}
 
 #[entry]
 fn main() -> ! {
