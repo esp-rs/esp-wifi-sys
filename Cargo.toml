@@ -7,10 +7,9 @@ edition = "2021"
 embedded-hal = "0.2.3"
 nb = "1.0.0"
 void = { version = "1.0.2", default-features = false }
-
 esp32c3-hal = { package="esp32c3-hal", git = "https://github.com/esp-rs/esp-hal", optional = true }
 esp32-hal = { package="esp32-hal", git = "https://github.com/esp-rs/esp-hal", optional = true, features = [ "bluetooth" ] }
-riscv-rt = { version = "0.8.1", optional = true }
+riscv-rt = { version = "0.9.0", optional = true }
 riscv = { version = "0.8.0", optional = true }
 xtensa-lx-rt = { version = "0.12.0", optional = true }
 xtensa-lx = { version = "0.7.0", optional = true }
@@ -20,7 +19,7 @@ atomic-polyfill = "0.1.7"
 log = "0.4.17"
 embedded-svc = { version = "0.22.0", default-features = false, features = [], optional = true }
 enumset = { version = "1", default-features = false, optional = true }
-esp-alloc = { git = "https://github.com/esp-rs/esp-alloc", branch = "legacy" }
+esp-alloc = { git = "https://github.com/esp-rs/esp-alloc", rev = "ccc849b", features = ["oom-handler"] }
 embedded-io = "0.3.0"
 fugit = "0.3.6"
 heapless = { version = "0.7.14", default-features = false }
@@ -28,21 +27,21 @@ heapless = { version = "0.7.14", default-features = false }
 [build-dependencies]
 riscv-target = { version = "0.1.2", optional = true }
 
+[dev-dependencies]
+ble-hci = { git = "https://github.com/bjoernQ/ble-hci", branch = "embedded-io" }
+
 [target.xtensa-esp32-none-elf.dev-dependencies]
-esp-println = { git = "https://github.com/esp-rs/esp-println.git", features = [ "esp32" ] }
+esp-println = { version = "0.2.0", features = [ "esp32" ] }
 esp-backtrace = { git = "https://github.com/esp-rs/esp-backtrace.git", features = [ "esp32", "panic-handler", "exception-handler", "print-uart" ] }
 
 [target.riscv32imc-unknown-none-elf.dev-dependencies]
-esp-println = { git = "https://github.com/esp-rs/esp-println.git", features = [ "esp32c3" ] }
+esp-println = { version = "0.2.0", features = [ "esp32c3" ] }
 esp-backtrace = { git = "https://github.com/esp-rs/esp-backtrace.git", features = [ "esp32c3", "panic-handler", "exception-handler", "print-uart" ] }
-
-[dev-dependencies]
-ble-hci = { git = "https://github.com/bjoernQ/ble-hci", branch = "embedded-io" }
 
 [features]
 default = [ "utils" ]
 esp32c3 = [ "riscv-target", "riscv", "riscv-rt", "esp32c3-hal" ]
-esp32 = [ "esp32-hal", "xtensa-lx-rt", "xtensa-lx" ]
+esp32 = [ "esp32-hal", "xtensa-lx-rt/esp32", "xtensa-lx/esp32", "critical-section/custom-impl" ]
 wifi_logs = []
 dump_packets = []
 utils = [ ]

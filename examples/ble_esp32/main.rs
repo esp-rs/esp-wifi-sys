@@ -3,27 +3,31 @@
 #![feature(c_variadic)]
 #![feature(const_mut_refs)]
 
-use ble_hci::ad_structure::{
-    create_advertising_data, AdStructure, BR_EDR_NOT_SUPPORTED, LE_GENERAL_DISCOVERABLE,
+use ble_hci::{
+    ad_structure::{
+        create_advertising_data, AdStructure, BR_EDR_NOT_SUPPORTED, LE_GENERAL_DISCOVERABLE,
+    },
+    att::Uuid,
+    attribute_server::{AttributeServer, Service, WorkResult, ATT_READABLE, ATT_WRITEABLE},
+    Ble, Data, HciConnector,
 };
-use ble_hci::att::Uuid;
-use ble_hci::attribute_server::{
-    AttributeServer, Service, WorkResult, ATT_READABLE, ATT_WRITEABLE,
-};
-use ble_hci::{Ble, Data, HciConnector};
-use esp32_hal::clock::ClockControl;
-use esp32_hal::prelude::*;
-use esp32_hal::{pac::Peripherals, RtcCntl};
+use esp32_hal::{clock::ClockControl, pac::Peripherals, prelude::*, RtcCntl};
+use esp_backtrace as _;
 use esp_println::println;
-use esp_wifi::ble::ble_init;
-use esp_wifi::ble::controller::BleConnector;
-use esp_wifi::wifi::initialize_ble;
+use esp_wifi::{
+    ble::{ble_init, controller::BleConnector},
+    wifi::initialize_ble,
+};
 use xtensa_lx_rt::entry;
 
-use esp_backtrace as _;
+extern crate alloc;
 
 #[entry]
 fn main() -> ! {
+    init_logger();
+
+    esp_wifi::init_heap();
+
     let peripherals = Peripherals::take().unwrap();
     let system = peripherals.DPORT.split();
     let clocks = ClockControl::boot_defaults(system.clock_control).freeze();
@@ -32,8 +36,6 @@ fn main() -> ! {
 
     // Disable MWDT and RWDT (Watchdog) flash boot protection
     rtc_cntl.set_wdt_global_enable(false);
-
-    init_logger();
 
     initialize_ble(peripherals.TIMG1, peripherals.RNG, &clocks).unwrap();
 

@@ -8,16 +8,17 @@ use embedded_svc::wifi::{
     Configuration, Status, Wifi,
 };
 use esp32c3_hal::{pac::Peripherals, RtcCntl};
+use esp_backtrace as _;
 use esp_println::{print, println};
 use esp_wifi::wifi::initialize;
 use esp_wifi::wifi::utils::create_network_interface;
 use esp_wifi::wifi_interface::{timestamp, WifiError};
 use esp_wifi::{create_network_stack_storage, network_stack_storage};
 use riscv_rt::entry;
-use smoltcp::iface::SocketHandle;
-use smoltcp::socket::{Socket, TcpSocket};
-
-use esp_backtrace as _;
+use smoltcp::{
+    iface::SocketHandle,
+    socket::{Socket, TcpSocket},
+};
 
 extern crate alloc;
 
@@ -26,6 +27,9 @@ const PASSWORD: &str = env!("PASSWORD");
 
 #[entry]
 fn main() -> ! {
+    init_logger();
+    esp_wifi::init_heap();
+
     let mut peripherals = Peripherals::take().unwrap();
 
     let mut rtc_cntl = RtcCntl::new(peripherals.RTC_CNTL);
@@ -37,8 +41,6 @@ fn main() -> ! {
     let mut storage = create_network_stack_storage!(3, 8, 1);
     let ethernet = create_network_interface(network_stack_storage!(storage));
     let mut wifi_interface = esp_wifi::wifi_interface::Wifi::new(ethernet);
-
-    init_logger();
 
     initialize(
         &mut peripherals.SYSTIMER,

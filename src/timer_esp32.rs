@@ -137,7 +137,7 @@ pub fn level2_interrupt(context: &mut Context) {
 
     unsafe {
         (&TIMER1).lock(|data| {
-            esp_alloc::memory_fence();
+            crate::memory_fence::memory_fence();
 
             let mut timer1 = data.borrow_mut();
             let timer1 = timer1.as_mut().unwrap();

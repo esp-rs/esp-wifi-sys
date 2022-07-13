@@ -3,25 +3,30 @@
 #![feature(c_variadic)]
 #![feature(const_mut_refs)]
 
-use ble_hci::ad_structure::{
-    create_advertising_data, AdStructure, BR_EDR_NOT_SUPPORTED, LE_GENERAL_DISCOVERABLE,
+use ble_hci::{
+    ad_structure::{
+        create_advertising_data, AdStructure, BR_EDR_NOT_SUPPORTED, LE_GENERAL_DISCOVERABLE,
+    },
+    att::Uuid,
+    attribute_server::{AttributeServer, Service, WorkResult, ATT_READABLE, ATT_WRITEABLE},
+    Ble, Data, HciConnector,
 };
-use ble_hci::att::Uuid;
-use ble_hci::attribute_server::{
-    AttributeServer, Service, WorkResult, ATT_READABLE, ATT_WRITEABLE,
-};
-use ble_hci::{Ble, Data, HciConnector};
 use esp32c3_hal::{pac::Peripherals, RtcCntl};
+use esp_backtrace as _;
 use esp_println::println;
-use esp_wifi::ble::ble_init;
-use esp_wifi::ble::controller::BleConnector;
-use esp_wifi::wifi::initialize_ble;
+use esp_wifi::{
+    ble::{ble_init, controller::BleConnector},
+    wifi::initialize_ble,
+};
 use riscv_rt::entry;
 
-use esp_backtrace as _;
+extern crate alloc;
 
 #[entry]
 fn main() -> ! {
+    init_logger();
+    esp_wifi::init_heap();
+
     let mut peripherals = Peripherals::take().unwrap();
 
     let mut rtc_cntl = RtcCntl::new(peripherals.RTC_CNTL);
@@ -29,8 +34,6 @@ fn main() -> ! {
     // Disable watchdog timers
     rtc_cntl.set_super_wdt_enable(false);
     rtc_cntl.set_wdt_enable(false);
-
-    init_logger();
 
     initialize_ble(
         &mut peripherals.SYSTIMER,

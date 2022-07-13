@@ -5,19 +5,19 @@ use embedded_svc::wifi::{
     ClientConfiguration, ClientConnectionStatus, ClientIpStatus, ClientStatus, Configuration,
     Status, Wifi,
 };
-use esp32_hal::clock::ClockControl;
-use esp32_hal::prelude::*;
-use esp32_hal::{pac::Peripherals, RtcCntl};
-use esp_println::{print, println};
-use esp_wifi::wifi::initialize;
-use esp_wifi::wifi::utils::create_network_interface;
-use esp_wifi::wifi_interface::timestamp;
-use esp_wifi::{create_network_stack_storage, network_stack_storage};
-use smoltcp::iface::SocketHandle;
-use smoltcp::socket::{Socket, TcpSocket};
-use xtensa_lx_rt::entry;
-
+use esp32_hal::{clock::ClockControl, pac::Peripherals, prelude::*, RtcCntl};
 use esp_backtrace as _;
+use esp_println::{print, println};
+use esp_wifi::{
+    create_network_stack_storage, network_stack_storage,
+    wifi::{initialize, utils::create_network_interface},
+    wifi_interface::timestamp,
+};
+use smoltcp::{
+    iface::SocketHandle,
+    socket::{Socket, TcpSocket},
+};
+use xtensa_lx_rt::entry;
 
 extern crate alloc;
 
@@ -26,6 +26,9 @@ const PASSWORD: &str = env!("PASSWORD");
 
 #[entry]
 fn main() -> ! {
+    init_logger();
+    esp_wifi::init_heap();
+
     let peripherals = Peripherals::take().unwrap();
     let system = peripherals.DPORT.split();
     let clocks = ClockControl::boot_defaults(system.clock_control).freeze();
@@ -39,7 +42,6 @@ fn main() -> ! {
     let ethernet = create_network_interface(network_stack_storage!(storage));
     let mut wifi_interface = esp_wifi::wifi_interface::Wifi::new(ethernet);
 
-    init_logger();
     initialize(peripherals.TIMG1, peripherals.RNG, &clocks).unwrap();
 
     println!("{:?}", wifi_interface.get_status());

@@ -26,6 +26,9 @@ mod additional_esp32;
 #[cfg(feature = "utils")]
 pub mod utils;
 
+#[cfg(feature = "esp32")] // TODO for ESP32 we should support multicore
+mod critical_section_xtensa_singlecore;
+
 use crate::{
     binary::include::{
         __BindgenBitfieldUnit, esp_err_t, esp_interface_t_ESP_IF_WIFI_STA, esp_supplicant_init,

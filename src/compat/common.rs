@@ -2,12 +2,12 @@
 
 use core::{ffi::VaListImpl, fmt::Write};
 
-use esp_alloc::memory_fence;
 use log::{info, trace};
 
 use super::queue::SimpleQueue;
 use crate::{
     binary::{c_types::c_void, include::OSI_FUNCS_TIME_BLOCKING},
+    memory_fence::memory_fence,
     preempt::preempt::current_task,
 };
 
