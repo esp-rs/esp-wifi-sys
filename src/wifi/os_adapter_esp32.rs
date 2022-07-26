@@ -1,7 +1,7 @@
 #![allow(unused_variables)]
 #![allow(dead_code)]
 #![allow(non_snake_case)]
-use esp32_hal::ram;
+use esp32_hal::macros::ram;
 
 use crate::binary::include::*;
 use crate::wifi::phy_init_data_esp32::PHY_INIT_DATA_DEFAULT;

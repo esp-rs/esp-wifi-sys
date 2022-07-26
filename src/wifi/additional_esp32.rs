@@ -1,4 +1,4 @@
-use esp32_hal::ram;
+use esp32_hal::macros::ram;
 
 use log::trace;
 
