@@ -91,19 +91,27 @@ pub(crate) unsafe extern "C" fn set_intr(
         intr_prio
     );
 
+    // this gets called with
+    // INFO - set_intr 0 2 1 1 (WIFI_PWR)
+    // INFO - set_intr 0 0 1 1 (WIFI_MAC)
+
+    // we do nothing here anymore since all the interrupts are already
+    // configured in `setup_timer_isr` and messing with the interrupts will
+    // get us into trouble
+
     // esp32c3_bind_irq(intr_num, intr_source, intr_prio, ESP32C3_INT_LEVEL);
 
     /* Disable the CPU interrupt. */
     // resetbits(1 << cpuint, INTERRUPT_CPU_INT_ENABLE_REG);
 
     /* Set the interrupt priority. */
-    ((0x600c2000 + 0x114 + intr_num * 4) as *mut u32).write_volatile(intr_prio as u32);
+    //  ((0x600c2000 + 0x114 + intr_num * 4) as *mut u32).write_volatile(intr_prio as u32);
 
     /* Set the interrupt type (Edge or Level). */
     // ----
 
     /* Map the CPU interrupt ID to the peripheral. */
-    ((0x600c2000 + intr_source * 4) as *mut u32).write_volatile(intr_num as u32);
+    //  ((0x600c2000 + intr_source * 4) as *mut u32).write_volatile(intr_num as u32);
 }
 
 pub(crate) unsafe extern "C" fn phy_enable() {

@@ -60,9 +60,6 @@ pub fn setup_timer_isr(systimer: &mut SYSTIMER) {
 #[interrupt]
 fn WIFI_MAC() {
     unsafe {
-        let intr = &*pac::INTERRUPT_CORE0::ptr();
-        intr.cpu_int_clear.write(|w| w.bits(1 << 1));
-
         let (fnc, arg) = crate::wifi::os_adapter::ISR_INTERRUPT_1;
 
         trace!("interrupt WIFI_MAC {:p} {:p}", fnc, arg);
