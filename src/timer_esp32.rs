@@ -43,35 +43,11 @@ fn read_timer_value() -> u64 {
 pub fn setup_timer_isr(timg1: TIMG1, clocks: &Clocks) {
     let timg1 = TimerGroup::new(timg1, &clocks);
     let mut timer1 = timg1.timer0;
-    interrupt::vectored::enable(
-        pac::Interrupt::TG1_T0_LEVEL,
-        interrupt::vectored::Priority::Priority2,
-    )
-    .unwrap();
-
-    interrupt::vectored::enable(
-        pac::Interrupt::WIFI_MAC,
-        interrupt::vectored::Priority::Priority1,
-    )
-    .unwrap();
-
-    interrupt::vectored::enable(
-        pac::Interrupt::RWBT,
-        interrupt::vectored::Priority::Priority1,
-    )
-    .unwrap();
-
-    interrupt::vectored::enable(
-        pac::Interrupt::RWBLE,
-        interrupt::vectored::Priority::Priority1,
-    )
-    .unwrap();
-
-    interrupt::vectored::enable(
-        pac::Interrupt::BT_BB,
-        interrupt::vectored::Priority::Priority1,
-    )
-    .unwrap();
+    interrupt::enable(pac::Interrupt::TG1_T0_LEVEL, interrupt::Priority::Priority2).unwrap();
+    interrupt::enable(pac::Interrupt::WIFI_MAC, interrupt::Priority::Priority1).unwrap();
+    interrupt::enable(pac::Interrupt::RWBT, interrupt::Priority::Priority1).unwrap();
+    interrupt::enable(pac::Interrupt::RWBLE, interrupt::Priority::Priority1).unwrap();
+    interrupt::enable(pac::Interrupt::BT_BB, interrupt::Priority::Priority1).unwrap();
 
     timer1.listen();
     timer1.start(TIMER_DELAY.convert());
