@@ -32,6 +32,9 @@ use timer::{get_systimer_count, TICKS_PER_SECOND};
 #[cfg(feature = "embedded-svc")]
 pub mod wifi_interface;
 
+#[cfg(feature = "esp32c3")]
+use esp32c3_hal::interrupt;
+
 pub fn current_millis() -> u64 {
     get_systimer_count() / TICKS_PER_SECOND
 }

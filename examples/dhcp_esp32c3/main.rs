@@ -42,12 +42,7 @@ fn main() -> ! {
     let ethernet = create_network_interface(network_stack_storage!(storage));
     let mut wifi_interface = esp_wifi::wifi_interface::Wifi::new(ethernet);
 
-    initialize(
-        &mut peripherals.SYSTIMER,
-        &mut peripherals.INTERRUPT_CORE0,
-        peripherals.RNG,
-    )
-    .unwrap();
+    initialize(&mut peripherals.SYSTIMER, peripherals.RNG).unwrap();
 
     println!("{:?}", wifi_interface.get_status());
 
@@ -172,11 +167,6 @@ fn main() -> ! {
             }
         }
     }
-}
-
-#[export_name = "DefaultHandler"]
-pub fn default_handler() {
-    println!("DefaultHandler called!");
 }
 
 pub fn init_logger() {
