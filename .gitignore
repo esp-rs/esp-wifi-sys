@@ -3,3 +3,6 @@
 # Libraries shouldn't contain Cargo.lock
 # More information here https://doc.rust-lang.org/cargo/guide/cargo-toml-vs-cargo-lock.html
 Cargo.lock
+
+# You should copy the template and not modify `settings.json`
+.vscode/settings.json
