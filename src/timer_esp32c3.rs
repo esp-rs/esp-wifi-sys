@@ -1,7 +1,9 @@
 use esp32c3_hal as hal;
 use esp32c3_hal::interrupt::TrapFrame;
-use esp32c3_hal::pac::INTERRUPT_CORE0;
 use esp32c3_hal::pac::SYSTIMER;
+use esp32c3_hal::prelude::*;
+use hal::pac;
+use hal::pac::Interrupt;
 
 use crate::{binary, preempt::preempt::task_switch};
 use log::trace;
@@ -11,9 +13,9 @@ pub const TICKS_PER_SECOND: u64 = 16_000_000;
 #[cfg(debug_assertions)]
 const TIMER_DELAY: u32 = 8_000u32;
 #[cfg(not(debug_assertions))]
-const TIMER_DELAY: u32 = 500u32;
+const TIMER_DELAY: u32 = 3500u32;
 
-pub fn setup_timer_isr(systimer: &mut SYSTIMER, interrupt_core0: &mut INTERRUPT_CORE0) {
+pub fn setup_timer_isr(systimer: &mut SYSTIMER) {
     // set systimer to 0
     systimer.unit0_load_lo.write(|w| unsafe { w.bits(0) });
     systimer.unit0_load_hi.write(|w| unsafe { w.bits(0) });
@@ -35,15 +37,16 @@ pub fn setup_timer_isr(systimer: &mut SYSTIMER, interrupt_core0: &mut INTERRUPT_
     // TARGET0 INT ENA
     systimer.int_ena.write(|w| unsafe { w.bits(1 << 0) });
 
-    interrupt_core0
-        .systimer_target0_int_map
-        .write(|w| unsafe { w.bits(10) });
-    interrupt_core0
-        .cpu_int_pri_10
-        .write(|w| unsafe { w.bits(1) }); // PRIO = 1
-    interrupt_core0
-        .cpu_int_enable
-        .write(|w| unsafe { w.bits(1 << 10) }); // ENABLE INT 10
+    esp32c3_hal::interrupt::enable(
+        Interrupt::SYSTIMER_TARGET0,
+        hal::interrupt::Priority::Priority1,
+    )
+    .unwrap();
+    esp32c3_hal::interrupt::enable(Interrupt::WIFI_MAC, hal::interrupt::Priority::Priority1)
+        .unwrap();
+    esp32c3_hal::interrupt::enable(Interrupt::RWBT, hal::interrupt::Priority::Priority1).unwrap();
+    esp32c3_hal::interrupt::enable(Interrupt::RWBLE, hal::interrupt::Priority::Priority1).unwrap();
+    esp32c3_hal::interrupt::enable(Interrupt::BT_BB, hal::interrupt::Priority::Priority1).unwrap();
 
     unsafe {
         riscv::interrupt::enable();
@@ -54,15 +57,15 @@ pub fn setup_timer_isr(systimer: &mut SYSTIMER, interrupt_core0: &mut INTERRUPT_
     } {}
 }
 
-#[no_mangle]
-pub fn interrupt1(_trap_frame: &mut TrapFrame) {
+#[interrupt]
+fn WIFI_MAC() {
     unsafe {
-        let intr = &*hal::pac::INTERRUPT_CORE0::ptr();
+        let intr = &*pac::INTERRUPT_CORE0::ptr();
         intr.cpu_int_clear.write(|w| w.bits(1 << 1));
 
         let (fnc, arg) = crate::wifi::os_adapter::ISR_INTERRUPT_1;
 
-        trace!("interrupt 1 {:p} {:p}", fnc, arg);
+        trace!("interrupt WIFI_MAC {:p} {:p}", fnc, arg);
 
         if !fnc.is_null() {
             let fnc: fn(*mut binary::c_types::c_void) = core::mem::transmute(fnc);
@@ -73,15 +76,15 @@ pub fn interrupt1(_trap_frame: &mut TrapFrame) {
     };
 }
 
-#[no_mangle]
-pub fn interrupt5(_trap_frame: &mut TrapFrame) {
+#[interrupt]
+fn RWBT() {
     unsafe {
-        let intr = &*hal::pac::INTERRUPT_CORE0::ptr();
+        let intr = &*pac::INTERRUPT_CORE0::ptr();
         intr.cpu_int_clear.write(|w| w.bits(1 << 1));
 
         let (fnc, arg) = crate::ble::ble_os_adapter_chip_specific::BT_INTERRUPT_FUNCTION5;
 
-        trace!("interrupt 5 {:p} {:p}", fnc, arg);
+        trace!("interrupt RWBT {:p} {:p}", fnc, arg);
 
         if !fnc.is_null() {
             let fnc: fn(*mut binary::c_types::c_void) = core::mem::transmute(fnc);
@@ -92,15 +95,33 @@ pub fn interrupt5(_trap_frame: &mut TrapFrame) {
     };
 }
 
-#[no_mangle]
-pub fn interrupt8(_trap_frame: &mut TrapFrame) {
+#[interrupt]
+fn RWBLE() {
     unsafe {
-        let intr = &*hal::pac::INTERRUPT_CORE0::ptr();
+        let intr = &*pac::INTERRUPT_CORE0::ptr();
+        intr.cpu_int_clear.write(|w| w.bits(1 << 1));
+
+        let (fnc, arg) = crate::ble::ble_os_adapter_chip_specific::BT_INTERRUPT_FUNCTION5;
+
+        trace!("interrupt RWBLE {:p} {:p}", fnc, arg);
+
+        if !fnc.is_null() {
+            let fnc: fn(*mut binary::c_types::c_void) = core::mem::transmute(fnc);
+            fnc(arg);
+        }
+
+        trace!("interrupt 5 done");
+    };
+}
+#[interrupt]
+fn BT_BB(_trap_frame: &mut TrapFrame) {
+    unsafe {
+        let intr = &*pac::INTERRUPT_CORE0::ptr();
         intr.cpu_int_clear.write(|w| w.bits(1 << 1));
 
         let (fnc, arg) = crate::ble::ble_os_adapter_chip_specific::BT_INTERRUPT_FUNCTION8;
 
-        trace!("interrupt 8 {:p} {:p}", fnc, arg);
+        trace!("interrupt BT_BB {:p} {:p}", fnc, arg);
 
         if !fnc.is_null() {
             let fnc: fn(*mut binary::c_types::c_void) = core::mem::transmute(fnc);
@@ -111,13 +132,13 @@ pub fn interrupt8(_trap_frame: &mut TrapFrame) {
     };
 }
 
-#[no_mangle]
-pub fn interrupt10(trap_frame: &mut TrapFrame) {
+#[interrupt]
+fn SYSTIMER_TARGET0(trap_frame: &mut TrapFrame) {
     unsafe {
         // clear the systimer intr
-        (*hal::pac::SYSTIMER::ptr())
+        (*pac::SYSTIMER::ptr())
             .int_clr
-            .write(|w| w.bits(1 << 0));
+            .write(|w| w.target0_int_clr().set_bit());
 
         task_switch(trap_frame);
     }
@@ -127,7 +148,7 @@ pub fn interrupt10(trap_frame: &mut TrapFrame) {
 /// A tick is 1 / 16_000_000 seconds
 pub fn get_systimer_count() -> u64 {
     unsafe {
-        let systimer = &(*hal::pac::SYSTIMER::ptr());
+        let systimer = &(*pac::SYSTIMER::ptr());
 
         systimer.unit0_op.write(|w| w.bits(1 << 30));
 

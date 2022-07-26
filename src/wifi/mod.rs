@@ -81,12 +81,11 @@ static mut BLE_ENABLED: bool = false;
 /// This will initialize internals and also initialize WiFi
 pub fn initialize(
     systimer: &mut esp32c3_hal::pac::SYSTIMER,
-    interrupt_core0: &mut esp32c3_hal::pac::INTERRUPT_CORE0,
     rng: hal::pac::RNG,
 ) -> Result<(), WifiError> {
     init_rng(rng);
     init_tasks();
-    setup_timer_isr(systimer, interrupt_core0);
+    setup_timer_isr(systimer);
     wifi_set_log_verbose();
     init_clocks();
     init_buffer();
@@ -107,12 +106,11 @@ pub fn initialize(
 /// This will just initialize internals.
 pub fn initialize_ble(
     systimer: &mut esp32c3_hal::pac::SYSTIMER,
-    interrupt_core0: &mut esp32c3_hal::pac::INTERRUPT_CORE0,
     rng: hal::pac::RNG,
 ) -> Result<(), WifiError> {
     init_rng(rng);
     init_tasks();
-    setup_timer_isr(systimer, interrupt_core0);
+    setup_timer_isr(systimer);
     wifi_set_log_verbose();
     init_clocks();
     init_buffer();

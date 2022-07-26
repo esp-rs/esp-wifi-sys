@@ -35,12 +35,7 @@ fn main() -> ! {
     rtc_cntl.set_super_wdt_enable(false);
     rtc_cntl.set_wdt_enable(false);
 
-    initialize_ble(
-        &mut peripherals.SYSTIMER,
-        &mut peripherals.INTERRUPT_CORE0,
-        peripherals.RNG,
-    )
-    .unwrap();
+    initialize_ble(&mut peripherals.SYSTIMER, peripherals.RNG).unwrap();
 
     println!("before ble init");
     ble_init();
@@ -109,11 +104,6 @@ fn main() -> ! {
             }
         }
     }
-}
-
-#[export_name = "DefaultHandler"]
-pub fn default_handler() {
-    println!("DefaultHandler called!");
 }
 
 pub fn init_logger() {
