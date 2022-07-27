@@ -9,7 +9,7 @@ use esp32c3_hal as hal;
 #[cfg(feature = "esp32c3")]
 use esp32c3_hal::Rng;
 
-#[cfg(feature = "esp32")]
+use fugit::MegahertzU32;
 use hal::clock::Clocks;
 
 #[doc(hidden)]
@@ -71,6 +71,7 @@ static mut RANDOM_GENERATOR: Option<Rng> = None;
 #[derive(Debug, Clone, Copy)]
 pub enum WifiError {
     General(i32),
+    WrongClockConfig,
 }
 
 #[allow(unused)]
@@ -82,7 +83,12 @@ static mut BLE_ENABLED: bool = false;
 pub fn initialize(
     systimer: &mut esp32c3_hal::pac::SYSTIMER,
     rng: hal::pac::RNG,
+    clocks: &Clocks,
 ) -> Result<(), WifiError> {
+    if clocks.cpu_clock != MegahertzU32::MHz(160) {
+        return Err(WifiError::WrongClockConfig);
+    }
+
     init_rng(rng);
     init_tasks();
     setup_timer_isr(systimer);
@@ -107,7 +113,12 @@ pub fn initialize(
 pub fn initialize_ble(
     systimer: &mut esp32c3_hal::pac::SYSTIMER,
     rng: hal::pac::RNG,
+    clocks: &Clocks,
 ) -> Result<(), WifiError> {
+    if clocks.cpu_clock != MegahertzU32::MHz(160) {
+        return Err(WifiError::WrongClockConfig);
+    }
+
     init_rng(rng);
     init_tasks();
     setup_timer_isr(systimer);
@@ -126,13 +137,17 @@ pub fn initialize_ble(
 /// Initialize for using WiFi
 /// This will initialize internals and also initialize WiFi
 pub fn initialize(
-    timg1: esp32_hal::pac::TIMG1,
+    timg1_timer0: hal::timer::Timer<hal::timer::Timer0<hal::pac::TIMG1>>,
     rng: hal::pac::RNG,
     clocks: &Clocks,
 ) -> Result<(), WifiError> {
+    if clocks.cpu_clock != MegahertzU32::MHz(240) {
+        return Err(WifiError::WrongClockConfig);
+    }
+
     init_rng(rng);
     init_tasks();
-    setup_timer_isr(timg1, clocks);
+    setup_timer_isr(timg1_timer0);
     wifi_set_log_verbose();
     init_clocks();
     init_buffer();
@@ -152,13 +167,17 @@ pub fn initialize(
 /// Initialize for using Bluetooth LE
 /// This will just initialize internals.
 pub fn initialize_ble(
-    timg1: esp32_hal::pac::TIMG1,
+    timg1_timer0: hal::timer::Timer<hal::timer::Timer0<hal::pac::TIMG1>>,
     rng: hal::pac::RNG,
     clocks: &Clocks,
 ) -> Result<(), WifiError> {
+    if clocks.cpu_clock != MegahertzU32::MHz(240) {
+        return Err(WifiError::WrongClockConfig);
+    }
+
     init_rng(rng);
     init_tasks();
-    setup_timer_isr(timg1, clocks);
+    setup_timer_isr(timg1_timer0);
     wifi_set_log_verbose();
     init_clocks();
     init_buffer();

@@ -63,7 +63,8 @@ This is even more experimental than support for ESP32C3.
 - Also there might be some packet loss and a bit worse performance than on ESP32C3 currently.
 - The code runs on a single core and is currently not multi-core safe!
 
-On ESP32 currently TIMG1 is used as the main timer so you can't use it for anything else.
+On ESP32 currently TIMG1/TIMER0 is used as the main timer so you can't use it for anything else.
+Additionally it uses CCOMPARE0 - so don't touch that, too.
 
 ## Directory Structure
 

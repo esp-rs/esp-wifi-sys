@@ -13,9 +13,12 @@ pub const TICKS_PER_SECOND: u64 = 16_000_000;
 #[cfg(debug_assertions)]
 const TIMER_DELAY: u32 = 8_000u32;
 #[cfg(not(debug_assertions))]
-const TIMER_DELAY: u32 = 3500u32;
+const TIMER_DELAY: u32 = 500u32;
 
 pub fn setup_timer_isr(systimer: &mut SYSTIMER) {
+    // ideally we should use HAL here but it doesn't support periodic
+    // systimer alarms yet
+
     // set systimer to 0
     systimer.unit0_load_lo.write(|w| unsafe { w.bits(0) });
     systimer.unit0_load_hi.write(|w| unsafe { w.bits(0) });
