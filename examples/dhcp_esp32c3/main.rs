@@ -7,6 +7,8 @@ use embedded_svc::wifi::{
     AccessPointInfo, ClientConfiguration, ClientConnectionStatus, ClientIpStatus, ClientStatus,
     Configuration, Status, Wifi,
 };
+use esp32c3_hal::clock::{ClockControl, CpuClock};
+use esp32c3_hal::system::SystemExt;
 use esp32c3_hal::{pac::Peripherals, RtcCntl};
 use esp_backtrace as _;
 use esp_println::{print, println};
@@ -31,18 +33,20 @@ fn main() -> ! {
     esp_wifi::init_heap();
 
     let mut peripherals = Peripherals::take().unwrap();
+    let system = peripherals.SYSTEM.split();
+    let clocks = ClockControl::configure(system.clock_control, CpuClock::Clock160MHz).freeze();
 
     let mut rtc_cntl = RtcCntl::new(peripherals.RTC_CNTL);
 
     // Disable watchdog timers
     rtc_cntl.set_super_wdt_enable(false);
-    rtc_cntl.set_wdt_enable(false);
+    rtc_cntl.set_wdt_global_enable(false);
 
     let mut storage = create_network_stack_storage!(3, 8, 1);
     let ethernet = create_network_interface(network_stack_storage!(storage));
     let mut wifi_interface = esp_wifi::wifi_interface::Wifi::new(ethernet);
 
-    initialize(&mut peripherals.SYSTIMER, peripherals.RNG).unwrap();
+    initialize(&mut peripherals.SYSTIMER, peripherals.RNG, &clocks).unwrap();
 
     println!("{:?}", wifi_interface.get_status());
 

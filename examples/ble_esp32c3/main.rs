@@ -11,7 +11,12 @@ use ble_hci::{
     attribute_server::{AttributeServer, Service, WorkResult, ATT_READABLE, ATT_WRITEABLE},
     Ble, Data, HciConnector,
 };
-use esp32c3_hal::{pac::Peripherals, RtcCntl};
+use esp32c3_hal::{
+    clock::{ClockControl, CpuClock},
+    pac::Peripherals,
+    system::SystemExt,
+    RtcCntl,
+};
 use esp_backtrace as _;
 use esp_println::println;
 use esp_wifi::{
@@ -28,14 +33,16 @@ fn main() -> ! {
     esp_wifi::init_heap();
 
     let mut peripherals = Peripherals::take().unwrap();
+    let system = peripherals.SYSTEM.split();
+    let clocks = ClockControl::configure(system.clock_control, CpuClock::Clock160MHz).freeze();
 
     let mut rtc_cntl = RtcCntl::new(peripherals.RTC_CNTL);
 
     // Disable watchdog timers
     rtc_cntl.set_super_wdt_enable(false);
-    rtc_cntl.set_wdt_enable(false);
+    rtc_cntl.set_wdt_global_enable(false);
 
-    initialize_ble(&mut peripherals.SYSTIMER, peripherals.RNG).unwrap();
+    initialize_ble(&mut peripherals.SYSTIMER, peripherals.RNG, &clocks).unwrap();
 
     println!("before ble init");
     ble_init();

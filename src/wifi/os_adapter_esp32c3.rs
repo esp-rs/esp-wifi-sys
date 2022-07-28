@@ -20,16 +20,6 @@ pub(crate) fn chip_ints_on(mask: u32) {
 }
 
 pub(crate) fn init_clocks() {
-    // CPU as 160Mhz
-    unsafe {
-        (*hal::pac::SYSTEM::PTR)
-            .cpu_per_conf
-            .modify(|_, w| w.cpuperiod_sel().bits(1).pll_freq_sel().set_bit());
-        (*hal::pac::SYSTEM::PTR)
-            .sysclk_conf
-            .modify(|_, w| w.soc_clk_sel().bits(1));
-    }
-
     unsafe {
         // PERIP_CLK_EN0
         ((0x600c0000 + 0x10) as *mut u32).write_volatile(0xffffffff);

@@ -2,11 +2,10 @@ use core::cell::RefCell;
 
 use atomic_polyfill::{AtomicU64, Ordering};
 use esp32_hal::{
-    clock::Clocks,
     interrupt,
     pac::{self, TIMG1},
     prelude::_embedded_hal_timer_CountDown,
-    timer::{Timer, Timer0, TimerGroup},
+    timer::{Timer, Timer0},
 };
 use log::trace;
 use xtensa_lx::mutex::{Mutex, SpinLockMutex};
@@ -31,18 +30,14 @@ pub fn get_systimer_count() -> u64 {
     unsafe { TIME.load(Ordering::Relaxed) + read_timer_value() }
 }
 
+#[inline(always)]
 fn read_timer_value() -> u64 {
-    let value = unsafe {
-        let timg1 = esp32_hal::pac::TIMG1::ptr();
-        (*timg1).t0update.write(|w| w.bits(1));
-        (*timg1).t0lo.read().bits() as u64 | (((*timg1).t0hi.read().bits() as u64) << 32u64)
-    };
-    value
+    let value = xtensa_lx::timer::get_cycle_count() as u64;
+    value * 40_000_000 / 240_000_000
 }
 
-pub fn setup_timer_isr(timg1: TIMG1, clocks: &Clocks) {
-    let timg1 = TimerGroup::new(timg1, &clocks);
-    let mut timer1 = timg1.timer0;
+pub fn setup_timer_isr(timg1_timer0: Timer<Timer0<TIMG1>>) {
+    let mut timer1 = timg1_timer0;
     interrupt::enable(pac::Interrupt::TG1_T0_LEVEL, interrupt::Priority::Priority2).unwrap();
     interrupt::enable(pac::Interrupt::WIFI_MAC, interrupt::Priority::Priority1).unwrap();
     interrupt::enable(pac::Interrupt::RWBT, interrupt::Priority::Priority1).unwrap();
@@ -55,10 +50,13 @@ pub fn setup_timer_isr(timg1: TIMG1, clocks: &Clocks) {
         (&TIMER1).lock(|data| (*data).replace(Some(timer1)));
     }
 
+    xtensa_lx::timer::set_ccompare0(0xffffffff);
+
     unsafe {
         xtensa_lx::interrupt::disable();
         xtensa_lx::interrupt::enable_mask(
-            xtensa_lx_rt::interrupt::CpuInterruptLevel::Level2.mask()
+            1 << 6
+                | xtensa_lx_rt::interrupt::CpuInterruptLevel::Level2.mask()
                 | xtensa_lx_rt::interrupt::CpuInterruptLevel::Level6.mask(),
         );
     }
@@ -80,6 +78,16 @@ fn Software0(_level: u32) {
             fnc(arg);
         }
     }
+}
+
+#[allow(non_snake_case)]
+#[no_mangle]
+fn Timer0(_level: u32) {
+    unsafe {
+        TIME.fetch_add(0x1_0000_0000 * 40_000_000 / 240_000_000, Ordering::Relaxed);
+    }
+
+    xtensa_lx::timer::set_ccompare0(0xffffffff);
 }
 
 #[interrupt]
@@ -144,9 +152,6 @@ fn TG1_T0_LEVEL(context: &mut Context) {
 
             let mut timer1 = data.borrow_mut();
             let timer1 = timer1.as_mut().unwrap();
-
-            let ticks = timer1.read_raw();
-            TIME.store(TIME.load(Ordering::Relaxed) + ticks, Ordering::Relaxed);
 
             timer1.clear_interrupt();
             timer1.start(TIMER_DELAY.convert());
