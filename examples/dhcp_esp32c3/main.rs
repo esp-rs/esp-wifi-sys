@@ -18,6 +18,7 @@ use esp_wifi::wifi_interface::{timestamp, WifiError};
 use esp_wifi::{create_network_stack_storage, network_stack_storage};
 use riscv_rt::entry;
 use smoltcp::socket::dns::{self, GetQueryResultError};
+use smoltcp::time::Duration;
 use smoltcp::wire::Ipv4Address;
 use smoltcp::{
     iface::SocketHandle,
@@ -120,9 +121,18 @@ fn main() -> ! {
 
     let mut dns_query_handle = None;
 
+    let mut last_time = timestamp();
+    println!("Initial timestamp: {}", last_time);
+
     loop {
         wifi_interface.poll_dhcp(&mut sockets).ok();
         wifi_interface.network_interface().poll(timestamp(), &mut wifi_device, &mut sockets).ok();
+
+        let now = timestamp();
+        if now > (last_time + Duration::from_secs(1)) {
+            println!("1 second has passed: now: {}", now);
+            last_time = now;
+        }
 
         if let Status(
             ClientStatus::Started(ClientConnectionStatus::Connected(ClientIpStatus::Done(config))),
