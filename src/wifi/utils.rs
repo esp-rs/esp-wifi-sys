@@ -53,6 +53,8 @@ pub fn create_network_interface<'a>(
     let routes_storage = storage.2;
     let ip_addrs = storage.3;
 
+    log::info!("Socket storage: {}", socket_set_entries.len());
+
     let mut mac = [0u8; 6];
     get_sta_mac(&mut mac);
     let hw_address = EthernetAddress::from_bytes(&mac);
@@ -60,7 +62,7 @@ pub fn create_network_interface<'a>(
     let neighbor_cache = NeighborCache::new(&mut neighbor_cache_storage[..]);
     let routes = Routes::new(&mut routes_storage[..]);
 
-    let sockets_to_add = socket_set_entries.len() - 1;
+    let sockets_to_add = socket_set_entries.len() - 2;
     let mut sockets = SocketSet::new(socket_set_entries);
     let ethernet = InterfaceBuilder::new()
         .hardware_addr(smoltcp::wire::HardwareAddress::Ethernet(hw_address))
@@ -68,6 +70,8 @@ pub fn create_network_interface<'a>(
         .ip_addrs(&mut ip_addrs[..])
         .routes(routes)
         .finalize(device);
+
+    // log::info!("Socket set: {}", sockets.len());
 
     for _ in 0..sockets_to_add {
         let rx_tx_socket1 = {

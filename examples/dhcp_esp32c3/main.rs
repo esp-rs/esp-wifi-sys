@@ -17,6 +17,8 @@ use esp_wifi::wifi::utils::create_network_interface;
 use esp_wifi::wifi_interface::{timestamp, WifiError};
 use esp_wifi::{create_network_stack_storage, network_stack_storage};
 use riscv_rt::entry;
+use smoltcp::socket::dns::{self, GetQueryResultError};
+use smoltcp::wire::Ipv4Address;
 use smoltcp::{
     iface::SocketHandle,
     socket::tcp,
@@ -44,17 +46,17 @@ fn main() -> ! {
 
     let mut wifi_device = WifiDevice::new();
 
-    let mut storage = create_network_stack_storage!(4, 8, 1);
+    let mut storage = create_network_stack_storage!(5, 8, 1);
     let (ethernet, mut sockets) = create_network_interface(&mut wifi_device, network_stack_storage!(storage));
 
-    // // TODO get this from DHCP instead
-    // let servers = &[
-    //     Ipv4Address::new(8, 8, 4, 4).into(),
-    //     Ipv4Address::new(8, 8, 8, 8).into(),
-    // ];
-    // static mut DNS_SOCKET_STORAGE: [u8; 2500] = [0; 2500];
-    // let dns_socket = smoltcp::socket::dns::Socket::new(servers, unsafe { &mut DNS_SOCKET_STORAGE[..] });
-    // ethernet.add_socket(dns_socket);
+    // TODO get this from DHCP instead
+    let servers = &[
+        Ipv4Address::new(8, 8, 4, 4).into(),
+        Ipv4Address::new(8, 8, 8, 8).into(),
+    ];
+    let mut dnsq = [None, None, None, None, None];
+    let dns_socket = smoltcp::socket::dns::Socket::new(servers, &mut dnsq[..]);
+    let dns_handle = sockets.add(dns_socket);
 
     let mut dhcp_socket_handle: Option<SocketHandle> = None;
 
@@ -116,10 +118,11 @@ fn main() -> ! {
         }
     }
 
+    let mut dns_query_handle = None;
+
     loop {
         wifi_interface.poll_dhcp(&mut sockets).ok();
         wifi_interface.network_interface().poll(timestamp(), &mut wifi_device, &mut sockets).ok();
-        // wifi_interface.network_interface().poll(timestamp(), &mut wifi_device, sockets).ok();
 
         if let Status(
             ClientStatus::Started(ClientConnectionStatus::Connected(ClientIpStatus::Done(config))),
@@ -129,9 +132,27 @@ fn main() -> ! {
             match stage {
                 0 => {
                     println!("My IP config is {:?}", config);
-                    
+                    let socket = sockets.get_mut::<dns::Socket>(dns_handle);
+                    let name = "google.com";
+                    println!("Starting query for {}", name);
+                    dns_query_handle = Some(socket.start_query(wifi_interface.network_interface().context(), name).unwrap());
+                    stage = 1;
                 }
                 1 => {
+                    let query = dns_query_handle.as_ref().unwrap().clone();
+                    match sockets
+                        .get_mut::<dns::Socket>(dns_handle)
+                        .get_query_result(query)
+                    {
+                        Ok(addrs) => {
+                            println!("Query done: {:?}", addrs);
+                            stage = 2;
+                        }
+                        Err(GetQueryResultError::Pending) => {} // not done yet
+                        Err(e) => panic!("query failed: {:?}", e),
+                    }
+                }
+                2 => {
                     println!("Lets connect");
                     let socket= sockets
                         .get_mut::<tcp::Socket>(http_socket_handle.unwrap());
@@ -140,10 +161,10 @@ fn main() -> ! {
                     let remote_endpoint = (address, 80);
                     socket.connect(wifi_interface.network_interface().context(), remote_endpoint, 41000).unwrap();
 
-                    stage = 2;
+                    stage = 3;
                     println!("Lets send");
                 }
-                2 => {
+                3 => {
                     let socket = sockets
                         .get_mut::<tcp::Socket>(http_socket_handle.unwrap());
 
@@ -151,11 +172,11 @@ fn main() -> ! {
                         .send_slice(&b"GET / HTTP/1.0\r\nHost: www.mobile-j.de\r\n\r\n"[..])
                         .is_ok()
                     {
-                        stage = 3;
+                        stage = 4;
                         println!("Lets receive");
                     }
                 }
-                3 => {
+                4 => {
                     let socket = sockets
                         .get_mut::<tcp::Socket>(http_socket_handle.unwrap());
 
@@ -164,7 +185,7 @@ fn main() -> ! {
                             idx += s;
                         }
                     } else {
-                        stage = 4;
+                        stage = 5;
 
                         for c in &buffer[..idx] {
                             print!("{}", *c as char);
@@ -172,15 +193,15 @@ fn main() -> ! {
                         println!("");
                     }
                 }
-                4 => {
+                5 => {
                     println!("Close");
                     let socket = sockets
                         .get_mut::<tcp::Socket>(http_socket_handle.unwrap());
 
                     socket.abort();
-                    stage = 5;
+                    stage = 6;
                 }
-                5 => {
+                6 => {
                     waiter -= 1;
                     if waiter == 0 {
                         idx = 0;
