@@ -9,36 +9,24 @@ use embedded_svc::{
     },
 };
 use enumset::EnumSet;
-use smoltcp::iface::{Interface, SocketHandle};
-use smoltcp::socket::{Dhcpv4Socket, Socket};
+use smoltcp::iface::{Interface, SocketHandle, SocketSet};
 use smoltcp::time::Instant;
 use smoltcp::wire::{IpAddress, IpCidr};
 
 use crate::current_millis;
-use crate::wifi::WifiDevice;
-
 extern crate alloc;
 
 /// An implementation of `embedded-svc`'s wifi trait.
 pub struct Wifi<'a> {
-    network_interface: Interface<'a, WifiDevice>,
+    network_interface: Interface<'a>,
     current_config: embedded_svc::wifi::Configuration,
-    network_config: Option<smoltcp::socket::Dhcpv4Config>,
+    network_config: Option<smoltcp::socket::dhcpv4::Config>,
     dhcp_socket_handle: Option<SocketHandle>,
 }
 
 impl<'a> Wifi<'a> {
     /// Create a new instance from a `NetworkStack`
-    pub fn new(mut network_interface: Interface<'a, WifiDevice>) -> Wifi<'a> {
-        let mut dhcp_socket_handle: Option<SocketHandle> = None;
-
-        for (handle, socket) in network_interface.sockets_mut() {
-            match socket {
-                Socket::Dhcpv4(_) => dhcp_socket_handle = Some(handle),
-                _ => {}
-            }
-        }
-
+    pub fn new(network_interface: Interface<'a>, dhcp_socket_handle: Option<SocketHandle>) -> Wifi<'a> {
         Wifi {
             network_interface,
             current_config: embedded_svc::wifi::Configuration::default(),
@@ -48,26 +36,25 @@ impl<'a> Wifi<'a> {
     }
 
     /// Get a mutable reference to the `NetworkStack`
-    pub fn network_interface(&mut self) -> &mut Interface<'a, WifiDevice> {
+    pub fn network_interface(&mut self) -> &mut Interface<'a> {
         &mut self.network_interface
     }
 
     /// Convenience function to poll the DHCP socket.
-    pub fn poll_dhcp(&mut self) -> Result<(), WifiError> {
+    pub fn poll_dhcp(&mut self, sockets: &mut SocketSet<'a>) -> Result<(), WifiError> {
         if let Some(dhcp_handle) = self.dhcp_socket_handle {
-            let dhcp_socket = self
-                .network_interface
-                .get_socket::<Dhcpv4Socket>(dhcp_handle);
+            let dhcp_socket = sockets
+                .get_mut::<smoltcp::socket::dhcpv4::Socket>(dhcp_handle);
             let event = dhcp_socket.poll();
             if let Some(event) = event {
                 match event {
-                    smoltcp::socket::Dhcpv4Event::Deconfigured => {
+                    smoltcp::socket::dhcpv4::Event::Deconfigured => {
                         self.network_config = None;
                         self.network_interface
                             .routes_mut()
                             .remove_default_ipv4_route();
                     }
-                    smoltcp::socket::Dhcpv4Event::Configured(config) => {
+                    smoltcp::socket::dhcpv4::Event::Configured(config) => {
                         self.network_config = Some(config);
                         let address = config.address;
                         self.network_interface.update_ip_addrs(|addrs| {
@@ -75,7 +62,7 @@ impl<'a> Wifi<'a> {
                                 .iter_mut()
                                 .filter(|cidr| match cidr.address() {
                                     IpAddress::Ipv4(_) => true,
-                                    _ => false,
+                                    /* _ => false, */
                                 })
                                 .next()
                                 .unwrap();

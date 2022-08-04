@@ -757,10 +757,10 @@ fn dump_packet_info(buffer: &[u8]) {
                 "src={:?} dst={:?} proto={:x?}",
                 ip.src_addr(),
                 ip.dst_addr(),
-                ip.protocol()
+                ip.next_header()
             );
 
-            match ip.protocol() {
+            match ip.next_header() {
                 smoltcp::wire::IpProtocol::HopByHop => {}
                 smoltcp::wire::IpProtocol::Icmp => {}
                 smoltcp::wire::IpProtocol::Igmp => {}

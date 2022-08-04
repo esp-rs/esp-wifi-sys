@@ -12,14 +12,14 @@ use esp32c3_hal::system::SystemExt;
 use esp32c3_hal::{pac::Peripherals, RtcCntl};
 use esp_backtrace as _;
 use esp_println::{print, println};
-use esp_wifi::wifi::initialize;
+use esp_wifi::wifi::{initialize, WifiDevice};
 use esp_wifi::wifi::utils::create_network_interface;
 use esp_wifi::wifi_interface::{timestamp, WifiError};
 use esp_wifi::{create_network_stack_storage, network_stack_storage};
 use riscv_rt::entry;
 use smoltcp::{
     iface::SocketHandle,
-    socket::{Socket, TcpSocket},
+    socket::tcp,
 };
 
 extern crate alloc;
@@ -42,9 +42,30 @@ fn main() -> ! {
     rtc_cntl.set_super_wdt_enable(false);
     rtc_cntl.set_wdt_global_enable(false);
 
-    let mut storage = create_network_stack_storage!(3, 8, 1);
-    let ethernet = create_network_interface(network_stack_storage!(storage));
-    let mut wifi_interface = esp_wifi::wifi_interface::Wifi::new(ethernet);
+    let mut wifi_device = WifiDevice::new();
+
+    let mut storage = create_network_stack_storage!(4, 8, 1);
+    let (ethernet, mut sockets) = create_network_interface(&mut wifi_device, network_stack_storage!(storage));
+
+    // // TODO get this from DHCP instead
+    // let servers = &[
+    //     Ipv4Address::new(8, 8, 4, 4).into(),
+    //     Ipv4Address::new(8, 8, 8, 8).into(),
+    // ];
+    // static mut DNS_SOCKET_STORAGE: [u8; 2500] = [0; 2500];
+    // let dns_socket = smoltcp::socket::dns::Socket::new(servers, unsafe { &mut DNS_SOCKET_STORAGE[..] });
+    // ethernet.add_socket(dns_socket);
+
+    let mut dhcp_socket_handle: Option<SocketHandle> = None;
+
+    for (handle, socket) in sockets.iter() {
+        match socket {
+            smoltcp::socket::Socket::Dhcpv4(_) => dhcp_socket_handle = Some(handle),
+            _ => {}
+        }
+    }
+
+    let mut wifi_interface = esp_wifi::wifi_interface::Wifi::new(ethernet, dhcp_socket_handle);
 
     initialize(&mut peripherals.SYSTIMER, peripherals.RNG, &clocks).unwrap();
 
@@ -88,16 +109,17 @@ fn main() -> ! {
 
     let mut http_socket_handle: Option<SocketHandle> = None;
 
-    for (handle, socket) in wifi_interface.network_interface().sockets_mut() {
+    for (handle, socket) in sockets.iter() {
         match socket {
-            Socket::Tcp(_) => http_socket_handle = Some(handle),
+            smoltcp::socket::Socket::Tcp(_) => http_socket_handle = Some(handle),
             _ => {}
         }
     }
 
     loop {
-        wifi_interface.poll_dhcp().ok();
-        wifi_interface.network_interface().poll(timestamp()).ok();
+        wifi_interface.poll_dhcp(&mut sockets).ok();
+        wifi_interface.network_interface().poll(timestamp(), &mut wifi_device, &mut sockets).ok();
+        // wifi_interface.network_interface().poll(timestamp(), &mut wifi_device, sockets).ok();
 
         if let Status(
             ClientStatus::Started(ClientConnectionStatus::Connected(ClientIpStatus::Done(config))),
@@ -107,42 +129,42 @@ fn main() -> ! {
             match stage {
                 0 => {
                     println!("My IP config is {:?}", config);
+                    
+                }
+                1 => {
                     println!("Lets connect");
-                    let (socket, cx) = wifi_interface
-                        .network_interface()
-                        .get_socket_and_context::<TcpSocket>(http_socket_handle.unwrap());
+                    let socket= sockets
+                        .get_mut::<tcp::Socket>(http_socket_handle.unwrap());
 
                     let address = smoltcp::wire::Ipv4Address::new(142, 250, 185, 115);
                     let remote_endpoint = (address, 80);
-                    socket.connect(cx, remote_endpoint, 41000).unwrap();
+                    socket.connect(wifi_interface.network_interface().context(), remote_endpoint, 41000).unwrap();
 
-                    stage = 1;
+                    stage = 2;
                     println!("Lets send");
                 }
-                1 => {
-                    let socket = wifi_interface
-                        .network_interface()
-                        .get_socket::<TcpSocket>(http_socket_handle.unwrap());
+                2 => {
+                    let socket = sockets
+                        .get_mut::<tcp::Socket>(http_socket_handle.unwrap());
 
                     if socket
                         .send_slice(&b"GET / HTTP/1.0\r\nHost: www.mobile-j.de\r\n\r\n"[..])
                         .is_ok()
                     {
-                        stage = 2;
+                        stage = 3;
                         println!("Lets receive");
                     }
                 }
-                2 => {
-                    let socket = wifi_interface
-                        .network_interface()
-                        .get_socket::<TcpSocket>(http_socket_handle.unwrap());
+                3 => {
+                    let socket = sockets
+                        .get_mut::<tcp::Socket>(http_socket_handle.unwrap());
 
                     if let Ok(s) = socket.recv_slice(&mut buffer[idx..]) {
                         if s > 0 {
                             idx += s;
                         }
                     } else {
-                        stage = 3;
+                        stage = 4;
 
                         for c in &buffer[..idx] {
                             print!("{}", *c as char);
@@ -150,16 +172,15 @@ fn main() -> ! {
                         println!("");
                     }
                 }
-                3 => {
+                4 => {
                     println!("Close");
-                    let socket = wifi_interface
-                        .network_interface()
-                        .get_socket::<TcpSocket>(http_socket_handle.unwrap());
+                    let socket = sockets
+                        .get_mut::<tcp::Socket>(http_socket_handle.unwrap());
 
                     socket.abort();
-                    stage = 4;
+                    stage = 5;
                 }
-                4 => {
+                5 => {
                     waiter -= 1;
                     if waiter == 0 {
                         idx = 0;
