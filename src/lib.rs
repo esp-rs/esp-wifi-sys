@@ -36,7 +36,7 @@ pub mod wifi_interface;
 use esp32c3_hal::interrupt;
 
 pub fn current_millis() -> u64 {
-    get_systimer_count() / TICKS_PER_SECOND
+    get_systimer_count() / (TICKS_PER_SECOND / 1000)
 }
 
 // TODO: should the below code live somewhere else, in its own module maybe? Or is it fine here?
