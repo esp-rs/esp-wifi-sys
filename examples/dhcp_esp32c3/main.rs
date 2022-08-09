@@ -9,7 +9,7 @@ use embedded_svc::wifi::{
 };
 use esp32c3_hal::clock::{ClockControl, CpuClock};
 use esp32c3_hal::system::SystemExt;
-use esp32c3_hal::{pac::Peripherals, RtcCntl};
+use esp32c3_hal::{pac::Peripherals, prelude::*, Rtc};
 use esp_backtrace as _;
 use esp_println::{print, println};
 use esp_wifi::wifi::initialize;
@@ -36,11 +36,11 @@ fn main() -> ! {
     let system = peripherals.SYSTEM.split();
     let clocks = ClockControl::configure(system.clock_control, CpuClock::Clock160MHz).freeze();
 
-    let mut rtc_cntl = RtcCntl::new(peripherals.RTC_CNTL);
+    let mut rtc = Rtc::new(peripherals.RTC_CNTL);
 
     // Disable watchdog timers
-    rtc_cntl.set_super_wdt_enable(false);
-    rtc_cntl.set_wdt_global_enable(false);
+    rtc.swd.disable();
+    rtc.rwdt.disable();
 
     let mut storage = create_network_stack_storage!(3, 8, 1);
     let ethernet = create_network_interface(network_stack_storage!(storage));

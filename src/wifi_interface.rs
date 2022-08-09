@@ -250,7 +250,7 @@ impl<'a> embedded_svc::wifi::Wifi for Wifi<'a> {
                     _ => panic!(),
                 };
 
-                let mut ssid = heapless::String::<30>::new();
+                let mut ssid = heapless::String::<32>::new();
                 ssid.push_str(ssid_strbuf.as_str_ref()).ok();
 
                 let ap_info = AccessPointInfo {
