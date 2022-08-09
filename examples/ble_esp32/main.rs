@@ -16,7 +16,7 @@ use esp32_hal::{
     pac::Peripherals,
     prelude::*,
     timer::TimerGroup,
-    RtcCntl,
+    Rtc,
 };
 use esp_backtrace as _;
 use esp_println::println;
@@ -38,10 +38,10 @@ fn main() -> ! {
     let system = peripherals.DPORT.split();
     let clocks = ClockControl::configure(system.clock_control, CpuClock::Clock240MHz).freeze();
 
-    let mut rtc_cntl = RtcCntl::new(peripherals.RTC_CNTL);
+    let mut rtc = Rtc::new(peripherals.RTC_CNTL);
 
     // Disable MWDT and RWDT (Watchdog) flash boot protection
-    rtc_cntl.set_wdt_global_enable(false);
+    rtc.rwdt.disable();
 
     let timg1 = TimerGroup::new(peripherals.TIMG1, &clocks);
     initialize_ble(timg1.timer0, peripherals.RNG, &clocks).unwrap();

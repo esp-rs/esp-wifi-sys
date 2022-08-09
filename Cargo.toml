@@ -17,7 +17,7 @@ smoltcp = { version = "0.8.0", default-features=false, features = ["proto-igmp",
 critical-section = "0.2.7"
 atomic-polyfill = "0.1.7"
 log = "0.4.17"
-embedded-svc = { version = "0.22.0", default-features = false, features = [], optional = true }
+embedded-svc = { version = "0.22.1", default-features = false, features = [], optional = true }
 enumset = { version = "1", default-features = false, optional = true }
 esp-alloc = { version = "0.1.0", features = ["oom-handler"] }
 embedded-io = "0.3.0"

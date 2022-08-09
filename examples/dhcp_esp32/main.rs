@@ -10,7 +10,7 @@ use esp32_hal::{
     pac::Peripherals,
     prelude::*,
     timer::TimerGroup,
-    RtcCntl,
+    Rtc,
 };
 use esp_backtrace as _;
 use esp_println::{print, println};
@@ -39,10 +39,10 @@ fn main() -> ! {
     let system = peripherals.DPORT.split();
     let clocks = ClockControl::configure(system.clock_control, CpuClock::Clock240MHz).freeze();
 
-    let mut rtc_cntl = RtcCntl::new(peripherals.RTC_CNTL);
+    let mut rtc = Rtc::new(peripherals.RTC_CNTL);
 
     // Disable MWDT and RWDT (Watchdog) flash boot protection
-    rtc_cntl.set_wdt_global_enable(false);
+    rtc.rwdt.disable();
 
     let mut storage = create_network_stack_storage!(3, 8, 1);
     let ethernet = create_network_interface(network_stack_storage!(storage));
