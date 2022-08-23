@@ -42,7 +42,7 @@ unsafe extern "C" fn esp_dport_access_reg_read(reg: u32) -> u32 {
 unsafe extern "C" fn phy_enter_critical() -> u32 {
     trace!("phy_enter_critical");
 
-    critical_section::acquire() as u32
+    core::mem::transmute(critical_section::acquire())
 }
 
 /****************************************************************************
@@ -63,7 +63,7 @@ unsafe extern "C" fn phy_enter_critical() -> u32 {
 unsafe extern "C" fn phy_exit_critical(level: u32) {
     trace!("phy_exit_critical {}", level);
 
-    critical_section::release(level as u8);
+    critical_section::release(core::mem::transmute(level));
 }
 
 #[ram]

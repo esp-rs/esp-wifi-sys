@@ -14,8 +14,8 @@ riscv = { version = "0.8.0", optional = true }
 xtensa-lx-rt = { version = "0.13.0", optional = true }
 xtensa-lx = { version = "0.7.0", optional = true }
 smoltcp = { version = "0.8.0", default-features=false, features = ["proto-igmp", "proto-ipv4", "socket-tcp", "socket-icmp", "socket-udp", "medium-ethernet", "proto-dhcpv4", "socket-raw", "socket-dhcpv4"] }
-critical-section = "0.2.7"
-atomic-polyfill = "0.1.7"
+critical-section = "1.1.0"
+atomic-polyfill = "1.0.1"
 log = "0.4.17"
 embedded-svc = { version = "0.22.1", default-features = false, features = [], optional = true }
 enumset = { version = "1", default-features = false, optional = true }
@@ -32,16 +32,16 @@ ble-hci = { git = "https://github.com/bjoernQ/ble-hci", branch = "embedded-io" }
 
 [target.xtensa-esp32-none-elf.dev-dependencies]
 esp-println = { version = "0.2.0", features = [ "esp32" ] }
-esp-backtrace = { version = "0.1.0", features = [ "esp32", "panic-handler", "exception-handler", "print-uart" ] }
+esp-backtrace = { version = "0.2.0", features = [ "esp32", "panic-handler", "exception-handler", "print-uart" ] }
 
 [target.riscv32imc-unknown-none-elf.dev-dependencies]
 esp-println = { version = "0.2.0", features = [ "esp32c3" ] }
-esp-backtrace = { version = "0.1.0" , features = [ "esp32c3", "panic-handler", "exception-handler", "print-uart" ] }
+esp-backtrace = { version = "0.2.0" , features = [ "esp32c3", "panic-handler", "exception-handler", "print-uart" ] }
 
 [features]
 default = [ "utils" ]
 esp32c3 = [ "riscv-target", "riscv", "riscv-rt", "esp32c3-hal" ]
-esp32 = [ "esp32-hal", "xtensa-lx-rt/esp32", "xtensa-lx/esp32", "critical-section/custom-impl" ]
+esp32 = [ "esp32-hal", "xtensa-lx-rt/esp32", "xtensa-lx/esp32" ]
 wifi_logs = []
 dump_packets = []
 utils = [ ]

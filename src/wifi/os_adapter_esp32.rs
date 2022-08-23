@@ -47,7 +47,7 @@ pub(crate) unsafe extern "C" fn wifi_int_disable(
     wifi_int_mux: *mut crate::binary::c_types::c_void,
 ) -> u32 {
     trace!("wifi_int_disable() esp32");
-    critical_section::acquire() as u32
+    core::mem::transmute(critical_section::acquire())
 }
 
 pub(crate) unsafe extern "C" fn wifi_int_restore(
@@ -55,7 +55,7 @@ pub(crate) unsafe extern "C" fn wifi_int_restore(
     tmp: u32,
 ) {
     trace!("wifi_int_restore() esp32");
-    critical_section::release(tmp as u8)
+    critical_section::release(core::mem::transmute(tmp))
 }
 
 pub(crate) unsafe extern "C" fn phy_common_clock_disable() {
