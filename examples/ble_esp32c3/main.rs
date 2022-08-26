@@ -11,6 +11,7 @@ use ble_hci::{
     attribute_server::{AttributeServer, Service, WorkResult, ATT_READABLE, ATT_WRITEABLE},
     Ble, Data, HciConnector,
 };
+use esp32c3_hal::systimer::SystemTimer;
 use esp32c3_hal::{
     clock::{ClockControl, CpuClock},
     pac::Peripherals,
@@ -33,7 +34,7 @@ fn main() -> ! {
     init_logger();
     esp_wifi::init_heap();
 
-    let mut peripherals = Peripherals::take().unwrap();
+    let peripherals = Peripherals::take().unwrap();
     let system = peripherals.SYSTEM.split();
     let clocks = ClockControl::configure(system.clock_control, CpuClock::Clock160MHz).freeze();
 
@@ -43,7 +44,9 @@ fn main() -> ! {
     rtc.swd.disable();
     rtc.rwdt.disable();
 
-    initialize_ble(&mut peripherals.SYSTIMER, peripherals.RNG, &clocks).unwrap();
+    let syst = SystemTimer::new(peripherals.SYSTIMER);
+
+    initialize_ble(syst.alarm0, peripherals.RNG, &clocks).unwrap();
 
     println!("before ble init");
     ble_init();

@@ -1,9 +1,9 @@
 use esp32c3_hal as hal;
 use esp32c3_hal::interrupt::TrapFrame;
-use esp32c3_hal::pac::SYSTIMER;
 use esp32c3_hal::prelude::*;
 use hal::pac;
 use hal::pac::Interrupt;
+use hal::systimer::{Alarm, Target};
 
 use crate::{binary, preempt::preempt::task_switch};
 use log::trace;
@@ -11,34 +11,15 @@ use log::trace;
 pub const TICKS_PER_SECOND: u64 = 16_000_000;
 
 #[cfg(debug_assertions)]
-const TIMER_DELAY: u32 = 8_000u32;
+const TIMER_DELAY: fugit::HertzU32 = fugit::HertzU32::from_raw(500);
 #[cfg(not(debug_assertions))]
-const TIMER_DELAY: u32 = 500u32;
+const TIMER_DELAY: fugit::HertzU32 = fugit::HertzU32::from_raw(1_000);
 
-pub fn setup_timer_isr(systimer: &mut SYSTIMER) {
-    // ideally we should use HAL here but it doesn't support periodic
-    // systimer alarms yet
-
-    // set systimer to 0
-    systimer.unit0_load_lo.write(|w| unsafe { w.bits(0) });
-    systimer.unit0_load_hi.write(|w| unsafe { w.bits(0) });
-    systimer.unit0_load.write(|w| unsafe { w.bits(1) });
-
-    // PERIOD_MODE + PERIOD
-    systimer
-        .target0_conf
-        .write(|w| unsafe { w.bits((1 << 30) | TIMER_DELAY) });
-    // LOAD CONF VALUE
-    systimer.comp0_load.write(|w| unsafe { w.bits(1) });
-    // set SYSTIMER_TARGET0_WORK_EN + UNIT0_WORK_EN
-    systimer
-        .conf
-        .write(|w| unsafe { w.bits(1 << 24 | 1 << 30) });
-
-    systimer.int_clr.write(|w| unsafe { w.bits(1 << 0) });
-
-    // TARGET0 INT ENA
-    systimer.int_ena.write(|w| unsafe { w.bits(1 << 0) });
+pub fn setup_timer_isr(systimer: Alarm<Target, 0>) {
+    let alarm0 = systimer.into_periodic();
+    alarm0.set_period(TIMER_DELAY.into());
+    alarm0.clear_interrupt();
+    alarm0.enable_interrupt();
 
     esp32c3_hal::interrupt::enable(
         Interrupt::SYSTIMER_TARGET0,
