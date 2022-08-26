@@ -9,6 +9,7 @@ use embedded_svc::wifi::{
 };
 use esp32c3_hal::clock::{ClockControl, CpuClock};
 use esp32c3_hal::system::SystemExt;
+use esp32c3_hal::systimer::SystemTimer;
 use esp32c3_hal::{pac::Peripherals, prelude::*, Rtc};
 use esp_backtrace as _;
 use esp_println::{print, println};
@@ -32,7 +33,7 @@ fn main() -> ! {
     init_logger();
     esp_wifi::init_heap();
 
-    let mut peripherals = Peripherals::take().unwrap();
+    let peripherals = Peripherals::take().unwrap();
     let system = peripherals.SYSTEM.split();
     let clocks = ClockControl::configure(system.clock_control, CpuClock::Clock160MHz).freeze();
 
@@ -46,7 +47,9 @@ fn main() -> ! {
     let ethernet = create_network_interface(network_stack_storage!(storage));
     let mut wifi_interface = esp_wifi::wifi_interface::Wifi::new(ethernet);
 
-    initialize(&mut peripherals.SYSTIMER, peripherals.RNG, &clocks).unwrap();
+    let syst = SystemTimer::new(peripherals.SYSTIMER);
+
+    initialize(syst.alarm0, peripherals.RNG, &clocks).unwrap();
 
     println!("{:?}", wifi_interface.get_status());
 

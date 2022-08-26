@@ -1,6 +1,7 @@
-use core::cell::RefCell;
+use core::{borrow::BorrowMut, cell::RefCell};
 
 use atomic_polyfill::{AtomicU64, Ordering};
+use critical_section::Mutex;
 use esp32_hal::{
     interrupt,
     pac::{self, TIMG1},
@@ -8,7 +9,6 @@ use esp32_hal::{
     timer::{Timer, Timer0},
 };
 use log::trace;
-use xtensa_lx::mutex::{Mutex, SpinLockMutex};
 use xtensa_lx_rt::exception::Context;
 
 use crate::preempt::preempt::task_switch;
@@ -21,8 +21,7 @@ const TIMER_DELAY: fugit::MicrosDurationU64 = fugit::MicrosDurationU64::millis(1
 #[cfg(not(debug_assertions))]
 const TIMER_DELAY: fugit::MicrosDurationU64 = fugit::MicrosDurationU64::millis(3);
 
-static mut TIMER1: SpinLockMutex<RefCell<Option<Timer<Timer0<TIMG1>>>>> =
-    SpinLockMutex::new(RefCell::new(None));
+static mut TIMER1: Mutex<RefCell<Option<Timer<Timer0<TIMG1>>>>> = Mutex::new(RefCell::new(None));
 
 static mut TIME: AtomicU64 = AtomicU64::new(0);
 
@@ -46,9 +45,9 @@ pub fn setup_timer_isr(timg1_timer0: Timer<Timer0<TIMG1>>) {
 
     timer1.listen();
     timer1.start(TIMER_DELAY.convert());
-    unsafe {
-        (&TIMER1).lock(|data| (*data).replace(Some(timer1)));
-    }
+    critical_section::with(|cs| {
+        unsafe { TIMER1.borrow_mut() }.replace(cs, Some(timer1));
+    });
 
     xtensa_lx::timer::set_ccompare0(0xffffffff);
 
@@ -146,15 +145,12 @@ fn BT_BB() {
 fn TG1_T0_LEVEL(context: &mut Context) {
     task_switch(context);
 
-    unsafe {
-        (&TIMER1).lock(|data| {
-            crate::memory_fence::memory_fence();
+    critical_section::with(|cs| {
+        crate::memory_fence::memory_fence();
 
-            let mut timer1 = data.borrow_mut();
-            let timer1 = timer1.as_mut().unwrap();
-
-            timer1.clear_interrupt();
-            timer1.start(TIMER_DELAY.convert());
-        });
-    }
+        let mut timer = unsafe { TIMER1.borrow_mut() }.borrow_ref_mut(cs);
+        let timer = timer.as_mut().unwrap();
+        timer.clear_interrupt();
+        timer.start(TIMER_DELAY.convert());
+    });
 }

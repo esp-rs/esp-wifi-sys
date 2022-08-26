@@ -7,6 +7,8 @@ use esp32_hal::Rng;
 #[cfg(feature = "esp32c3")]
 use esp32c3_hal as hal;
 #[cfg(feature = "esp32c3")]
+use esp32c3_hal::systimer::{Alarm, Target};
+#[cfg(feature = "esp32c3")]
 use esp32c3_hal::Rng;
 
 use fugit::MegahertzU32;
@@ -78,7 +80,7 @@ static mut BLE_ENABLED: bool = false;
 /// Initialize for using WiFi
 /// This will initialize internals and also initialize WiFi
 pub fn initialize(
-    systimer: &mut esp32c3_hal::pac::SYSTIMER,
+    systimer: Alarm<Target, 0>,
     rng: hal::pac::RNG,
     clocks: &Clocks,
 ) -> Result<(), WifiError> {
@@ -108,7 +110,7 @@ pub fn initialize(
 /// Initialize for using Bluetooth LE
 /// This will just initialize internals.
 pub fn initialize_ble(
-    systimer: &mut esp32c3_hal::pac::SYSTIMER,
+    systimer: Alarm<Target, 0>,
     rng: hal::pac::RNG,
     clocks: &Clocks,
 ) -> Result<(), WifiError> {
