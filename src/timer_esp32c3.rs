@@ -26,11 +26,20 @@ pub fn setup_timer_isr(systimer: Alarm<Target, 0>) {
         hal::interrupt::Priority::Priority1,
     )
     .unwrap();
+
+    #[cfg(feature = "wifi")]
     esp32c3_hal::interrupt::enable(Interrupt::WIFI_MAC, hal::interrupt::Priority::Priority1)
         .unwrap();
-    esp32c3_hal::interrupt::enable(Interrupt::RWBT, hal::interrupt::Priority::Priority1).unwrap();
-    esp32c3_hal::interrupt::enable(Interrupt::RWBLE, hal::interrupt::Priority::Priority1).unwrap();
-    esp32c3_hal::interrupt::enable(Interrupt::BT_BB, hal::interrupt::Priority::Priority1).unwrap();
+
+    #[cfg(feature = "ble")]
+    {
+        esp32c3_hal::interrupt::enable(Interrupt::RWBT, hal::interrupt::Priority::Priority1)
+            .unwrap();
+        esp32c3_hal::interrupt::enable(Interrupt::RWBLE, hal::interrupt::Priority::Priority1)
+            .unwrap();
+        esp32c3_hal::interrupt::enable(Interrupt::BT_BB, hal::interrupt::Priority::Priority1)
+            .unwrap();
+    }
 
     unsafe {
         riscv::interrupt::enable();
@@ -41,6 +50,7 @@ pub fn setup_timer_isr(systimer: Alarm<Target, 0>) {
     } {}
 }
 
+#[cfg(feature = "wifi")]
 #[interrupt]
 fn WIFI_MAC() {
     unsafe {
@@ -57,6 +67,7 @@ fn WIFI_MAC() {
     };
 }
 
+#[cfg(feature = "ble")]
 #[interrupt]
 fn RWBT() {
     unsafe {
@@ -76,6 +87,7 @@ fn RWBT() {
     };
 }
 
+#[cfg(feature = "ble")]
 #[interrupt]
 fn RWBLE() {
     unsafe {
@@ -94,6 +106,8 @@ fn RWBLE() {
         trace!("interrupt 5 done");
     };
 }
+
+#[cfg(feature = "ble")]
 #[interrupt]
 fn BT_BB(_trap_frame: &mut TrapFrame) {
     unsafe {

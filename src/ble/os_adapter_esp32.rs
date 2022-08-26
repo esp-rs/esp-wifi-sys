@@ -195,68 +195,171 @@ pub(crate) fn disable_sleep_mode() {
 }
 
 pub(crate) unsafe extern "C" fn coex_bt_wakeup_request() -> bool {
-    todo!()
+    log::debug!("coex_bt_wakeup_request");
+    #[cfg(coex)]
+    return async_wakeup_request(BTDM_ASYNC_WAKEUP_REQ_COEX);
+
+    #[cfg(not(coex))]
+    true
 }
 
-pub(crate) unsafe extern "C" fn coex_bt_wakeup_request_end() -> () {
-    todo!()
+pub(crate) unsafe extern "C" fn coex_bt_wakeup_request_end() {
+    log::warn!("coex_bt_wakeup_request_end");
+
+    #[cfg(coex)]
+    async_wakeup_request_end(BTDM_ASYNC_WAKEUP_REQ_COEX);
 }
 
-pub(crate) unsafe extern "C" fn coex_bt_request(_event: u32, _latency: u32, _duration: u32) -> i32 {
-    log::trace!("COEX not supported in coex_bt_request");
+#[allow(unused_variables)]
+pub(crate) unsafe extern "C" fn coex_bt_request(event: u32, latency: u32, duration: u32) -> i32 {
+    log::debug!("coex_bt_request");
+    extern "C" {
+        #[cfg(coex)]
+        fn coex_bt_request(event: u32, latency: u32, duration: u32) -> i32;
+    }
+
+    #[cfg(coex)]
+    return coex_bt_request(event, latency, duration);
+
+    #[cfg(not(coex))]
     0
 }
 
-pub(crate) unsafe extern "C" fn coex_bt_release(_event: u32) -> i32 {
-    log::trace!("COEX not supported in coex_bt_release");
+#[allow(unused_variables)]
+pub(crate) unsafe extern "C" fn coex_bt_release(event: u32) -> i32 {
+    log::debug!("coex_bt_release");
+    extern "C" {
+        #[cfg(coex)]
+        fn coex_bt_release(event: u32) -> i32;
+    }
+
+    #[cfg(coex)]
+    return coex_bt_release(event);
+
+    #[cfg(not(coex))]
     0
 }
 
-pub(crate) unsafe extern "C" fn coex_register_bt_cb(_callback: unsafe extern "C" fn()) -> i32 {
-    log::trace!("COEX not supported in coex_register_bt_cb");
+pub(crate) unsafe extern "C" fn coex_register_bt_cb_wrapper(
+    callback: unsafe extern "C" fn(),
+) -> i32 {
+    log::warn!("coex_register_bt_cb {:p}", callback);
+    extern "C" {
+        #[cfg(coex)]
+        fn coex_register_bt_cb(callback: unsafe extern "C" fn()) -> i32;
+    }
+
+    #[cfg(coex)]
+    return coex_register_bt_cb(callback);
+
+    #[cfg(not(coex))]
     0
 }
 
 pub(crate) unsafe extern "C" fn coex_bb_reset_lock() -> u32 {
-    log::trace!("COEX not supported in coex_bb_reset_lock");
+    log::debug!("coex_bb_reset_lock");
+    extern "C" {
+        #[cfg(coex)]
+        fn coex_bb_reset_lock() -> u32;
+    }
+
+    #[cfg(coex)]
+    return coex_bb_reset_lock();
+
+    #[cfg(not(coex))]
     0
 }
 
-pub(crate) unsafe extern "C" fn coex_bb_reset_unlock(_event: u32) {
-    log::trace!("COEX not supported in coex_bb_reset_unlock");
+#[allow(unused_variables)]
+pub(crate) unsafe extern "C" fn coex_bb_reset_unlock(event: u32) {
+    log::debug!("coex_bb_reset_unlock");
+    extern "C" {
+        #[cfg(coex)]
+        fn coex_bb_reset_unlock(event: u32);
+    }
+
+    #[cfg(coex)]
+    coex_bb_reset_unlock(event);
 }
 
-pub(crate) unsafe extern "C" fn coex_schm_register_btdm_callback(
-    _callback: unsafe extern "C" fn(),
+pub(crate) unsafe extern "C" fn coex_schm_register_btdm_callback_wrapper(
+    callback: unsafe extern "C" fn(),
 ) -> i32 {
-    log::trace!("COEX not supported in coex_schm_register_btdm_callback");
+    log::warn!("coex_schm_register_btdm_callback {:p}", callback);
+    extern "C" {
+        #[cfg(coex)]
+        fn coex_schm_register_btdm_callback(callback: unsafe extern "C" fn()) -> i32;
+    }
+
+    #[cfg(coex)]
+    return coex_schm_register_btdm_callback(callback);
+
+    #[cfg(not(coex))]
     0
 }
 
 pub(crate) unsafe extern "C" fn coex_schm_interval_get() -> u32 {
-    todo!()
+    log::debug!("coex_schm_interval_get");
+
+    #[cfg(coex)]
+    return crate::binary::include::coex_schm_interval_get();
+
+    #[cfg(not(coex))]
+    0
 }
 
 pub(crate) unsafe extern "C" fn coex_schm_curr_period_get() -> u8 {
-    todo!()
+    log::debug!("coex_schm_curr_period_get");
+    // BEWARE: One might expect to call coex_schm_curr_period_get
+    //crate::binary::include::coex_schm_curr_period_get()
+
+    #[cfg(coex)]
+    return crate::binary::include::coex_schm_interval_get() as u8;
+
+    #[cfg(not(coex))]
+    0
 }
 
 pub(crate) unsafe extern "C" fn coex_schm_curr_phase_get() -> *const () {
-    todo!()
+    log::debug!("coex_schm_curr_phase_get");
+
+    #[cfg(coex)]
+    return crate::binary::include::coex_schm_curr_phase_get() as *const ();
+
+    #[cfg(not(coex))]
+    return 0 as *const ();
 }
 
-pub(crate) unsafe extern "C" fn coex_wifi_channel_get(
-    _primary: *mut u8,
-    _secondary: *mut u8,
-) -> i32 {
-    log::trace!("COEX not supported in coex_wifi_channel_get");
+#[allow(unused_variables)]
+pub(crate) unsafe extern "C" fn coex_wifi_channel_get(primary: *mut u8, secondary: *mut u8) -> i32 {
+    log::warn!("coex_wifi_channel_get");
+    extern "C" {
+        #[cfg(coex)]
+        fn coex_wifi_channel_get(primary: *mut u8, secondary: *mut u8) -> i32;
+    }
+
+    #[cfg(coex)]
+    return coex_wifi_channel_get(primary, secondary);
+
+    #[cfg(not(coex))]
     -1
 }
 
+#[allow(unused_variables)]
 pub(crate) unsafe extern "C" fn coex_register_wifi_channel_change_callback(
-    _callback: unsafe extern "C" fn(),
+    callback: unsafe extern "C" fn(),
 ) -> i32 {
-    todo!()
+    log::warn!("coex_register_wifi_channel_change_callback");
+    extern "C" {
+        #[cfg(coex)]
+        fn coex_register_wifi_channel_change_callback(callback: unsafe extern "C" fn()) -> i32;
+    }
+
+    #[cfg(coex)]
+    return coex_register_wifi_channel_change_callback(callback);
+
+    #[cfg(not(coex))]
+    0
 }
 
 pub(crate) unsafe extern "C" fn set_isr(n: i32, f: unsafe extern "C" fn(), arg: *const ()) -> i32 {
@@ -281,4 +384,99 @@ pub(crate) unsafe extern "C" fn set_isr(n: i32, f: unsafe extern "C" fn(), arg: 
 pub(crate) unsafe extern "C" fn ints_on(mask: u32) {
     log::trace!("chip_ints_on esp32 {:b}", mask);
     xtensa_lx::interrupt::enable_mask(mask);
+}
+
+#[cfg(coex)]
+const BTDM_ASYNC_WAKEUP_REQ_HCI: i32 = 0;
+
+#[cfg(coex)]
+const BTDM_ASYNC_WAKEUP_REQ_COEX: i32 = 1;
+
+//const BTDM_ASYNC_WAKEUP_REQMAX: i32 = 2;
+
+/****************************************************************************
+ * Name: async_wakeup_request
+ *
+ * Description:
+ *   Request the BLE Controller to wakeup
+ *
+ * Input Parameters:
+ *   event - the event that triggered the wakeup
+ *
+ * Returned Value:
+ *   true if request lock is needed, false otherwise
+ *
+ ****************************************************************************/
+
+#[cfg(coex)]
+fn async_wakeup_request(event: i32) -> bool {
+    let request_lock: bool;
+    let mut do_wakeup_request = false;
+
+    match event {
+        BTDM_ASYNC_WAKEUP_REQ_HCI => {
+            request_lock = true;
+        }
+        BTDM_ASYNC_WAKEUP_REQ_COEX => {
+            request_lock = false;
+        }
+        _ => {
+            return false;
+        }
+    }
+
+    extern "C" {
+        fn btdm_power_state_active() -> bool;
+        fn btdm_wakeup_request(request_lock: bool);
+    }
+
+    if !unsafe { btdm_power_state_active() } {
+        do_wakeup_request = true;
+        unsafe { btdm_wakeup_request(request_lock) };
+    }
+
+    return do_wakeup_request;
+}
+
+/****************************************************************************
+ * Name: async_wakeup_request_end
+ *
+ * Description:
+ *   Finish a wakeup request
+ *
+ * Input Parameters:
+ *   event - the event that triggered the wakeup
+ *
+ * Returned Value:
+ *   true if request lock is needed, false otherwise
+ *
+ ****************************************************************************/
+
+#[cfg(coex)]
+fn async_wakeup_request_end(event: i32) {
+    let request_lock: bool;
+
+    match event {
+        BTDM_ASYNC_WAKEUP_REQ_HCI => {
+            request_lock = true;
+        }
+        BTDM_ASYNC_WAKEUP_REQ_COEX => {
+            request_lock = false;
+        }
+        _ => {
+            return;
+        }
+    }
+
+    extern "C" {
+        // this isn't found anywhere ... not a ROM function
+        // not in any of the libs - but the code will never call this anyway
+
+        // fn btdm_wakeup_request_end();
+    }
+    if request_lock {
+        // unsafe { btdm_wakeup_request_end() };
+    }
+
+    return;
 }

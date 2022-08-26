@@ -9,6 +9,11 @@ pub struct Context {
 }
 
 const STACK_SIZE: usize = 8192 * 2; // TODO how much is enough? would be better to have this per task
+
+#[cfg(coex)]
+const MAX_TASK: usize = 4;
+
+#[cfg(not(coex))]
 const MAX_TASK: usize = 3;
 
 static mut TASK_STACK: [u8; STACK_SIZE * MAX_TASK] = [0u8; STACK_SIZE * MAX_TASK];

@@ -8,13 +8,18 @@ use crate::{
     memory_fence::memory_fence,
 };
 
+#[cfg(feature = "esp32")]
+use esp32_hal as hal;
+#[cfg(feature = "esp32c3")]
+use esp32c3_hal as hal;
+
+use hal::macros::ram;
+
 #[cfg_attr(feature = "esp32c3", path = "os_adapter_esp32c3.rs")]
 #[cfg_attr(feature = "esp32", path = "os_adapter_esp32.rs")]
 pub(crate) mod ble_os_adapter_chip_specific;
 
 pub mod controller;
-
-static mut BLE_INITIALIZED: bool = false;
 
 static mut BT_RECEIVE_QUEUE: Option<SimpleQueue<ReceivedPacket, 10>> = None;
 
@@ -326,11 +331,11 @@ static G_OSI_FUNCS: osi_funcs_s = osi_funcs_s {
     coex_bt_wakeup_request_end: Some(ble_os_adapter_chip_specific::coex_bt_wakeup_request_end),
     coex_bt_request: Some(ble_os_adapter_chip_specific::coex_bt_request),
     coex_bt_release: Some(ble_os_adapter_chip_specific::coex_bt_release),
-    coex_register_bt_cb: Some(ble_os_adapter_chip_specific::coex_register_bt_cb),
+    coex_register_bt_cb: Some(ble_os_adapter_chip_specific::coex_register_bt_cb_wrapper),
     coex_bb_reset_lock: Some(ble_os_adapter_chip_specific::coex_bb_reset_lock),
     coex_bb_reset_unlock: Some(ble_os_adapter_chip_specific::coex_bb_reset_unlock),
     coex_schm_register_btdm_callback: Some(
-        ble_os_adapter_chip_specific::coex_schm_register_btdm_callback,
+        ble_os_adapter_chip_specific::coex_schm_register_btdm_callback_wrapper,
     ),
     coex_schm_status_bit_clear: Some(coex_schm_status_bit_clear),
     coex_schm_status_bit_set: Some(coex_schm_status_bit_set),
@@ -344,14 +349,25 @@ static G_OSI_FUNCS: osi_funcs_s = osi_funcs_s {
     magic: 0xfadebead,
 };
 
+// #[cfg(target_arch = "riscv32")]
+// static mut G_INTER_FLAGS: u8 = 0;
+
+// #[cfg(target_arch = "xtensa")]
+// static mut G_INTER_FLAGS: u32 = 0;
+
+#[ram]
 unsafe extern "C" fn interrupt_enable() {
-    trace!("!!!! unimplemented interrupt_enable");
+    log::trace!("interrupt_enable");
+    //  critical_section::release(core::mem::transmute(G_INTER_FLAGS));
 }
 
+#[ram]
 unsafe extern "C" fn interrupt_disable() {
-    trace!("!!!! unimplemented interrupt_disable");
+    log::trace!("interrupt_disable");
+    //  G_INTER_FLAGS =  core::mem::transmute(critical_section::acquire());
 }
 
+#[ram]
 unsafe extern "C" fn task_yield() {
     todo!();
 }
@@ -361,29 +377,33 @@ unsafe extern "C" fn task_yield_from_isr() {
 }
 
 unsafe extern "C" fn semphr_create(max: u32, init: u32) -> *const () {
-    crate::wifi::semphr_create(max, init) as *const ()
+    crate::common_adapter::semphr_create(max, init) as *const ()
 }
 
 unsafe extern "C" fn semphr_delete(sem: *const ()) {
-    crate::wifi::semphr_delete(sem as *mut crate::binary::c_types::c_void);
+    crate::common_adapter::semphr_delete(sem as *mut crate::binary::c_types::c_void);
 }
 
-unsafe extern "C" fn semphr_take_from_isr(sem: *const (), _hptw: *const ()) -> i32 {
+#[ram]
+pub(crate) unsafe extern "C" fn semphr_take_from_isr(sem: *const (), hptw: *const ()) -> i32 {
     trace!("sem take from isr");
-    crate::wifi::semphr_take(sem as *mut crate::binary::c_types::c_void, 0)
+    (hptw as *mut u32).write_volatile(0);
+    crate::common_adapter::semphr_take(sem as *mut crate::binary::c_types::c_void, 0)
 }
 
-unsafe extern "C" fn semphr_give_from_isr(sem: *const (), _hptw: *const ()) -> i32 {
+#[ram]
+pub(crate) unsafe extern "C" fn semphr_give_from_isr(sem: *const (), hptw: *const ()) -> i32 {
     trace!("sem give from isr");
-    crate::wifi::semphr_give(sem as *mut crate::binary::c_types::c_void)
+    (hptw as *mut u32).write_volatile(0);
+    crate::common_adapter::semphr_give(sem as *mut crate::binary::c_types::c_void)
 }
 
 unsafe extern "C" fn semphr_take(sem: *const (), block_time_ms: u32) -> i32 {
-    crate::wifi::semphr_take(sem as *mut crate::binary::c_types::c_void, block_time_ms)
+    crate::common_adapter::semphr_take(sem as *mut crate::binary::c_types::c_void, block_time_ms)
 }
 
 unsafe extern "C" fn semphr_give(sem: *const ()) -> i32 {
-    crate::wifi::semphr_give(sem as *mut crate::binary::c_types::c_void)
+    crate::common_adapter::semphr_give(sem as *mut crate::binary::c_types::c_void)
 }
 
 unsafe extern "C" fn mutex_create() -> *const () {
@@ -413,6 +433,7 @@ unsafe extern "C" fn queue_delete(queue: *const ()) {
     trace!("Unimplemented queue_delete {:p}", queue);
 }
 
+#[ram]
 unsafe extern "C" fn queue_send(queue: *const (), item: *const (), _block_time_ms: u32) -> i32 {
     if queue == &BT_INTERNAL_QUEUE as *const _ as *const () {
         critical_section::with(|_| {
@@ -433,6 +454,7 @@ unsafe extern "C" fn queue_send(queue: *const (), item: *const (), _block_time_m
     1
 }
 
+#[ram]
 unsafe extern "C" fn queue_send_from_isr(
     _queue: *const (),
     _item: *const (),
@@ -490,6 +512,7 @@ unsafe extern "C" fn queue_recv(queue: *const (), item: *const (), block_time_ms
     }
 }
 
+#[ram]
 unsafe extern "C" fn queue_recv_from_isr(
     _queue: *const (),
     _item: *const (),
@@ -530,10 +553,12 @@ unsafe extern "C" fn task_delete(_task: *const ()) {
     todo!();
 }
 
+#[ram]
 unsafe extern "C" fn is_in_isr() -> i32 {
     0
 }
 
+#[ram]
 unsafe extern "C" fn cause_sw_intr_to_core(_core: i32, _intr_no: i32) -> i32 {
     #[cfg(feature = "esp32c3")]
     todo!("cause_sw_intr_to_core is not implemented for ESP32C3");
@@ -559,19 +584,23 @@ unsafe extern "C" fn free(ptr: *const ()) {
     crate::compat::malloc::free(ptr as *const u8);
 }
 
+#[ram]
 unsafe extern "C" fn srand(seed: u32) {
-    trace!("!!!! unimplemented srand {}", seed);
+    log::debug!("!!!! unimplemented srand {}", seed);
 }
 
+#[ram]
 unsafe extern "C" fn rand() -> i32 {
     trace!("rand");
-    crate::wifi::os_adapter::random() as i32
+    crate::common_adapter::random() as i32
 }
 
+#[ram]
 unsafe extern "C" fn btdm_lpcycles_2_hus(_cycles: u32, _error_corr: u32) -> u32 {
     todo!();
 }
 
+#[ram]
 unsafe extern "C" fn btdm_hus_2_lpcycles(us: u32) -> u32 {
     const RTC_CLK_CAL_FRACT: u32 = 19;
     let g_btdm_lpcycle_us_frac = RTC_CLK_CAL_FRACT;
@@ -579,7 +608,7 @@ unsafe extern "C" fn btdm_hus_2_lpcycles(us: u32) -> u32 {
 
     // Converts a duration in half us into a number of low power clock cycles.
     let cycles: u64 = (us as u64) << (g_btdm_lpcycle_us_frac as u64 / g_btdm_lpcycle_us as u64);
-    log::warn!("*** NOT implemented btdm_hus_2_lpcycles {} {}", us, cycles);
+    log::debug!("*** NOT implemented btdm_hus_2_lpcycles {} {}", us, cycles);
     // probably not right ... NX returns half of the values we calculate here
 
     cycles as u32
@@ -609,25 +638,29 @@ unsafe extern "C" fn btdm_sleep_exit_phase3() {
     todo!();
 }
 
-unsafe extern "C" fn coex_schm_status_bit_set(_typ: i32, _status: i32) {
-    trace!("!!! unimplemented coex_schm_status_bit_set");
+unsafe extern "C" fn coex_schm_status_bit_set(_typ: i32, status: i32) {
+    log::debug!("coex_schm_status_bit_set {} {}", _typ, status);
+    #[cfg(coex)]
+    crate::binary::include::coex_schm_status_bit_set(_typ as u32, status as u32);
 }
 
-unsafe extern "C" fn coex_schm_status_bit_clear(_typ: i32, _status: i32) {
-    trace!("!!! unimplemented coex_schm_status_bit_clear");
+unsafe extern "C" fn coex_schm_status_bit_clear(_typ: i32, status: i32) {
+    log::debug!("coex_schm_status_bit_clear {} {}", _typ, status);
+    #[cfg(coex)]
+    crate::binary::include::coex_schm_status_bit_clear(_typ as u32, status as u32);
 }
 
+#[ram]
 unsafe extern "C" fn read_efuse_mac(mac: *const ()) -> i32 {
-    crate::wifi::read_mac(mac as *mut _, 2)
+    crate::common_adapter::chip_specific::read_mac(mac as *mut _, 2)
 }
 
-pub fn ble_init() {
+pub(crate) fn ble_init() {
     unsafe {
         BT_INTERNAL_QUEUE = Some(SimpleQueue::new());
         BT_RECEIVE_QUEUE = Some(SimpleQueue::new());
 
         *(HCI_OUT_COLLECTOR.as_mut_ptr()) = HciOutCollector::new();
-
         // turn on logging
         #[cfg(feature = "wifi_logs")]
         {
@@ -640,6 +673,7 @@ pub fn ble_init() {
         }
 
         // esp32_bt_controller_init
+        ble_os_adapter_chip_specific::btdm_controller_mem_init();
 
         let mut cfg = ble_os_adapter_chip_specific::create_ble_config();
 
@@ -648,11 +682,17 @@ pub fn ble_init() {
             panic!("btdm_osi_funcs_register returned {}", res);
         }
 
+        #[cfg(coex)]
+        {
+            let res = crate::wifi::coex_init();
+            if res != 0 {
+                panic!("got error");
+            }
+        }
+
         let version = btdm_controller_get_compile_version();
         let version_str = StrBuf::from(version);
         log::debug!("BT controller compile version {}", version_str.as_str_ref());
-
-        ble_os_adapter_chip_specific::btdm_controller_mem_init();
 
         ble_os_adapter_chip_specific::bt_periph_module_enable();
 
@@ -673,6 +713,9 @@ pub fn ble_init() {
 
         log::debug!("The btdm_controller_init was initialized");
 
+        #[cfg(coex)]
+        crate::binary::include::coex_enable();
+
         #[cfg(feature = "esp32")]
         {
             extern "C" {
@@ -686,7 +729,7 @@ pub fn ble_init() {
 
         // modifyreg32(SYSTEM_WIFI_CLK_EN_REG, 0, UINT32_MAX);
         // bt_phy_enable();
-        crate::wifi::os_adapter::phy_enable();
+        crate::common_adapter::chip_specific::phy_enable();
 
         #[cfg(feature = "esp32")]
         {
@@ -698,13 +741,12 @@ pub fn ble_init() {
             coex_bt_high_prio();
         }
 
-        btdm_controller_enable(esp_bt_mode_t_ESP_BT_MODE_BLE); // fails with assertion
+        #[cfg(coex)]
+        coex_enable();
+
+        btdm_controller_enable(esp_bt_mode_t_ESP_BT_MODE_BLE);
 
         API_vhci_host_register_callback(&VHCI_HOST_CALLBACK);
-
-        critical_section::with(|_| {
-            BLE_INITIALIZED = true;
-        });
     }
 }
 

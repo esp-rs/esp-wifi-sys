@@ -1,28 +1,36 @@
 #![no_std]
 #![no_main]
-#![feature(asm_experimental_arch)]
+#![feature(c_variadic)]
+#![feature(const_mut_refs)]
+
+use ble_hci::{
+    ad_structure::{
+        create_advertising_data, AdStructure, BR_EDR_NOT_SUPPORTED, LE_GENERAL_DISCOVERABLE,
+    },
+    att::Uuid,
+    Ble, HciConnector,
+};
+use esp_wifi::ble::controller::BleConnector;
+
 use embedded_svc::wifi::{
-    ClientConfiguration, ClientConnectionStatus, ClientIpStatus, ClientStatus, Configuration,
-    Status, Wifi,
+    AccessPointInfo, ClientConfiguration, ClientConnectionStatus, ClientIpStatus, ClientStatus,
+    Configuration, Status, Wifi,
 };
-use esp32_hal::{
-    clock::{ClockControl, CpuClock},
-    pac::Peripherals,
-    prelude::*,
-    timer::TimerGroup,
-    Rtc,
-};
+use esp32c3_hal::clock::{ClockControl, CpuClock};
+use esp32c3_hal::system::SystemExt;
+use esp32c3_hal::systimer::SystemTimer;
+use esp32c3_hal::{pac::Peripherals, prelude::*, Rtc};
 use esp_backtrace as _;
 use esp_println::{print, println};
-use esp_wifi::{
-    create_network_stack_storage, initialize, network_stack_storage,
-    wifi::utils::create_network_interface, wifi_interface::timestamp,
-};
+use esp_wifi::initialize;
+use esp_wifi::wifi::utils::create_network_interface;
+use esp_wifi::wifi_interface::{timestamp, WifiError};
+use esp_wifi::{create_network_stack_storage, network_stack_storage};
+use riscv_rt::entry;
 use smoltcp::{
     iface::SocketHandle,
     socket::{Socket, TcpSocket},
 };
-use xtensa_lx_rt::entry;
 
 extern crate alloc;
 
@@ -35,25 +43,28 @@ fn main() -> ! {
     esp_wifi::init_heap();
 
     let peripherals = Peripherals::take().unwrap();
-    let system = peripherals.DPORT.split();
-    let clocks = ClockControl::configure(system.clock_control, CpuClock::Clock240MHz).freeze();
+    let system = peripherals.SYSTEM.split();
+    let clocks = ClockControl::configure(system.clock_control, CpuClock::Clock160MHz).freeze();
 
     let mut rtc = Rtc::new(peripherals.RTC_CNTL);
 
-    // Disable MWDT and RWDT (Watchdog) flash boot protection
+    // Disable watchdog timers
+    rtc.swd.disable();
     rtc.rwdt.disable();
 
     let mut storage = create_network_stack_storage!(3, 8, 1);
     let ethernet = create_network_interface(network_stack_storage!(storage));
     let mut wifi_interface = esp_wifi::wifi_interface::Wifi::new(ethernet);
 
-    let timg1 = TimerGroup::new(peripherals.TIMG1, &clocks);
-    initialize(timg1.timer0, peripherals.RNG, &clocks).unwrap();
+    let syst = SystemTimer::new(peripherals.SYSTIMER);
+
+    initialize(syst.alarm0, peripherals.RNG, &clocks).unwrap();
 
     println!("{:?}", wifi_interface.get_status());
 
     println!("Start Wifi Scan");
-    let res = wifi_interface.scan_n::<10>();
+    let res: Result<(heapless::Vec<AccessPointInfo, 10>, usize), WifiError> =
+        wifi_interface.scan_n();
     if let Ok((res, _count)) = res {
         for ap in res {
             println!("{:?}", ap);
@@ -80,7 +91,25 @@ fn main() -> ! {
     }
     println!("{:?}", wifi_interface.get_status());
 
-    println!("Start busy loop on main");
+    let connector = BleConnector {};
+    let hci = HciConnector::new(connector, esp_wifi::current_millis);
+    let mut ble = Ble::new(&hci);
+
+    println!("{:?}", ble.init());
+    println!("{:?}", ble.cmd_set_le_advertising_parameters());
+    println!(
+        "{:?}",
+        ble.cmd_set_le_advertising_data(create_advertising_data(&[
+            AdStructure::Flags(LE_GENERAL_DISCOVERABLE | BR_EDR_NOT_SUPPORTED),
+            AdStructure::ServiceUuids16(&[Uuid::Uuid16(0x1809)]),
+            AdStructure::CompleteLocalName("ESP32C3 BLE"),
+        ]))
+    );
+    println!("{:?}", ble.cmd_set_le_advertise_enable(true));
+
+    println!("started advertising");
+
+    println!("Start busy loop on main - you can also scan for the BLE device");
 
     let mut stage = 0;
     let mut idx = 0;

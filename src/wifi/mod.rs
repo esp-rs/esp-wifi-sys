@@ -1,32 +1,24 @@
 #[doc(hidden)]
 pub mod os_adapter;
-#[cfg(feature = "esp32")]
-use esp32_hal as hal;
-#[cfg(feature = "esp32")]
-use esp32_hal::Rng;
-#[cfg(feature = "esp32c3")]
-use esp32c3_hal as hal;
-#[cfg(feature = "esp32c3")]
-use esp32c3_hal::systimer::{Alarm, Target};
-#[cfg(feature = "esp32c3")]
-use esp32c3_hal::Rng;
 
-use fugit::MegahertzU32;
-use hal::clock::Clocks;
+use crate::common_adapter::*;
 
 #[doc(hidden)]
 pub use os_adapter::*;
 use smoltcp::phy::{Device, DeviceCapabilities, RxToken, TxToken};
-#[cfg(feature = "esp32")]
-mod phy_init_data_esp32;
-#[cfg(feature = "esp32c3")]
-mod phy_init_data_esp32c3;
 
 #[cfg(feature = "esp32")]
-mod additional_esp32;
+use esp32_hal as hal;
+#[cfg(feature = "esp32c3")]
+use esp32c3_hal as hal;
+
+use hal::macros::ram;
 
 #[cfg(feature = "utils")]
 pub mod utils;
+
+#[cfg(coex)]
+use crate::binary::include::{coex_adapter_funcs_t, coex_pre_init, esp_coex_adapter_register};
 
 use crate::{
     binary::include::{
@@ -38,15 +30,13 @@ use crate::{
         wifi_auth_mode_t_WIFI_AUTH_OPEN, wifi_config_t,
         wifi_country_policy_t_WIFI_COUNTRY_POLICY_MANUAL, wifi_country_t, wifi_init_config_t,
         wifi_interface_t_WIFI_IF_STA, wifi_mode_t_WIFI_MODE_STA, wifi_osi_funcs_t,
-        wifi_pmf_config_t, wifi_ps_type_t_WIFI_PS_NONE, wifi_scan_config_t,
-        wifi_scan_method_t_WIFI_FAST_SCAN, wifi_scan_threshold_t, wifi_scan_time_t,
-        wifi_scan_type_t_WIFI_SCAN_TYPE_ACTIVE, wifi_sort_method_t_WIFI_CONNECT_AP_BY_SIGNAL,
-        wifi_sta_config_t, wpa_crypto_funcs_t, ESP_WIFI_OS_ADAPTER_MAGIC,
-        ESP_WIFI_OS_ADAPTER_VERSION, WIFI_INIT_CONFIG_MAGIC,
+        wifi_pmf_config_t, wifi_scan_config_t, wifi_scan_method_t_WIFI_FAST_SCAN,
+        wifi_scan_threshold_t, wifi_scan_time_t, wifi_scan_type_t_WIFI_SCAN_TYPE_ACTIVE,
+        wifi_sort_method_t_WIFI_CONNECT_AP_BY_SIGNAL, wifi_sta_config_t, wpa_crypto_funcs_t,
+        ESP_WIFI_OS_ADAPTER_MAGIC, ESP_WIFI_OS_ADAPTER_VERSION, WIFI_INIT_CONFIG_MAGIC,
     },
     compat::queue::SimpleQueue,
 };
-use crate::{tasks::init_tasks, timer::setup_timer_isr};
 use log::{debug, info};
 
 #[cfg(feature = "dump_packets")]
@@ -54,18 +44,16 @@ static DUMP_PACKETS: bool = true;
 #[cfg(not(feature = "dump_packets"))]
 static DUMP_PACKETS: bool = false;
 
-struct DataFrame {
+pub(crate) struct DataFrame {
     len: usize,
     data: [u8; 2500],
 }
 
-static mut DATA_QUEUE_RX: Option<SimpleQueue<DataFrame, 3>> = None;
+pub(crate) static mut DATA_QUEUE_RX: Option<SimpleQueue<DataFrame, 3>> = None;
 
-pub static mut TX_BUFFER: [u8; 2500] = [0u8; 2500]; // should be a queue
-pub static mut TX_QUEUED: bool = false;
-pub static mut TX_QUEUED_DATA_LEN: u16 = 0;
-
-static mut RANDOM_GENERATOR: Option<Rng> = None;
+pub(crate) static mut TX_BUFFER: [u8; 2500] = [0u8; 2500]; // should be a queue
+pub(crate) static mut TX_QUEUED: bool = false;
+pub(crate) static mut TX_QUEUED_DATA_LEN: u16 = 0;
 
 #[derive(Debug, Clone, Copy)]
 pub enum WifiError {
@@ -73,145 +61,97 @@ pub enum WifiError {
     WrongClockConfig,
 }
 
-#[allow(unused)]
-static mut BLE_ENABLED: bool = false;
+#[cfg(all(feature = "esp32c3", coex))]
+static mut G_COEX_ADAPTER_FUNCS: coex_adapter_funcs_t = coex_adapter_funcs_t {
+    _version: crate::binary::include::COEX_ADAPTER_VERSION as i32,
+    _task_yield_from_isr: Some(task_yield_from_isr),
+    _semphr_create: Some(semphr_create),
+    _semphr_delete: Some(semphr_delete),
+    _semphr_take_from_isr: Some(semphr_take_from_isr_wrapper),
+    _semphr_give_from_isr: Some(semphr_give_from_isr_wrapper),
+    _semphr_take: Some(semphr_take),
+    _semphr_give: Some(semphr_give),
+    _is_in_isr: Some(is_in_isr_wrapper),
+    _malloc_internal: Some(malloc),
+    _free: Some(free),
+    _esp_timer_get_time: Some(esp_timer_get_time),
+    _magic: crate::binary::include::COEX_ADAPTER_MAGIC as i32,
+};
 
-#[cfg(feature = "esp32c3")]
-/// Initialize for using WiFi
-/// This will initialize internals and also initialize WiFi
-pub fn initialize(
-    systimer: Alarm<Target, 0>,
-    rng: hal::pac::RNG,
-    clocks: &Clocks,
-) -> Result<(), WifiError> {
-    if clocks.cpu_clock != MegahertzU32::MHz(160) {
-        return Err(WifiError::WrongClockConfig);
-    }
+#[cfg(all(feature = "esp32", coex))]
+static mut G_COEX_ADAPTER_FUNCS: coex_adapter_funcs_t = coex_adapter_funcs_t {
+    _version: crate::binary::include::COEX_ADAPTER_VERSION as i32,
+    _task_yield_from_isr: Some(task_yield_from_isr),
+    _semphr_create: Some(semphr_create),
+    _semphr_delete: Some(semphr_delete),
+    _semphr_take_from_isr: Some(semphr_take_from_isr_wrapper),
+    _semphr_give_from_isr: Some(semphr_give_from_isr_wrapper),
+    _semphr_take: Some(semphr_take),
+    _semphr_give: Some(semphr_give),
+    _is_in_isr: Some(is_in_isr_wrapper),
+    _malloc_internal: Some(malloc),
+    _free: Some(free),
+    _esp_timer_get_time: Some(esp_timer_get_time),
+    _spin_lock_create: Some(spin_lock_create),
+    _spin_lock_delete: Some(spin_lock_delete),
+    _int_disable: Some(wifi_int_disable),
+    _int_enable: Some(wifi_int_restore),
+    _timer_disarm: Some(timer_disarm),
+    _timer_done: Some(timer_done),
+    _timer_setfn: Some(timer_setfn),
+    _timer_arm_us: Some(timer_arm_us),
+    _magic: crate::binary::include::COEX_ADAPTER_MAGIC as i32,
+};
 
-    init_rng(rng);
-    init_tasks();
-    setup_timer_isr(systimer);
-    wifi_set_log_verbose();
-    init_clocks();
-    init_buffer();
-    let res = wifi_init();
-    if res != 0 {
-        return Err(WifiError::General(res));
-    }
-    let res = wifi_start();
-    if res != 0 {
-        return Err(WifiError::General(res));
-    }
-
-    Ok(())
+#[cfg(coex)]
+unsafe extern "C" fn semphr_take_from_isr_wrapper(
+    semphr: *mut crate::binary::c_types::c_void,
+    hptw: *mut crate::binary::c_types::c_void,
+) -> i32 {
+    crate::ble::semphr_take_from_isr(semphr as *const (), hptw as *const ())
 }
 
-#[cfg(feature = "esp32c3")]
-/// Initialize for using Bluetooth LE
-/// This will just initialize internals.
-pub fn initialize_ble(
-    systimer: Alarm<Target, 0>,
-    rng: hal::pac::RNG,
-    clocks: &Clocks,
-) -> Result<(), WifiError> {
-    if clocks.cpu_clock != MegahertzU32::MHz(160) {
-        return Err(WifiError::WrongClockConfig);
-    }
+#[cfg(coex)]
+unsafe extern "C" fn semphr_give_from_isr_wrapper(
+    semphr: *mut crate::binary::c_types::c_void,
+    hptw: *mut crate::binary::c_types::c_void,
+) -> i32 {
+    crate::ble::semphr_give_from_isr(semphr as *const (), hptw as *const ())
+}
 
-    init_rng(rng);
-    init_tasks();
-    setup_timer_isr(systimer);
-    wifi_set_log_verbose();
-    init_clocks();
-    init_buffer();
+#[cfg(coex)]
+unsafe extern "C" fn is_in_isr_wrapper() -> i32 {
+    // like original implementation
+    0
+}
 
+#[cfg(coex)]
+pub(crate) fn coex_initialize() -> i32 {
+    log::info!("call coex-initialize");
     unsafe {
-        BLE_ENABLED = true;
-    }
-
-    Ok(())
-}
-
-#[cfg(feature = "esp32")]
-/// Initialize for using WiFi
-/// This will initialize internals and also initialize WiFi
-pub fn initialize(
-    timg1_timer0: hal::timer::Timer<hal::timer::Timer0<hal::pac::TIMG1>>,
-    rng: hal::pac::RNG,
-    clocks: &Clocks,
-) -> Result<(), WifiError> {
-    if clocks.cpu_clock != MegahertzU32::MHz(240) {
-        return Err(WifiError::WrongClockConfig);
-    }
-
-    init_rng(rng);
-    init_tasks();
-    setup_timer_isr(timg1_timer0);
-    wifi_set_log_verbose();
-    init_clocks();
-    init_buffer();
-    let res = wifi_init();
-    if res != 0 {
-        return Err(WifiError::General(res));
-    }
-    let res = wifi_start();
-    if res != 0 {
-        return Err(WifiError::General(res));
-    }
-
-    Ok(())
-}
-
-#[cfg(feature = "esp32")]
-/// Initialize for using Bluetooth LE
-/// This will just initialize internals.
-pub fn initialize_ble(
-    timg1_timer0: hal::timer::Timer<hal::timer::Timer0<hal::pac::TIMG1>>,
-    rng: hal::pac::RNG,
-    clocks: &Clocks,
-) -> Result<(), WifiError> {
-    if clocks.cpu_clock != MegahertzU32::MHz(240) {
-        return Err(WifiError::WrongClockConfig);
-    }
-
-    init_rng(rng);
-    init_tasks();
-    setup_timer_isr(timg1_timer0);
-    wifi_set_log_verbose();
-    init_clocks();
-    init_buffer();
-
-    unsafe {
-        BLE_ENABLED = true;
-    }
-
-    Ok(())
-}
-
-pub fn init_buffer() {
-    unsafe {
-        DATA_QUEUE_RX = Some(SimpleQueue::new());
+        let res = esp_coex_adapter_register(
+            &mut G_COEX_ADAPTER_FUNCS as *mut _ as *mut coex_adapter_funcs_t,
+        );
+        if res != 0 {
+            log::error!("Error: esp_coex_adapter_register {}", res);
+            return res;
+        }
+        let res = coex_pre_init();
+        if res != 0 {
+            log::error!("Error: coex_pre_init {}", res);
+            return res;
+        }
+        0
     }
 }
 
-pub fn init_rng(rng: hal::pac::RNG) {
-    unsafe {
-        RANDOM_GENERATOR = Some(Rng::new(rng));
-    }
-}
+pub unsafe extern "C" fn coex_init() -> i32 {
+    log::info!("coex-init");
+    #[cfg(coex)]
+    return crate::binary::include::coex_init();
 
-pub fn init_clocks() {
-    crate::wifi::os_adapter::os_adapter_chip_specific::init_clocks();
-}
-
-pub fn wifi_set_log_verbose() {
-    #[cfg(feature = "wifi_logs")]
-    unsafe {
-        use crate::binary::include::{esp_wifi_internal_set_log_level, wifi_log_level_t};
-
-        let level: wifi_log_level_t = crate::binary::include::wifi_log_level_t_WIFI_LOG_VERBOSE;
-        esp_wifi_internal_set_log_level(level);
-    }
+    #[cfg(not(coex))]
+    0
 }
 
 #[no_mangle]
@@ -425,14 +365,23 @@ pub fn wifi_init() -> i32 {
             policy: wifi_country_policy_t_WIFI_COUNTRY_POLICY_MANUAL,
         };
 
-        wifi_set_log_verbose();
+        crate::wifi_set_log_verbose();
+
+        #[cfg(coex)]
+        {
+            let res = coex_init();
+            if res != 0 {
+                log::error!("coex_init failed");
+                return res;
+            }
+        }
 
         let res = esp_wifi_init_internal(&G_CONFIG);
         if res != 0 {
             return res;
         }
 
-        wifi_set_log_verbose();
+        crate::wifi_set_log_verbose();
         let res = esp_supplicant_init();
         if res != 0 {
             return res;
@@ -488,7 +437,8 @@ pub fn wifi_init() -> i32 {
         #[cfg(feature = "esp32")]
         {
             static mut NVS_STRUCT: [u32; 12] = [0; 12];
-            additional_esp32::g_misc_nvs = &NVS_STRUCT as *const _ as *const u32 as u32;
+            crate::common_adapter::chip_specific::g_misc_nvs =
+                &NVS_STRUCT as *const _ as *const u32 as u32;
         }
 
         0
@@ -520,6 +470,7 @@ unsafe extern "C" fn recv_cb(
     0
 }
 
+#[ram]
 unsafe extern "C" fn esp_wifi_tx_done_cb(
     _ifidx: u8,
     _data: *mut u8,
@@ -536,7 +487,7 @@ pub fn wifi_start() -> i32 {
             return res;
         }
 
-        let res = esp_wifi_set_ps(wifi_ps_type_t_WIFI_PS_NONE);
+        let res = esp_wifi_set_ps(crate::binary::include::wifi_ps_type_t_WIFI_PS_MIN_MODEM);
         if res != 0 {
             return res;
         }

@@ -3,8 +3,24 @@ use std::fs::File;
 use std::io::Write;
 use std::path::PathBuf;
 
+fn main() -> Result<(), String> {
+    let features: u8 = cfg!(feature = "wifi") as u8 + cfg!(feature = "ble") as u8;
+
+    if features == 0 {
+        return Err("You need to use feature `wifi` and/or `ble`".to_string());
+    }
+
+    if features >= 2 {
+        println!("cargo:rustc-cfg=coex");
+    }
+
+    handle_chip();
+
+    Ok(())
+}
+
 #[cfg(feature = "esp32c3")]
-fn main() {
+fn handle_chip() {
     // Put the linker script somewhere the linker can find it
     let out = &PathBuf::from(env::var_os("OUT_DIR").unwrap());
 
@@ -72,7 +88,7 @@ fn main() {
 }
 
 #[cfg(feature = "esp32")]
-fn main() {
+fn handle_chip() {
     // Put the linker script somewhere the linker can find it
     let out = &PathBuf::from(env::var_os("OUT_DIR").unwrap());
 

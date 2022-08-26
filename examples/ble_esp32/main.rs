@@ -20,10 +20,7 @@ use esp32_hal::{
 };
 use esp_backtrace as _;
 use esp_println::println;
-use esp_wifi::{
-    ble::{ble_init, controller::BleConnector},
-    wifi::initialize_ble,
-};
+use esp_wifi::{ble::controller::BleConnector, initialize};
 use xtensa_lx_rt::entry;
 
 extern crate alloc;
@@ -44,11 +41,7 @@ fn main() -> ! {
     rtc.rwdt.disable();
 
     let timg1 = TimerGroup::new(peripherals.TIMG1, &clocks);
-    initialize_ble(timg1.timer0, peripherals.RNG, &clocks).unwrap();
-
-    println!("before ble init");
-    ble_init();
-    println!("after ble init");
+    initialize(timg1.timer0, peripherals.RNG, &clocks).unwrap();
 
     loop {
         let connector = BleConnector {};

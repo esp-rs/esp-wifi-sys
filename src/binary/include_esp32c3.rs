@@ -1022,6 +1022,9 @@ pub const AGC_RECORRECT_EN: u32 = 0;
 pub const CFG_MASK_BIT_SCAN_DUPLICATE_OPTION: u32 = 1;
 pub const CFG_NASK: u32 = 1;
 pub const BLE_HW_TARGET_CODE_ESP32C3_CHIP_ECO0: u32 = 16842752;
+pub const COEX_ADAPTER_VERSION: u32 = 2;
+pub const COEX_ADAPTER_MAGIC: u32 = 3735928495;
+pub const COEX_ADAPTER_FUNCS_TIME_BLOCKING: u32 = 4294967295;
 pub type __int8_t = crate::binary::c_types::c_schar;
 pub type __uint8_t = crate::binary::c_types::c_uchar;
 pub type __int16_t = crate::binary::c_types::c_short;
@@ -8345,6 +8348,229 @@ extern "C" {
     #[doc = " @brief  Get BT MAC address."]
     #[doc = " @return Array pointer of length 6 storing MAC address value."]
     pub fn esp_bt_get_mac() -> *mut u8;
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct coex_adapter_funcs_t {
+    pub _version: i32,
+    pub _task_yield_from_isr: ::core::option::Option<unsafe extern "C" fn()>,
+    pub _semphr_create: ::core::option::Option<
+        unsafe extern "C" fn(max: u32, init: u32) -> *mut crate::binary::c_types::c_void,
+    >,
+    pub _semphr_delete:
+        ::core::option::Option<unsafe extern "C" fn(semphr: *mut crate::binary::c_types::c_void)>,
+    pub _semphr_take_from_isr: ::core::option::Option<
+        unsafe extern "C" fn(
+            semphr: *mut crate::binary::c_types::c_void,
+            hptw: *mut crate::binary::c_types::c_void,
+        ) -> i32,
+    >,
+    pub _semphr_give_from_isr: ::core::option::Option<
+        unsafe extern "C" fn(
+            semphr: *mut crate::binary::c_types::c_void,
+            hptw: *mut crate::binary::c_types::c_void,
+        ) -> i32,
+    >,
+    pub _semphr_take: ::core::option::Option<
+        unsafe extern "C" fn(
+            semphr: *mut crate::binary::c_types::c_void,
+            block_time_tick: u32,
+        ) -> i32,
+    >,
+    pub _semphr_give: ::core::option::Option<
+        unsafe extern "C" fn(semphr: *mut crate::binary::c_types::c_void) -> i32,
+    >,
+    pub _is_in_isr: ::core::option::Option<unsafe extern "C" fn() -> crate::binary::c_types::c_int>,
+    pub _malloc_internal: ::core::option::Option<
+        unsafe extern "C" fn(size: size_t) -> *mut crate::binary::c_types::c_void,
+    >,
+    pub _free: ::core::option::Option<unsafe extern "C" fn(p: *mut crate::binary::c_types::c_void)>,
+    pub _esp_timer_get_time: ::core::option::Option<unsafe extern "C" fn() -> i64>,
+    pub _magic: i32,
+}
+extern "C" {
+    pub static mut g_coex_adapter_funcs: coex_adapter_funcs_t;
+}
+pub const coex_prefer_t_COEX_PREFER_WIFI: coex_prefer_t = 0;
+pub const coex_prefer_t_COEX_PREFER_BT: coex_prefer_t = 1;
+pub const coex_prefer_t_COEX_PREFER_BALANCE: coex_prefer_t = 2;
+pub const coex_prefer_t_COEX_PREFER_NUM: coex_prefer_t = 3;
+pub type coex_prefer_t = crate::binary::c_types::c_uint;
+pub type coex_func_cb_t = ::core::option::Option<
+    unsafe extern "C" fn(event: u32, sched_cnt: crate::binary::c_types::c_int),
+>;
+extern "C" {
+    #[doc = " @brief Pre-Init software coexist"]
+    #[doc = "        extern function for internal use."]
+    #[doc = ""]
+    #[doc = " @return Init ok or failed."]
+    pub fn coex_pre_init() -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Init software coexist"]
+    #[doc = "        extern function for internal use."]
+    #[doc = ""]
+    #[doc = " @return Init ok or failed."]
+    pub fn coex_init() -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief De-init software coexist"]
+    #[doc = "        extern function for internal use."]
+    pub fn coex_deinit();
+}
+extern "C" {
+    #[doc = " @brief Enable software coexist"]
+    #[doc = "        extern function for internal use."]
+    #[doc = ""]
+    #[doc = " @return Enable ok or failed."]
+    pub fn coex_enable() -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Disable software coexist"]
+    #[doc = "        extern function for internal use."]
+    pub fn coex_disable();
+}
+extern "C" {
+    #[doc = " @brief Get software coexist version string"]
+    #[doc = "        extern function for internal use."]
+    #[doc = " @return : version string"]
+    pub fn coex_version_get() -> *const crate::binary::c_types::c_char;
+}
+extern "C" {
+    #[doc = " @brief Coexist performance preference set from libbt.a"]
+    #[doc = "        extern function for internal use."]
+    #[doc = ""]
+    #[doc = "  @param prefer : the prefer enumeration value"]
+    #[doc = "  @return : ESP_OK - success, other - failed"]
+    pub fn coex_preference_set(prefer: coex_prefer_t) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Get software coexist status."]
+    #[doc = " @return : software coexist status"]
+    pub fn coex_status_get() -> u32;
+}
+extern "C" {
+    #[doc = " @brief Set software coexist condition."]
+    #[doc = " @return : software coexist condition"]
+    pub fn coex_condition_set(type_: u32, dissatisfy: bool);
+}
+extern "C" {
+    #[doc = " @brief WiFi requests coexistence."]
+    #[doc = ""]
+    #[doc = "  @param event : WiFi event"]
+    #[doc = "  @param latency : WiFi will request coexistence after latency"]
+    #[doc = "  @param duration : duration for WiFi to request coexistence"]
+    #[doc = "  @return : 0 - success, other - failed"]
+    pub fn coex_wifi_request(
+        event: u32,
+        latency: u32,
+        duration: u32,
+    ) -> crate::binary::c_types::c_int;
+}
+extern "C" {
+    #[doc = " @brief WiFi release coexistence."]
+    #[doc = ""]
+    #[doc = "  @param event : WiFi event"]
+    #[doc = "  @return : 0 - success, other - failed"]
+    pub fn coex_wifi_release(event: u32) -> crate::binary::c_types::c_int;
+}
+extern "C" {
+    #[doc = " @brief Set WiFi channel to coexistence module."]
+    #[doc = ""]
+    #[doc = "  @param primary : WiFi primary channel"]
+    #[doc = "  @param secondary : WiFi secondary channel"]
+    #[doc = "  @return : 0 - success, other - failed"]
+    pub fn coex_wifi_channel_set(primary: u8, secondary: u8) -> crate::binary::c_types::c_int;
+}
+extern "C" {
+    #[doc = " @brief Get coexistence event duration."]
+    #[doc = ""]
+    #[doc = "  @param event : Coexistence event"]
+    #[doc = "  @param duration: Coexistence event duration"]
+    #[doc = "  @return : 0 - success, other - failed"]
+    pub fn coex_event_duration_get(event: u32, duration: *mut u32)
+        -> crate::binary::c_types::c_int;
+}
+extern "C" {
+    #[doc = " @brief Get coexistence event priority."]
+    #[doc = ""]
+    #[doc = "  @param event : Coexistence event"]
+    #[doc = "  @param pti: Coexistence event priority"]
+    #[doc = "  @return : 0 - success, other - failed"]
+    pub fn coex_pti_get(event: u32, pti: *mut u8) -> crate::binary::c_types::c_int;
+}
+extern "C" {
+    #[doc = " @brief Clear coexistence status."]
+    #[doc = ""]
+    #[doc = "  @param type : Coexistence status type"]
+    #[doc = "  @param status: Coexistence status"]
+    pub fn coex_schm_status_bit_clear(type_: u32, status: u32);
+}
+extern "C" {
+    #[doc = " @brief Set coexistence status."]
+    #[doc = ""]
+    #[doc = "  @param type : Coexistence status type"]
+    #[doc = "  @param status: Coexistence status"]
+    pub fn coex_schm_status_bit_set(type_: u32, status: u32);
+}
+extern "C" {
+    #[doc = " @brief Set coexistence scheme interval."]
+    #[doc = ""]
+    #[doc = "  @param interval : Coexistence scheme interval"]
+    #[doc = "  @return : 0 - success, other - failed"]
+    pub fn coex_schm_interval_set(interval: u32) -> crate::binary::c_types::c_int;
+}
+extern "C" {
+    #[doc = " @brief Get coexistence scheme interval."]
+    #[doc = ""]
+    #[doc = "  @return : Coexistence scheme interval"]
+    pub fn coex_schm_interval_get() -> u32;
+}
+extern "C" {
+    #[doc = " @brief Get current coexistence scheme period."]
+    #[doc = ""]
+    #[doc = "  @return : Coexistence scheme period"]
+    pub fn coex_schm_curr_period_get() -> u8;
+}
+extern "C" {
+    #[doc = " @brief Get current coexistence scheme phase."]
+    #[doc = ""]
+    #[doc = "  @return : Coexistence scheme phase"]
+    pub fn coex_schm_curr_phase_get() -> *mut crate::binary::c_types::c_void;
+}
+extern "C" {
+    #[doc = " @brief Set current coexistence scheme phase index."]
+    #[doc = ""]
+    #[doc = "  @param interval : Coexistence scheme phase index"]
+    #[doc = "  @return : 0 - success, other - failed"]
+    pub fn coex_schm_curr_phase_idx_set(
+        idx: crate::binary::c_types::c_int,
+    ) -> crate::binary::c_types::c_int;
+}
+extern "C" {
+    #[doc = " @brief Get current coexistence scheme phase index."]
+    #[doc = ""]
+    #[doc = "  @return : Coexistence scheme phase index"]
+    pub fn coex_schm_curr_phase_idx_get() -> crate::binary::c_types::c_int;
+}
+extern "C" {
+    #[doc = " @brief Register coexistence adapter functions."]
+    #[doc = ""]
+    #[doc = "  @param funcs : coexistence adapter functions"]
+    #[doc = "  @return : ESP_OK - success, other - failed"]
+    pub fn esp_coex_adapter_register(funcs: *mut coex_adapter_funcs_t) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief     Check the MD5 values of the coexistence adapter header files in IDF and WiFi library"]
+    #[doc = ""]
+    #[doc = " @attention 1. It is used for internal CI version check"]
+    #[doc = ""]
+    #[doc = " @return"]
+    #[doc = "     - ESP_OK : succeed"]
+    #[doc = "     - ESP_WIFI_INVALID_ARG : MD5 check fail"]
+    pub fn esp_coex_adapter_funcs_md5_check(
+        md5: *const crate::binary::c_types::c_char,
+    ) -> esp_err_t;
 }
 #[repr(C)]
 #[derive(Copy, Clone)]

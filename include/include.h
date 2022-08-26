@@ -5,3 +5,5 @@
 #include "phy.h"
 #include "esp_timer.h"
 #include "esp_bt.h"
+#include "esp_coexist_internal.h"
+#include "esp_coexist_adapter.h"
