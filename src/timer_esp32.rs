@@ -1,4 +1,4 @@
-use core::{borrow::BorrowMut, cell::RefCell};
+use core::cell::RefCell;
 
 use atomic_polyfill::{AtomicU64, Ordering};
 use critical_section::Mutex;
@@ -21,12 +21,12 @@ const TIMER_DELAY: fugit::MicrosDurationU64 = fugit::MicrosDurationU64::millis(1
 #[cfg(not(debug_assertions))]
 const TIMER_DELAY: fugit::MicrosDurationU64 = fugit::MicrosDurationU64::millis(3);
 
-static mut TIMER1: Mutex<RefCell<Option<Timer<Timer0<TIMG1>>>>> = Mutex::new(RefCell::new(None));
+static TIMER1: Mutex<RefCell<Option<Timer<Timer0<TIMG1>>>>> = Mutex::new(RefCell::new(None));
 
-static mut TIME: AtomicU64 = AtomicU64::new(0);
+static TIME: AtomicU64 = AtomicU64::new(0);
 
 pub fn get_systimer_count() -> u64 {
-    unsafe { TIME.load(Ordering::Relaxed) + read_timer_value() }
+    TIME.load(Ordering::Relaxed) + read_timer_value()
 }
 
 #[inline(always)]
@@ -46,7 +46,7 @@ pub fn setup_timer_isr(timg1_timer0: Timer<Timer0<TIMG1>>) {
     timer1.listen();
     timer1.start(TIMER_DELAY.convert());
     critical_section::with(|cs| {
-        unsafe { TIMER1.borrow_mut() }.replace(cs, Some(timer1));
+        TIMER1.borrow_ref_mut(cs).replace(timer1);
     });
 
     xtensa_lx::timer::set_ccompare0(0xffffffff);
@@ -82,9 +82,7 @@ fn Software0(_level: u32) {
 #[allow(non_snake_case)]
 #[no_mangle]
 fn Timer0(_level: u32) {
-    unsafe {
-        TIME.fetch_add(0x1_0000_0000 * 40_000_000 / 240_000_000, Ordering::Relaxed);
-    }
+    TIME.fetch_add(0x1_0000_0000 * 40_000_000 / 240_000_000, Ordering::Relaxed);
 
     xtensa_lx::timer::set_ccompare0(0xffffffff);
 }
@@ -148,7 +146,7 @@ fn TG1_T0_LEVEL(context: &mut Context) {
     critical_section::with(|cs| {
         crate::memory_fence::memory_fence();
 
-        let mut timer = unsafe { TIMER1.borrow_mut() }.borrow_ref_mut(cs);
+        let mut timer = TIMER1.borrow_ref_mut(cs);
         let timer = timer.as_mut().unwrap();
         timer.clear_interrupt();
         timer.start(TIMER_DELAY.convert());
