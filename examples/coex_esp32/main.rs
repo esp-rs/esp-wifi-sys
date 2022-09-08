@@ -1,23 +1,34 @@
+// THIS CURRENTLY DOESN'T WORK ON ESP32
+
 #![no_std]
 #![no_main]
-#![feature(asm_experimental_arch)]
+#![feature(c_variadic)]
+#![feature(const_mut_refs)]
+
+use ble_hci::{
+    ad_structure::{
+        create_advertising_data, AdStructure, BR_EDR_NOT_SUPPORTED, LE_GENERAL_DISCOVERABLE,
+    },
+    att::Uuid,
+    Ble, HciConnector,
+};
+use esp_wifi::ble::controller::BleConnector;
+
 use embedded_svc::wifi::{
-    ClientConfiguration, ClientConnectionStatus, ClientIpStatus, ClientStatus, Configuration,
-    Status, Wifi,
+    AccessPointInfo, ClientConfiguration, ClientConnectionStatus, ClientIpStatus, ClientStatus,
+    Configuration, Status, Wifi,
 };
 use esp32_hal::{
     clock::{ClockControl, CpuClock},
-    pac::Peripherals,
-    prelude::*,
     timer::TimerGroup,
-    Rtc,
 };
+use esp32_hal::{pac::Peripherals, prelude::*, Rtc};
 use esp_backtrace as _;
 use esp_println::{print, println};
-use esp_wifi::{
-    create_network_stack_storage, initialize, network_stack_storage,
-    wifi::utils::create_network_interface, wifi_interface::timestamp,
-};
+use esp_wifi::initialize;
+use esp_wifi::wifi::utils::create_network_interface;
+use esp_wifi::wifi_interface::{timestamp, WifiError};
+use esp_wifi::{create_network_stack_storage, network_stack_storage};
 use smoltcp::{
     iface::SocketHandle,
     socket::{Socket, TcpSocket},
@@ -53,7 +64,8 @@ fn main() -> ! {
     println!("{:?}", wifi_interface.get_status());
 
     println!("Start Wifi Scan");
-    let res = wifi_interface.scan_n::<10>();
+    let res: Result<(heapless::Vec<AccessPointInfo, 10>, usize), WifiError> =
+        wifi_interface.scan_n();
     if let Ok((res, _count)) = res {
         for ap in res {
             println!("{:?}", ap);
@@ -80,7 +92,25 @@ fn main() -> ! {
     }
     println!("{:?}", wifi_interface.get_status());
 
-    println!("Start busy loop on main");
+    let connector = BleConnector {};
+    let hci = HciConnector::new(connector, esp_wifi::current_millis);
+    let mut ble = Ble::new(&hci);
+
+    println!("{:?}", ble.init());
+    println!("{:?}", ble.cmd_set_le_advertising_parameters());
+    println!(
+        "{:?}",
+        ble.cmd_set_le_advertising_data(create_advertising_data(&[
+            AdStructure::Flags(LE_GENERAL_DISCOVERABLE | BR_EDR_NOT_SUPPORTED),
+            AdStructure::ServiceUuids16(&[Uuid::Uuid16(0x1809)]),
+            AdStructure::CompleteLocalName("ESP32 BLE"),
+        ]))
+    );
+    println!("{:?}", ble.cmd_set_le_advertise_enable(true));
+
+    println!("started advertising");
+
+    println!("Start busy loop on main - you can also scan for the BLE device");
 
     let mut stage = 0;
     let mut idx = 0;

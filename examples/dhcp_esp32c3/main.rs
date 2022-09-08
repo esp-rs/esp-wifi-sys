@@ -13,7 +13,7 @@ use esp32c3_hal::systimer::SystemTimer;
 use esp32c3_hal::{pac::Peripherals, prelude::*, Rtc};
 use esp_backtrace as _;
 use esp_println::{print, println};
-use esp_wifi::wifi::initialize;
+use esp_wifi::initialize;
 use esp_wifi::wifi::utils::create_network_interface;
 use esp_wifi::wifi_interface::{timestamp, WifiError};
 use esp_wifi::{create_network_stack_storage, network_stack_storage};

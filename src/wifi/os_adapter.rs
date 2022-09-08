@@ -1,4 +1,3 @@
-use embedded_hal::prelude::_embedded_hal_blocking_rng_Read;
 #[cfg_attr(feature = "esp32c3", path = "os_adapter_esp32c3.rs")]
 #[cfg_attr(feature = "esp32", path = "os_adapter_esp32.rs")]
 pub(crate) mod os_adapter_chip_specific;
@@ -9,20 +8,17 @@ use crate::{
     binary::include::*,
     compat::{
         common::{
-            create_recursive_mutex, create_wifi_queue, lock_mutex, receive_queued, sem_create,
-            sem_delete, sem_give, sem_take, send_queued, syslog, thread_sem_get, unlock_mutex,
-            StrBuf,
+            create_recursive_mutex, create_wifi_queue, lock_mutex, receive_queued, send_queued,
+            thread_sem_get, unlock_mutex, StrBuf,
         },
         malloc::calloc,
-        timer_compat::{
-            compat_esp_timer_create, compat_timer_arm, compat_timer_arm_us, compat_timer_disarm,
-            compat_timer_done, compat_timer_setfn,
-        },
         work_queue::queue_work,
     },
     memory_fence::memory_fence,
-    wifi::RANDOM_GENERATOR,
 };
+
+#[cfg(feature = "esp32c3")]
+use crate::compat::common::syslog;
 
 pub static mut WIFI_STATE: i32 = -1;
 
@@ -352,81 +348,6 @@ pub unsafe extern "C" fn wifi_int_restore(
 pub unsafe extern "C" fn task_yield_from_isr() {
     // original: /* Do nothing */
     trace!("task_yield_from_isr")
-}
-
-/****************************************************************************
- * Name: esp_semphr_create
- *
- * Description:
- *   Create and initialize semaphore
- *
- * Input Parameters:
- *   max  - No mean
- *   init - semaphore initialization value
- *
- * Returned Value:
- *   Semaphore data pointer
- *
- ****************************************************************************/
-pub unsafe extern "C" fn semphr_create(max: u32, init: u32) -> *mut crate::binary::c_types::c_void {
-    trace!("semphr_create - max {} init {}", max, init);
-    sem_create(max, init)
-}
-
-/****************************************************************************
- * Name: esp_semphr_delete
- *
- * Description:
- *   Delete semaphore
- *
- * Input Parameters:
- *   semphr - Semaphore data pointer
- *
- * Returned Value:
- *   None
- *
- ****************************************************************************/
-pub unsafe extern "C" fn semphr_delete(semphr: *mut crate::binary::c_types::c_void) {
-    trace!("semphr_delete {:p}", semphr);
-    sem_delete(semphr);
-}
-
-/****************************************************************************
- * Name: esp_semphr_take
- *
- * Description:
- *   Wait semaphore within a certain period of time
- *
- * Input Parameters:
- *   semphr - Semaphore data pointer
- *   ticks  - Wait system ticks
- *
- * Returned Value:
- *   True if success or false if fail
- *
- ****************************************************************************/
-pub unsafe extern "C" fn semphr_take(
-    semphr: *mut crate::binary::c_types::c_void,
-    tick: u32,
-) -> i32 {
-    sem_take(semphr, tick)
-}
-
-/****************************************************************************
- * Name: esp_semphr_give
- *
- * Description:
- *   Post semaphore
- *
- * Input Parameters:
- *   semphr - Semaphore data pointer
- *
- * Returned Value:
- *   True if success or false if fail
- *
- ****************************************************************************/
-pub unsafe extern "C" fn semphr_give(semphr: *mut crate::binary::c_types::c_void) -> i32 {
-    sem_give(semphr)
 }
 
 /****************************************************************************
@@ -1128,7 +1049,7 @@ pub unsafe extern "C" fn phy_enable() {
     // quite some code needed here
     trace!("phy_enable - not fully implemented");
 
-    crate::wifi::os_adapter::os_adapter_chip_specific::phy_enable();
+    crate::common_adapter::chip_specific::phy_enable();
 }
 
 /****************************************************************************
@@ -1163,110 +1084,7 @@ pub unsafe extern "C" fn phy_update_country_info(
 pub unsafe extern "C" fn read_mac(mac: *mut u8, type_: u32) -> crate::binary::c_types::c_int {
     trace!("read_mac {:p} {}", mac, type_);
 
-    crate::wifi::os_adapter::os_adapter_chip_specific::read_mac(mac, type_)
-}
-
-/****************************************************************************
- * Name: ets_timer_arm
- *
- * Description:
- *   Set timer timeout period and repeat flag
- *
- * Input Parameters:
- *   ptimer - timer data pointer
- *   ms     - millim seconds
- *   repeat - true: run cycle, false: run once
- *
- * Returned Value:
- *   None
- *
- ****************************************************************************/
-pub unsafe extern "C" fn timer_arm(
-    ptimer: *mut crate::binary::c_types::c_void,
-    tmout: u32,
-    repeat: bool,
-) {
-    compat_timer_arm(ptimer, tmout, repeat);
-}
-
-/****************************************************************************
- * Name: ets_timer_disarm
- *
- * Description:
- *   Disable timer
- *
- * Input Parameters:
- *   ptimer - timer data pointer
- *
- * Returned Value:
- *   None
- *
- ****************************************************************************/
-pub unsafe extern "C" fn timer_disarm(ptimer: *mut crate::binary::c_types::c_void) {
-    compat_timer_disarm(ptimer);
-}
-
-/****************************************************************************
- * Name: ets_timer_done
- *
- * Description:
- *   Disable and free timer
- *
- * Input Parameters:
- *   ptimer - timer data pointer
- *
- * Returned Value:
- *   None
- *
- ****************************************************************************/
-pub unsafe extern "C" fn timer_done(ptimer: *mut crate::binary::c_types::c_void) {
-    compat_timer_done(ptimer);
-}
-
-/****************************************************************************
- * Name: ets_timer_setfn
- *
- * Description:
- *   Set timer callback function and private data
- *
- * Input Parameters:
- *   ptimer    - Timer data pointer
- *   pfunction - Callback function
- *   parg      - Callback function private data
- *
- * Returned Value:
- *   None
- *
- ****************************************************************************/
-pub unsafe extern "C" fn timer_setfn(
-    ptimer: *mut crate::binary::c_types::c_void,
-    pfunction: *mut crate::binary::c_types::c_void,
-    parg: *mut crate::binary::c_types::c_void,
-) {
-    compat_timer_setfn(ptimer, pfunction, parg);
-}
-
-/****************************************************************************
- * Name: ets_timer_arm_us
- *
- * Description:
- *   Set timer timeout period and repeat flag
- *
- * Input Parameters:
- *   ptimer - timer data pointer
- *   us     - micro seconds
- *   repeat - true: run cycle, false: run once
- *
- * Returned Value:
- *   None
- *
- ****************************************************************************/
-pub unsafe extern "C" fn timer_arm_us(
-    ptimer: *mut crate::binary::c_types::c_void,
-    us: u32,
-    repeat: bool,
-) {
-    compat_timer_arm_us(ptimer, us, repeat);
+    crate::common_adapter::chip_specific::read_mac(mac, type_)
 }
 
 /****************************************************************************
@@ -1664,21 +1482,6 @@ pub unsafe extern "C" fn get_time(
 }
 
 /****************************************************************************
- * Name: esp_random_ulong
- ****************************************************************************/
-pub unsafe extern "C" fn random() -> crate::binary::c_types::c_ulong {
-    trace!("random");
-
-    if let Some(ref mut rng) = RANDOM_GENERATOR {
-        let mut buffer = [0u8; 4];
-        rng.read(&mut buffer).unwrap();
-        u32::from_le_bytes(buffer)
-    } else {
-        0
-    }
-}
-
-/****************************************************************************
  * Name: esp_log_write
  *
  * Description:
@@ -1959,18 +1762,6 @@ pub unsafe extern "C" fn wifi_delete_queue(queue: *mut crate::binary::c_types::c
 }
 
 /****************************************************************************
- * Name: wifi_coex_init
- *
- * Description:
- *   Don't support
- *
- ****************************************************************************/
-pub unsafe extern "C" fn coex_init() -> crate::binary::c_types::c_int {
-    trace!("coex_init - not implemented");
-    0
-}
-
-/****************************************************************************
  * Name: wifi_coex_deinit
  *
  * Description:
@@ -1978,7 +1769,7 @@ pub unsafe extern "C" fn coex_init() -> crate::binary::c_types::c_int {
  *
  ****************************************************************************/
 pub unsafe extern "C" fn coex_deinit() {
-    trace!("coex_deinit - not implemented");
+    log::warn!("coex_deinit - not implemented");
 }
 
 /****************************************************************************
@@ -1989,7 +1780,12 @@ pub unsafe extern "C" fn coex_deinit() {
  *
  ****************************************************************************/
 pub unsafe extern "C" fn coex_enable() -> crate::binary::c_types::c_int {
-    trace!("coex_enable - not implemented");
+    log::debug!("coex_enable");
+
+    #[cfg(coex)]
+    return crate::binary::include::coex_enable();
+
+    #[cfg(not(coex))]
     0
 }
 
@@ -2001,7 +1797,10 @@ pub unsafe extern "C" fn coex_enable() -> crate::binary::c_types::c_int {
  *
  ****************************************************************************/
 pub unsafe extern "C" fn coex_disable() {
-    todo!("coex_disable")
+    log::debug!("coex_disable");
+
+    #[cfg(coex)]
+    crate::binary::include::coex_disable();
 }
 
 /****************************************************************************
@@ -2012,7 +1811,12 @@ pub unsafe extern "C" fn coex_disable() {
  *
  ****************************************************************************/
 pub unsafe extern "C" fn coex_status_get() -> u32 {
-    trace!("coex_status_get");
+    log::debug!("coex_status_get");
+
+    #[cfg(coex)]
+    return crate::binary::include::coex_status_get();
+
+    #[cfg(not(coex))]
     0
 }
 
@@ -2023,8 +1827,12 @@ pub unsafe extern "C" fn coex_status_get() -> u32 {
  *   Don't support
  *
  ****************************************************************************/
-pub unsafe extern "C" fn coex_condition_set(_type_: u32, _dissatisfy: bool) {
-    trace!("coex_condition_set - do nothing")
+#[allow(unused_variables)]
+pub unsafe extern "C" fn coex_condition_set(type_: u32, dissatisfy: bool) {
+    log::debug!("coex_condition_set");
+
+    #[cfg(coex)]
+    crate::binary::include::coex_condition_set(type_, dissatisfy);
 }
 
 /****************************************************************************
@@ -2034,12 +1842,18 @@ pub unsafe extern "C" fn coex_condition_set(_type_: u32, _dissatisfy: bool) {
  *   Don't support
  *
  ****************************************************************************/
+#[allow(unused_variables)]
 pub unsafe extern "C" fn coex_wifi_request(
-    _event: u32,
-    _latency: u32,
-    _duration: u32,
+    event: u32,
+    latency: u32,
+    duration: u32,
 ) -> crate::binary::c_types::c_int {
-    trace!("coex_wifi_request - not implemented");
+    log::debug!("coex_wifi_request");
+
+    #[cfg(coex)]
+    return crate::binary::include::coex_wifi_request(event, latency, duration);
+
+    #[cfg(not(coex))]
     0
 }
 
@@ -2050,8 +1864,14 @@ pub unsafe extern "C" fn coex_wifi_request(
  *   Don't support
  *
  ****************************************************************************/
-pub unsafe extern "C" fn coex_wifi_release(_event: u32) -> crate::binary::c_types::c_int {
-    trace!("coex_wifi_release - not implemented");
+#[allow(unused_variables)]
+pub unsafe extern "C" fn coex_wifi_release(event: u32) -> crate::binary::c_types::c_int {
+    log::debug!("coex_wifi_release");
+
+    #[cfg(coex)]
+    return crate::binary::include::coex_wifi_release(event);
+
+    #[cfg(not(coex))]
     0
 }
 
@@ -2062,11 +1882,17 @@ pub unsafe extern "C" fn coex_wifi_release(_event: u32) -> crate::binary::c_type
  *   Don't support
  *
  ****************************************************************************/
+#[allow(unused_variables)]
 pub unsafe extern "C" fn coex_wifi_channel_set(
-    _primary: u8,
-    _secondary: u8,
+    primary: u8,
+    secondary: u8,
 ) -> crate::binary::c_types::c_int {
-    trace!("coex_wifi_channel_set");
+    log::debug!("coex_wifi_channel_set");
+
+    #[cfg(coex)]
+    return crate::binary::include::coex_wifi_channel_set(primary, secondary);
+
+    #[cfg(not(coex))]
     0
 }
 
@@ -2077,12 +1903,17 @@ pub unsafe extern "C" fn coex_wifi_channel_set(
  *   Don't support
  *
  ****************************************************************************/
+#[allow(unused_variables)]
 pub unsafe extern "C" fn coex_event_duration_get(
-    _event: u32,
-    _duration: *mut u32,
+    event: u32,
+    duration: *mut u32,
 ) -> crate::binary::c_types::c_int {
-    trace!("coex_event_duration_get");
-    // does nothing in original code
+    log::debug!("coex_event_duration_get");
+
+    #[cfg(coex)]
+    return crate::binary::include::coex_event_duration_get(event, duration);
+
+    #[cfg(not(coex))]
     0
 }
 
@@ -2093,8 +1924,21 @@ pub unsafe extern "C" fn coex_event_duration_get(
  *   Don't support
  *
  ****************************************************************************/
-pub unsafe extern "C" fn coex_pti_get(_event: u32, _pti: *mut u8) -> crate::binary::c_types::c_int {
-    trace!("coex_pti_get");
+#[cfg(feature = "esp32c3")]
+#[allow(unused_variables)]
+pub unsafe extern "C" fn coex_pti_get(event: u32, pti: *mut u8) -> crate::binary::c_types::c_int {
+    log::debug!("coex_pti_get");
+
+    #[cfg(coex)]
+    return crate::binary::include::coex_pti_get(event, pti);
+
+    #[cfg(not(coex))]
+    0
+}
+
+#[cfg(feature = "esp32")]
+pub unsafe extern "C" fn coex_pti_get(event: u32, pti: *mut u8) -> crate::binary::c_types::c_int {
+    log::debug!("coex_pti_get {} {:p}", event, pti);
     0
 }
 
@@ -2105,9 +1949,12 @@ pub unsafe extern "C" fn coex_pti_get(_event: u32, _pti: *mut u8) -> crate::bina
  *   Don't support
  *
  ****************************************************************************/
-pub unsafe extern "C" fn coex_schm_status_bit_clear(_type_: u32, _status: u32) {
-    trace!("coex_schm_status_bit_clear")
-    // original implementation does nothing here
+#[allow(unused_variables)]
+pub unsafe extern "C" fn coex_schm_status_bit_clear(type_: u32, status: u32) {
+    log::debug!("coex_schm_status_bit_clear");
+
+    #[cfg(coex)]
+    crate::binary::include::coex_schm_status_bit_clear(type_, status);
 }
 
 /****************************************************************************
@@ -2117,9 +1964,12 @@ pub unsafe extern "C" fn coex_schm_status_bit_clear(_type_: u32, _status: u32) {
  *   Don't support
  *
  ****************************************************************************/
-pub unsafe extern "C" fn coex_schm_status_bit_set(_type_: u32, _status: u32) {
-    trace!("coex_schm_status_bit_set")
-    // original implementation does nothing here
+#[allow(unused_variables)]
+pub unsafe extern "C" fn coex_schm_status_bit_set(type_: u32, status: u32) {
+    log::debug!("coex_schm_status_bit_set");
+
+    #[cfg(coex)]
+    crate::binary::include::coex_schm_status_bit_set(type_, status);
 }
 
 /****************************************************************************
@@ -2129,8 +1979,15 @@ pub unsafe extern "C" fn coex_schm_status_bit_set(_type_: u32, _status: u32) {
  *   Don't support
  *
  ****************************************************************************/
-pub unsafe extern "C" fn coex_schm_interval_set(_interval: u32) -> crate::binary::c_types::c_int {
-    todo!("coex_schm_interval_set")
+#[allow(unused_variables)]
+pub unsafe extern "C" fn coex_schm_interval_set(interval: u32) -> crate::binary::c_types::c_int {
+    log::debug!("coex_schm_interval_set");
+
+    #[cfg(coex)]
+    return crate::binary::include::coex_schm_interval_set(interval);
+
+    #[cfg(not(coex))]
+    0
 }
 
 /****************************************************************************
@@ -2140,8 +1997,15 @@ pub unsafe extern "C" fn coex_schm_interval_set(_interval: u32) -> crate::binary
  *   Don't support
  *
  ****************************************************************************/
+#[allow(unused_variables)]
 pub unsafe extern "C" fn coex_schm_interval_get() -> u32 {
-    todo!("coex_schm_interval_get")
+    log::debug!("coex_schm_interval_get");
+
+    #[cfg(coex)]
+    return crate::binary::include::coex_schm_interval_get();
+
+    #[cfg(not(coex))]
+    0
 }
 
 /****************************************************************************
@@ -2151,8 +2015,15 @@ pub unsafe extern "C" fn coex_schm_interval_get() -> u32 {
  *   Don't support
  *
  ****************************************************************************/
+#[allow(unused_variables)]
 pub unsafe extern "C" fn coex_schm_curr_period_get() -> u8 {
-    todo!("coex_schm_curr_period_get")
+    log::debug!("coex_schm_curr_period_get");
+
+    #[cfg(coex)]
+    return crate::binary::include::coex_schm_curr_period_get();
+
+    #[cfg(not(coex))]
+    0
 }
 
 /****************************************************************************
@@ -2162,14 +2033,28 @@ pub unsafe extern "C" fn coex_schm_curr_period_get() -> u8 {
  *   Don't support
  *
  ****************************************************************************/
+#[allow(unused_variables)]
 pub unsafe extern "C" fn coex_schm_curr_phase_get() -> *mut crate::binary::c_types::c_void {
-    todo!("coex_schm_curr_phase_get")
+    log::debug!("coex_schm_curr_phase_get");
+
+    #[cfg(coex)]
+    return crate::binary::include::coex_schm_curr_phase_get();
+
+    #[cfg(not(coex))]
+    return 0 as *mut crate::binary::c_types::c_void;
 }
 
+#[allow(unused_variables)]
 pub unsafe extern "C" fn coex_schm_curr_phase_idx_set(
-    _idx: crate::binary::c_types::c_int,
+    idx: crate::binary::c_types::c_int,
 ) -> crate::binary::c_types::c_int {
-    todo!("coex_schm_curr_phase_idx_set")
+    log::debug!("coex_schm_curr_phase_idx_set");
+
+    #[cfg(coex)]
+    return crate::binary::include::coex_schm_curr_phase_idx_set(idx);
+
+    #[cfg(not(coex))]
+    0
 }
 
 /****************************************************************************
@@ -2179,8 +2064,15 @@ pub unsafe extern "C" fn coex_schm_curr_phase_idx_set(
  *   Don't support
  *
  ****************************************************************************/
+#[allow(unused_variables)]
 pub unsafe extern "C" fn coex_schm_curr_phase_idx_get() -> crate::binary::c_types::c_int {
-    todo!("coex_schm_curr_phase_idx_get")
+    log::debug!("coex_schm_curr_phase_idx_get");
+
+    #[cfg(coex)]
+    return crate::binary::include::coex_schm_curr_phase_idx_get();
+
+    #[cfg(not(coex))]
+    0
 }
 
 /****************************************************************************
@@ -2199,131 +2091,4 @@ pub unsafe extern "C" fn coex_schm_curr_phase_idx_get() -> crate::binary::c_type
 pub unsafe extern "C" fn slowclk_cal_get() -> u32 {
     trace!("slowclk_cal_get");
     28639
-}
-
-// other functions
-#[no_mangle]
-pub unsafe extern "C" fn puts(s: *const u8) {
-    let cstr = StrBuf::from(s);
-    trace!("{}", cstr.as_str_ref());
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn sprintf(dst: *mut u8, format: *const u8, args: ...) -> i32 {
-    let str = StrBuf::from(format);
-    trace!("sprintf {}", str.as_str_ref());
-
-    let len = crate::compat::common::vsnprintf(dst, 511, format, args);
-
-    let s = StrBuf::from(dst);
-    trace!("sprintf {}", s.as_str_ref());
-
-    len
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn printf(s: *const u8, args: ...) {
-    syslog(0, s, args);
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn phy_printf(s: *const u8, args: ...) {
-    syslog(0, s, args);
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn net80211_printf(s: *const u8, args: ...) {
-    syslog(0, s, args);
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn pp_printf(s: *const u8, args: ...) {
-    syslog(0, s, args);
-}
-
-// #define ESP_EVENT_DEFINE_BASE(id) esp_event_base_t id = #id
-static mut EVT: u8 = 0;
-#[no_mangle]
-static mut WIFI_EVENT: esp_event_base_t = unsafe { &EVT };
-
-// stuff needed by wpa-supplicant
-#[no_mangle]
-pub unsafe extern "C" fn __assert_func(
-    _file: *const u8,
-    _line: u32,
-    _func: *const u8,
-    _failed_expr: *const u8,
-) {
-    todo!("__assert_func");
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn ets_timer_disarm(timer: *mut crate::binary::c_types::c_void) {
-    timer_disarm(timer);
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn ets_timer_done(timer: *mut crate::binary::c_types::c_void) {
-    timer_done(timer);
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn ets_timer_setfn(
-    ptimer: *mut crate::binary::c_types::c_void,
-    pfunction: *mut crate::binary::c_types::c_void,
-    parg: *mut crate::binary::c_types::c_void,
-) {
-    timer_setfn(ptimer, pfunction, parg);
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn ets_timer_arm(
-    timer: *mut crate::binary::c_types::c_void,
-    tmout: u32,
-    repeat: bool,
-) {
-    timer_arm(timer, tmout, repeat);
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn gettimeofday(_tv: *const (), _tz: *const ()) {
-    todo!("gettimeofday");
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn esp_fill_random(dst: *mut u8, len: u32) {
-    trace!("esp_fill_random");
-    let dst = core::slice::from_raw_parts_mut(dst, len as usize);
-
-    if let Some(ref mut rng) = RANDOM_GENERATOR {
-        rng.read(dst).unwrap();
-    }
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn esp_timer_stop(_handle: *mut ()) {
-    todo!("esp_timer_stop");
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn esp_timer_delete(_handle: *mut ()) {
-    todo!("esp_timer_delete");
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn esp_timer_start_once(_handle: *mut (), _timeout_us: u64) -> i32 {
-    todo!("esp_timer_start_once");
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn esp_timer_create(
-    args: *const esp_timer_create_args_t,
-    out_handle: *mut esp_timer_handle_t,
-) -> i32 {
-    compat_esp_timer_create(args, out_handle)
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn strrchr(_s: *const (), _c: u32) -> *const u8 {
-    todo!("strrchr");
 }

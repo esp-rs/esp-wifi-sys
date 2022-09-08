@@ -1,10 +1,12 @@
-# Wifi and Bluetooth LE on ESP32C3 and ESP32 (on bare-metal Rust)
+# Wifi and Bluetooth LE on ESP32-C3 and ESP32 (on bare-metal Rust)
 
 ## About
 
 This is experimental and work-in-progress! You are welcome to experiment with it and contribute but probably shouldn't use this for something real yet.
 
-It is currently _NOT_ possible to use Bluetooth and WiFi together.
+WiFi / BTLE coexistence is implemented but currently only works (to some extend) on ESP32-C3.
+
+THIS CURRENTLY DOESN'T WORK WITH THE XTENSA ENABLED RUST COMPILER 1.63.0.2
 
 This uses the WiFi driver found in https://github.com/espressif/esp-wireless-drivers-3rdparty
 
@@ -29,10 +31,11 @@ https://github.com/espressif/esp-wireless-drivers-3rdparty/archive/45701c0.zip
 
 | Command                                                                                                                      | Chip    |
 | ---------------------------------------------------------------------------------------------------------------------------- | ------- |
-| `cargo "+nightly" run --example ble_esp32c3 --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc"`  | ESP32C3 |
-| `cargo "+nightly" run --example dhcp_esp32c3 --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc"` | ESP32C3 |
-| `cargo "+esp" run --example ble_esp32 --release --target xtensa-esp32-none-elf --features "esp32,embedded-svc"`              | ESP32   |
-| `cargo "+esp" run --example dhcp_esp32 --release --target xtensa-esp32-none-elf --features "esp32,embedded-svc"`             | ESP32   |
+| `cargo "+nightly" run --example ble_esp32c3 --release --target riscv32imc-unknown-none-elf --features "esp32c3,ble"`  | ESP32-C3 |
+| `cargo "+nightly" run --example dhcp_esp32c3 --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc,wifi"` | ESP32-C3 |
+| `cargo "+nightly" run --example coex_esp32c3 --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc,wifi,ble"` | ESP32-C3 |
+| `cargo "+esp" run --example ble_esp32 --release --target xtensa-esp32-none-elf --features "esp32,ble"`              | ESP32   |
+| `cargo "+esp" run --example dhcp_esp32 --release --target xtensa-esp32-none-elf --features "esp32,embedded-svc,wifi"`             | ESP32   |
 
 Additional you can specify these features
 |Feature|Meaning|
@@ -41,6 +44,8 @@ Additional you can specify these features
 |dump_packets|dumps some packet info at log level info|
 |utils|Provide utilities for smoltcp initialization, this is a default feature|
 |embedded-svc|Provides a (very limited) implementation of the `embedded-svc` WiFi trait, includes `utils` feature|
+|ble|Enable BLE support|
+|wifi|Enable WiFi support|
 
 In general you should use the release profile since otherwise the performance is quite bad.
 
@@ -50,18 +55,18 @@ In general you should use the release profile since otherwise the performance is
 - connect to WiFi access point
 - providing an HCI interface
 
-## Notes on ESP32C3 support
+## Notes on ESP32-C3 support
 
 - uses SYSTIMER as the main timer
 - doesn't work in direct-boot mode
 
 ## Notes on ESP32 support
 
-This is even more experimental than support for ESP32C3.
+This is even more experimental than support for ESP32-C3.
 
 - The WiFi logs only print the format string - not the actual values.
-- Also there might be some packet loss and a bit worse performance than on ESP32C3 currently.
-- The code runs on a single core and is currently not multi-core safe!
+- Also there might be some packet loss and a bit worse performance than on ESP32-C3 currently.
+- The code runs on a single core and might currently not be multi-core safe!
 
 On ESP32 currently TIMG1/TIMER0 is used as the main timer so you can't use it for anything else.
 Additionally it uses CCOMPARE0 - so don't touch that, too.
@@ -85,9 +90,10 @@ Additionally it uses CCOMPARE0 - so don't touch that, too.
 ## Missing / To be done
 
 - lots of refactoring
-- CoEx
+- make CoEx work on ESP32
 - esp-now
 - powersafe support
+- maybe SoftAP
 
 ## License
 

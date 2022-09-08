@@ -16,7 +16,7 @@ static mut CURR_SEM: [Option<u32>; 20] = [
     None, None, None, None,
 ];
 
-static mut PER_THREAD_SEM: [Option<*mut crate::binary::c_types::c_void>; 3] = [None; 3];
+static mut PER_THREAD_SEM: [Option<*mut crate::binary::c_types::c_void>; 4] = [None; 4];
 
 #[derive(Clone, Copy, Debug)]
 struct Mutex {

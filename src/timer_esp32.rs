@@ -17,9 +17,9 @@ use esp32_hal::macros::interrupt;
 pub const TICKS_PER_SECOND: u64 = 40_000_000;
 
 #[cfg(debug_assertions)]
-const TIMER_DELAY: fugit::MicrosDurationU64 = fugit::MicrosDurationU64::millis(13);
+const TIMER_DELAY: fugit::MicrosDurationU64 = fugit::MicrosDurationU64::micros(4000);
 #[cfg(not(debug_assertions))]
-const TIMER_DELAY: fugit::MicrosDurationU64 = fugit::MicrosDurationU64::millis(3);
+const TIMER_DELAY: fugit::MicrosDurationU64 = fugit::MicrosDurationU64::micros(500);
 
 static TIMER1: Mutex<RefCell<Option<Timer<Timer0<TIMG1>>>>> = Mutex::new(RefCell::new(None));
 
@@ -38,10 +38,16 @@ fn read_timer_value() -> u64 {
 pub fn setup_timer_isr(timg1_timer0: Timer<Timer0<TIMG1>>) {
     let mut timer1 = timg1_timer0;
     interrupt::enable(pac::Interrupt::TG1_T0_LEVEL, interrupt::Priority::Priority2).unwrap();
+
+    #[cfg(feature = "wifi")]
     interrupt::enable(pac::Interrupt::WIFI_MAC, interrupt::Priority::Priority1).unwrap();
-    interrupt::enable(pac::Interrupt::RWBT, interrupt::Priority::Priority1).unwrap();
-    interrupt::enable(pac::Interrupt::RWBLE, interrupt::Priority::Priority1).unwrap();
-    interrupt::enable(pac::Interrupt::BT_BB, interrupt::Priority::Priority1).unwrap();
+
+    #[cfg(feature = "ble")]
+    {
+        interrupt::enable(pac::Interrupt::RWBT, interrupt::Priority::Priority1).unwrap();
+        interrupt::enable(pac::Interrupt::RWBLE, interrupt::Priority::Priority1).unwrap();
+        interrupt::enable(pac::Interrupt::BT_BB, interrupt::Priority::Priority1).unwrap();
+    }
 
     timer1.listen();
     timer1.start(TIMER_DELAY.convert());
@@ -65,6 +71,7 @@ pub fn setup_timer_isr(timg1_timer0: Timer<Timer0<TIMG1>>) {
     } {}
 }
 
+#[cfg(feature = "ble")]
 #[allow(non_snake_case)]
 #[no_mangle]
 fn Software0(_level: u32) {
@@ -87,6 +94,7 @@ fn Timer0(_level: u32) {
     xtensa_lx::timer::set_ccompare0(0xffffffff);
 }
 
+#[cfg(feature = "wifi")]
 #[interrupt]
 fn WIFI_MAC() {
     unsafe {
@@ -100,6 +108,7 @@ fn WIFI_MAC() {
     }
 }
 
+#[cfg(feature = "ble")]
 #[interrupt]
 fn RWBT() {
     unsafe {
@@ -113,6 +122,7 @@ fn RWBT() {
     }
 }
 
+#[cfg(feature = "ble")]
 #[interrupt]
 fn RWBLE() {
     unsafe {
@@ -126,6 +136,7 @@ fn RWBLE() {
     }
 }
 
+#[cfg(feature = "ble")]
 #[interrupt]
 fn BT_BB() {
     unsafe {

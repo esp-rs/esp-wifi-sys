@@ -7,6 +7,11 @@ pub struct TaskContext {
 }
 
 const STACK_SIZE: usize = 8192 * 2;
+
+#[cfg(coex)]
+const MAX_TASK: usize = 4;
+
+#[cfg(not(coex))]
 const MAX_TASK: usize = 3;
 
 static mut TASK_STACK: [u8; STACK_SIZE * MAX_TASK] = [0x0u8; STACK_SIZE * MAX_TASK];

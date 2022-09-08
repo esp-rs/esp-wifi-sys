@@ -134,14 +134,27 @@ pub(crate) unsafe extern "C" fn interrupt_handler_set(
 }
 
 pub(crate) unsafe extern "C" fn coex_wifi_sleep_set(sleep: i32) {
-    trace!("!!!! unimplemented coex_wifi_sleep_set {}", sleep);
+    log::debug!(
+        "ignored coex_wifi_sleep_set {} - because original implementation does the same",
+        sleep
+    );
 }
 
+#[allow(unused_variables, dead_code)]
 pub(crate) unsafe extern "C" fn coex_core_ble_conn_dyn_prio_get(
-    _low: *mut i32,
-    _high: *mut i32,
+    low: *mut i32,
+    high: *mut i32,
 ) -> i32 {
-    todo!();
+    extern "C" {
+        fn coex_core_ble_conn_dyn_prio_get(low: *mut i32, high: *mut i32) -> i32;
+    }
+    log::debug!("coex_core_ble_conn_dyn_prio_get");
+
+    #[cfg(coex)]
+    return coex_core_ble_conn_dyn_prio_get(low, high);
+
+    #[cfg(not(coex))]
+    0
 }
 
 pub(crate) unsafe extern "C" fn esp_hw_power_down() {

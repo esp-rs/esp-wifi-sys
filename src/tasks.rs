@@ -9,15 +9,24 @@ use crate::{
     memory_fence::memory_fence,
     preempt::preempt::task_create,
     timer::get_systimer_count,
-    wifi::send_data_if_needed,
 };
 
 pub fn init_tasks() {
     task_create(worker_task1);
     task_create(worker_task2);
+
+    // if coex then we know we have ble + wifi
+    #[cfg(coex)]
+    task_create(worker_task3);
 }
 
 pub extern "C" fn worker_task1() {
+    loop {
+        compat::work_queue::do_work();
+    }
+}
+
+pub extern "C" fn worker_task3() {
     loop {
         compat::work_queue::do_work();
     }
@@ -75,6 +84,7 @@ pub extern "C" fn worker_task2() {
             trace!("timer callback called");
         }
 
-        send_data_if_needed();
+        #[cfg(feature = "wifi")]
+        crate::wifi::send_data_if_needed();
     }
 }
