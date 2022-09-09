@@ -31,7 +31,7 @@ riscv-target = { version = "0.1.2", optional = true }
 ble-hci = { git = "https://github.com/bjoernQ/ble-hci", branch = "embedded-io" }
 
 [target.xtensa-esp32-none-elf.dev-dependencies]
-esp-println = { version = "0.2.0", features = [ "esp32" ] }
+esp-println = { version = "0.3.0", features = [ "esp32" ] }
 esp-backtrace = { version = "0.2.0", features = [ "esp32", "panic-handler", "exception-handler", "print-uart" ] }
 
 [target.riscv32imc-unknown-none-elf.dev-dependencies]
@@ -49,3 +49,9 @@ enumset = []
 embedded-svc = [ "dep:enumset", "dep:embedded-svc", "utils" ]
 wifi = []
 ble = []
+
+# currently published versions don't contain all relevant adjustments - using git dependencies for now
+[patch.crates-io]
+esp32-hal = { git = "https://github.com/esp-rs/esp-hal", package = "esp32-hal", rev = "da3ec47b30a5f598e904ffac0e10f94716cb4023" }
+esp32c3-hal = { git = "https://github.com/esp-rs/esp-hal", package = "esp32c3-hal", rev = "da3ec47b30a5f598e904ffac0e10f94716cb4023" }
+esp-hal-common = { git = "https://github.com/esp-rs/esp-hal", package = "esp-hal-common", rev = "da3ec47b30a5f598e904ffac0e10f94716cb4023" }
