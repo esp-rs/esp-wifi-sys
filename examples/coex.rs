@@ -15,24 +15,23 @@ use ble_hci::{
     att::Uuid,
     Ble, HciConnector,
 };
-use esp_wifi::ble::controller::BleConnector;
+use esp_wifi::{ble::controller::BleConnector, current_millis, wifi::utils::Network};
 
+use embedded_io::blocking::*;
 use embedded_svc::wifi::{
     AccessPointInfo, ClientConfiguration, ClientConnectionStatus, ClientIpStatus, ClientStatus,
     Configuration, Status, Wifi,
 };
+
 use esp_backtrace as _;
-use esp_println::{print, println, logger::init_logger};
+use esp_println::{logger::init_logger, print, println};
 use esp_wifi::initialize;
 use esp_wifi::wifi::utils::create_network_interface;
 use esp_wifi::wifi_interface::{timestamp, WifiError};
 use esp_wifi::{create_network_stack_storage, network_stack_storage};
 use hal::clock::{ClockControl, CpuClock};
 use hal::{pac::Peripherals, prelude::*, Rtc};
-use smoltcp::{
-    iface::SocketHandle,
-    socket::{Socket, TcpSocket},
-};
+use smoltcp::wire::Ipv4Address;
 
 #[cfg(feature = "esp32c3")]
 use hal::system::SystemExt;
@@ -113,12 +112,33 @@ fn main() -> ! {
     println!("{:?}", wifi_interface.get_status());
 
     // wait to get connected
+    println!("Wait to get connected");
     loop {
         if let Status(ClientStatus::Started(_), _) = wifi_interface.get_status() {
             break;
         }
     }
     println!("{:?}", wifi_interface.get_status());
+
+    // wait for getting an ip address
+    println!("Wait to get an ip address");
+    loop {
+        wifi_interface.poll_dhcp().unwrap();
+
+        wifi_interface
+            .network_interface()
+            .poll(timestamp())
+            .unwrap();
+
+        if let Status(
+            ClientStatus::Started(ClientConnectionStatus::Connected(ClientIpStatus::Done(config))),
+            _,
+        ) = wifi_interface.get_status()
+        {
+            println!("got ip {:?}", config);
+            break;
+        }
+    }
 
     let connector = BleConnector {};
     let hci = HciConnector::new(connector, esp_wifi::current_millis);
@@ -131,103 +151,56 @@ fn main() -> ! {
         ble.cmd_set_le_advertising_data(create_advertising_data(&[
             AdStructure::Flags(LE_GENERAL_DISCOVERABLE | BR_EDR_NOT_SUPPORTED),
             AdStructure::ServiceUuids16(&[Uuid::Uuid16(0x1809)]),
-            AdStructure::CompleteLocalName("ESP32C3 BLE"),
+            #[cfg(feature = "esp32c3")]
+            AdStructure::CompleteLocalName("ESP32-C3 BLE"),
+            #[cfg(feature = "esp32")]
+            AdStructure::CompleteLocalName("ESP32 BLE"),
         ]))
     );
     println!("{:?}", ble.cmd_set_le_advertise_enable(true));
 
     println!("started advertising");
 
-    println!("Start busy loop on main - you can also scan for the BLE device");
+    println!("Start busy loop on main");
 
-    let mut stage = 0;
-    let mut idx = 0;
-    let mut buffer = [0u8; 8000];
-    let mut waiter = 50000;
-
-    let mut http_socket_handle: Option<SocketHandle> = None;
-
-    for (handle, socket) in wifi_interface.network_interface().sockets_mut() {
-        match socket {
-            Socket::Tcp(_) => http_socket_handle = Some(handle),
-            _ => {}
-        }
-    }
+    let mut network = Network::new(wifi_interface, current_millis);
+    let mut socket = network.get_socket();
 
     loop {
-        wifi_interface.poll_dhcp().ok();
-        wifi_interface.network_interface().poll(timestamp()).ok();
+        println!("Making HTTP request");
+        socket.work();
 
-        if let Status(
-            ClientStatus::Started(ClientConnectionStatus::Connected(ClientIpStatus::Done(config))),
-            _,
-        ) = wifi_interface.get_status()
-        {
-            match stage {
-                0 => {
-                    println!("My IP config is {:?}", config);
-                    println!("Lets connect");
-                    let (socket, cx) = wifi_interface
-                        .network_interface()
-                        .get_socket_and_context::<TcpSocket>(http_socket_handle.unwrap());
+        socket
+            .open(Ipv4Address::new(142, 250, 185, 115), 80)
+            .unwrap();
 
-                    let address = smoltcp::wire::Ipv4Address::new(142, 250, 185, 115);
-                    let remote_endpoint = (address, 80);
-                    socket.connect(cx, remote_endpoint, 41000).unwrap();
+        socket
+            .write(b"GET / HTTP/1.0\r\nHost: www.mobile-j.de\r\n\r\n")
+            .unwrap();
+        socket.flush().unwrap();
 
-                    stage = 1;
-                    println!("Lets send");
-                }
-                1 => {
-                    let socket = wifi_interface
-                        .network_interface()
-                        .get_socket::<TcpSocket>(http_socket_handle.unwrap());
-
-                    if socket
-                        .send_slice(&b"GET / HTTP/1.0\r\nHost: www.mobile-j.de\r\n\r\n"[..])
-                        .is_ok()
-                    {
-                        stage = 2;
-                        println!("Lets receive");
-                    }
-                }
-                2 => {
-                    let socket = wifi_interface
-                        .network_interface()
-                        .get_socket::<TcpSocket>(http_socket_handle.unwrap());
-
-                    if let Ok(s) = socket.recv_slice(&mut buffer[idx..]) {
-                        if s > 0 {
-                            idx += s;
-                        }
-                    } else {
-                        stage = 3;
-
-                        for c in &buffer[..idx] {
-                            print!("{}", *c as char);
-                        }
-                        println!("");
-                    }
-                }
-                3 => {
-                    println!("Close");
-                    let socket = wifi_interface
-                        .network_interface()
-                        .get_socket::<TcpSocket>(http_socket_handle.unwrap());
-
-                    socket.abort();
-                    stage = 4;
-                }
-                4 => {
-                    waiter -= 1;
-                    if waiter == 0 {
-                        idx = 0;
-                        waiter = 50000;
-                        stage = 0;
-                    }
-                }
-                _ => (),
+        let wait_end = current_millis() + 2 * 1000;
+        loop {
+            let mut buffer = [0u8; 512];
+            if let Ok(len) = socket.read(&mut buffer) {
+                let to_print = unsafe { core::str::from_utf8_unchecked(&buffer[..len]) };
+                print!("{}", to_print);
+            } else {
+                break;
             }
+
+            if current_millis() > wait_end {
+                println!("Timeout");
+                break;
+            }
+        }
+        println!();
+
+        socket.disconnect();
+
+        let wait_end = current_millis() + 5 * 1000;
+        while current_millis() < wait_end {
+            socket.work();
         }
     }
 }

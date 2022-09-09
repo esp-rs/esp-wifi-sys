@@ -17,7 +17,7 @@ use ble_hci::{
     Ble, Data, HciConnector,
 };
 use esp_backtrace as _;
-use esp_println::{println, logger::init_logger};
+use esp_println::{logger::init_logger, println};
 use esp_wifi::{ble::controller::BleConnector, initialize};
 use hal::{
     clock::{ClockControl, CpuClock},
@@ -86,7 +86,10 @@ fn main() -> ! {
             ble.cmd_set_le_advertising_data(create_advertising_data(&[
                 AdStructure::Flags(LE_GENERAL_DISCOVERABLE | BR_EDR_NOT_SUPPORTED),
                 AdStructure::ServiceUuids16(&[Uuid::Uuid16(0x1809)]),
-                AdStructure::CompleteLocalName("ESP32C3 BLE"),
+                #[cfg(feature = "esp32c3")]
+                AdStructure::CompleteLocalName("ESP32-C3 BLE"),
+                #[cfg(feature = "esp32")]
+                AdStructure::CompleteLocalName("ESP32 BLE"),
             ]))
         );
         println!("{:?}", ble.cmd_set_le_advertise_enable(true));
