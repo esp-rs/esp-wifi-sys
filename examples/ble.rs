@@ -3,6 +3,11 @@
 #![feature(c_variadic)]
 #![feature(const_mut_refs)]
 
+#[cfg(feature = "esp32")]
+use esp32_hal as hal;
+#[cfg(feature = "esp32c3")]
+use esp32c3_hal as hal;
+
 use ble_hci::{
     ad_structure::{
         create_advertising_data, AdStructure, BR_EDR_NOT_SUPPORTED, LE_GENERAL_DISCOVERABLE,
@@ -11,18 +16,23 @@ use ble_hci::{
     attribute_server::{AttributeServer, Service, WorkResult, ATT_READABLE, ATT_WRITEABLE},
     Ble, Data, HciConnector,
 };
-use esp32c3_hal::systimer::SystemTimer;
-use esp32c3_hal::{
-    clock::{ClockControl, CpuClock},
-    pac::Peripherals,
-    prelude::*,
-    system::SystemExt,
-    Rtc,
-};
 use esp_backtrace as _;
 use esp_println::println;
 use esp_wifi::{ble::controller::BleConnector, initialize};
+use hal::{
+    clock::{ClockControl, CpuClock},
+    pac::Peripherals,
+    prelude::*,
+    Rtc,
+};
+
+#[cfg(feature = "esp32c3")]
+use hal::system::SystemExt;
+
+#[cfg(feature = "esp32c3")]
 use riscv_rt::entry;
+#[cfg(feature = "esp32")]
+use xtensa_lx_rt::entry;
 
 extern crate alloc;
 
@@ -32,18 +42,37 @@ fn main() -> ! {
     esp_wifi::init_heap();
 
     let peripherals = Peripherals::take().unwrap();
+
+    #[cfg(not(feature = "esp32"))]
     let system = peripherals.SYSTEM.split();
+    #[cfg(feature = "esp32")]
+    let system = peripherals.DPORT.split();
+
+    #[cfg(feature = "esp32c3")]
     let clocks = ClockControl::configure(system.clock_control, CpuClock::Clock160MHz).freeze();
+    #[cfg(feature = "esp32")]
+    let clocks = ClockControl::configure(system.clock_control, CpuClock::Clock240MHz).freeze();
 
     let mut rtc = Rtc::new(peripherals.RTC_CNTL);
 
     // Disable watchdog timers
+    #[cfg(not(feature = "esp32"))]
     rtc.swd.disable();
+
     rtc.rwdt.disable();
 
-    let syst = SystemTimer::new(peripherals.SYSTIMER);
-
-    initialize(syst.alarm0, peripherals.RNG, &clocks).unwrap();
+    #[cfg(feature = "esp32c3")]
+    {
+        use hal::systimer::SystemTimer;
+        let syst = SystemTimer::new(peripherals.SYSTIMER);
+        initialize(syst.alarm0, peripherals.RNG, &clocks).unwrap();
+    }
+    #[cfg(feature = "esp32")]
+    {
+        use hal::timer::TimerGroup;
+        let timg1 = TimerGroup::new(peripherals.TIMG1, &clocks);
+        initialize(timg1.timer0, peripherals.RNG, &clocks).unwrap();
+    }
 
     loop {
         let connector = BleConnector {};
@@ -126,9 +155,7 @@ impl log::Log for SimpleLogger {
     }
 
     fn log(&self, record: &log::Record) {
-        riscv::interrupt::free(|_| {
-            println!("{} - {}", record.level(), record.args());
-        });
+        println!("{} - {}", record.level(), record.args());
     }
 
     fn flush(&self) {}

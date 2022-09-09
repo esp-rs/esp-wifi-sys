@@ -37,11 +37,11 @@ https://github.com/esp-rs/esp-wireless-drivers-3rdparty/ (commit e951a30043699c6
 
 | Command                                                                                                                      | Chip    |
 | ---------------------------------------------------------------------------------------------------------------------------- | ------- |
-| `cargo "+nightly" run --example ble_esp32c3 --release --target riscv32imc-unknown-none-elf --features "esp32c3,ble"`  | ESP32-C3 |
-| `cargo "+nightly" run --example dhcp_esp32c3 --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc,wifi"` | ESP32-C3 |
-| `cargo "+nightly" run --example coex_esp32c3 --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc,wifi,ble"` | ESP32-C3 |
-| `cargo "+esp" run --example ble_esp32 --release --target xtensa-esp32-none-elf --features "esp32,ble"`              | ESP32   |
-| `cargo "+esp" run --example dhcp_esp32 --release --target xtensa-esp32-none-elf --features "esp32,embedded-svc,wifi"`             | ESP32   |
+| `cargo "+nightly" run --example ble --release --target riscv32imc-unknown-none-elf --features "esp32c3,ble"`  | ESP32-C3 |
+| `cargo "+nightly" run --example dhcp --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc,wifi"` | ESP32-C3 |
+| `cargo "+nightly" run --example coex --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc,wifi,ble"` | ESP32-C3 |
+| `cargo "+esp" run --example ble --release --target xtensa-esp32-none-elf --features "esp32,ble"`              | ESP32   |
+| `cargo "+esp" run --example dhcp --release --target xtensa-esp32-none-elf --features "esp32,embedded-svc,wifi"`             | ESP32   |
 
 Additional you can specify these features
 |Feature|Meaning|
@@ -91,7 +91,7 @@ Additionally it uses CCOMPARE0 - so don't touch that, too.
 - `mkbindings.bat`: generate the bindings / just calls `bindgen`
 - `ld/espXXX/rom_functions.x`: the WiFi driver uses some of these so it needs to get linked
 - `ld/esp32/wifi-link.x`: the main linker script for ESP32 - needs to get cleaned up and ideally the changes move to ESP-HAL
-- `examples/dhcp_espXXX/main.rs`: example using the code (per chip)
+- `examples/*.rs`: examples
 
 ## Missing / To be done
 

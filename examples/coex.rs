@@ -1,9 +1,12 @@
-// THIS CURRENTLY DOESN'T WORK ON ESP32
-
 #![no_std]
 #![no_main]
 #![feature(c_variadic)]
 #![feature(const_mut_refs)]
+
+#[cfg(feature = "esp32")]
+use esp32_hal as hal;
+#[cfg(feature = "esp32c3")]
+use esp32c3_hal as hal;
 
 use ble_hci::{
     ad_structure::{
@@ -18,21 +21,25 @@ use embedded_svc::wifi::{
     AccessPointInfo, ClientConfiguration, ClientConnectionStatus, ClientIpStatus, ClientStatus,
     Configuration, Status, Wifi,
 };
-use esp32_hal::{
-    clock::{ClockControl, CpuClock},
-    timer::TimerGroup,
-};
-use esp32_hal::{pac::Peripherals, prelude::*, Rtc};
 use esp_backtrace as _;
 use esp_println::{print, println};
 use esp_wifi::initialize;
 use esp_wifi::wifi::utils::create_network_interface;
 use esp_wifi::wifi_interface::{timestamp, WifiError};
 use esp_wifi::{create_network_stack_storage, network_stack_storage};
+use hal::clock::{ClockControl, CpuClock};
+use hal::{pac::Peripherals, prelude::*, Rtc};
 use smoltcp::{
     iface::SocketHandle,
     socket::{Socket, TcpSocket},
 };
+
+#[cfg(feature = "esp32c3")]
+use hal::system::SystemExt;
+
+#[cfg(feature = "esp32c3")]
+use riscv_rt::entry;
+#[cfg(feature = "esp32")]
 use xtensa_lx_rt::entry;
 
 extern crate alloc;
@@ -46,20 +53,41 @@ fn main() -> ! {
     esp_wifi::init_heap();
 
     let peripherals = Peripherals::take().unwrap();
+
+    #[cfg(not(feature = "esp32"))]
+    let system = peripherals.SYSTEM.split();
+    #[cfg(feature = "esp32")]
     let system = peripherals.DPORT.split();
+
+    #[cfg(feature = "esp32c3")]
+    let clocks = ClockControl::configure(system.clock_control, CpuClock::Clock160MHz).freeze();
+    #[cfg(feature = "esp32")]
     let clocks = ClockControl::configure(system.clock_control, CpuClock::Clock240MHz).freeze();
 
     let mut rtc = Rtc::new(peripherals.RTC_CNTL);
 
-    // Disable MWDT and RWDT (Watchdog) flash boot protection
+    // Disable watchdog timers
+    #[cfg(not(feature = "esp32"))]
+    rtc.swd.disable();
+
     rtc.rwdt.disable();
 
     let mut storage = create_network_stack_storage!(3, 8, 1);
     let ethernet = create_network_interface(network_stack_storage!(storage));
     let mut wifi_interface = esp_wifi::wifi_interface::Wifi::new(ethernet);
 
-    let timg1 = TimerGroup::new(peripherals.TIMG1, &clocks);
-    initialize(timg1.timer0, peripherals.RNG, &clocks).unwrap();
+    #[cfg(feature = "esp32c3")]
+    {
+        use hal::systimer::SystemTimer;
+        let syst = SystemTimer::new(peripherals.SYSTIMER);
+        initialize(syst.alarm0, peripherals.RNG, &clocks).unwrap();
+    }
+    #[cfg(feature = "esp32")]
+    {
+        use hal::timer::TimerGroup;
+        let timg1 = TimerGroup::new(peripherals.TIMG1, &clocks);
+        initialize(timg1.timer0, peripherals.RNG, &clocks).unwrap();
+    }
 
     println!("{:?}", wifi_interface.get_status());
 
@@ -103,7 +131,7 @@ fn main() -> ! {
         ble.cmd_set_le_advertising_data(create_advertising_data(&[
             AdStructure::Flags(LE_GENERAL_DISCOVERABLE | BR_EDR_NOT_SUPPORTED),
             AdStructure::ServiceUuids16(&[Uuid::Uuid16(0x1809)]),
-            AdStructure::CompleteLocalName("ESP32 BLE"),
+            AdStructure::CompleteLocalName("ESP32C3 BLE"),
         ]))
     );
     println!("{:?}", ble.cmd_set_le_advertise_enable(true));
