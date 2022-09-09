@@ -31,11 +31,11 @@ riscv-target = { version = "0.1.2", optional = true }
 ble-hci = { git = "https://github.com/bjoernQ/ble-hci", branch = "embedded-io" }
 
 [target.xtensa-esp32-none-elf.dev-dependencies]
-esp-println = { version = "0.3.0", features = [ "esp32" ] }
+esp-println = { version = "0.3.0", features = [ "esp32", "log" ] }
 esp-backtrace = { version = "0.2.0", features = [ "esp32", "panic-handler", "exception-handler", "print-uart" ] }
 
 [target.riscv32imc-unknown-none-elf.dev-dependencies]
-esp-println = { version = "0.2.0", features = [ "esp32c3" ] }
+esp-println = { version = "0.3.0", features = [ "esp32c3", "log" ] }
 esp-backtrace = { version = "0.2.0" , features = [ "esp32c3", "panic-handler", "exception-handler", "print-uart" ] }
 
 [features]

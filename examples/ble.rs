@@ -17,7 +17,7 @@ use ble_hci::{
     Ble, Data, HciConnector,
 };
 use esp_backtrace as _;
-use esp_println::println;
+use esp_println::{println, logger::init_logger};
 use esp_wifi::{ble::controller::BleConnector, initialize};
 use hal::{
     clock::{ClockControl, CpuClock},
@@ -38,7 +38,7 @@ extern crate alloc;
 
 #[entry]
 fn main() -> ! {
-    init_logger();
+    init_logger(log::LevelFilter::Info);
     esp_wifi::init_heap();
 
     let peripherals = Peripherals::take().unwrap();
@@ -137,26 +137,4 @@ fn main() -> ! {
             }
         }
     }
-}
-
-pub fn init_logger() {
-    unsafe {
-        log::set_logger_racy(&LOGGER).unwrap();
-        log::set_max_level(log::LevelFilter::Info);
-    }
-}
-
-static LOGGER: SimpleLogger = SimpleLogger;
-struct SimpleLogger;
-
-impl log::Log for SimpleLogger {
-    fn enabled(&self, _metadata: &log::Metadata) -> bool {
-        true
-    }
-
-    fn log(&self, record: &log::Record) {
-        println!("{} - {}", record.level(), record.args());
-    }
-
-    fn flush(&self) {}
 }

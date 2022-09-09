@@ -22,7 +22,7 @@ use embedded_svc::wifi::{
     Configuration, Status, Wifi,
 };
 use esp_backtrace as _;
-use esp_println::{print, println};
+use esp_println::{print, println, logger::init_logger};
 use esp_wifi::initialize;
 use esp_wifi::wifi::utils::create_network_interface;
 use esp_wifi::wifi_interface::{timestamp, WifiError};
@@ -49,7 +49,7 @@ const PASSWORD: &str = env!("PASSWORD");
 
 #[entry]
 fn main() -> ! {
-    init_logger();
+    init_logger(log::LevelFilter::Info);
     esp_wifi::init_heap();
 
     let peripherals = Peripherals::take().unwrap();
@@ -230,26 +230,4 @@ fn main() -> ! {
             }
         }
     }
-}
-
-pub fn init_logger() {
-    unsafe {
-        log::set_logger_racy(&LOGGER).unwrap();
-        log::set_max_level(log::LevelFilter::Info);
-    }
-}
-
-static LOGGER: SimpleLogger = SimpleLogger;
-struct SimpleLogger;
-
-impl log::Log for SimpleLogger {
-    fn enabled(&self, _metadata: &log::Metadata) -> bool {
-        true
-    }
-
-    fn log(&self, record: &log::Record) {
-        println!("{} - {}", record.level(), record.args());
-    }
-
-    fn flush(&self) {}
 }
