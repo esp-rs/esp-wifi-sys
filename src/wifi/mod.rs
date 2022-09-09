@@ -75,6 +75,8 @@ static mut G_COEX_ADAPTER_FUNCS: coex_adapter_funcs_t = coex_adapter_funcs_t {
     _malloc_internal: Some(malloc),
     _free: Some(free),
     _esp_timer_get_time: Some(esp_timer_get_time),
+    _env_is_chip: Some(env_is_chip),
+    _slowclk_cal_get: Some(slowclk_cal_get),
     _magic: crate::binary::include::COEX_ADAPTER_MAGIC as i32,
 };
 
@@ -100,6 +102,8 @@ static mut G_COEX_ADAPTER_FUNCS: coex_adapter_funcs_t = coex_adapter_funcs_t {
     _timer_done: Some(timer_done),
     _timer_setfn: Some(timer_setfn),
     _timer_arm_us: Some(timer_arm_us),
+    _env_is_chip: Some(env_is_chip),
+    _slowclk_cal_get: Some(slowclk_cal_get),
     _magic: crate::binary::include::COEX_ADAPTER_MAGIC as i32,
 };
 
@@ -280,6 +284,7 @@ static g_wifi_osi_funcs: wifi_osi_funcs_t = wifi_osi_funcs_t {
     _phy_common_clock_enable: Some(
         crate::wifi::os_adapter::os_adapter_chip_specific::phy_common_clock_enable,
     ),
+    _coex_register_start_cb: Some(coex_register_start_cb),
     _magic: ESP_WIFI_OS_ADAPTER_MAGIC as i32,
 };
 
@@ -292,7 +297,6 @@ unsafe impl Sync for wifi_osi_funcs_t {}
 static mut g_wifi_feature_caps: u64 = CONFIG_FEATURE_WPA3_SAE_BIT;
 
 static mut G_CONFIG: wifi_init_config_t = wifi_init_config_t {
-    event_handler: Some(esp_event_send_internal),
     osi_funcs: &g_wifi_osi_funcs as *const _ as *mut _,
 
     // dummy for now - populated in init
@@ -323,6 +327,7 @@ static mut G_CONFIG: wifi_init_config_t = wifi_init_config_t {
         omac1_aes_128: None,
         ccmp_decrypt: None,
         ccmp_encrypt: None,
+        aes_gmac: None,
     },
     static_rx_buf_num: 10,
     dynamic_rx_buf_num: 32,
@@ -355,15 +360,6 @@ pub fn wifi_init() -> i32 {
     unsafe {
         G_CONFIG.wpa_crypto_funcs = g_wifi_default_wpa_crypto_funcs;
         G_CONFIG.feature_caps = g_wifi_feature_caps;
-
-        let cntry_code = [b'C', b'N', 0];
-        let country = wifi_country_t {
-            cc: cntry_code,
-            schan: 1,
-            nchan: 13,
-            max_tx_power: 20,
-            policy: wifi_country_policy_t_WIFI_COUNTRY_POLICY_MANUAL,
-        };
 
         crate::wifi_set_log_verbose();
 
@@ -410,6 +406,7 @@ pub fn wifi_init() -> i32 {
                     capable: false,
                     required: false,
                 },
+                sae_pwe_h2e: 3,
                 _bitfield_align_1: [0u32; 0],
                 _bitfield_1: __BindgenBitfieldUnit::new([0u8; 4usize]),
             },
@@ -420,11 +417,6 @@ pub fn wifi_init() -> i32 {
         }
 
         let res = esp_wifi_set_tx_done_cb(Some(esp_wifi_tx_done_cb));
-        if res != 0 {
-            return res;
-        }
-
-        let res = esp_wifi_set_country(&country);
         if res != 0 {
             return res;
         }
@@ -491,8 +483,31 @@ pub fn wifi_start() -> i32 {
         if res != 0 {
             return res;
         }
+
+        let cntry_code = [b'C', b'N', 0];
+        let country = wifi_country_t {
+            cc: cntry_code,
+            schan: 1,
+            nchan: 13,
+            max_tx_power: 20,
+            policy: wifi_country_policy_t_WIFI_COUNTRY_POLICY_MANUAL,
+        };
+        let res = esp_wifi_set_country(&country);
+        if res != 0 {
+            return res;
+        }
     }
 
+    0
+}
+
+unsafe extern "C" fn coex_register_start_cb(
+    _cb: ::core::option::Option<unsafe extern "C" fn() -> crate::binary::c_types::c_int>,
+) -> crate::binary::c_types::c_int {
+    #[cfg(coex)]
+    return crate::binary::include::coex_register_start_cb(_cb);
+
+    #[cfg(not(coex))]
     0
 }
 
@@ -534,6 +549,7 @@ pub fn wifi_connect(ssid: &str, password: &str) -> i32 {
                     capable: true,
                     required: false,
                 },
+                sae_pwe_h2e: 3,
                 _bitfield_align_1: [0u32; 0],
                 _bitfield_1: __BindgenBitfieldUnit::new([0u8; 4usize]),
             },

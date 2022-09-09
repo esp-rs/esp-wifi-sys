@@ -1,16 +1,8 @@
-// Copyright 2015-2016 Espressif Systems (Shanghai) PTE LTD
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+/*
+ * SPDX-FileCopyrightText: 2015-2021 Espressif Systems (Shanghai) CO LTD
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
 #pragma once
 #include <stdint.h>
@@ -22,7 +14,8 @@ extern "C" {
 #endif
 
 /**
- * @file PHY init parameters and API
+ * @file
+ *          init parameters and API
  */
 
 
@@ -42,13 +35,17 @@ typedef struct {
     uint8_t opaque[1894];                   /*!< calibration data */
 } esp_phy_calibration_data_t;
 
+/**
+ * @brief PHY calibration mode
+ *
+ */
 typedef enum {
     PHY_RF_CAL_PARTIAL = 0x00000000,        /*!< Do part of RF calibration. This should be used after power-on reset. */
     PHY_RF_CAL_NONE    = 0x00000001,        /*!< Don't do any RF calibration. This mode is only suggested to be used after deep sleep reset. */
     PHY_RF_CAL_FULL    = 0x00000002         /*!< Do full RF calibration. Produces best results, but also consumes a lot of time and current. Suggested to be used once. */
 } esp_phy_calibration_mode_t;
 
-#if CONFIG_ESP32_SUPPORT_MULTIPLE_PHY_INIT_DATA_BIN
+#if CONFIG_ESP_PHY_MULTIPLE_INIT_DATA_BIN
 /**
  * @brief PHY init data type
  */
@@ -178,11 +175,26 @@ void esp_phy_disable(void);
  */
 void esp_phy_load_cal_and_init(void);
 
+/**
+ * @brief Initialize backup memory for Phy power up/down
+ */
+void esp_phy_pd_mem_init(void);
+
+/**
+ * @brief Deinitialize backup memory for Phy power up/down
+ */
+void esp_phy_pd_mem_deinit(void);
+
 #if CONFIG_MAC_BB_PD
 /**
  * @brief Initialize backup memory for MAC and Baseband power up/down
  */
 void esp_mac_bb_pd_mem_init(void);
+
+/**
+ * @brief Deinitialize backup memory for MAC and Baseband power up/down
+ */
+void esp_mac_bb_pd_mem_deinit(void);
 
 /**
  * @brief Power up MAC and Baseband
@@ -216,11 +228,15 @@ int64_t esp_phy_rf_get_on_ts(void);
 
 /**
  * @brief Update the corresponding PHY init type according to the country code of Wi-Fi.
+ *
+ * @param country country code
+ * @return ESP_OK on success.
+ * @return esp_err_t code describing the error on fail
  */
 esp_err_t esp_phy_update_country_info(const char *country);
 
 
-#if CONFIG_ESP32_SUPPORT_MULTIPLE_PHY_INIT_DATA_BIN
+#if CONFIG_ESP_PHY_MULTIPLE_INIT_DATA_BIN
 /**
  * @brief Apply PHY init bin to PHY
  * @return ESP_OK on success.

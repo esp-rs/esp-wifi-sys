@@ -1,16 +1,8 @@
-// Copyright 2018 Espressif Systems (Shanghai) PTE LTD
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+/*
+ * SPDX-FileCopyrightText: 2018-2021 Espressif Systems (Shanghai) CO LTD
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
 #ifndef ESP_WIFI_OS_ADAPTER_H_
 #define ESP_WIFI_OS_ADAPTER_H_
@@ -74,7 +66,7 @@ typedef struct {
     int32_t (* _task_ms_to_tick)(uint32_t ms);
     void *(* _task_get_current_task)(void);
     int32_t (* _task_get_max_priority)(void);
-    void *(* _malloc)(unsigned int size);
+    void *(* _malloc)(size_t size);
     void (* _free)(void *p);
     int32_t (* _event_post)(const char* event_base, int32_t event_id, void* event_data, size_t event_data_size, uint32_t ticks_to_wait);
     uint32_t (* _get_free_heap_size)(void);
@@ -85,12 +77,12 @@ typedef struct {
     void (* _wifi_apb80m_release)(void);
     void (* _phy_disable)(void);
     void (* _phy_enable)(void);
-#if CONFIG_IDF_TARGET_ESP32
+#if CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S2
     void (* _phy_common_clock_enable)(void);
     void (* _phy_common_clock_disable)(void);
 #endif
     int (* _phy_update_country_info)(const char* country);
-    int (* _read_mac)(uint8_t* mac, uint32_t type);
+    int (* _read_mac)(uint8_t* mac, unsigned int type);
     void (* _timer_arm)(void *timer, uint32_t tmout, bool repeat);
     void (* _timer_disarm)(void *timer);
     void (* _timer_done)(void *ptimer);
@@ -108,7 +100,7 @@ typedef struct {
     int (* _nvs_get_u8)(uint32_t handle, const char* key, uint8_t* out_value);
     int (* _nvs_set_u16)(uint32_t handle, const char* key, uint16_t value);
     int (* _nvs_get_u16)(uint32_t handle, const char* key, uint16_t* out_value);
-    int (* _nvs_open)(const char* name, uint32_t open_mode, uint32_t *out_handle);
+    int (* _nvs_open)(const char* name, unsigned int open_mode, uint32_t *out_handle);
     void (* _nvs_close)(uint32_t handle);
     int (* _nvs_commit)(uint32_t handle);
     int (* _nvs_set_blob)(uint32_t handle, const char* key, const void* value, size_t length);
@@ -117,11 +109,11 @@ typedef struct {
     int (* _get_random)(uint8_t *buf, size_t len);
     int (* _get_time)(void *t);
     unsigned long (* _random)(void);
-#if CONFIG_IDF_TARGET_ESP32S2 || CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32C3
+#if CONFIG_IDF_TARGET_ESP32S2 || CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32C3 || CONFIG_IDF_TARGET_ESP32C2
     uint32_t (* _slowclk_cal_get)(void);
 #endif
-    void (* _log_write)(uint32_t level, const char* tag, const char* format, ...);
-    void (* _log_writev)(uint32_t level, const char* tag, const char* format, va_list args);
+    void (* _log_write)(unsigned int level, const char* tag, const char* format, ...);
+    void (* _log_writev)(unsigned int level, const char* tag, const char* format, va_list args);
     uint32_t (* _log_timestamp)(void);
     void * (* _malloc_internal)(size_t size);
     void * (* _realloc_internal)(void *ptr, size_t size);
@@ -152,6 +144,7 @@ typedef struct {
     void * (* _coex_schm_curr_phase_get)(void);
     int (* _coex_schm_curr_phase_idx_set)(int idx);
     int (* _coex_schm_curr_phase_idx_get)(void);
+    int (* _coex_register_start_cb)(int (* cb)(void));
     int32_t _magic;
 } wifi_osi_funcs_t;
 

@@ -281,12 +281,17 @@ struct osi_funcs_s {
     coex_wifi_channel_get: Option<unsafe extern "C" fn(*mut u8, *mut u8) -> i32>,
     coex_register_wifi_channel_change_callback:
         Option<unsafe extern "C" fn(unsafe extern "C" fn()) -> i32>,
+    set_isr13: Option<unsafe extern "C" fn(i32, unsafe extern "C" fn(), *const ()) -> i32>,
+    interrupt_13_disable: Option<unsafe extern "C" fn() -> ()>,
+    interrupt_13_restore: Option<unsafe extern "C" fn() -> ()>,
+    custom_queue_create:
+        Option<unsafe extern "C" fn(u32, u32) -> *mut crate::binary::c_types::c_void>,
     magic: u32,
 }
 
 #[cfg(feature = "esp32")]
 static G_OSI_FUNCS: osi_funcs_s = osi_funcs_s {
-    version: 0x00010002,
+    version: 0x00010003,
     set_isr: Some(ble_os_adapter_chip_specific::set_isr),
     ints_on: Some(ble_os_adapter_chip_specific::ints_on),
     interrupt_disable: Some(interrupt_disable),
@@ -346,6 +351,10 @@ static G_OSI_FUNCS: osi_funcs_s = osi_funcs_s {
     coex_register_wifi_channel_change_callback: Some(
         ble_os_adapter_chip_specific::coex_register_wifi_channel_change_callback,
     ),
+    set_isr13: Some(set_isr13),
+    interrupt_13_disable: Some(interrupt_13_disable),
+    interrupt_13_restore: Some(interrupt_13_restore),
+    custom_queue_create: Some(custom_queue_create),
     magic: 0xfadebead,
 };
 
@@ -655,6 +664,29 @@ unsafe extern "C" fn read_efuse_mac(mac: *const ()) -> i32 {
     crate::common_adapter::chip_specific::read_mac(mac as *mut _, 2)
 }
 
+#[cfg(feature = "esp32")]
+unsafe extern "C" fn set_isr13(n: i32, handler: unsafe extern "C" fn(), arg: *const ()) -> i32 {
+    ble_os_adapter_chip_specific::set_isr(n, handler, arg)
+}
+
+#[cfg(feature = "esp32")]
+unsafe extern "C" fn interrupt_13_disable() {
+    // log::info!("unimplemented interrupt_13_disable");
+}
+
+#[cfg(feature = "esp32")]
+unsafe extern "C" fn interrupt_13_restore() {
+    //  log::info!("unimplemented interrupt_13_restore");
+}
+
+#[cfg(feature = "esp32")]
+unsafe extern "C" fn custom_queue_create(
+    _len: u32,
+    _item_size: u32,
+) -> *mut crate::binary::c_types::c_void {
+    todo!();
+}
+
 pub(crate) fn ble_init() {
     unsafe {
         BT_INTERNAL_QUEUE = Some(SimpleQueue::new());
@@ -715,15 +747,6 @@ pub(crate) fn ble_init() {
 
         #[cfg(coex)]
         crate::binary::include::coex_enable();
-
-        #[cfg(feature = "esp32")]
-        {
-            extern "C" {
-                fn coex_ble_adv_priority_high_set(high: bool);
-            }
-
-            coex_ble_adv_priority_high_set(false);
-        }
 
         // esp32_bt_controller_enable
 

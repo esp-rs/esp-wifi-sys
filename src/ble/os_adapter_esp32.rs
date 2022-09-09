@@ -108,6 +108,7 @@ pub(crate) fn create_ble_config() -> esp_bt_controller_config_t {
         ble_sca: 1,
         pcm_role: 0,
         pcm_polar: 0,
+        hli: false,
         magic: 0x20200622,
     }
 }

@@ -1,16 +1,8 @@
-// Copyright 2015-2018 Espressif Systems (Shanghai) PTE LTD
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+/*
+ * SPDX-FileCopyrightText: 2015-2021 Espressif Systems (Shanghai) CO LTD
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
 #ifndef __ESP_COEXIST_H__
 #define __ESP_COEXIST_H__
@@ -32,6 +24,13 @@ typedef enum {
     ESP_COEX_PREFER_NUM,            /*!< Prefer value numbers */
 } esp_coex_prefer_t;
 
+typedef enum {
+    EXTERN_COEX_WIRE_1 = 0,
+    EXTERN_COEX_WIRE_2,
+    EXTERN_COEX_WIRE_3,
+    EXTERN_COEX_WIRE_NUM,
+} external_coex_wire_t;
+
 /**
  * @brief coex status type
  */
@@ -42,37 +41,39 @@ typedef enum {
 } esp_coex_status_type_t;
 
 /**
- * @brief coex configuration structure
+ * @brief external coex gpio pti
  */
-typedef struct
-{
-    uint8_t wifi_st;
-    uint8_t ble_st;
-    uint8_t bt_st;
-    /* Members above shall vary from coexistence status macro: ESP_COEX_[MODULE]_ST_[STATUS] */
-    uint8_t wifi_prop;
-    uint8_t ble_prop;
-    uint8_t bt_prop;
-    /* proportion shall vary from 0-100 and the summary of them shall equal to 100 */ 
-} esp_coex_proportion_t;
+typedef struct {
+    int32_t in_pin0;
+    int32_t in_pin1;
+    int32_t out_pin0;
+} esp_external_coex_gpio_set_t;
 
-/* coexistence status macro */
-#define ESP_COEX_WIIF_ST_SCAN              0x01
-#define ESP_COEX_WIFI_ST_CONNECTING        0x02
-#define ESP_COEX_WIFI_ST_CONNECTED         0x04
+/**
+ * @brief external coex pti level
+ */
+typedef enum {
+    EXTERN_COEX_PTI_MID = 0,
+    EXTERN_COEX_PTI_HIGH,
+    EXTERN_COEX_PTI_NUM,
+} esp_coex_pti_level_t;
 
-#define ESP_COEX_BLE_ST_IDLE               0x00
-#define ESP_COEX_BLE_ST_ADV                0x01
-#define ESP_COEX_BLE_ST_SCAN               0x02
-#define ESP_COEX_BLE_ST_CONNECTED          0x04
+/**
+ * @brief external coex pti
+ */
+typedef struct {
+    uint32_t in_pti1;
+    uint32_t in_pti2;
+    uint32_t in_pti3;
+    uint32_t out_pti1;
+    uint32_t out_pti2;
+    uint32_t out_pti3;
+} esp_external_coex_pti_set_t;
+
 #define ESP_COEX_BLE_ST_MESH_CONFIG        0x08
 #define ESP_COEX_BLE_ST_MESH_TRAFFIC       0x10
 #define ESP_COEX_BLE_ST_MESH_STANDBY       0x20
 
-#define ESP_COEX_BT_ST_IDLE                0x00
-#define ESP_COEX_BT_ST_ISCAN               0x01
-#define ESP_COEX_BT_ST_CONNECTED           0x04
-#define ESP_COEX_BT_ST_SNIFF               0x08
 #define ESP_COEX_BT_ST_A2DP_STREAMING      0x10
 #define ESP_COEX_BT_ST_A2DP_PAUSED         0x20
 
@@ -112,29 +113,18 @@ esp_err_t esp_coex_status_bit_set(esp_coex_status_type_t type, uint32_t status);
  */
 esp_err_t esp_coex_status_bit_clear(esp_coex_status_type_t type, uint32_t status);
 
+#if CONFIG_EXTERNAL_COEX_ENABLE
 /**
- * @brief Set specifical coexistence proportion for different coexistence combination
- *  The following combinations are not supported to set proportion
- *  1. WiFi module is at IDLE status
- *  2. BLE module is at IDLE status and BT module is at IDLE / InquiryScan / Sniff / Inquiry status
- *  3. BLE module is at MESH_CONFIG / MESH_STANDBY status
- *  4. BLE module is at MESH TRAFFIC / SCAN with no mesh status and BT module is at Inquiry status
- *  @param prop : pointer for configuration structure
- *  @return : ESP_OK - success, other - failed
+ * @brief Setup gpio pin and corresponding pti level, start external coex.
+ * @param wire_type : to select the whole external coex gpio number.
+ * @param gpio_pin : gpio pin number to choose.
+ * @return : ESP_OK - success, other - failed
  */
-esp_err_t esp_coex_proportion_set(esp_coex_proportion_t *prop);
+esp_err_t esp_enable_extern_coex_gpio_pin(external_coex_wire_t wire_type,
+                    esp_external_coex_gpio_set_t gpio_pin);
 
-/**
- * @brief Get specifical coexistence proportion at different coexistence combination
- *  The following combinations are not supported to get proportion
- *  1. WiFi module is at IDLE status
- *  2. BLE module is at IDLE status and BT module is at IDLE / InquiryScan / Sniff / Inquiry status
- *  3. BLE module is at MESH_CONFIG / MESH_STANDBY status
- *  4. BLE module is at MESH TRAFFIC / SCAN with no mesh status and BT module is at Inquiry status
- *  @param prop : pointer for configuration structure
- *  @return : ESP_OK - success, other - failed
- */
-esp_err_t esp_coex_proportion_get(esp_coex_proportion_t *prop);
+esp_err_t esp_disable_extern_coex_gpio_pin();
+#endif
 
 #ifdef __cplusplus
 }

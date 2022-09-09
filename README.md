@@ -8,14 +8,13 @@ WiFi / BTLE coexistence is implemented but currently only works (to some extend)
 
 THIS CURRENTLY DOESN'T WORK WITH THE XTENSA ENABLED RUST COMPILER 1.63.0.2
 
-This uses the WiFi driver found in https://github.com/espressif/esp-wireless-drivers-3rdparty
+This uses the WiFi drivers from https://github.com/esp-rs/esp-wireless-drivers-3rdparty
 
 ## Version used
 
-esp-wireless-drivers-3rdparty-055f1ef49d0cb72c24bd492fbbdd37497a90bdae
-45701c0
+v5.0-beta1-427-g4532e6e0b2 commit 4532e6e0b2ddd02b5bdbc1119e37aac3c306e65d
 
-https://github.com/espressif/esp-wireless-drivers-3rdparty/archive/45701c0.zip
+https://github.com/esp-rs/esp-wireless-drivers-3rdparty/ (commit e951a30043699c6c935c3c4d018488efcdbd449b)
 
 ## Examples
 
@@ -28,6 +27,13 @@ https://github.com/espressif/esp-wireless-drivers-3rdparty/archive/45701c0.zip
     - starts Bluetooth advertising
     - offers two services (one is read/write, one is write only)
     - this uses a toy level BLE stack - might not work with every BLE central device (tested with Android and Windows Bluetooth LE Explorer)
+
+- coex (ESP32-C3 only)
+  - set SSID and PASSWORD env variable
+  - gets an ip address via DHCP
+  - performs an HTTP get request to some "random" server
+  - does BLE advertising
+  - coex support is still somewhat flaky
 
 | Command                                                                                                                      | Chip    |
 | ---------------------------------------------------------------------------------------------------------------------------- | ------- |
@@ -90,7 +96,7 @@ Additionally it uses CCOMPARE0 - so don't touch that, too.
 ## Missing / To be done
 
 - lots of refactoring
-- make CoEx work on ESP32
+- make CoEx work on ESP32 (it kind of works when commenting out setting the country in wifi_start, probably some mis-compilation since it then crashes in a totally different code path)
 - esp-now
 - powersafe support
 - maybe SoftAP

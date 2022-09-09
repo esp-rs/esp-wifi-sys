@@ -2028,6 +2028,8 @@ __umodsi3 = 0x400008c0;
 __unorddf2 = 0x400008c4;
 __unordsf2 = 0x400008c8;
 
+ r_lld_ext_adv_dynamic_aux_pti_process = 0x40001b44;
+ 
 /***************************************
  Redefine functions
  ***************************************/

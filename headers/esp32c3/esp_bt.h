@@ -1,16 +1,8 @@
-// Copyright 2015-2016 Espressif Systems (Shanghai) PTE LTD
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+/*
+ * SPDX-FileCopyrightText: 2015-2022 Espressif Systems (Shanghai) CO LTD
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
 #ifndef __ESP_BT_H__
 #define __ESP_BT_H__
@@ -25,7 +17,7 @@ extern "C" {
 #endif
 
 #define ESP_BT_CTRL_CONFIG_MAGIC_VAL    0x5A5AA5A5
-#define ESP_BT_CTRL_CONFIG_VERSION      0x02104270
+#define ESP_BT_CTRL_CONFIG_VERSION      0x02112280
 
 #define ESP_BT_HCI_TL_MAGIC_VALUE   0xfadebead
 #define ESP_BT_HCI_TL_VERSION       0x00010000
@@ -91,6 +83,13 @@ enum {
     ESP_BT_COEX_PHY_CODED_TX_RX_TIME_LIMIT_FORCE_DISABLE = 0,    /*!< Disable the limit */
     ESP_BT_COEX_PHY_CODED_TX_RX_TIME_LIMIT_FORCE_ENABLE,         /*!< Always Enable the limit */
 };
+
+#define ESP_BT_HCI_TL_STATUS_OK            (0)   /*!< HCI_TL Tx/Rx operation status OK */
+
+/**
+ * @brief callback function for HCI Transport Layer send/receive operations
+ */
+typedef void (* esp_bt_hci_tl_callback_t) (void *arg, uint8_t status);
 
 #ifdef CONFIG_BT_ENABLED
 
@@ -163,7 +162,9 @@ enum {
     .ble_st_acl_tx_buf_nb = CONFIG_BT_CTRL_BLE_STATIC_ACL_TX_BUF_NB,       \
     .ble_hw_cca_check = CONFIG_BT_CTRL_HW_CCA_EFF,                         \
     .ble_adv_dup_filt_max = CONFIG_BT_CTRL_ADV_DUP_FILT_MAX,               \
+    .coex_param_en = false,                                                \
     .ce_len_type = CONFIG_BT_CTRL_CE_LENGTH_TYPE_EFF,                      \
+    .coex_use_hooks = false,                                               \
     .hci_tl_type = CONFIG_BT_CTRL_HCI_TL_EFF,                              \
     .hci_tl_funcs = NULL,                                                  \
     .txant_dft = CONFIG_BT_CTRL_TX_ANTENNA_INDEX_EFF,                      \
@@ -178,6 +179,7 @@ enum {
     .hw_target_code = BLE_HW_TARGET_CODE_ESP32C3_CHIP_ECO0,                \
     .slave_ce_len_min = SLAVE_CE_LEN_MIN_DEFAULT,                          \
     .hw_recorrect_en = AGC_RECORRECT_EN,                                   \
+    .cca_thresh = CONFIG_BT_CTRL_HW_CCA_VAL,                               \
 };
 
 #else
@@ -195,8 +197,8 @@ typedef struct {
     int (* _open)(void);                    /* hci tl open */
     void (* _close)(void);                  /* hci tl close */
     void (* _finish_transfers)(void);       /* hci tl finish trasnfers */
-    void (* _recv)(uint8_t *buf, uint32_t len, void (*callback) (void*, uint8_t), void* dummy); /* hci tl recv */
-    void (* _send)(uint8_t *buf, uint32_t len, void (*callback) (void*, uint8_t), void* dummy); /* hci tl send */
+    void (* _recv)(uint8_t *buf, uint32_t len, esp_bt_hci_tl_callback_t callback, void* arg); /* hci tl recv */
+    void (* _send)(uint8_t *buf, uint32_t len, esp_bt_hci_tl_callback_t callback, void* arg); /* hci tl send */
     bool (* _flow_off)(void); /* hci tl flow off */
     void (* _flow_on)(void); /* hci tl flow on */
 } esp_bt_hci_tl_t;
@@ -244,6 +246,7 @@ typedef struct {
     uint32_t hw_target_code;                /*!< hardware target */
     uint8_t slave_ce_len_min;
     uint8_t hw_recorrect_en;
+    uint8_t cca_thresh;                     /*!< cca threshold*/
 } esp_bt_controller_config_t;
 
 /**
@@ -286,22 +289,22 @@ typedef enum {
  * @brief Bluetooth TX power level(index), it's just a index corresponding to power(dbm).
  */
 typedef enum {
-    ESP_PWR_LVL_N27 = 0,              /*!< Corresponding to -27dbm */
-    ESP_PWR_LVL_N24 = 1,              /*!< Corresponding to -24dbm */
-    ESP_PWR_LVL_N21 = 2,              /*!< Corresponding to -21dbm */
-    ESP_PWR_LVL_N18 = 3,              /*!< Corresponding to -18dbm */
-    ESP_PWR_LVL_N15 = 4,              /*!< Corresponding to -15dbm */
-    ESP_PWR_LVL_N12 = 5,              /*!< Corresponding to -12dbm */
-    ESP_PWR_LVL_N9  = 6,              /*!< Corresponding to  -9dbm */
-    ESP_PWR_LVL_N6  = 7,              /*!< Corresponding to  -6dbm */
-    ESP_PWR_LVL_N3  = 8,              /*!< Corresponding to  -3dbm */
-    ESP_PWR_LVL_N0  = 9,              /*!< Corresponding to   0dbm */
-    ESP_PWR_LVL_P3  = 10,             /*!< Corresponding to  +3dbm */
-    ESP_PWR_LVL_P6  = 11,             /*!< Corresponding to  +6dbm */
-    ESP_PWR_LVL_P9  = 12,             /*!< Corresponding to  +9dbm */
-    ESP_PWR_LVL_P12 = 13,             /*!< Corresponding to  +12dbm */
-    ESP_PWR_LVL_P15 = 14,             /*!< Corresponding to  +15dbm */
-    ESP_PWR_LVL_P18 = 15,             /*!< Corresponding to  +18dbm */
+    ESP_PWR_LVL_N24 = 0,              /*!< Corresponding to -24dbm */
+    ESP_PWR_LVL_N21 = 1,              /*!< Corresponding to -21dbm */
+    ESP_PWR_LVL_N18 = 2,              /*!< Corresponding to -18dbm */
+    ESP_PWR_LVL_N15 = 3,              /*!< Corresponding to -15dbm */
+    ESP_PWR_LVL_N12 = 4,              /*!< Corresponding to -12dbm */
+    ESP_PWR_LVL_N9  = 5,              /*!< Corresponding to  -9dbm */
+    ESP_PWR_LVL_N6  = 6,              /*!< Corresponding to  -6dbm */
+    ESP_PWR_LVL_N3  = 7,              /*!< Corresponding to  -3dbm */
+    ESP_PWR_LVL_N0  = 8,              /*!< Corresponding to   0dbm */
+    ESP_PWR_LVL_P3  = 9,              /*!< Corresponding to  +3dbm */
+    ESP_PWR_LVL_P6  = 10,             /*!< Corresponding to  +6dbm */
+    ESP_PWR_LVL_P9  = 11,             /*!< Corresponding to  +9dbm */
+    ESP_PWR_LVL_P12 = 12,             /*!< Corresponding to  +12dbm */
+    ESP_PWR_LVL_P15 = 13,             /*!< Corresponding to  +15dbm */
+    ESP_PWR_LVL_P18 = 14,             /*!< Corresponding to  +18dbm */
+    ESP_PWR_LVL_P21 = 15,             /*!< Corresponding to  +21dbm */
     ESP_PWR_LVL_INVALID = 0xFF,         /*!< Indicates an invalid value */
 } esp_power_level_t;
 
@@ -333,6 +336,8 @@ esp_err_t esp_bt_controller_init(esp_bt_controller_config_t *cfg);
 
 /**
  * @brief  De-initialize BT controller to free resource and delete task.
+ *         You should stop advertising and scanning, as well as
+ *         disconnect all existing connections before de-initializing BT controller.
  *
  * This function should be called only once, after any other BT functions are called.
  * This function is not whole completed, esp_bt_controller_init cannot called after this function.
@@ -520,10 +525,14 @@ void esp_bt_controller_wakeup_request(void);
 int esp_bt_h4tl_eif_io_event_notify(int event);
 
 /**
- * @brief  Get BT MAC address.
- * @return Array pointer of length 6 storing MAC address value.
+ * @brief bt Wi-Fi power domain power on
  */
-uint8_t* esp_bt_get_mac(void);
+void esp_wifi_bt_power_domain_on(void);
+
+/**
+ * @brief bt Wi-Fi power domain power off
+ */
+void esp_wifi_bt_power_domain_off(void);
 
 #ifdef __cplusplus
 }
