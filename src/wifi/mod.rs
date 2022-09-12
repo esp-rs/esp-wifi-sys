@@ -479,7 +479,12 @@ pub fn wifi_start() -> i32 {
             return res;
         }
 
-        let res = esp_wifi_set_ps(crate::binary::include::wifi_ps_type_t_WIFI_PS_MIN_MODEM);
+        // To make this fully work we probably need to implement some level of PM support!
+        #[cfg(coex)]
+        let res = esp_wifi_set_ps(crate::binary::include::wifi_ps_type_t_WIFI_PS_MAX_MODEM);
+
+        #[cfg(not(coex))]
+        let res = esp_wifi_set_ps(crate::binary::include::wifi_ps_type_t_WIFI_PS_NONE);
         if res != 0 {
             return res;
         }

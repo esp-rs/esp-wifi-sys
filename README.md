@@ -4,9 +4,9 @@
 
 This is experimental and work-in-progress! You are welcome to experiment with it and contribute but probably shouldn't use this for something real yet.
 
-WiFi / BTLE coexistence is implemented but currently only works (to some extend) on ESP32-C3.
+WiFi / BTLE coexistence is implemented but currently only works (to some extend) on ESP32-C3. In general COEX shouldn't be used currently.
 
-THIS CURRENTLY DOESN'T WORK WITH THE XTENSA ENABLED RUST COMPILER 1.63.0.2
+THIS CURRENTLY DOESN'T WORK WITH THE XTENSA ENABLED RUST COMPILER 1.63.0.2. Use 1.63.0.0!
 
 This uses the WiFi drivers from https://github.com/esp-rs/esp-wireless-drivers-3rdparty
 
