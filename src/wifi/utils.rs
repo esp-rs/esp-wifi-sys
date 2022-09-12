@@ -78,8 +78,8 @@ pub fn create_network_interface<'a>(
 
     for _ in 0..sockets_to_add {
         let rx_tx_socket1 = {
-            static mut TCP_SERVER_RX_DATA: [u8; 2500] = [0; 2500];
-            static mut TCP_SERVER_TX_DATA: [u8; 2500] = [0; 2500];
+            static mut TCP_SERVER_RX_DATA: [u8; 1536] = [0; 1536];
+            static mut TCP_SERVER_TX_DATA: [u8; 1536] = [0; 1536];
 
             let tcp_rx_buffer = unsafe { TcpSocketBuffer::new(&mut TCP_SERVER_RX_DATA[..]) };
             let tcp_tx_buffer = unsafe { TcpSocketBuffer::new(&mut TCP_SERVER_TX_DATA[..]) };
@@ -213,6 +213,8 @@ impl<'s, 'n: 's> Socket<'s, 'n> {
                 .get_socket::<TcpSocket>(self.socket_handle)
                 .abort();
         });
+
+        self.work();
     }
 
     pub fn work(&mut self) {

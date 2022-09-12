@@ -206,10 +206,7 @@ pub fn wifi_set_log_verbose() {
 }
 
 pub fn init_buffer() {
-    #[cfg(feature = "wifi")]
-    unsafe {
-        crate::wifi::DATA_QUEUE_RX = Some(compat::queue::SimpleQueue::new());
-    }
+    // nothing anymore for now
 }
 
 pub fn init_clocks() {
