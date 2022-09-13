@@ -1,5 +1,6 @@
-use core::mem::MaybeUninit;
+use core::{cell::RefCell, mem::MaybeUninit};
 
+use critical_section::Mutex;
 use log::trace;
 
 use crate::{
@@ -21,14 +22,17 @@ pub(crate) mod ble_os_adapter_chip_specific;
 
 pub mod controller;
 
-static mut BT_RECEIVE_QUEUE: Option<SimpleQueue<ReceivedPacket, 10>> = None;
+static BT_RECEIVE_QUEUE: Mutex<RefCell<SimpleQueue<ReceivedPacket, 10>>> =
+    Mutex::new(RefCell::new(SimpleQueue::new()));
 
+#[derive(Debug, Clone, Copy)]
 pub struct ReceivedPacket {
     pub len: u8,
     pub data: [u8; 256],
 }
 
-static mut BT_INTERNAL_QUEUE: Option<SimpleQueue<[u8; 8], 5>> = None;
+static BT_INTERNAL_QUEUE: Mutex<RefCell<SimpleQueue<[u8; 8], 5>>> =
+    Mutex::new(RefCell::new(SimpleQueue::new()));
 
 #[repr(C)]
 struct vhci_host_callback_s {
@@ -80,7 +84,10 @@ extern "C" fn notify_host_recv(data: *mut u8, len: u16) -> i32 {
             data: buf,
         };
 
-        BT_RECEIVE_QUEUE.as_mut().unwrap().enqueue(packet);
+        critical_section::with(|cs| {
+            let mut queue = BT_RECEIVE_QUEUE.borrow_ref_mut(cs);
+            queue.enqueue(packet);
+        });
     }
 
     0
@@ -281,12 +288,17 @@ struct osi_funcs_s {
     coex_wifi_channel_get: Option<unsafe extern "C" fn(*mut u8, *mut u8) -> i32>,
     coex_register_wifi_channel_change_callback:
         Option<unsafe extern "C" fn(unsafe extern "C" fn()) -> i32>,
+    set_isr13: Option<unsafe extern "C" fn(i32, unsafe extern "C" fn(), *const ()) -> i32>,
+    interrupt_13_disable: Option<unsafe extern "C" fn() -> ()>,
+    interrupt_13_restore: Option<unsafe extern "C" fn() -> ()>,
+    custom_queue_create:
+        Option<unsafe extern "C" fn(u32, u32) -> *mut crate::binary::c_types::c_void>,
     magic: u32,
 }
 
 #[cfg(feature = "esp32")]
 static G_OSI_FUNCS: osi_funcs_s = osi_funcs_s {
-    version: 0x00010002,
+    version: 0x00010003,
     set_isr: Some(ble_os_adapter_chip_specific::set_isr),
     ints_on: Some(ble_os_adapter_chip_specific::ints_on),
     interrupt_disable: Some(interrupt_disable),
@@ -346,6 +358,10 @@ static G_OSI_FUNCS: osi_funcs_s = osi_funcs_s {
     coex_register_wifi_channel_change_callback: Some(
         ble_os_adapter_chip_specific::coex_register_wifi_channel_change_callback,
     ),
+    set_isr13: Some(set_isr13),
+    interrupt_13_disable: Some(interrupt_13_disable),
+    interrupt_13_restore: Some(interrupt_13_restore),
+    custom_queue_create: Some(custom_queue_create),
     magic: 0xfadebead,
 };
 
@@ -445,7 +461,10 @@ unsafe extern "C" fn queue_send(queue: *const (), item: *const (), _block_time_m
             }
             trace!("queue posting {:x?}", data);
 
-            BT_INTERNAL_QUEUE.as_mut().unwrap().enqueue(data);
+            critical_section::with(|cs| {
+                let mut queue = BT_INTERNAL_QUEUE.borrow_ref_mut(cs);
+                queue.enqueue(data);
+            });
             memory_fence();
         });
     } else {
@@ -477,22 +496,24 @@ unsafe extern "C" fn queue_recv(queue: *const (), item: *const (), block_time_ms
     let end_time = crate::timer::get_systimer_count() + block_time_ms as u64;
 
     // handle the BT_QUEUE
-    if queue == &mut BT_INTERNAL_QUEUE as *const _ as *const () {
+    if queue == &BT_INTERNAL_QUEUE as *const _ as *const () {
         loop {
             let res = critical_section::with(|_| {
                 memory_fence();
-                let message = BT_INTERNAL_QUEUE.as_mut().unwrap().dequeue();
-                if message.is_some() {
-                    let message = message.unwrap();
-                    let item = item as *mut u8;
-                    for i in 0..8 {
-                        item.offset(i).write_volatile(message[i as usize]);
+
+                critical_section::with(|cs| {
+                    let mut queue = BT_INTERNAL_QUEUE.borrow_ref_mut(cs);
+                    if let Some(message) = queue.dequeue() {
+                        let item = item as *mut u8;
+                        for i in 0..8 {
+                            item.offset(i).write_volatile(message[i as usize]);
+                        }
+                        trace!("received {:x?}", message);
+                        1
+                    } else {
+                        0
                     }
-                    trace!("received {:x?}", message);
-                    1
-                } else {
-                    0
-                }
+                })
             });
 
             if res == 1 {
@@ -655,11 +676,31 @@ unsafe extern "C" fn read_efuse_mac(mac: *const ()) -> i32 {
     crate::common_adapter::chip_specific::read_mac(mac as *mut _, 2)
 }
 
+#[cfg(feature = "esp32")]
+unsafe extern "C" fn set_isr13(n: i32, handler: unsafe extern "C" fn(), arg: *const ()) -> i32 {
+    ble_os_adapter_chip_specific::set_isr(n, handler, arg)
+}
+
+#[cfg(feature = "esp32")]
+unsafe extern "C" fn interrupt_13_disable() {
+    // log::info!("unimplemented interrupt_13_disable");
+}
+
+#[cfg(feature = "esp32")]
+unsafe extern "C" fn interrupt_13_restore() {
+    //  log::info!("unimplemented interrupt_13_restore");
+}
+
+#[cfg(feature = "esp32")]
+unsafe extern "C" fn custom_queue_create(
+    _len: u32,
+    _item_size: u32,
+) -> *mut crate::binary::c_types::c_void {
+    todo!();
+}
+
 pub(crate) fn ble_init() {
     unsafe {
-        BT_INTERNAL_QUEUE = Some(SimpleQueue::new());
-        BT_RECEIVE_QUEUE = Some(SimpleQueue::new());
-
         *(HCI_OUT_COLLECTOR.as_mut_ptr()) = HciOutCollector::new();
         // turn on logging
         #[cfg(feature = "wifi_logs")]
@@ -715,15 +756,6 @@ pub(crate) fn ble_init() {
 
         #[cfg(coex)]
         crate::binary::include::coex_enable();
-
-        #[cfg(feature = "esp32")]
-        {
-            extern "C" {
-                fn coex_ble_adv_priority_high_set(high: bool);
-            }
-
-            coex_ble_adv_priority_high_set(false);
-        }
 
         // esp32_bt_controller_enable
 
@@ -784,9 +816,10 @@ static mut BLE_HCI_READ_DATA_LEN: usize = 0;
 pub fn read_hci(data: &mut [u8]) -> usize {
     unsafe {
         if BLE_HCI_READ_DATA_LEN == 0 {
-            let dequeued = BT_RECEIVE_QUEUE.as_mut().unwrap().dequeue();
-            match dequeued {
-                Some(packet) => {
+            critical_section::with(|cs| {
+                let mut queue = BT_RECEIVE_QUEUE.borrow_ref_mut(cs);
+
+                if let Some(packet) = queue.dequeue() {
                     for i in 0..(packet.len as usize + 0/*1*/) {
                         BLE_HCI_READ_DATA[i] = packet.data[i];
                     }
@@ -794,8 +827,7 @@ pub fn read_hci(data: &mut [u8]) -> usize {
                     BLE_HCI_READ_DATA_LEN = packet.len as usize + 0 /*1*/;
                     BLE_HCI_READ_DATA_INDEX = 0;
                 }
-                None => (),
-            };
+            });
         }
 
         if BLE_HCI_READ_DATA_LEN > 0 {

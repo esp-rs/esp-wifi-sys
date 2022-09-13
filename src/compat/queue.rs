@@ -2,25 +2,27 @@
 
 use core::mem::MaybeUninit;
 
-pub struct SimpleQueue<T, const N: usize> {
+pub struct SimpleQueue<T, const N: usize>
+where
+    T: Copy,
+{
     data: [Option<T>; N],
     read_index: usize,
     write_index: usize,
 }
 
-impl<T, const N: usize> SimpleQueue<T, N> {
-    pub fn new() -> SimpleQueue<T, N> {
+impl<T, const N: usize> SimpleQueue<T, N>
+where
+    T: Copy,
+{
+    pub const fn new() -> SimpleQueue<T, N> {
         let mut queue = unsafe {
             SimpleQueue {
-                data: MaybeUninit::uninit().assume_init(),
+                data: [None; N],
                 read_index: 0,
                 write_index: 0,
             }
         };
-
-        for i in 0..N {
-            queue.data[i] = None;
-        }
 
         queue
     }

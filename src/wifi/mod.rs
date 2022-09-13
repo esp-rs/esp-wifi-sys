@@ -1,8 +1,11 @@
 #[doc(hidden)]
 pub mod os_adapter;
 
+use core::{cell::RefCell, marker::PhantomData};
+
 use crate::common_adapter::*;
 
+use critical_section::Mutex;
 #[doc(hidden)]
 pub use os_adapter::*;
 use smoltcp::phy::{Device, DeviceCapabilities, RxToken, TxToken};
@@ -44,14 +47,34 @@ static DUMP_PACKETS: bool = true;
 #[cfg(not(feature = "dump_packets"))]
 static DUMP_PACKETS: bool = false;
 
-pub(crate) struct DataFrame {
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct DataFrame<'a> {
     len: usize,
-    data: [u8; 2500],
+    data: [u8; 1536],
+    _phantom: PhantomData<&'a ()>,
 }
 
-pub(crate) static mut DATA_QUEUE_RX: Option<SimpleQueue<DataFrame, 3>> = None;
+impl<'a> DataFrame<'a> {
+    pub(crate) fn new() -> DataFrame<'a> {
+        DataFrame {
+            len: 0,
+            data: [0u8; 1536],
+            _phantom: Default::default(),
+        }
+    }
 
-pub(crate) static mut TX_BUFFER: [u8; 2500] = [0u8; 2500]; // should be a queue
+    pub(crate) fn from_bytes(bytes: &[u8]) -> DataFrame {
+        let mut data = DataFrame::new();
+        data.len = bytes.len();
+        data.data[..bytes.len()].copy_from_slice(bytes);
+        data
+    }
+}
+
+pub(crate) static DATA_QUEUE_RX: Mutex<RefCell<SimpleQueue<DataFrame, 3>>> =
+    Mutex::new(RefCell::new(SimpleQueue::new()));
+
+pub(crate) static mut TX_BUFFER: [u8; 1536] = [0u8; 1536]; // should be a queue
 pub(crate) static mut TX_QUEUED: bool = false;
 pub(crate) static mut TX_QUEUED_DATA_LEN: u16 = 0;
 
@@ -75,6 +98,8 @@ static mut G_COEX_ADAPTER_FUNCS: coex_adapter_funcs_t = coex_adapter_funcs_t {
     _malloc_internal: Some(malloc),
     _free: Some(free),
     _esp_timer_get_time: Some(esp_timer_get_time),
+    _env_is_chip: Some(env_is_chip),
+    _slowclk_cal_get: Some(slowclk_cal_get),
     _magic: crate::binary::include::COEX_ADAPTER_MAGIC as i32,
 };
 
@@ -100,6 +125,8 @@ static mut G_COEX_ADAPTER_FUNCS: coex_adapter_funcs_t = coex_adapter_funcs_t {
     _timer_done: Some(timer_done),
     _timer_setfn: Some(timer_setfn),
     _timer_arm_us: Some(timer_arm_us),
+    _env_is_chip: Some(env_is_chip),
+    _slowclk_cal_get: Some(slowclk_cal_get),
     _magic: crate::binary::include::COEX_ADAPTER_MAGIC as i32,
 };
 
@@ -280,6 +307,7 @@ static g_wifi_osi_funcs: wifi_osi_funcs_t = wifi_osi_funcs_t {
     _phy_common_clock_enable: Some(
         crate::wifi::os_adapter::os_adapter_chip_specific::phy_common_clock_enable,
     ),
+    _coex_register_start_cb: Some(coex_register_start_cb),
     _magic: ESP_WIFI_OS_ADAPTER_MAGIC as i32,
 };
 
@@ -292,7 +320,6 @@ unsafe impl Sync for wifi_osi_funcs_t {}
 static mut g_wifi_feature_caps: u64 = CONFIG_FEATURE_WPA3_SAE_BIT;
 
 static mut G_CONFIG: wifi_init_config_t = wifi_init_config_t {
-    event_handler: Some(esp_event_send_internal),
     osi_funcs: &g_wifi_osi_funcs as *const _ as *mut _,
 
     // dummy for now - populated in init
@@ -323,6 +350,7 @@ static mut G_CONFIG: wifi_init_config_t = wifi_init_config_t {
         omac1_aes_128: None,
         ccmp_decrypt: None,
         ccmp_encrypt: None,
+        aes_gmac: None,
     },
     static_rx_buf_num: 10,
     dynamic_rx_buf_num: 32,
@@ -355,15 +383,6 @@ pub fn wifi_init() -> i32 {
     unsafe {
         G_CONFIG.wpa_crypto_funcs = g_wifi_default_wpa_crypto_funcs;
         G_CONFIG.feature_caps = g_wifi_feature_caps;
-
-        let cntry_code = [b'C', b'N', 0];
-        let country = wifi_country_t {
-            cc: cntry_code,
-            schan: 1,
-            nchan: 13,
-            max_tx_power: 20,
-            policy: wifi_country_policy_t_WIFI_COUNTRY_POLICY_MANUAL,
-        };
 
         crate::wifi_set_log_verbose();
 
@@ -410,6 +429,7 @@ pub fn wifi_init() -> i32 {
                     capable: false,
                     required: false,
                 },
+                sae_pwe_h2e: 3,
                 _bitfield_align_1: [0u32; 0],
                 _bitfield_1: __BindgenBitfieldUnit::new([0u8; 4usize]),
             },
@@ -420,11 +440,6 @@ pub fn wifi_init() -> i32 {
         }
 
         let res = esp_wifi_set_tx_done_cb(Some(esp_wifi_tx_done_cb));
-        if res != 0 {
-            return res;
-        }
-
-        let res = esp_wifi_set_country(&country);
         if res != 0 {
             return res;
         }
@@ -450,24 +465,18 @@ unsafe extern "C" fn recv_cb(
     len: u16,
     eb: *mut crate::binary::c_types::c_void,
 ) -> esp_err_t {
-    critical_section::with(|_| {
-        if let Some(ref mut data_queue_rx) = DATA_QUEUE_RX {
-            if !data_queue_rx.is_full() {
-                let mut buf = [0u8; 2500];
-                let src = core::slice::from_raw_parts_mut(buffer as *mut u8, len as usize);
-                buf[..(len as usize)].copy_from_slice(src);
-                data_queue_rx.enqueue(DataFrame {
-                    len: len as usize,
-                    data: buf,
-                });
-
-                esp_wifi_internal_free_rx_buffer(eb);
-                debug!("esp_wifi_internal_free_rx_buffer done");
-            }
+    critical_section::with(|cs| {
+        let mut queue = DATA_QUEUE_RX.borrow_ref_mut(cs);
+        if !queue.is_full() {
+            let src = core::slice::from_raw_parts_mut(buffer as *mut u8, len as usize);
+            let packet = DataFrame::from_bytes(src);
+            queue.enqueue(packet);
+            esp_wifi_internal_free_rx_buffer(eb);
+            0
+        } else {
+            1
         }
-    });
-
-    0
+    })
 }
 
 #[ram]
@@ -487,12 +496,40 @@ pub fn wifi_start() -> i32 {
             return res;
         }
 
-        let res = esp_wifi_set_ps(crate::binary::include::wifi_ps_type_t_WIFI_PS_MIN_MODEM);
+        // To make this fully work we probably need to implement some level of PM support!
+        #[cfg(coex)]
+        let res = esp_wifi_set_ps(crate::binary::include::wifi_ps_type_t_WIFI_PS_MAX_MODEM);
+
+        #[cfg(not(coex))]
+        let res = esp_wifi_set_ps(crate::binary::include::wifi_ps_type_t_WIFI_PS_NONE);
+        if res != 0 {
+            return res;
+        }
+
+        let cntry_code = [b'C', b'N', 0];
+        let country = wifi_country_t {
+            cc: cntry_code,
+            schan: 1,
+            nchan: 13,
+            max_tx_power: 20,
+            policy: wifi_country_policy_t_WIFI_COUNTRY_POLICY_MANUAL,
+        };
+        let res = esp_wifi_set_country(&country);
         if res != 0 {
             return res;
         }
     }
 
+    0
+}
+
+unsafe extern "C" fn coex_register_start_cb(
+    _cb: ::core::option::Option<unsafe extern "C" fn() -> crate::binary::c_types::c_int>,
+) -> crate::binary::c_types::c_int {
+    #[cfg(coex)]
+    return crate::binary::include::coex_register_start_cb(_cb);
+
+    #[cfg(not(coex))]
     0
 }
 
@@ -534,6 +571,7 @@ pub fn wifi_connect(ssid: &str, password: &str) -> i32 {
                     capable: true,
                     required: false,
                 },
+                sae_pwe_h2e: 3,
                 _bitfield_align_1: [0u32; 0],
                 _bitfield_1: __BindgenBitfieldUnit::new([0u8; 4usize]),
             },
@@ -571,19 +609,15 @@ impl<'a> Device<'a> for WifiDevice {
     type TxToken = WifiTxToken;
 
     fn receive(&'a mut self) -> Option<(Self::RxToken, Self::TxToken)> {
-        let available = unsafe {
-            if let Some(ref data_queue_rx) = DATA_QUEUE_RX {
-                !data_queue_rx.is_empty()
-            } else {
-                false
-            }
-        };
+        critical_section::with(|cs| {
+            let queue = DATA_QUEUE_RX.borrow_ref_mut(cs);
 
-        if available {
-            Some((WifiRxToken::default(), WifiTxToken::default()))
-        } else {
-            None
-        }
+            if !queue.is_empty() {
+                Some((WifiRxToken::default(), WifiTxToken::default()))
+            } else {
+                None
+            }
+        })
     }
 
     fn transmit(&'a mut self) -> Option<Self::TxToken> {
@@ -606,31 +640,19 @@ impl RxToken for WifiRxToken {
     where
         F: FnOnce(&mut [u8]) -> smoltcp::Result<R>,
     {
-        let mut result: Option<smoltcp::Result<R>> = None;
-        unsafe {
-            if let Some(ref mut data_queue_rx) = DATA_QUEUE_RX {
-                if !data_queue_rx.is_empty() {
-                    let element = data_queue_rx.dequeue();
+        critical_section::with(|cs| {
+            let mut queue = DATA_QUEUE_RX.borrow_ref_mut(cs);
 
-                    result = match element {
-                        Some(mut data) => {
-                            let buffer =
-                                core::slice::from_raw_parts(&data.data as *const u8, data.len);
-                            debug!("received {:?}", _timestamp);
-                            dump_packet_info(&buffer);
-                            Some(f(&mut data.data[..]))
-                        }
-                        None => Some(Err(smoltcp::Error::Exhausted)),
-                    };
-                }
+            if let Some(mut data) = queue.dequeue() {
+                let buffer =
+                    unsafe { core::slice::from_raw_parts(&data.data as *const u8, data.len) };
+                debug!("received {:?}", _timestamp);
+                dump_packet_info(&buffer);
+                f(&mut data.data[..])
+            } else {
+                Err(smoltcp::Error::Exhausted)
             }
-        }
-
-        if let Some(res) = result {
-            res
-        } else {
-            Err(smoltcp::Error::Exhausted)
-        }
+        })
     }
 }
 

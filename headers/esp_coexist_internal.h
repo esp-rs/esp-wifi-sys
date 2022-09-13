@@ -1,21 +1,14 @@
-// Copyright 2018-2018 Espressif Systems (Shanghai) PTE LTD
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+/*
+ * SPDX-FileCopyrightText: 2018-2022 Espressif Systems (Shanghai) CO LTD
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
 #ifndef __ESP_COEXIST_INTERNAL_H__
 #define __ESP_COEXIST_INTERNAL_H__
 
 #include <stdbool.h>
+#include "esp_coexist.h"
 #include "esp_coexist_adapter.h"
 
 #ifdef __cplusplus
@@ -30,6 +23,7 @@ typedef enum {
 } coex_prefer_t;
 
 typedef void (* coex_func_cb_t)(uint32_t event, int sched_cnt);
+typedef esp_err_t (* coex_set_lpclk_source_callback_t)(void);
 
 /**
  * @brief Pre-Init software coexist
@@ -123,6 +117,18 @@ int coex_wifi_release(uint32_t event);
 int coex_wifi_channel_set(uint8_t primary, uint8_t secondary);
 
 /**
+ * @brief Register application callback function to Wi-Fi update low power clock module.
+ *
+ * @param callback : Wi-Fi update low power clock callback function
+ */
+void coex_wifi_register_update_lpclk_callback(coex_set_lpclk_source_callback_t callback);
+
+/**
+ * @brief Update low power clock interval
+ */
+void coex_update_lpclk_interval(void);
+
+/**
  * @brief Get coexistence event duration.
  *
  *  @param event : Coexistence event
@@ -203,12 +209,43 @@ int coex_schm_curr_phase_idx_set(int idx);
 int coex_schm_curr_phase_idx_get(void);
 
 /**
+ * @brief Register WiFi callback for coexistence starts.
+ *
+ *  @param cb : WiFi callback
+ *  @return : 0 - success, other - failed
+ */
+int coex_register_start_cb(int (* cb)(void));
+
+/**
  * @brief Register coexistence adapter functions.
  *
  *  @param funcs : coexistence adapter functions
  *  @return : ESP_OK - success, other - failed
  */
 esp_err_t esp_coex_adapter_register(coex_adapter_funcs_t *funcs);
+
+#if CONFIG_EXTERNAL_COEX_ENABLE
+/**
+  * @brief     Set external coexistence pti level and enable it.
+  *
+  * @param     level1    external coex low pti
+  * @param     level2    external coex mid pti
+  * @param     level3    external coex high pti
+  *
+  * @return
+  *    - ESP_OK: succeed
+  */
+esp_err_t esp_coex_external_set(esp_coex_pti_level_t level1,
+         esp_coex_pti_level_t level2, esp_coex_pti_level_t level3);
+
+/**
+  * @brief     Disable external coexist
+  *
+  * @return
+  *    - ESP_OK: succeed
+  */
+void esp_coex_external_stop(void);
+#endif    /*External Coex*/
 
 /**
   * @brief     Check the MD5 values of the coexistence adapter header files in IDF and WiFi library

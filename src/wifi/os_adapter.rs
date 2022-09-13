@@ -49,59 +49,6 @@ pub fn get_wifi_state() -> WifiState {
 }
 
 /****************************************************************************
- * Name: esp_event_send_internal
- *
- * Description:
- *   Post event message to queue
- *
- * Input Parameters:
- *   event_base      - Event set name
- *   event_id        - Event ID
- *   event_data      - Event private data
- *   event_data_size - Event data size
- *   ticks_to_wait   - Waiting system ticks
- *
- * Returned Value:
- *   Task maximum priority
- *
- ****************************************************************************/
-pub unsafe extern "C" fn esp_event_send_internal(
-    event_base: esp_event_base_t,
-    event_id: i32,
-    event_data: *mut crate::binary::c_types::c_void,
-    event_data_size: size_t,
-    ticks_to_wait: TickType_t,
-) -> esp_err_t {
-    trace!(
-        "esp_event_send_internal {:?} {} {:p} {} {:?}",
-        event_base,
-        event_id,
-        event_data,
-        event_data_size,
-        ticks_to_wait
-    );
-
-    // probably also need to look at event_base
-    #[allow(non_upper_case_globals)]
-    let take_state = match event_id as u32 {
-        wifi_event_t_WIFI_EVENT_WIFI_READY => true,
-        wifi_event_t_WIFI_EVENT_STA_START => true,
-        wifi_event_t_WIFI_EVENT_STA_STOP => true,
-        wifi_event_t_WIFI_EVENT_STA_CONNECTED => true,
-        wifi_event_t_WIFI_EVENT_STA_DISCONNECTED => true,
-        _ => false,
-    };
-
-    if take_state {
-        WIFI_STATE = event_id;
-    }
-
-    memory_fence();
-
-    0
-}
-
-/****************************************************************************
  * Name: wifi_env_is_chip
  *
  * Description:
@@ -930,13 +877,39 @@ pub unsafe extern "C" fn free(p: *mut crate::binary::c_types::c_void) {
  *
  ****************************************************************************/
 pub unsafe extern "C" fn event_post(
-    _event_base: *const crate::binary::c_types::c_char,
-    _event_id: i32,
-    _event_data: *mut crate::binary::c_types::c_void,
-    _event_data_size: size_t,
-    _ticks_to_wait: u32,
+    event_base: *const crate::binary::c_types::c_char,
+    event_id: i32,
+    event_data: *mut crate::binary::c_types::c_void,
+    event_data_size: size_t,
+    ticks_to_wait: u32,
 ) -> i32 {
-    todo!("event_post")
+    trace!(
+        "event_post {:?} {} {:p} {} {:?}",
+        event_base,
+        event_id,
+        event_data,
+        event_data_size,
+        ticks_to_wait
+    );
+
+    // probably also need to look at event_base
+    #[allow(non_upper_case_globals)]
+    let take_state = match event_id as u32 {
+        wifi_event_t_WIFI_EVENT_WIFI_READY => true,
+        wifi_event_t_WIFI_EVENT_STA_START => true,
+        wifi_event_t_WIFI_EVENT_STA_STOP => true,
+        wifi_event_t_WIFI_EVENT_STA_CONNECTED => true,
+        wifi_event_t_WIFI_EVENT_STA_DISCONNECTED => true,
+        _ => false,
+    };
+
+    if take_state {
+        WIFI_STATE = event_id;
+    }
+
+    memory_fence();
+
+    0
 }
 
 /****************************************************************************
