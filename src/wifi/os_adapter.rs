@@ -1,5 +1,6 @@
 #[cfg_attr(feature = "esp32c3", path = "os_adapter_esp32c3.rs")]
 #[cfg_attr(feature = "esp32", path = "os_adapter_esp32.rs")]
+#[cfg_attr(feature = "esp32s3", path = "os_adapter_esp32s3.rs")]
 pub(crate) mod os_adapter_chip_specific;
 
 use log::{debug, trace};
@@ -1897,7 +1898,7 @@ pub unsafe extern "C" fn coex_event_duration_get(
  *   Don't support
  *
  ****************************************************************************/
-#[cfg(feature = "esp32c3")]
+#[cfg(any(feature = "esp32c3", feature = "esp32s3"))]
 #[allow(unused_variables)]
 pub unsafe extern "C" fn coex_pti_get(event: u32, pti: *mut u8) -> crate::binary::c_types::c_int {
     log::debug!("coex_pti_get");

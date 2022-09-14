@@ -9,6 +9,8 @@ use esp32_hal as hal;
 use esp32c3_hal as hal;
 #[cfg(feature = "esp32c3")]
 use esp32c3_hal::systimer::{Alarm, Target};
+#[cfg(feature = "esp32s3")]
+use esp32s3_hal as hal;
 
 use fugit::MegahertzU32;
 use hal::clock::Clocks;
@@ -29,6 +31,7 @@ pub mod preempt;
 #[doc(hidden)]
 #[cfg_attr(feature = "esp32", path = "timer_esp32.rs")]
 #[cfg_attr(feature = "esp32c3", path = "timer_esp32c3.rs")]
+#[cfg_attr(feature = "esp32s3", path = "timer_esp32s3.rs")]
 pub mod timer;
 
 #[cfg(feature = "wifi")]
@@ -143,7 +146,7 @@ pub enum InitializationError {
     WrongClockConfig,
 }
 
-#[cfg(feature = "esp32")]
+#[cfg(any(feature = "esp32", feature = "esp32s3"))]
 /// Initialize for using WiFi / BLE
 /// This will initialize internals and also initialize WiFi and BLE
 pub fn initialize(
