@@ -14,6 +14,8 @@ use smoltcp::phy::{Device, DeviceCapabilities, RxToken, TxToken};
 use esp32_hal as hal;
 #[cfg(feature = "esp32c3")]
 use esp32c3_hal as hal;
+#[cfg(feature = "esp32s3")]
+use esp32s3_hal as hal;
 
 use hal::macros::ram;
 
@@ -297,7 +299,7 @@ static g_wifi_osi_funcs: wifi_osi_funcs_t = wifi_osi_funcs_t {
     _coex_schm_curr_phase_get: Some(coex_schm_curr_phase_get),
     _coex_schm_curr_phase_idx_set: Some(coex_schm_curr_phase_idx_set),
     _coex_schm_curr_phase_idx_get: Some(coex_schm_curr_phase_idx_get),
-    #[cfg(feature = "esp32c3")]
+    #[cfg(any(feature = "esp32c3", feature = "esp32s3"))]
     _slowclk_cal_get: Some(slowclk_cal_get),
     #[cfg(feature = "esp32")]
     _phy_common_clock_disable: Some(
@@ -449,7 +451,7 @@ pub fn wifi_init() -> i32 {
             return res;
         }
 
-        #[cfg(feature = "esp32")]
+        #[cfg(any(feature = "esp32", feature = "esp32s3"))]
         {
             static mut NVS_STRUCT: [u32; 12] = [0; 12];
             crate::common_adapter::chip_specific::g_misc_nvs =

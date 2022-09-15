@@ -1,4 +1,4 @@
-# Wifi and Bluetooth LE on ESP32-C3 and ESP32 (on bare-metal Rust)
+# Wifi and Bluetooth LE on ESP32-C3,ESP32 and ESP32-S3 (on bare-metal Rust)
 
 ## About
 
@@ -6,7 +6,10 @@ This is experimental and work-in-progress! You are welcome to experiment with it
 
 WiFi / BTLE coexistence is implemented but currently only works (to some extend) on ESP32-C3. In general COEX shouldn't be used currently.
 
+On ESP32-S3 only WiFi is support currently.
+
 THIS CURRENTLY DOESN'T WORK WITH THE XTENSA ENABLED RUST COMPILER 1.63.0.2. Use 1.63.0.0!
+FOR ESP32-S3 THIS CURRENTLY EVEN DOESN'T WORK WITH THE XTENSA ENABLED RUST COMPILER 1.63.0.3. Use 1.63.0.0!
 
 This uses the WiFi drivers from https://github.com/esp-rs/esp-wireless-drivers-3rdparty
 
@@ -14,7 +17,7 @@ This uses the WiFi drivers from https://github.com/esp-rs/esp-wireless-drivers-3
 
 v5.0-beta1-427-g4532e6e0b2 commit 4532e6e0b2ddd02b5bdbc1119e37aac3c306e65d
 
-https://github.com/esp-rs/esp-wireless-drivers-3rdparty/ (commit e951a30043699c6c935c3c4d018488efcdbd449b)
+https://github.com/esp-rs/esp-wireless-drivers-3rdparty/ (commit 8e5147d2de8d9b95c61fdd568e60a1d96812ea9d)
 
 ## Examples
 
@@ -42,6 +45,7 @@ https://github.com/esp-rs/esp-wireless-drivers-3rdparty/ (commit e951a30043699c6
 | `cargo "+nightly" run --example coex --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc,wifi,ble"` | ESP32-C3 |
 | `cargo "+esp" run --example ble --release --target xtensa-esp32-none-elf --features "esp32,ble"`              | ESP32   |
 | `cargo "+esp" run --example dhcp --release --target xtensa-esp32-none-elf --features "esp32,embedded-svc,wifi"`             | ESP32   |
+| `cargo "+esp" run --example dhcp --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi"`             | ESP32-S3|
 
 Additional you can specify these features
 |Feature|Meaning|
@@ -66,7 +70,7 @@ In general you should use the release profile since otherwise the performance is
 - uses SYSTIMER as the main timer
 - doesn't work in direct-boot mode
 
-## Notes on ESP32 support
+## Notes on ESP32 / ESP32-S3 support
 
 This is even more experimental than support for ESP32-C3.
 
@@ -74,7 +78,7 @@ This is even more experimental than support for ESP32-C3.
 - Also there might be some packet loss and a bit worse performance than on ESP32-C3 currently.
 - The code runs on a single core and might currently not be multi-core safe!
 
-On ESP32 currently TIMG1/TIMER0 is used as the main timer so you can't use it for anything else.
+On ESP32 / ESP32-S3 currently TIMG1/TIMER0 is used as the main timer so you can't use it for anything else.
 Additionally it uses CCOMPARE0 - so don't touch that, too.
 
 ## Directory Structure
@@ -90,7 +94,6 @@ Additionally it uses CCOMPARE0 - so don't touch that, too.
 - `libs/espXXX`: static libraries found in the WiFi driver archive (these get linked into the binary)
 - `mkbindings.bat`: generate the bindings / just calls `bindgen`
 - `ld/espXXX/rom_functions.x`: the WiFi driver uses some of these so it needs to get linked
-- `ld/esp32/wifi-link.x`: the main linker script for ESP32 - needs to get cleaned up and ideally the changes move to ESP-HAL
 - `examples/*.rs`: examples
 
 ## Missing / To be done

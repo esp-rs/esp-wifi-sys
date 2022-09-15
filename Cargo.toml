@@ -4,12 +4,16 @@ version = "0.1.0"
 edition = "2021"
 license = "MIT OR Apache-2.0"
 
+[profile.release]
+opt-level = "s"
+
 [dependencies]
 embedded-hal = "0.2.3"
 nb = "1.0.0"
 void = { version = "1.0.2", default-features = false }
-esp32c3-hal = { version = "0.1.0", optional = true }
-esp32-hal = { version = "0.4.0", optional = true, features = [ "bluetooth","rt" ] }
+esp32c3-hal = { version = "0.2.0", optional = true }
+esp32-hal = { version = "0.5.0", optional = true, features = [ "bluetooth","rt" ] }
+esp32s3-hal = { version = "0.2.0", optional = true, features = [ "rt" ] }
 riscv-rt = { version = "0.9.0", optional = true }
 riscv = { version = "0.8.0", optional = true }
 xtensa-lx-rt = { version = "0.13.0", optional = true }
@@ -39,10 +43,15 @@ esp-backtrace = { version = "0.2.0", features = [ "esp32", "panic-handler", "exc
 esp-println = { version = "0.3.0", features = [ "esp32c3", "log" ] }
 esp-backtrace = { version = "0.2.0" , features = [ "esp32c3", "panic-handler", "exception-handler", "print-uart" ] }
 
+[target.xtensa-esp32s3-none-elf.dev-dependencies]
+esp-println = { version = "0.3.0", features = [ "esp32s3", "log" ] }
+esp-backtrace = { version = "0.2.0", features = [ "esp32s3", "panic-handler", "exception-handler", "print-uart" ] }
+
 [features]
 default = [ "utils" ]
 esp32c3 = [ "riscv-target", "riscv", "riscv-rt", "esp32c3-hal" ]
 esp32 = [ "esp32-hal", "xtensa-lx-rt/esp32", "xtensa-lx/esp32" ]
+esp32s3 = [ "esp32s3-hal", "xtensa-lx-rt/esp32s3", "xtensa-lx/esp32s3" ]
 wifi_logs = []
 dump_packets = []
 utils = []
@@ -53,6 +62,4 @@ ble = []
 
 # currently published versions don't contain all relevant adjustments - using git dependencies for now
 [patch.crates-io]
-esp32-hal = { git = "https://github.com/esp-rs/esp-hal", package = "esp32-hal", rev = "da3ec47b30a5f598e904ffac0e10f94716cb4023" }
-esp32c3-hal = { git = "https://github.com/esp-rs/esp-hal", package = "esp32c3-hal", rev = "da3ec47b30a5f598e904ffac0e10f94716cb4023" }
-esp-hal-common = { git = "https://github.com/esp-rs/esp-hal", package = "esp-hal-common", rev = "da3ec47b30a5f598e904ffac0e10f94716cb4023" }
+esp32s3-hal = { git = "https://github.com/esp-rs/esp-hal/", package = "esp32s3-hal", rev = "6eea2f266a451678d244917329e2e885940fce9c" }

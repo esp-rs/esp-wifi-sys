@@ -4,6 +4,9 @@
 #include "esp_phy_init.h"
 #include "phy.h"
 #include "esp_timer.h"
+
+#if !defined(CONFIG_IDF_TARGET_ESP32S2)
 #include "esp_bt.h"
 #include "esp_coexist_internal.h"
 #include "esp_coexist_adapter.h"
+#endif

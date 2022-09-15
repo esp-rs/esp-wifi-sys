@@ -11,20 +11,26 @@ use crate::compat::common::*;
 use esp32_hal::Rng;
 #[cfg(feature = "esp32c3")]
 use esp32c3_hal::Rng;
+#[cfg(feature = "esp32s3")]
+use esp32s3_hal::Rng;
 
 #[cfg(feature = "esp32")]
 use esp32_hal as hal;
 #[cfg(feature = "esp32c3")]
 use esp32c3_hal as hal;
+#[cfg(feature = "esp32s3")]
+use esp32s3_hal as hal;
 
 use hal::macros::ram;
 
 #[cfg_attr(feature = "esp32c3", path = "common_adapter_esp32c3.rs")]
 #[cfg_attr(feature = "esp32", path = "common_adapter_esp32.rs")]
+#[cfg_attr(feature = "esp32s3", path = "common_adapter_esp32s3.rs")]
 pub(crate) mod chip_specific;
 
 #[cfg_attr(feature = "esp32c3", path = "phy_init_data_esp32c3.rs")]
 #[cfg_attr(feature = "esp32", path = "phy_init_data_esp32.rs")]
+#[cfg_attr(feature = "esp32s3", path = "phy_init_data_esp32s3.rs")]
 pub(crate) mod phy_init_data;
 
 pub(crate) static mut RANDOM_GENERATOR: Option<Rng> = None;
@@ -254,6 +260,11 @@ pub unsafe extern "C" fn sprintf(dst: *mut u8, format: *const u8, args: ...) -> 
 
 #[no_mangle]
 pub unsafe extern "C" fn printf(s: *const u8, args: ...) {
+    syslog(0, s, args);
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn rtc_printf(s: *const u8, args: ...) {
     syslog(0, s, args);
 }
 

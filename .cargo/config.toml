@@ -16,6 +16,14 @@ rustflags = [
     "-C", "link-arg=-Tesp32_rom_functions.x",
 ]
 
+[target.xtensa-esp32s3-none-elf]
+runner = "espflash --speed 921600 --monitor"
+
+rustflags = [
+    "-C", "link-arg=-Tlinkall.x",
+    "-C", "link-arg=-Tesp32s3_rom_functions.x",
+]
+
 [build]
 target = "riscv32imc-unknown-none-elf"
  

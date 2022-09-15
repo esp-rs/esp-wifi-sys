@@ -275,7 +275,6 @@ impl<'s, 'n: 's> Read for Socket<'s, 'n> {
 
                 (socket.may_recv(), socket.is_open(), socket.can_recv())
             });
-
             if may_recv {
                 break;
             }
@@ -303,39 +302,13 @@ impl<'s, 'n: 's> Read for Socket<'s, 'n> {
             }
         }
 
-        loop {
-            self.network.with_interface(|interface| {
-                interface
-                    .network_interface()
-                    .poll(Instant::from_millis(
-                        (self.network.current_millis_fn)() as i64
-                    ))
-                    .unwrap();
-            });
+        self.network.with_interface(|interface| {
+            let socket = interface
+                .network_interface()
+                .get_socket::<TcpSocket>(self.socket_handle);
 
-            let res = self.network.with_interface(|interface| {
-                let socket = interface
-                    .network_interface()
-                    .get_socket::<TcpSocket>(self.socket_handle);
-
-                let res = socket.recv_slice(buf).map_err(|e| IoError::Other(e));
-                let can_rcv = socket.can_recv();
-
-                (res, can_rcv)
-            });
-
-            if let Ok(len) = res.0 {
-                if len == 0 {
-                    break Ok(0);
-                }
-            } else {
-                break Err(IoError::SocketClosed);
-            }
-
-            if res.1 == false {
-                break Ok(res.0.unwrap());
-            }
-        }
+            socket.recv_slice(buf).map_err(|e| IoError::Other(e))
+        })
     }
 }
 
