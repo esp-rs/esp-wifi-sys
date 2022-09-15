@@ -302,24 +302,13 @@ impl<'s, 'n: 's> Read for Socket<'s, 'n> {
             }
         }
 
-        loop {
-            self.network.with_interface(|interface| {
-                interface
-                    .network_interface()
-                    .poll(Instant::from_millis(
-                        (self.network.current_millis_fn)() as i64
-                    ))
-                    .unwrap();
-            });
+        self.network.with_interface(|interface| {
+            let socket = interface
+                .network_interface()
+                .get_socket::<TcpSocket>(self.socket_handle);
 
-            break self.network.with_interface(|interface| {
-                let socket = interface
-                    .network_interface()
-                    .get_socket::<TcpSocket>(self.socket_handle);
-
-                socket.recv_slice(buf).map_err(|e| IoError::Other(e))
-            });
-        }
+            socket.recv_slice(buf).map_err(|e| IoError::Other(e))
+        })
     }
 }
 
