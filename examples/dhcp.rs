@@ -7,6 +7,8 @@
 use esp32_hal as hal;
 #[cfg(feature = "esp32c3")]
 use esp32c3_hal as hal;
+#[cfg(feature = "esp32s2")]
+use esp32s2_hal as hal;
 #[cfg(feature = "esp32s3")]
 use esp32s3_hal as hal;
 
@@ -32,7 +34,7 @@ use hal::system::SystemExt;
 
 #[cfg(feature = "esp32c3")]
 use riscv_rt::entry;
-#[cfg(any(feature = "esp32", feature = "esp32s3"))]
+#[cfg(any(feature = "esp32", feature = "esp32s3", feature = "esp32s2"))]
 use xtensa_lx_rt::entry;
 
 extern crate alloc;
@@ -54,13 +56,13 @@ fn main() -> ! {
 
     #[cfg(feature = "esp32c3")]
     let clocks = ClockControl::configure(system.clock_control, CpuClock::Clock160MHz).freeze();
-    #[cfg(any(feature = "esp32", feature = "esp32s3"))]
+    #[cfg(any(feature = "esp32", feature = "esp32s3", feature = "esp32s2"))]
     let clocks = ClockControl::configure(system.clock_control, CpuClock::Clock240MHz).freeze();
 
     let mut rtc = Rtc::new(peripherals.RTC_CNTL);
 
     // Disable watchdog timers
-    #[cfg(not(feature = "esp32"))]
+    #[cfg(not(any(feature = "esp32", feature = "esp32s2")))]
     rtc.swd.disable();
 
     rtc.rwdt.disable();
@@ -75,7 +77,7 @@ fn main() -> ! {
         let syst = SystemTimer::new(peripherals.SYSTIMER);
         initialize(syst.alarm0, peripherals.RNG, &clocks).unwrap();
     }
-    #[cfg(any(feature = "esp32", feature = "esp32s3"))]
+    #[cfg(any(feature = "esp32", feature = "esp32s3", feature = "esp32s2"))]
     {
         use hal::timer::TimerGroup;
         let timg1 = TimerGroup::new(peripherals.TIMG1, &clocks);

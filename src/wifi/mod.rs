@@ -14,6 +14,8 @@ use smoltcp::phy::{Device, DeviceCapabilities, RxToken, TxToken};
 use esp32_hal as hal;
 #[cfg(feature = "esp32c3")]
 use esp32c3_hal as hal;
+#[cfg(feature = "esp32s2")]
+use esp32s2_hal as hal;
 #[cfg(feature = "esp32s3")]
 use esp32s3_hal as hal;
 
@@ -299,13 +301,13 @@ static g_wifi_osi_funcs: wifi_osi_funcs_t = wifi_osi_funcs_t {
     _coex_schm_curr_phase_get: Some(coex_schm_curr_phase_get),
     _coex_schm_curr_phase_idx_set: Some(coex_schm_curr_phase_idx_set),
     _coex_schm_curr_phase_idx_get: Some(coex_schm_curr_phase_idx_get),
-    #[cfg(any(feature = "esp32c3", feature = "esp32s3"))]
+    #[cfg(any(feature = "esp32c3", feature = "esp32s3", feature = "esp32s2"))]
     _slowclk_cal_get: Some(slowclk_cal_get),
-    #[cfg(feature = "esp32")]
+    #[cfg(any(feature = "esp32", feature = "esp32s2"))]
     _phy_common_clock_disable: Some(
         crate::wifi::os_adapter::os_adapter_chip_specific::phy_common_clock_disable,
     ),
-    #[cfg(feature = "esp32")]
+    #[cfg(any(feature = "esp32", feature = "esp32s2"))]
     _phy_common_clock_enable: Some(
         crate::wifi::os_adapter::os_adapter_chip_specific::phy_common_clock_enable,
     ),

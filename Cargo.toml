@@ -14,6 +14,7 @@ void = { version = "1.0.2", default-features = false }
 esp32c3-hal = { version = "0.2.0", optional = true }
 esp32-hal = { version = "0.5.0", optional = true, features = [ "bluetooth","rt" ] }
 esp32s3-hal = { version = "0.2.0", optional = true, features = [ "rt" ] }
+esp32s2-hal = { version = "0.2.0", optional = true, features = [ "rt" ] }
 riscv-rt = { version = "0.9.0", optional = true }
 riscv = { version = "0.8.0", optional = true }
 xtensa-lx-rt = { version = "0.13.0", optional = true }
@@ -36,22 +37,28 @@ riscv-target = { version = "0.1.2", optional = true }
 ble-hci = { git = "https://github.com/bjoernQ/ble-hci", branch = "embedded-io" }
 
 [target.xtensa-esp32-none-elf.dev-dependencies]
-esp-println = { version = "0.3.0", features = [ "esp32", "log" ] }
+esp-println = { version = "0.3.1", features = [ "esp32", "log" ] }
 esp-backtrace = { version = "0.2.0", features = [ "esp32", "panic-handler", "exception-handler", "print-uart" ] }
 
 [target.riscv32imc-unknown-none-elf.dev-dependencies]
-esp-println = { version = "0.3.0", features = [ "esp32c3", "log" ] }
+esp-println = { version = "0.3.1", features = [ "esp32c3", "log" ] }
 esp-backtrace = { version = "0.2.0" , features = [ "esp32c3", "panic-handler", "exception-handler", "print-uart" ] }
 
 [target.xtensa-esp32s3-none-elf.dev-dependencies]
-esp-println = { version = "0.3.0", features = [ "esp32s3", "log" ] }
+esp-println = { version = "0.3.1", features = [ "esp32s3", "log" ] }
 esp-backtrace = { version = "0.2.0", features = [ "esp32s3", "panic-handler", "exception-handler", "print-uart" ] }
+
+[target.xtensa-esp32s2-none-elf.dev-dependencies]
+esp-println = { version = "0.3.1", features = [ "esp32s2", "log", "critical-section" ] }
+esp-backtrace = { version = "0.2.0", features = [ "esp32s2", "panic-handler", "exception-handler", "print-uart" ] }
+xtensa-atomic-emulation-trap = "0.2.0"
 
 [features]
 default = [ "utils" ]
 esp32c3 = [ "riscv-target", "riscv", "riscv-rt", "esp32c3-hal" ]
 esp32 = [ "esp32-hal", "xtensa-lx-rt/esp32", "xtensa-lx/esp32" ]
 esp32s3 = [ "esp32s3-hal", "xtensa-lx-rt/esp32s3", "xtensa-lx/esp32s3" ]
+esp32s2 = [ "esp32s2-hal", "xtensa-lx-rt/esp32s2", "xtensa-lx/esp32s2" ]
 wifi_logs = []
 dump_packets = []
 utils = []
@@ -62,4 +69,5 @@ ble = []
 
 # currently published versions don't contain all relevant adjustments - using git dependencies for now
 [patch.crates-io]
-esp32s3-hal = { git = "https://github.com/esp-rs/esp-hal/", package = "esp32s3-hal", rev = "6eea2f266a451678d244917329e2e885940fce9c" }
+esp32s3-hal = { git = "https://github.com/esp-rs/esp-hal/", package = "esp32s3-hal", rev = "b1d5e37f36508ccfa835b236b2d30c3115bd3f72" }
+esp32s2-hal = { git = "https://github.com/esp-rs/esp-hal/", package = "esp32s2-hal", rev = "b1d5e37f36508ccfa835b236b2d30c3115bd3f72" }
