@@ -15,7 +15,7 @@ use ble_hci::{
     att::Uuid,
     Ble, HciConnector,
 };
-use esp_wifi::{ble::controller::BleConnector, current_millis, wifi::utils::Network};
+use esp_wifi::{ble::controller::BleConnector, current_millis, wifi_interface::Network};
 
 use embedded_io::blocking::*;
 use embedded_svc::wifi::{
