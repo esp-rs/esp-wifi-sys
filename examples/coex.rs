@@ -8,13 +8,15 @@ use esp32_hal as hal;
 #[cfg(feature = "esp32c3")]
 use esp32c3_hal as hal;
 
-use ble_hci::{
+use bleps::{
     ad_structure::{
         create_advertising_data, AdStructure, BR_EDR_NOT_SUPPORTED, LE_GENERAL_DISCOVERABLE,
     },
-    att::Uuid,
-    Ble, HciConnector,
+    attribute_server::{AttributeServer, WorkResult},
+    Ble, Data, HciConnection, HciConnector, att::Uuid,
 };
+use bleps_macros::gatt;
+
 use esp_wifi::{ble::controller::BleConnector, current_millis, wifi_interface::Network};
 
 use embedded_io::blocking::*;

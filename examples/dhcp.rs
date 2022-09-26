@@ -21,8 +21,8 @@ use embedded_svc::wifi::{
 use esp_backtrace as _;
 use esp_println::logger::init_logger;
 use esp_println::{print, println};
-use esp_wifi::wifi::utils::{create_network_interface};
-use esp_wifi::wifi_interface::{timestamp, WifiError, Network};
+use esp_wifi::wifi::utils::create_network_interface;
+use esp_wifi::wifi_interface::{timestamp, Network, WifiError};
 use esp_wifi::{create_network_stack_storage, network_stack_storage};
 use esp_wifi::{current_millis, initialize};
 use hal::clock::{ClockControl, CpuClock};
