@@ -5,7 +5,7 @@ edition = "2021"
 license = "MIT OR Apache-2.0"
 
 [profile.release]
-opt-level = "s"
+opt-level = 3
 
 [dependencies]
 embedded-hal = "0.2.3"
@@ -34,7 +34,8 @@ heapless = { version = "0.7.14", default-features = false }
 riscv-target = { version = "0.1.2", optional = true }
 
 [dev-dependencies]
-ble-hci = { git = "https://github.com/bjoernQ/ble-hci", branch = "embedded-io" }
+bleps = { git = "https://github.com/bjoernQ/bleps", package = "bleps" }
+bleps-macros = { git = "https://github.com/bjoernQ/bleps", package = "bleps-macros" }
 
 [target.xtensa-esp32-none-elf.dev-dependencies]
 esp-println = { version = "0.3.1", features = [ "esp32", "log" ] }
