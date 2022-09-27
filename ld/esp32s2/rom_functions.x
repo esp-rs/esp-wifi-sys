@@ -67,3 +67,4 @@ strncmp = 0x4001ae64;
 
 /* from esp32s3.rom.libgcc.ld*/
 __popcountsi2 = 0x40008fa8;
+__bswapsi2 = 0x40006d0c;

@@ -8,8 +8,7 @@ WiFi / BTLE coexistence is implemented but currently only works (to some extend)
 
 On ESP32-S3 only WiFi is support currently.
 
-THIS CURRENTLY DOESN'T WORK WITH THE XTENSA ENABLED RUST COMPILER 1.63.0.2. Use 1.63.0.0!
-FOR ESP32-S3 THIS CURRENTLY EVEN DOESN'T WORK WITH THE XTENSA ENABLED RUST COMPILER 1.63.0.3. Use 1.63.0.0!
+THIS CURRENTLY DOESN'T WORK WITH THE XTENSA ENABLED RUST COMPILER 1.63.0.2. Use 1.64.0.0!
 
 This uses the WiFi drivers from https://github.com/esp-rs/esp-wireless-drivers-3rdparty
 
@@ -17,7 +16,7 @@ This uses the WiFi drivers from https://github.com/esp-rs/esp-wireless-drivers-3
 
 v5.0-beta1-427-g4532e6e0b2 commit 4532e6e0b2ddd02b5bdbc1119e37aac3c306e65d
 
-https://github.com/esp-rs/esp-wireless-drivers-3rdparty/ (commit 8e5147d2de8d9b95c61fdd568e60a1d96812ea9d)
+https://github.com/esp-rs/esp-wireless-drivers-3rdparty/ (commit 839bcd7cb89d69571cda26df1caf42a3a6548b2e)
 
 ## Examples
 
