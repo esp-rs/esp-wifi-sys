@@ -104,8 +104,7 @@ fn main() -> ! {
 
         let mut wf2 = |_data| {};
 
-        gatt!([
-        service {
+        gatt!([service {
             uuid: "937312e0-2354-11eb-9f10-fbc30a62cf38",
             characteristics: [
                 characteristic {
