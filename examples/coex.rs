@@ -12,10 +12,9 @@ use bleps::{
     ad_structure::{
         create_advertising_data, AdStructure, BR_EDR_NOT_SUPPORTED, LE_GENERAL_DISCOVERABLE,
     },
-    attribute_server::{AttributeServer, WorkResult},
-    Ble, Data, HciConnection, HciConnector, att::Uuid,
+    att::Uuid,
+    Ble, HciConnector,
 };
-use bleps_macros::gatt;
 
 use esp_wifi::{ble::controller::BleConnector, current_millis, wifi_interface::Network};
 

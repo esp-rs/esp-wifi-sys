@@ -70,5 +70,6 @@ ble = []
 
 # currently published versions don't contain all relevant adjustments - using git dependencies for now
 [patch.crates-io]
-esp32s3-hal = { git = "https://github.com/esp-rs/esp-hal/", package = "esp32s3-hal", rev = "b1d5e37f36508ccfa835b236b2d30c3115bd3f72" }
-esp32s2-hal = { git = "https://github.com/esp-rs/esp-hal/", package = "esp32s2-hal", rev = "b1d5e37f36508ccfa835b236b2d30c3115bd3f72" }
+esp32s3-hal = { git = "https://github.com/esp-rs/esp-hal/", package = "esp32s3-hal", rev = "af745ac7b0799752260e13573895b97153d85639" }
+esp32s2-hal = { git = "https://github.com/esp-rs/esp-hal/", package = "esp32s2-hal", rev = "af745ac7b0799752260e13573895b97153d85639" }
+esp32c3-hal = { git = "https://github.com/esp-rs/esp-hal/", package = "esp32c3-hal", rev = "af745ac7b0799752260e13573895b97153d85639" }

@@ -4,7 +4,6 @@ use esp32c3_hal::interrupt::TrapFrame;
 #[derive(Debug, Default, Clone, Copy)]
 pub struct Context {
     trap_frame: TrapFrame,
-    pc: usize,
     _running: bool,
 }
 
@@ -57,8 +56,11 @@ static mut CTX_TASKS: [Context; MAX_TASK] = [Context {
         gp: 0,
         tp: 0,
         sp: 0,
+        pc: 0,
+        mstatus: 0,
+        mcause: 0,
+        mtval: 0,
     },
-    pc: 0,
     _running: false,
 }; MAX_TASK];
 
@@ -66,7 +68,7 @@ pub fn task_create(task: extern "C" fn()) -> usize {
     unsafe {
         let i = TASK_TOP;
         TASK_TOP += 1;
-        CTX_TASKS[i].pc = task as usize;
+        CTX_TASKS[i].trap_frame.pc = task as usize;
 
         // stack must be aligned by 16
         let task_stack_ptr = &TASK_STACK as *const _ as usize
@@ -85,7 +87,7 @@ fn task_create_from_mepc(mepc: usize) -> usize {
     unsafe {
         let i = TASK_TOP;
         TASK_TOP += 1;
-        CTX_TASKS[i].pc = mepc;
+        CTX_TASKS[i].trap_frame.pc = mepc;
         CTX_NOW = i;
         i
     }
@@ -125,7 +127,7 @@ pub fn task_to_trap_frame(id: usize, trap_frame: &mut TrapFrame) -> usize {
         trap_frame.gp = CTX_TASKS[id].trap_frame.gp;
         trap_frame.tp = CTX_TASKS[id].trap_frame.tp;
 
-        CTX_TASKS[id].pc
+        CTX_TASKS[id].trap_frame.pc
     }
 }
 
@@ -163,7 +165,7 @@ pub fn trap_frame_to_task(id: usize, pc: usize, trap_frame: &TrapFrame) {
         CTX_TASKS[id].trap_frame.gp = trap_frame.gp;
         CTX_TASKS[id].trap_frame.tp = trap_frame.tp;
 
-        CTX_TASKS[id].pc = pc;
+        CTX_TASKS[id].trap_frame.pc = pc;
     }
 }
 
@@ -175,7 +177,7 @@ pub fn next_task() {
 
 pub fn task_switch(trap_frame: &mut TrapFrame) {
     unsafe {
-        let old_mepc = riscv::register::mepc::read();
+        let old_mepc = trap_frame.pc;
 
         if FIRST_SWITCH.load(Ordering::Relaxed) {
             FIRST_SWITCH.store(false, Ordering::Relaxed);
@@ -188,8 +190,7 @@ pub fn task_switch(trap_frame: &mut TrapFrame) {
         next_task();
 
         let new_pc = task_to_trap_frame(CTX_NOW, trap_frame);
-
-        riscv::register::mepc::write(new_pc);
+        trap_frame.pc = new_pc;
 
         // debug aid! remove when not needed anymore!!!!!
         // static mut CNT: u32 = 0;
