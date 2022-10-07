@@ -2,6 +2,7 @@ use core::alloc::{GlobalAlloc, Layout};
 
 use crate::ALLOCATOR;
 
+#[no_mangle]
 pub unsafe extern "C" fn malloc(size: u32) -> *const u8 {
     log::trace!("alloc {}", size);
 
@@ -11,6 +12,7 @@ pub unsafe extern "C" fn malloc(size: u32) -> *const u8 {
     ptr.offset(4)
 }
 
+#[no_mangle]
 pub unsafe extern "C" fn free(ptr: *const u8) {
     log::trace!("free {:p}", ptr);
 
