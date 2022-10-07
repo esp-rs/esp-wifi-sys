@@ -45,7 +45,7 @@ https://github.com/esp-rs/esp-wireless-drivers-3rdparty/ (commit 839bcd7cb89d695
 | `cargo "+esp" run --example ble --release --target xtensa-esp32-none-elf --features "esp32,ble"`              | ESP32   |
 | `cargo "+esp" run --example dhcp --release --target xtensa-esp32-none-elf --features "esp32,embedded-svc,wifi"`             | ESP32   |
 | `cargo "+esp" run --example dhcp --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi"`             | ESP32-S3|
-| `cargo "+esp" run --example dhcp --release --target xtensa-esp32s2-none-elf --features "esp32s2,embedded-svc,wifi"`             | ESP32-S2|
+| `CARGO_PROFILE_RELEASE_OPT_LEVEL=1 cargo "+esp" run --example dhcp --release --target xtensa-esp32s2-none-elf --features "esp32s2,embedded-svc,wifi"`             | ESP32-S2|
 
 Additional you can specify these features
 |Feature|Meaning|
@@ -85,6 +85,8 @@ Additionally it uses CCOMPARE0 - so don't touch that, too.
 
 Currently your mileage might vary a lot for different opt-levels on Xtensa targets!
 If something doesn't work as expected try a different opt-level.
+
+e.g. that's why the ESP32-S2 example needs to be built with `opt-level=2`
 
 ## Directory Structure
 
