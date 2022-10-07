@@ -20,8 +20,6 @@ use smoltcp::wire::{IpAddress, IpCidr, Ipv4Address};
 use crate::current_millis;
 use crate::wifi::WifiDevice;
 
-extern crate alloc;
-
 /// An implementation of `embedded-svc`'s wifi trait.
 pub struct Wifi<'a> {
     network_interface: Interface<'a, WifiDevice>,

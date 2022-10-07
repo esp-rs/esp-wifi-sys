@@ -35,8 +35,6 @@ use riscv_rt::entry;
 #[cfg(feature = "esp32")]
 use xtensa_lx_rt::entry;
 
-extern crate alloc;
-
 #[entry]
 fn main() -> ! {
     init_logger(log::LevelFilter::Info);

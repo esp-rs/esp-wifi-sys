@@ -3,6 +3,10 @@
 #![feature(c_variadic)]
 #![feature(layout_for_ptr)]
 
+use core::cell::RefCell;
+use core::mem::MaybeUninit;
+
+use critical_section::Mutex;
 #[cfg(feature = "esp32")]
 use esp32_hal as hal;
 #[cfg(feature = "esp32c3")]
@@ -16,6 +20,7 @@ use esp32s3_hal as hal;
 
 use fugit::MegahertzU32;
 use hal::clock::Clocks;
+use linked_list_allocator::Heap;
 
 use crate::common_adapter::init_rng;
 use crate::tasks::init_tasks;
@@ -63,31 +68,22 @@ pub fn current_millis() -> u64 {
     get_systimer_count() / (TICKS_PER_SECOND / 1000)
 }
 
-// TODO: should the below code live somewhere else, in its own module maybe? Or is it fine here?
+#[cfg(not(coex))]
+const HEAP_SIZE: usize = 64 * 1024;
 
-#[global_allocator]
-pub(crate) static ALLOCATOR: esp_alloc::EspHeap = esp_alloc::EspHeap::empty();
+#[cfg(coex)]
+const HEAP_SIZE: usize = 96 * 1024;
+
+static mut HEAP_DATA: [MaybeUninit<u8>; HEAP_SIZE] = [MaybeUninit::new(0u8); HEAP_SIZE];
+
+pub(crate) static HEAP: Mutex<RefCell<Heap>> = Mutex::new(RefCell::new(Heap::empty()));
 
 pub fn init_heap() {
-    #[cfg(not(coex))]
-    const HEAP_SIZE: usize = 64 * 1024;
-
-    #[cfg(coex)]
-    const HEAP_SIZE: usize = 96 * 1024;
-
-    extern "C" {
-        static mut _heap_start: u32;
-        //static mut _heap_end: u32; // XXX we don't have it on ESP32-C3 currently
-    }
-
-    unsafe {
-        let heap_start = &_heap_start as *const _ as usize;
-
-        //let heap_end = &_heap_end as *const _ as usize;
-        //assert!(heap_end - heap_start > HEAP_SIZE, "Not enough available heap memory.");
-
-        ALLOCATOR.init(heap_start as *mut u8, HEAP_SIZE);
-    }
+    critical_section::with(|cs| {
+        HEAP.borrow(cs)
+            .borrow_mut()
+            .init_from_slice(unsafe { &mut HEAP_DATA })
+    });
 }
 
 #[cfg(feature = "esp32c3")]
