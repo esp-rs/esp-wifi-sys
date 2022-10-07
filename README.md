@@ -81,6 +81,11 @@ This is even more experimental than support for ESP32-C3.
 On ESP32 / ESP32-S3 currently TIMG1/TIMER0 is used as the main timer so you can't use it for anything else.
 Additionally it uses CCOMPARE0 - so don't touch that, too.
 
+## opt-level for Xtensa targets
+
+Currently your mileage might vary a lot for different opt-levels on Xtensa targets!
+If something doesn't work as expected try a different opt-level.
+
 ## Directory Structure
 
 - `src/timer-espXXX.rs`: systimer code used for timing and task switching
