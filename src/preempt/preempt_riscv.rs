@@ -15,7 +15,7 @@ const MAX_TASK: usize = 4;
 #[cfg(not(coex))]
 const MAX_TASK: usize = 3;
 
-static mut TASK_STACK: [u8; STACK_SIZE * MAX_TASK] = [0u8; STACK_SIZE * MAX_TASK];
+static mut TASK_STACK: [u8; STACK_SIZE * (MAX_TASK - 1)] = [0u8; STACK_SIZE * (MAX_TASK - 1)];
 
 pub static mut FIRST_SWITCH: AtomicBool = AtomicBool::new(true);
 

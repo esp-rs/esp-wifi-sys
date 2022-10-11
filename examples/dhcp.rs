@@ -37,8 +37,6 @@ use riscv_rt::entry;
 #[cfg(any(feature = "esp32", feature = "esp32s3", feature = "esp32s2"))]
 use xtensa_lx_rt::entry;
 
-extern crate alloc;
-
 const SSID: &str = env!("SSID");
 const PASSWORD: &str = env!("PASSWORD");
 

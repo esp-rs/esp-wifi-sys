@@ -365,22 +365,29 @@ static G_OSI_FUNCS: osi_funcs_s = osi_funcs_s {
     magic: 0xfadebead,
 };
 
-// #[cfg(target_arch = "riscv32")]
-// static mut G_INTER_FLAGS: u8 = 0;
+#[cfg(target_arch = "riscv32")]
+static mut G_INTER_FLAGS: [u8; 10] = [0; 10];
 
-// #[cfg(target_arch = "xtensa")]
-// static mut G_INTER_FLAGS: u32 = 0;
+#[cfg(target_arch = "xtensa")]
+static mut G_INTER_FLAGS: [u32; 10] = [0; 10];
+
+static mut INTERRUPT_DISABLE_CNT: usize = 0;
 
 #[ram]
 unsafe extern "C" fn interrupt_enable() {
-    log::trace!("interrupt_enable");
-    //  critical_section::release(core::mem::transmute(G_INTER_FLAGS));
+    INTERRUPT_DISABLE_CNT -= 1;
+    let flags = G_INTER_FLAGS[INTERRUPT_DISABLE_CNT];
+    log::trace!("interrupt_enable {}", flags);
+    critical_section::release(core::mem::transmute(flags));
 }
 
 #[ram]
 unsafe extern "C" fn interrupt_disable() {
     log::trace!("interrupt_disable");
-    //  G_INTER_FLAGS =  core::mem::transmute(critical_section::acquire());
+    let flags = core::mem::transmute(critical_section::acquire());
+    G_INTER_FLAGS[INTERRUPT_DISABLE_CNT] = flags;
+    INTERRUPT_DISABLE_CNT += 1;
+    log::trace!("interrupt_disable {}", flags);
 }
 
 #[ram]
