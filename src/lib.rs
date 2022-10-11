@@ -74,7 +74,7 @@ const HEAP_SIZE: usize = 64 * 1024;
 #[cfg(coex)]
 const HEAP_SIZE: usize = 96 * 1024;
 
-static mut HEAP_DATA: [MaybeUninit<u8>; HEAP_SIZE] = [MaybeUninit::new(0u8); HEAP_SIZE];
+static mut HEAP_DATA: [MaybeUninit<u8>; HEAP_SIZE] = [MaybeUninit::uninit(); HEAP_SIZE];
 
 pub(crate) static HEAP: Mutex<RefCell<Heap>> = Mutex::new(RefCell::new(Heap::empty()));
 
