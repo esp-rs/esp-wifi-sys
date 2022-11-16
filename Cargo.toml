@@ -70,6 +70,6 @@ ble = [ "esp32-hal?/bluetooth" ]
 
 # currently published versions don't contain all relevant adjustments - using git dependencies for now
 [patch.crates-io]
-esp32s3-hal = { git = "https://github.com/esp-rs/esp-hal/", package = "esp32s3-hal", rev = "af745ac7b0799752260e13573895b97153d85639" }
-esp32s2-hal = { git = "https://github.com/esp-rs/esp-hal/", package = "esp32s2-hal", rev = "af745ac7b0799752260e13573895b97153d85639" }
-esp32c3-hal = { git = "https://github.com/esp-rs/esp-hal/", package = "esp32c3-hal", rev = "af745ac7b0799752260e13573895b97153d85639" }
+esp32s3-hal = { git = "https://github.com/esp-rs/esp-hal/", package = "esp32s3-hal", rev = "9b3e644e309e0ab3332fd007f4ac2fb4881abc4c" }
+esp32s2-hal = { git = "https://github.com/esp-rs/esp-hal/", package = "esp32s2-hal", rev = "9b3e644e309e0ab3332fd007f4ac2fb4881abc4c" }
+esp32c3-hal = { git = "https://github.com/esp-rs/esp-hal/", package = "esp32c3-hal", rev = "9b3e644e309e0ab3332fd007f4ac2fb4881abc4c" }
