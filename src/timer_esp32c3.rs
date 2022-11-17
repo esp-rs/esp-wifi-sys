@@ -19,7 +19,7 @@ pub fn setup_timer_isr(systimer: Alarm<Target, 0>) {
     let alarm0 = systimer.into_periodic();
     alarm0.set_period(TIMER_DELAY.into());
     alarm0.clear_interrupt();
-    alarm0.enable_interrupt();
+    alarm0.interrupt_enable(true);
 
     esp32c3_hal::interrupt::enable(
         Interrupt::SYSTIMER_TARGET0,
