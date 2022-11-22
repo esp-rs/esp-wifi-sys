@@ -14,8 +14,9 @@ use embedded_svc::{
 use enumset::EnumSet;
 use smoltcp::iface::{Interface, SocketHandle};
 use smoltcp::socket::{Dhcpv4Socket, TcpSocket};
+use smoltcp::storage::PacketMetadata;
 use smoltcp::time::Instant;
-use smoltcp::wire::{IpAddress, IpCidr, Ipv4Address};
+use smoltcp::wire::{IpAddress, IpCidr, IpEndpoint, Ipv4Address};
 
 use crate::current_millis;
 use crate::wifi::WifiDevice;
@@ -79,7 +80,7 @@ impl<'a> Wifi<'a> {
                                     _ => false,
                                 })
                                 .next()
-                                .unwrap();
+                                .expect("No address");
 
                             *addr = IpCidr::Ipv4(address);
                         });
@@ -346,16 +347,47 @@ impl<'a> Network<'a> {
         f(&mut interface)
     }
 
-    pub fn get_socket<'s>(&'s mut self) -> Socket<'s, 'a>
+    pub fn get_socket<'s>(
+        &'s self,
+        rx_buffer: &'a mut [u8],
+        tx_buffer: &'a mut [u8],
+    ) -> Socket<'s, 'a>
     where
         'a: 's,
     {
-        let socket_handle = self.with_interface(|interface| {
-            let (socket_handle, _) = interface.network_interface().sockets_mut().next().unwrap();
-            socket_handle
-        });
+        let socket = TcpSocket::new(
+            smoltcp::socket::TcpSocketBuffer::new(rx_buffer),
+            smoltcp::socket::TcpSocketBuffer::new(tx_buffer),
+        );
+
+        let socket_handle =
+            self.with_interface(|interface| interface.network_interface().add_socket(socket));
 
         Socket {
+            socket_handle,
+            network: self,
+        }
+    }
+
+    pub fn get_udp_socket<'s>(
+        &'s self,
+        rx_meta: &'a mut [PacketMetadata<IpEndpoint>],
+        rx_buffer: &'a mut [u8],
+        tx_meta: &'a mut [PacketMetadata<IpEndpoint>],
+        tx_buffer: &'a mut [u8],
+    ) -> UdpSocket<'s, 'a>
+    where
+        'a: 's,
+    {
+        let socket = smoltcp::socket::UdpSocket::new(
+            smoltcp::socket::UdpSocketBuffer::new(rx_meta, rx_buffer),
+            smoltcp::socket::UdpSocketBuffer::new(tx_meta, tx_buffer),
+        );
+
+        let socket_handle =
+            self.with_interface(|interface| interface.network_interface().add_socket(socket));
+
+        UdpSocket {
             socket_handle,
             network: self,
         }
@@ -395,14 +427,17 @@ impl<'s, 'n: 's> Socket<'s, 'n> {
         's: 'i,
     {
         {
-            self.network.with_interface(|interface| {
+            let res = self.network.with_interface(|interface| {
                 let (sock, cx) = interface
                     .network_interface()
                     .get_socket_and_context::<TcpSocket>(self.socket_handle);
                 let remote_endpoint = (addr, port);
                 sock.connect(cx, remote_endpoint, self.network.next_local_port())
-                    .unwrap();
             });
+
+            if let Err(err) = res {
+                return Err(err.into());
+            }
         }
 
         loop {
@@ -455,6 +490,16 @@ impl<'s, 'n: 's> Socket<'s, 'n> {
     }
 }
 
+impl<'s, 'n: 's> Drop for Socket<'s, 'n> {
+    fn drop(&mut self) {
+        self.network.with_interface(|interface| {
+            interface
+                .network_interface
+                .remove_socket(self.socket_handle)
+        });
+    }
+}
+
 #[derive(Debug)]
 pub enum IoError {
     Other(smoltcp::Error),
@@ -480,14 +525,17 @@ impl<'s, 'n: 's> Io for Socket<'s, 'n> {
 impl<'s, 'n: 's> Read for Socket<'s, 'n> {
     fn read(&mut self, buf: &mut [u8]) -> Result<usize, Self::Error> {
         loop {
-            self.network.with_interface(|interface| {
+            let res = self.network.with_interface(|interface| {
                 interface
                     .network_interface()
                     .poll(Instant::from_millis(
                         (self.network.current_millis_fn)() as i64
                     ))
-                    .unwrap();
             });
+
+            if let Err(err) = res {
+                return Err(err.into());
+            }
 
             let (may_recv, is_open, can_recv) = self.network.with_interface(|interface| {
                 let socket = interface
@@ -536,14 +584,17 @@ impl<'s, 'n: 's> Read for Socket<'s, 'n> {
 impl<'s, 'n: 's> Write for Socket<'s, 'n> {
     fn write(&mut self, buf: &[u8]) -> Result<usize, Self::Error> {
         loop {
-            self.network.with_interface(|interface| {
+            let res = self.network.with_interface(|interface| {
                 interface
                     .network_interface()
                     .poll(Instant::from_millis(
                         (self.network.current_millis_fn)() as i64
                     ))
-                    .unwrap();
             });
+
+            if let Err(err) = res {
+                return Err(err.into());
+            }
 
             let (may_send, is_open, can_send) = self.network.with_interface(|interface| {
                 let socket = interface
@@ -621,5 +672,169 @@ impl<'s, 'n: 's> Write for Socket<'s, 'n> {
         }
 
         Ok(())
+    }
+}
+
+pub struct UdpSocket<'s, 'n: 's> {
+    socket_handle: SocketHandle,
+    network: &'s Network<'n>,
+}
+
+impl<'s, 'n: 's> UdpSocket<'s, 'n> {
+    pub fn bind<'i>(&'i mut self, port: u16) -> Result<(), IoError>
+    where
+        's: 'i,
+    {
+        self.work();
+
+        {
+            let res = self.network.with_interface(|interface| {
+                let (sock, _cx) = interface
+                    .network_interface()
+                    .get_socket_and_context::<smoltcp::socket::UdpSocket>(self.socket_handle);
+                sock.bind(port)
+            });
+
+            if let Err(err) = res {
+                return Err(err.into());
+            }
+        }
+
+        loop {
+            let can_send = self.network.with_interface(|interface| {
+                let sock = interface
+                    .network_interface()
+                    .get_socket::<smoltcp::socket::UdpSocket>(self.socket_handle);
+                if sock.can_send() {
+                    true
+                } else {
+                    false
+                }
+            });
+
+            if can_send {
+                break;
+            }
+
+            self.work();
+        }
+
+        Ok(())
+    }
+
+    pub fn close(&mut self) {
+        self.network.with_interface(|interface| {
+            interface
+                .network_interface()
+                .get_socket::<smoltcp::socket::UdpSocket>(self.socket_handle)
+                .close();
+        });
+
+        self.work();
+    }
+
+    pub fn send(&mut self, addr: Ipv4Address, port: u16, data: &[u8]) -> Result<(), IoError> {
+        loop {
+            self.work();
+
+            let (can_send, packet_capacity, payload_capacity) =
+                self.network.with_interface(|interface| {
+                    let sock = interface
+                        .network_interface()
+                        .get_socket::<smoltcp::socket::UdpSocket>(self.socket_handle);
+                    (
+                        sock.can_send(),
+                        sock.packet_send_capacity(),
+                        sock.payload_send_capacity(),
+                    )
+                });
+
+            if can_send && packet_capacity > 0 && payload_capacity > data.len() {
+                break;
+            }
+        }
+
+        let res = self.network.with_interface(|interface| {
+            let endpoint = (addr, port);
+
+            interface
+                .network_interface()
+                .get_socket::<smoltcp::socket::UdpSocket>(self.socket_handle)
+                .send_slice(data, endpoint.into())
+        });
+
+        self.work();
+
+        match res {
+            Ok(res) => Ok(res),
+            Err(e) => Err(e.into()),
+        }
+    }
+
+    pub fn receive(&mut self, data: &mut [u8]) -> Result<(usize, [u8; 4], u16), IoError> {
+        self.work();
+
+        let res = self.network.with_interface(|interface| {
+            interface
+                .network_interface()
+                .get_socket::<smoltcp::socket::UdpSocket>(self.socket_handle)
+                .recv_slice(data)
+        });
+
+        match res {
+            Ok((len, endpoint)) => {
+                let addr = match endpoint.addr {
+                    IpAddress::Unspecified => todo!(),
+                    IpAddress::Ipv4(ipv4) => ipv4,
+                    _ => todo!(),
+                };
+                Ok((len, addr.0, endpoint.port))
+            }
+            Err(e) => Err(e.into()),
+        }
+    }
+
+    pub fn join_multicast_group(&mut self, addr: Ipv4Address) -> Result<bool, IoError> {
+        self.work();
+
+        let res = self.network.with_interface(|interface| {
+            interface.network_interface().join_multicast_group(
+                addr,
+                Instant::from_millis((self.network.current_millis_fn)() as i64),
+            )
+        });
+
+        self.work();
+
+        match res {
+            Ok(res) => Ok(res),
+            Err(e) => Err(e.into()),
+        }
+    }
+
+    pub fn work(&mut self) {
+        loop {
+            self.network
+                .with_interface(|interface| interface.poll_dhcp().ok());
+            if let Ok(false) = self.network.with_interface(|interface| {
+                interface
+                    .network_interface()
+                    .poll(Instant::from_millis(
+                        (self.network.current_millis_fn)() as i64
+                    ))
+            }) {
+                break;
+            }
+        }
+    }
+}
+
+impl<'s, 'n: 's> Drop for UdpSocket<'s, 'n> {
+    fn drop(&mut self) {
+        self.network.with_interface(|interface| {
+            interface
+                .network_interface
+                .remove_socket(self.socket_handle)
+        });
     }
 }

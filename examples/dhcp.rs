@@ -65,7 +65,7 @@ fn main() -> ! {
 
     rtc.rwdt.disable();
 
-    let mut storage = create_network_stack_storage!(3, 8, 1);
+    let mut storage = create_network_stack_storage!(3, 8, 1, 1);
     let ethernet = create_network_interface(network_stack_storage!(storage));
     let mut wifi_interface = esp_wifi::wifi_interface::Wifi::new(ethernet);
 
@@ -136,8 +136,11 @@ fn main() -> ! {
 
     println!("Start busy loop on main");
 
-    let mut network = Network::new(wifi_interface, current_millis);
-    let mut socket = network.get_socket();
+    let network = Network::new(wifi_interface, current_millis);
+
+    let mut rx_buffer = [0u8; 1536];
+    let mut tx_buffer = [0u8; 1536];
+    let mut socket = network.get_socket(&mut rx_buffer, &mut tx_buffer);
 
     loop {
         println!("Making HTTP request");

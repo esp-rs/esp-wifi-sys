@@ -5,7 +5,7 @@ use critical_section::Mutex;
 use esp32_hal::{
     interrupt,
     pac::{self, TIMG1},
-    prelude::_embedded_hal_timer_CountDown,
+    prelude::{Instance, _embedded_hal_timer_CountDown},
     timer::{Timer, Timer0},
 };
 use log::trace;
