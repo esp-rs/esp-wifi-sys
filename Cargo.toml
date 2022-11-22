@@ -23,7 +23,7 @@ smoltcp = { version = "0.8.0", default-features=false, features = ["proto-igmp",
 critical-section = "1.1.1"
 atomic-polyfill = "1.0.1"
 log = "0.4.17"
-embedded-svc = { version = "0.22.1", default-features = false, features = [], optional = true }
+embedded-svc = { version = "0.23.1", default-features = false, features = [], optional = true }
 enumset = { version = "1", default-features = false, optional = true }
 linked_list_allocator = { version = "0.10.3", default-features = false, features = ["const_mut_refs"] }
 embedded-io = "0.3.0"

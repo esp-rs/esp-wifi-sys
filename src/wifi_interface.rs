@@ -2,15 +2,8 @@ use core::cell::RefCell;
 use core::fmt::Display;
 use embedded_io::blocking::{Read, Write};
 use embedded_io::Io;
-use embedded_svc::ipv4::Ipv4Addr;
 
-use embedded_svc::{
-    ipv4::{ClientSettings, Mask, Subnet},
-    wifi::{
-        AccessPointInfo, ApStatus, AuthMethod, ClientConnectionStatus, ClientIpStatus,
-        ClientStatus, SecondaryChannel, Status,
-    },
-};
+use embedded_svc::wifi::{AccessPointInfo, AuthMethod, SecondaryChannel};
 use enumset::EnumSet;
 use smoltcp::iface::{Interface, SocketHandle};
 use smoltcp::socket::{Dhcpv4Socket, TcpSocket};
@@ -102,6 +95,7 @@ impl<'a> Wifi<'a> {
 pub enum WifiError {
     Unknown(i32),
     SmolTcpError(smoltcp::Error),
+    InitializationError(crate::InitializationError),
 }
 
 impl From<smoltcp::Error> for WifiError {
@@ -125,61 +119,6 @@ impl<'a> embedded_svc::wifi::Wifi for Wifi<'a> {
         let mut caps = EnumSet::empty();
         caps.insert(embedded_svc::wifi::Capability::Client);
         Ok(caps)
-    }
-
-    /// Get the wifi status.
-    /// Please note: To ever get into the state of an assigned IP address you need to make sure
-    /// that `poll` is called frequently on the network stack and dhcp socket.
-    fn get_status(&self) -> Status {
-        match crate::wifi::get_wifi_state() {
-            crate::wifi::WifiState::WifiReady => Status(ClientStatus::Stopped, ApStatus::Stopped),
-            crate::wifi::WifiState::StaStart => Status(ClientStatus::Starting, ApStatus::Stopped),
-            crate::wifi::WifiState::StaStop => Status(ClientStatus::Stopped, ApStatus::Stopped),
-            crate::wifi::WifiState::StaConnected => {
-                let client_ip_status = if let Some(ip) = self.network_interface.ipv4_addr() {
-                    if !ip.is_unspecified() {
-                        let mut ip_bytes: [u8; 4] = [0; 4];
-                        ip_bytes.copy_from_slice(ip.as_bytes());
-
-                        let mut gw_bytes: [u8; 4] = [0; 4];
-                        let mut dns_bytes: [u8; 4] = [0; 4];
-                        if let Some(config) = self.network_config {
-                            if let Some(router) = config.router {
-                                gw_bytes.copy_from_slice(router.as_bytes());
-                            }
-
-                            if let Some(dns_server) = config.dns_servers[0] {
-                                dns_bytes.copy_from_slice(dns_server.as_bytes());
-                            }
-                        }
-
-                        ClientIpStatus::Done(ClientSettings {
-                            ip: Ipv4Addr::from(ip_bytes),
-                            subnet: Subnet {
-                                gateway: Ipv4Addr::from(gw_bytes),
-                                mask: Mask(24), // where to get this from?
-                            },
-                            dns: Some(Ipv4Addr::from(dns_bytes)),
-                            secondary_dns: Some(Ipv4Addr::new(0, 0, 0, 0)),
-                        })
-                    } else {
-                        ClientIpStatus::Waiting
-                    }
-                } else {
-                    ClientIpStatus::Waiting
-                };
-
-                Status(
-                    ClientStatus::Started(ClientConnectionStatus::Connected(client_ip_status)),
-                    ApStatus::Stopped,
-                )
-            }
-            crate::wifi::WifiState::StaDisconnected => Status(
-                ClientStatus::Started(ClientConnectionStatus::Disconnected),
-                ApStatus::Stopped,
-            ),
-            crate::wifi::WifiState::Invalid => Status(ClientStatus::Stopped, ApStatus::Stopped),
-        }
     }
 
     /// A blocking wifi network scan.
@@ -271,7 +210,7 @@ impl<'a> embedded_svc::wifi::Wifi for Wifi<'a> {
                         }
                         _ => panic!(),
                     },
-                    signal_strength: record.rssi.abs() as u8,
+                    signal_strength: record.rssi,
                     protocols: EnumSet::empty(), // TODO
                     auth_method: auth_method,
                 };
@@ -296,19 +235,66 @@ impl<'a> embedded_svc::wifi::Wifi for Wifi<'a> {
     ) -> Result<(), Self::Error> {
         self.current_config = conf.clone();
 
-        let res = match conf {
+        match conf {
             embedded_svc::wifi::Configuration::None => panic!(),
-            embedded_svc::wifi::Configuration::Client(conf) => {
-                crate::wifi::wifi_connect(&conf.ssid, &conf.password)
-            }
+            embedded_svc::wifi::Configuration::Client(_) => {}
             embedded_svc::wifi::Configuration::AccessPoint(_) => panic!(),
             embedded_svc::wifi::Configuration::Mixed(_, _) => panic!(),
         };
 
+        Ok(())
+    }
+
+    fn start(&mut self) -> Result<(), Self::Error> {
+        let res = crate::wifi::wifi_start();
         if res != 0 {
-            Err(WifiError::Unknown(res))
+            return Err(WifiError::InitializationError(
+                crate::InitializationError::General(res),
+            ));
+        }
+        Ok(())
+    }
+
+    fn stop(&mut self) -> Result<(), Self::Error> {
+        let res = crate::wifi::wifi_stop();
+        if res != 0 {
+            return Err(WifiError::InitializationError(
+                crate::InitializationError::General(res),
+            ));
+        }
+        Ok(())
+    }
+
+    fn connect(&mut self) -> Result<(), Self::Error> {
+        if let embedded_svc::wifi::Configuration::Client(config) = &self.current_config {
+            let res = crate::wifi::wifi_connect(&config.ssid, &config.password);
+            if res != 0 {
+                return Err(WifiError::Unknown(res));
+            }
         } else {
-            Ok(())
+            panic!();
+        }
+        Ok(())
+    }
+
+    fn disconnect(&mut self) -> Result<(), Self::Error> {
+        //FIXME: Is there a way to disconnect from Wifi?
+        Ok(())
+    }
+
+    fn is_started(&self) -> Result<bool, Self::Error> {
+        match crate::wifi::get_wifi_state() {
+            crate::wifi::WifiState::StaStart => Ok(true),
+            //FIXME: Should any enum trigger an error instead of returning false?
+            _ => Ok(false),
+        }
+    }
+
+    fn is_connected(&self) -> Result<bool, Self::Error> {
+        match crate::wifi::get_wifi_state() {
+            crate::wifi::WifiState::StaConnected => Ok(true),
+            //FIXME: Should any enum trigger an error instead of returning false?
+            _ => Ok(false),
         }
     }
 }
