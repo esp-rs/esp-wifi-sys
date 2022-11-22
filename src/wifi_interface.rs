@@ -3,6 +3,7 @@ use core::fmt::Display;
 use embedded_io::blocking::{Read, Write};
 use embedded_io::Io;
 
+use embedded_svc::ipv4;
 use embedded_svc::wifi::{AccessPointInfo, AuthMethod, SecondaryChannel};
 use enumset::EnumSet;
 use smoltcp::iface::{Interface, SocketHandle};
@@ -18,7 +19,8 @@ use crate::wifi::WifiDevice;
 pub struct Wifi<'a> {
     network_interface: Interface<'a, WifiDevice>,
     current_config: embedded_svc::wifi::Configuration,
-    network_config: Option<smoltcp::socket::Dhcpv4Config>,
+    pub(crate) network_config: ipv4::Configuration,
+    pub(crate) ip_info: Option<ipv4::IpInfo>,
     dhcp_socket_handle: Option<SocketHandle>,
 }
 
@@ -37,7 +39,13 @@ impl<'a> Wifi<'a> {
         Wifi {
             network_interface,
             current_config: embedded_svc::wifi::Configuration::default(),
-            network_config: None,
+            network_config: ipv4::Configuration::Client(ipv4::ClientConfiguration::DHCP(
+                ipv4::DHCPClientSettings {
+                    //FIXME: smoltcp currently doesn't have a way of giving a hostname through DHCP
+                    hostname: Some("Espressif".into()),
+                },
+            )),
+            ip_info: None,
             dhcp_socket_handle,
         }
     }
@@ -57,13 +65,32 @@ impl<'a> Wifi<'a> {
             if let Some(event) = event {
                 match event {
                     smoltcp::socket::Dhcpv4Event::Deconfigured => {
-                        self.network_config = None;
+                        self.ip_info = None;
                         self.network_interface
                             .routes_mut()
                             .remove_default_ipv4_route();
                     }
                     smoltcp::socket::Dhcpv4Event::Configured(config) => {
-                        self.network_config = Some(config);
+                        self.ip_info = Some(ipv4::IpInfo {
+                            ip: config.address.address().0.into(),
+                            subnet: ipv4::Subnet {
+                                gateway: config.router.unwrap().0.into(),
+                                mask: ipv4::Mask(config.address.prefix_len()),
+                            },
+                            dns: config
+                                .dns_servers
+                                .get(0)
+                                .map(|x| x.as_ref())
+                                .flatten()
+                                .map(|x| x.0.into()),
+                            secondary_dns: config
+                                .dns_servers
+                                .get(1)
+                                .map(|x| x.as_ref())
+                                .flatten()
+                                .map(|x| x.0.into()),
+                        });
+
                         let address = config.address;
                         self.network_interface.update_ip_addrs(|addrs| {
                             let addr = addrs
@@ -96,6 +123,7 @@ pub enum WifiError {
     Unknown(i32),
     SmolTcpError(smoltcp::Error),
     InitializationError(crate::InitializationError),
+    MissingIp,
 }
 
 impl From<smoltcp::Error> for WifiError {
@@ -227,7 +255,7 @@ impl<'a> embedded_svc::wifi::Wifi for Wifi<'a> {
         Ok(self.current_config.clone())
     }
 
-    /// Set the configuration and start connecting.
+    /// Set the configuration, you need to use Wifi::connect() for connecting
     /// Currently only `ssid` and `password` is used. Trying anything but `Configuration::Client` will result in a panic!
     fn set_configuration(
         &mut self,
@@ -285,7 +313,7 @@ impl<'a> embedded_svc::wifi::Wifi for Wifi<'a> {
     fn is_started(&self) -> Result<bool, Self::Error> {
         match crate::wifi::get_wifi_state() {
             crate::wifi::WifiState::StaStart => Ok(true),
-            //FIXME: Should any enum trigger an error instead of returning false?
+            //FIXME: Should any of the enum trigger an error instead of returning false?
             _ => Ok(false),
         }
     }
@@ -293,7 +321,7 @@ impl<'a> embedded_svc::wifi::Wifi for Wifi<'a> {
     fn is_connected(&self) -> Result<bool, Self::Error> {
         match crate::wifi::get_wifi_state() {
             crate::wifi::WifiState::StaConnected => Ok(true),
-            //FIXME: Should any enum trigger an error instead of returning false?
+            //FIXME: Should any of the enum trigger an error instead of returning false?
             _ => Ok(false),
         }
     }
@@ -331,6 +359,10 @@ impl<'a> Network<'a> {
     {
         let mut interface = self.interface.borrow_mut();
         f(&mut interface)
+    }
+
+    pub fn poll_dhcp(&self) -> Result<(), WifiError> {
+        self.with_interface(|i| i.poll_dhcp())
     }
 
     pub fn get_socket<'s>(
@@ -399,6 +431,27 @@ impl<'a> Network<'a> {
             *local_port = 41000;
         }
         *local_port
+    }
+}
+
+impl<'a> ipv4::Interface for Network<'a> {
+    type Error = WifiError;
+
+    fn get_iface_configuration(&self) -> Result<ipv4::Configuration, Self::Error> {
+        Ok(self.interface.borrow().network_config.clone())
+    }
+
+    fn set_iface_configuration(&mut self, conf: &ipv4::Configuration) -> Result<(), Self::Error> {
+        self.with_interface(|x| x.network_config = conf.clone());
+        Ok(())
+    }
+
+    fn is_iface_up(&self) -> bool {
+        self.interface.borrow().ip_info.is_some()
+    }
+
+    fn get_ip_info(&self) -> Result<ipv4::IpInfo, Self::Error> {
+        self.interface.borrow().ip_info.ok_or(WifiError::MissingIp)
     }
 }
 

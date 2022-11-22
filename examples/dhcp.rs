@@ -13,16 +13,17 @@ use esp32s2_hal as hal;
 use esp32s3_hal as hal;
 
 use embedded_io::blocking::*;
+use embedded_svc::ipv4::Interface;
 use embedded_svc::wifi::{
-    AccessPointInfo, ClientConfiguration, ClientConnectionStatus, ClientIpStatus, ClientStatus,
-    Configuration, Status, Wifi,
+    AccessPointInfo, ClientConfiguration,
+    Configuration, Wifi, 
 };
 
 use esp_backtrace as _;
 use esp_println::logger::init_logger;
 use esp_println::{print, println};
 use esp_wifi::wifi::utils::create_network_interface;
-use esp_wifi::wifi_interface::{timestamp, Network, WifiError};
+use esp_wifi::wifi_interface::{Network, WifiError};
 use esp_wifi::{create_network_stack_storage, network_stack_storage};
 use esp_wifi::{current_millis, initialize};
 use hal::clock::{ClockControl, CpuClock};
@@ -82,7 +83,7 @@ fn main() -> ! {
         initialize(timg1.timer0, peripherals.RNG, &clocks).unwrap();
     }
 
-    println!("{:?}", wifi_interface.get_status());
+    println!("is wifi started: {:?}", wifi_interface.is_started());
 
     println!("Start Wifi Scan");
     let res: Result<(heapless::Vec<AccessPointInfo, 10>, usize), WifiError> =
@@ -100,43 +101,37 @@ fn main() -> ! {
         ..Default::default()
     });
     let res = wifi_interface.set_configuration(&client_config);
-    println!("wifi_connect returned {:?}", res);
+    println!("wifi_set_configuration returned {:?}", res);
 
     println!("{:?}", wifi_interface.get_capabilities());
-    println!("{:?}", wifi_interface.get_status());
+    println!("wifi_connect {:?}", wifi_interface.connect());
 
     // wait to get connected
     println!("Wait to get connected");
     loop {
-        if let Status(ClientStatus::Started(_), _) = wifi_interface.get_status() {
-            break;
+        let res = wifi_interface.is_connected();
+        match res {
+            Ok(connected) => if connected { break; },
+            Err(err) => println!("{:?}", err),
         }
     }
-    println!("{:?}", wifi_interface.get_status());
+    println!("{:?}", wifi_interface.is_connected());
 
     // wait for getting an ip address
     println!("Wait to get an ip address");
+    let network = Network::new(wifi_interface, current_millis);
     loop {
-        wifi_interface.poll_dhcp().unwrap();
+        network.poll_dhcp().unwrap();
 
-        wifi_interface
-            .network_interface()
-            .poll(timestamp())
-            .unwrap();
+        network.work();
 
-        if let Status(
-            ClientStatus::Started(ClientConnectionStatus::Connected(ClientIpStatus::Done(config))),
-            _,
-        ) = wifi_interface.get_status()
-        {
-            println!("got ip {:?}", config);
+        if network.is_iface_up() {
+            println!("got ip {:?}", network.get_ip_info());
             break;
         }
     }
 
     println!("Start busy loop on main");
-
-    let network = Network::new(wifi_interface, current_millis);
 
     let mut rx_buffer = [0u8; 1536];
     let mut tx_buffer = [0u8; 1536];
