@@ -22,6 +22,12 @@ pub(crate) unsafe extern "C" fn phy_enable() {
         if G_IS_PHY_CALIBRATED == false {
             let init_data = &PHY_INIT_DATA_DEFAULT;
 
+            extern "C" {
+                pub fn phy_bbpll_en_usb(param: bool);
+            }
+
+            phy_bbpll_en_usb(true);
+
             register_chipv7_phy(
                 init_data,
                 &mut cal_data as *mut _ as *mut crate::binary::include::esp_phy_calibration_data_t,
@@ -58,7 +64,8 @@ pub(crate) unsafe fn phy_enable_clock() {
     trace!("phy_enable_clock");
     const SYSTEM_WIFI_CLK_EN_REG: u32 = 0x60026000 + 0x014;
     critical_section::with(|_| {
-        (SYSTEM_WIFI_CLK_EN_REG as *mut u32).write_volatile(u32::MAX);
+        (SYSTEM_WIFI_CLK_EN_REG as *mut u32)
+            .write_volatile((SYSTEM_WIFI_CLK_EN_REG as *mut u32).read_volatile() | 0x78078F);
     });
 
     trace!("phy_enable_clock done!");
