@@ -320,7 +320,9 @@ impl<'a> embedded_svc::wifi::Wifi for Wifi<'a> {
 
     fn is_connected(&self) -> Result<bool, Self::Error> {
         match crate::wifi::get_wifi_state() {
-            crate::wifi::WifiState::StaConnected => Ok(true),
+            crate::wifi::WifiState::StaConnected | crate::wifi::WifiState::StaDisconnected => {
+                Ok(true)
+            }
             //FIXME: Should any of the enum trigger an error instead of returning false?
             _ => Ok(false),
         }

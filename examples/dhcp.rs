@@ -14,10 +14,7 @@ use esp32s3_hal as hal;
 
 use embedded_io::blocking::*;
 use embedded_svc::ipv4::Interface;
-use embedded_svc::wifi::{
-    AccessPointInfo, ClientConfiguration,
-    Configuration, Wifi, 
-};
+use embedded_svc::wifi::{AccessPointInfo, ClientConfiguration, Configuration, Wifi};
 
 use esp_backtrace as _;
 use esp_println::logger::init_logger;
@@ -111,7 +108,11 @@ fn main() -> ! {
     loop {
         let res = wifi_interface.is_connected();
         match res {
-            Ok(connected) => if connected { break; },
+            Ok(connected) => {
+                if connected {
+                    break;
+                }
+            }
             Err(err) => println!("{:?}", err),
         }
     }
