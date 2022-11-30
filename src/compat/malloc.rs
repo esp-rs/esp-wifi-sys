@@ -16,6 +16,11 @@ pub unsafe extern "C" fn malloc(size: u32) -> *const u8 {
             .map_or(core::ptr::null_mut(), |allocation| allocation.as_ptr())
     });
 
+    if ptr.is_null() {
+        log::debug!("out of memory");
+        return ptr;
+    }
+
     *(ptr as *mut _ as *mut usize) = total_size;
     ptr.offset(4)
 }

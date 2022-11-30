@@ -124,6 +124,7 @@ pub enum WifiError {
     SmolTcpError(smoltcp::Error),
     InitializationError(crate::InitializationError),
     MissingIp,
+    Disconnected,
 }
 
 impl From<smoltcp::Error> for WifiError {
@@ -313,17 +314,17 @@ impl<'a> embedded_svc::wifi::Wifi for Wifi<'a> {
     fn is_started(&self) -> Result<bool, Self::Error> {
         match crate::wifi::get_wifi_state() {
             crate::wifi::WifiState::StaStart => Ok(true),
-            //FIXME: Should any of the enum trigger an error instead of returning false?
+            crate::wifi::WifiState::StaConnected => Ok(true),
+            //FIXME: Should any of the enum values trigger an error instead of returning false?
             _ => Ok(false),
         }
     }
 
     fn is_connected(&self) -> Result<bool, Self::Error> {
         match crate::wifi::get_wifi_state() {
-            crate::wifi::WifiState::StaConnected | crate::wifi::WifiState::StaDisconnected => {
-                Ok(true)
-            }
-            //FIXME: Should any of the enum trigger an error instead of returning false?
+            crate::wifi::WifiState::StaConnected => Ok(true),
+            crate::wifi::WifiState::StaDisconnected => Err(WifiError::Disconnected),
+            //FIXME: Should any other enum value trigger an error instead of returning false?
             _ => Ok(false),
         }
     }
