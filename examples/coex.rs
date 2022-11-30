@@ -160,7 +160,6 @@ fn main() -> ! {
 
     println!("Start busy loop on main");
 
-    let network = Network::new(wifi_interface, current_millis);
 
     let mut rx_buffer = [0u8; 1536];
     let mut tx_buffer = [0u8; 1536];
