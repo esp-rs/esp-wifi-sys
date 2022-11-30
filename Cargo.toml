@@ -55,7 +55,7 @@ esp-backtrace = { version = "0.3.0", features = [ "esp32s2", "panic-handler", "e
 xtensa-atomic-emulation-trap = "0.2.0"
 
 [features]
-default = [ "utils" ]
+default = [ "utils", "esp32c3", "embedded-svc", "wifi", "ble" ]
 esp32c3 = [ "riscv-target", "riscv", "riscv-rt", "esp32c3-hal" ]
 esp32 = [ "esp32-hal", "xtensa-lx-rt/esp32", "xtensa-lx/esp32" ]
 esp32s3 = [ "esp32s3-hal", "xtensa-lx-rt/esp32s3", "xtensa-lx/esp32s3" ]
