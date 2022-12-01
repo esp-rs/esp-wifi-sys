@@ -8,7 +8,7 @@ WiFi / BTLE coexistence is implemented but currently only works (to some extend)
 
 On ESP32-S3 only WiFi is currently supported.
 
-THIS CURRENTLY DOESN'T WORK WITH THE XTENSA ENABLED RUST COMPILER 1.63.0.2. Use 1.64.0.0!
+THIS CURRENTLY DOESN'T WORK WITH THE XTENSA ENABLED RUST COMPILER 1.63.0.2. Use 1.65 or better
 
 This uses the WiFi drivers from https://github.com/esp-rs/esp-wireless-drivers-3rdparty
 
@@ -25,6 +25,13 @@ https://github.com/esp-rs/esp-wireless-drivers-3rdparty/ (commit 839bcd7cb89d695
   - gets an ip address via DHCP
   - performs an HTTP get request to some "random" server
 
+- static_ip
+  - set SSID and PASSWORD env variable
+  - set STATIC_IP and GATEWAY_IP env variable (e.g. "192.168.2.191" / "192.168.2.1")
+  - might be necessary to configure your WiFi access point accordingly
+  - uses the given static IP
+  - responds with some HTML content when connecting to port 8080
+
 - ble
     - starts Bluetooth advertising
     - offers one service with two characteristics (one is read/write, one is write only)
@@ -37,15 +44,19 @@ https://github.com/esp-rs/esp-wireless-drivers-3rdparty/ (commit 839bcd7cb89d695
   - does BLE advertising
   - coex support is still somewhat flaky
 
-| Command                                                                                                                      | Chip    |
-| ---------------------------------------------------------------------------------------------------------------------------- | ------- |
-| `cargo "+nightly" run --example ble --release --target riscv32imc-unknown-none-elf --features "esp32c3,ble"`  | ESP32-C3 |
-| `cargo "+nightly" run --example dhcp --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc,wifi"` | ESP32-C3 |
-| `cargo "+nightly" run --example coex --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc,wifi,ble"` | ESP32-C3 |
-| `cargo "+esp" run --example ble --release --target xtensa-esp32-none-elf --features "esp32,ble"`              | ESP32   |
-| `cargo "+esp" run --example dhcp --release --target xtensa-esp32-none-elf --features "esp32,embedded-svc,wifi"`             | ESP32   |
+| Command                                                                                                                         | Chip    |
+| ------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| `cargo "+nightly" run --example ble --release --target riscv32imc-unknown-none-elf --features "esp32c3,ble"`                    | ESP32-C3|
+| `cargo "+nightly" run --example dhcp --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc,wifi"`     | ESP32-C3|
+| `cargo "+nightly" run --example static_ip --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc,wifi"`| ESP32-C3|
+| `cargo "+nightly" run --example coex --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc,wifi,ble"` | ESP32-C3|
+| `cargo "+esp" run --example ble --release --target xtensa-esp32-none-elf --features "esp32,ble"`                                | ESP32   |
+| `cargo "+esp" run --example dhcp --release --target xtensa-esp32-none-elf --features "esp32,embedded-svc,wifi"`                 | ESP32   |
+| `cargo "+esp" run --example static_ip --release --target xtensa-esp32-none-elf --features "esp32,embedded-svc,wifi"`            | ESP32   |
 | `cargo "+esp" run --example dhcp --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi"`             | ESP32-S3|
+| `cargo "+esp" run --example static_ip --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi"`        | ESP32-S3|
 | `cargo "+esp" run --example dhcp --release --target xtensa-esp32s2-none-elf --features "esp32s2,embedded-svc,wifi"`             | ESP32-S2|
+| `cargo "+esp" run --example static_ip --release --target xtensa-esp32s2-none-elf --features "esp32s2,embedded-svc,wifi"`        | ESP32-S2|
 
 Additional you can specify these features
 |Feature|Meaning|
@@ -94,8 +105,6 @@ Additionally it uses CCOMPARE0 - so don't touch that, too.
 
 Currently your mileage might vary a lot for different opt-levels on Xtensa targets!
 If something doesn't work as expected try a different opt-level.
-
-e.g. that's why the ESP32-S2 example needs to be built with `opt-level=2`
 
 ## Directory Structure
 
