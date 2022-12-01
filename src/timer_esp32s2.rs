@@ -16,6 +16,8 @@ use esp32s2_hal::macros::interrupt;
 
 pub const TICKS_PER_SECOND: u64 = 40_000_000;
 
+pub const COUNTER_BIT_MASK: u64 = 0xFFFF_FFFF_FFFF_FFFF;
+
 #[cfg(debug_assertions)]
 const TIMER_DELAY: fugit::MicrosDurationU64 = fugit::MicrosDurationU64::micros(4000);
 #[cfg(not(debug_assertions))]

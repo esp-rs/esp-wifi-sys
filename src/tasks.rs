@@ -86,5 +86,17 @@ pub extern "C" fn worker_task2() {
 
         #[cfg(feature = "wifi")]
         crate::wifi::send_data_if_needed();
+
+        // ideally we would yield instead of wait here (https://github.com/esp-rs/esp-wifi/issues/10)
+        let start = get_systimer_count();
+        loop {
+            if get_systimer_count().wrapping_sub(start) & crate::timer::COUNTER_BIT_MASK
+                >= crate::timer::TICKS_PER_SECOND / 1000
+            {
+                break;
+            }
+        }
+
+        memory_fence();
     }
 }

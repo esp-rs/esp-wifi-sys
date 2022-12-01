@@ -45,7 +45,7 @@ https://github.com/esp-rs/esp-wireless-drivers-3rdparty/ (commit 839bcd7cb89d695
 | `cargo "+esp" run --example ble --release --target xtensa-esp32-none-elf --features "esp32,ble"`              | ESP32   |
 | `cargo "+esp" run --example dhcp --release --target xtensa-esp32-none-elf --features "esp32,embedded-svc,wifi"`             | ESP32   |
 | `cargo "+esp" run --example dhcp --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi"`             | ESP32-S3|
-| `CARGO_PROFILE_RELEASE_OPT_LEVEL=1 cargo "+esp" run --example dhcp --release --target xtensa-esp32s2-none-elf --features "esp32s2,embedded-svc,wifi"`             | ESP32-S2|
+| `cargo "+esp" run --example dhcp --release --target xtensa-esp32s2-none-elf --features "esp32s2,embedded-svc,wifi"`             | ESP32-S2|
 
 Additional you can specify these features
 |Feature|Meaning|
@@ -57,7 +57,16 @@ Additional you can specify these features
 |ble|Enable BLE support|
 |wifi|Enable WiFi support|
 
-In general you should use the release profile since otherwise the performance is quite bad.
+## Important
+
+It is necessary to build with optimization level 2 or 3 since otherwise it might not even be able to connect or advertise.
+
+To make it work also for your debug builds add this to your `Cargo.toml`
+
+```toml
+[profile.dev.package.esp-wifi]
+opt-level = 3
+```
 
 ## What works?
 

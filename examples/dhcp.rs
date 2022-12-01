@@ -113,7 +113,10 @@ fn main() -> ! {
                     break;
                 }
             }
-            Err(err) => println!("{:?}", err),
+            Err(err) => {
+                println!("{:?}", err);
+                loop {}
+            }
         }
     }
     println!("{:?}", wifi_interface.is_connected());

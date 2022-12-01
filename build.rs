@@ -10,6 +10,22 @@ use std::path::PathBuf;
     feature = "esp32s2"
 ))]
 fn main() -> Result<(), String> {
+    match std::env::var("OPT_LEVEL") {
+        Ok(level) => {
+            if level != "2" && level != "3" {
+                let message = format!(
+                    "esp-wifi should be built with optimization level 2 or 3 - yours is {}. 
+                    See https://github.com/esp-rs/esp-wifi",
+                    level
+                )
+                .to_string();
+                println!("cargo:warning={}", message);
+            }
+            ()
+        }
+        Err(_err) => (),
+    }
+
     let features: u8 = cfg!(feature = "wifi") as u8 + cfg!(feature = "ble") as u8;
 
     if features == 0 {

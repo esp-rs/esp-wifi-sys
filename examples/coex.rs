@@ -118,7 +118,10 @@ fn main() -> ! {
                     break;
                 }
             }
-            Err(err) => println!("{:?}", err),
+            Err(err) => {
+                println!("{:?}", err);
+                loop {}
+            }
         }
     }
     println!("{:?}", wifi_interface.is_connected());
@@ -159,7 +162,6 @@ fn main() -> ! {
     println!("started advertising");
 
     println!("Start busy loop on main");
-
 
     let mut rx_buffer = [0u8; 1536];
     let mut tx_buffer = [0u8; 1536];
