@@ -504,6 +504,56 @@ impl<'s, 'n: 's> Socket<'s, 'n> {
         Ok(())
     }
 
+    pub fn listen<'i>(&'i mut self, port: u16) -> Result<(), IoError>
+    where
+        's: 'i,
+    {
+        {
+            let res = self.network.with_interface(|interface| {
+                let (sock, _cx) = interface
+                    .network_interface()
+                    .get_socket_and_context::<TcpSocket>(self.socket_handle);
+                sock.listen(port)
+            });
+
+            if let Err(err) = res {
+                return Err(err.into());
+            }
+        }
+
+        loop {
+            let can_send = self.network.with_interface(|interface| {
+                let sock = interface
+                    .network_interface()
+                    .get_socket::<TcpSocket>(self.socket_handle);
+                if sock.can_send() {
+                    true
+                } else {
+                    false
+                }
+            });
+
+            if can_send {
+                break;
+            }
+
+            self.work();
+        }
+
+        Ok(())
+    }
+
+    pub fn close(&mut self) {
+        self.network.with_interface(|interface| {
+            interface
+                .network_interface()
+                .get_socket::<TcpSocket>(self.socket_handle)
+                .close();
+        });
+
+        self.work();
+    }
+
     pub fn disconnect(&mut self) {
         self.network.with_interface(|interface| {
             interface
@@ -515,10 +565,51 @@ impl<'s, 'n: 's> Socket<'s, 'n> {
         self.work();
     }
 
+    pub fn is_open(&mut self) -> bool {
+        self.network.with_interface(|interface| {
+            interface
+                .network_interface()
+                .get_socket::<TcpSocket>(self.socket_handle)
+                .is_open()
+        })
+    }
+
+    pub fn is_connected(&mut self) -> bool {
+        self.network.with_interface(|interface| {
+            let socket = interface
+                .network_interface()
+                .get_socket::<TcpSocket>(self.socket_handle);
+
+            socket.may_recv() && socket.may_send()
+        })
+    }
+
     pub fn work(&mut self) {
         loop {
-            self.network
-                .with_interface(|interface| interface.poll_dhcp().ok());
+            self.network.with_interface(|interface| {
+                if let ipv4::Configuration::Client(ipv4::ClientConfiguration::DHCP(_)) =
+                    interface.network_config
+                {
+                    interface.poll_dhcp().ok();
+                } else if let ipv4::Configuration::Client(ipv4::ClientConfiguration::Fixed(
+                    settings,
+                )) = interface.network_config
+                {
+                    let addr = Ipv4Address::from_bytes(&settings.ip.octets());
+                    if !interface.network_interface().has_ip_addr(addr) {
+                        let gateway = Ipv4Address::from_bytes(&settings.subnet.gateway.octets());
+                        interface
+                            .network_interface()
+                            .routes_mut()
+                            .add_default_ipv4_route(gateway)
+                            .ok();
+                        interface.network_interface().update_ip_addrs(|addrs| {
+                            addrs[0] = IpCidr::new(addr.into(), settings.subnet.mask.0);
+                        });
+                    }
+                }
+            });
+
             if let Ok(false) = self.network.with_interface(|interface| {
                 interface
                     .network_interface()
