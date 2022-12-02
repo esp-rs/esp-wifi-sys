@@ -73,14 +73,17 @@ impl<'a> DataFrame<'a> {
         data.data[..bytes.len()].copy_from_slice(bytes);
         data
     }
+
+    pub(crate) fn slice(&'a self) -> &'a [u8] {
+        &self.data[..self.len]
+    }
 }
 
 pub(crate) static DATA_QUEUE_RX: Mutex<RefCell<SimpleQueue<DataFrame, 3>>> =
     Mutex::new(RefCell::new(SimpleQueue::new()));
 
-pub(crate) static mut TX_BUFFER: [u8; 1536] = [0u8; 1536]; // should be a queue
-pub(crate) static mut TX_QUEUED: bool = false;
-pub(crate) static mut TX_QUEUED_DATA_LEN: u16 = 0;
+pub(crate) static DATA_QUEUE_TX: Mutex<RefCell<SimpleQueue<DataFrame, 3>>> =
+    Mutex::new(RefCell::new(SimpleQueue::new()));
 
 #[derive(Debug, Clone, Copy)]
 pub enum WifiError {
@@ -673,45 +676,43 @@ impl TxToken for WifiTxToken {
     where
         F: FnOnce(&mut [u8]) -> smoltcp::Result<R>,
     {
-        let res = unsafe { f(&mut TX_BUFFER[..len]) };
+        let res = critical_section::with(|cs| {
+            let mut queue = DATA_QUEUE_TX.borrow_ref_mut(cs);
 
-        match res {
-            Ok(_) => critical_section::with(|_| unsafe {
-                if !TX_QUEUED {
-                    TX_QUEUED_DATA_LEN = len as u16;
-                    TX_QUEUED = true;
-                    res
-                } else {
-                    Err(smoltcp::Error::Exhausted)
-                }
-            }),
-            Err(_) => res,
-        }
+            if queue.is_full() {
+                Err(smoltcp::Error::Exhausted)
+            } else {
+                let mut packet = DataFrame::new();
+                packet.len = len;
+                let res = f(&mut packet.data[..len]);
+                queue.enqueue(packet);
+                res
+            }
+        });
+
+        send_data_if_needed();
+        res
     }
 }
 
 pub fn send_data_if_needed() {
-    let to_send = critical_section::with(|_| unsafe {
-        if TX_QUEUED {
-            debug!("sending... {} bytes", TX_QUEUED_DATA_LEN);
-            dump_packet_info(&TX_BUFFER);
-            TX_QUEUED = false;
-            Some((TX_BUFFER, TX_QUEUED_DATA_LEN))
-        } else {
-            None
+    critical_section::with(|cs| {
+        let mut queue = DATA_QUEUE_TX.borrow_ref_mut(cs);
+
+        while let Some(packet) = queue.dequeue() {
+            log::trace!("sending... {} bytes", packet.len);
+            dump_packet_info(packet.slice());
+
+            unsafe {
+                let _res = esp_wifi_internal_tx(
+                    wifi_interface_t_WIFI_IF_STA,
+                    &packet.data as *const _ as *mut crate::binary::c_types::c_void,
+                    packet.len as u16,
+                );
+                log::trace!("esp_wifi_internal_tx {}", _res);
+            }
         }
     });
-
-    if let Some((data, len)) = to_send {
-        unsafe {
-            let _res = esp_wifi_internal_tx(
-                wifi_interface_t_WIFI_IF_STA,
-                &data as *const _ as *mut crate::binary::c_types::c_void,
-                len,
-            );
-            debug!("esp_wifi_internal_tx {}", _res);
-        }
-    }
 }
 
 fn dump_packet_info(buffer: &[u8]) {
