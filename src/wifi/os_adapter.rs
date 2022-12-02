@@ -17,6 +17,7 @@ use crate::{
         work_queue::queue_work,
     },
     memory_fence::memory_fence,
+    timer::yield_task,
 };
 
 #[cfg(feature = "esp32c3")]
@@ -764,6 +765,7 @@ pub unsafe extern "C" fn task_delay(tick: u32) {
             break;
         }
         now = crate::timer::get_systimer_count();
+        yield_task();
     }
 }
 

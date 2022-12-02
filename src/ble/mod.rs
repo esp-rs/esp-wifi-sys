@@ -7,6 +7,7 @@ use crate::{
     binary::include::*,
     compat::{common::StrBuf, queue::SimpleQueue, work_queue::queue_work},
     memory_fence::memory_fence,
+    timer::yield_task,
 };
 
 #[cfg(feature = "esp32")]
@@ -534,6 +535,8 @@ unsafe extern "C" fn queue_recv(queue: *const (), item: *const (), block_time_ms
                 trace!("queue_recv returns with timeout");
                 return -1;
             }
+
+            yield_task();
         }
     } else {
         panic!("Unknown queue to handle in queue_recv");

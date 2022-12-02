@@ -8,7 +8,7 @@ WiFi / BTLE coexistence is implemented but currently only works (to some extend)
 
 On ESP32-S3 only WiFi is currently supported.
 
-Minimum support Rust compiler version: 1.65.0.0
+Minimum supported Rust compiler version: 1.65.0.0
 
 This uses the WiFi drivers from https://github.com/esp-rs/esp-wireless-drivers-3rdparty
 
