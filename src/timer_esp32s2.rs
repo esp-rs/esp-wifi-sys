@@ -5,7 +5,7 @@ use critical_section::Mutex;
 use esp32s2_hal::{
     interrupt,
     pac::{self, TIMG1},
-    prelude::{Instance, _embedded_hal_timer_CountDown},
+    prelude::*,
     timer::{Timer, Timer0},
 };
 use log::trace;
@@ -55,7 +55,8 @@ pub fn setup_timer_isr(timg1_timer0: Timer<Timer0<TIMG1>>) {
     unsafe {
         xtensa_lx::interrupt::disable();
         xtensa_lx::interrupt::enable_mask(
-            1 << 6
+            1 << 6 // Timer0
+            | 1 << 29 // Software1
                 | xtensa_lx_rt::interrupt::CpuInterruptLevel::Level2.mask()
                 | xtensa_lx_rt::interrupt::CpuInterruptLevel::Level6.mask(),
         );
@@ -100,4 +101,31 @@ fn TG1_T0_LEVEL(context: &mut Context) {
         timer.clear_interrupt();
         timer.start(TIMER_DELAY.convert());
     });
+}
+
+#[allow(non_snake_case)]
+#[no_mangle]
+fn Software1(_level: u32, context: &mut Context) {
+    let intr = 1 << 29;
+    unsafe {
+        core::arch::asm!("wsr.227  {0}", in(reg) intr, options(nostack)); // 227 = "intclear"
+    }
+
+    task_switch(context);
+
+    critical_section::with(|cs| {
+        crate::memory_fence::memory_fence();
+
+        let mut timer = TIMER1.borrow_ref_mut(cs);
+        let timer = timer.as_mut().unwrap();
+        timer.clear_interrupt();
+        timer.start(TIMER_DELAY.convert());
+    });
+}
+
+pub fn yield_task() {
+    let intr = 1 << 29;
+    unsafe {
+        core::arch::asm!("wsr.226  {0}", in(reg) intr, options(nostack)); // 226 = "intset"
+    }
 }

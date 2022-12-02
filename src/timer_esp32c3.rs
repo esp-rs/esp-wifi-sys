@@ -1,9 +1,12 @@
+use core::cell::RefCell;
+
+use critical_section::Mutex;
 use esp32c3_hal as hal;
 use esp32c3_hal::interrupt::TrapFrame;
 use esp32c3_hal::prelude::*;
 use hal::pac;
 use hal::pac::Interrupt;
-use hal::systimer::{Alarm, Target};
+use hal::systimer::{Alarm, Periodic, Target};
 
 use crate::{binary, preempt::preempt::task_switch};
 use log::trace;
@@ -17,11 +20,15 @@ const TIMER_DELAY: fugit::HertzU32 = fugit::HertzU32::from_raw(500);
 #[cfg(not(debug_assertions))]
 const TIMER_DELAY: fugit::HertzU32 = fugit::HertzU32::from_raw(1_000);
 
+static ALARM0: Mutex<RefCell<Option<Alarm<Periodic, 0>>>> = Mutex::new(RefCell::new(None));
+
 pub fn setup_timer_isr(systimer: Alarm<Target, 0>) {
     let alarm0 = systimer.into_periodic();
     alarm0.set_period(TIMER_DELAY.into());
     alarm0.clear_interrupt();
     alarm0.interrupt_enable(true);
+
+    critical_section::with(|cs| ALARM0.borrow_ref_mut(cs).replace(alarm0));
 
     esp32c3_hal::interrupt::enable(
         Interrupt::SYSTIMER_TARGET0,
@@ -42,6 +49,9 @@ pub fn setup_timer_isr(systimer: Alarm<Target, 0>) {
         esp32c3_hal::interrupt::enable(Interrupt::BT_BB, hal::interrupt::Priority::Priority1)
             .unwrap();
     }
+
+    esp32c3_hal::interrupt::enable(Interrupt::SW_INTR_3, hal::interrupt::Priority::Priority1)
+        .unwrap();
 
     unsafe {
         riscv::interrupt::enable();
@@ -131,13 +141,43 @@ fn BT_BB(_trap_frame: &mut TrapFrame) {
 
 #[interrupt]
 fn SYSTIMER_TARGET0(trap_frame: &mut TrapFrame) {
-    unsafe {
-        // clear the systimer intr
-        (*pac::SYSTIMER::ptr())
-            .int_clr
-            .write(|w| w.target0_int_clr().set_bit());
+    // clear the systimer intr
+    critical_section::with(|cs| {
+        ALARM0
+            .borrow_ref_mut(cs)
+            .as_mut()
+            .unwrap()
+            .clear_interrupt();
+    });
 
-        task_switch(trap_frame);
+    task_switch(trap_frame);
+}
+
+#[interrupt]
+fn SW_INTR_3(trap_frame: &mut TrapFrame) {
+    unsafe {
+        // clear SW_INTR_3
+        (&*esp32c3_hal::pac::SYSTEM::PTR)
+            .cpu_intr_from_cpu_3
+            .modify(|_, w| w.cpu_intr_from_cpu_3().clear_bit());
+    }
+
+    critical_section::with(|cs| {
+        let mut alarm0 = ALARM0.borrow_ref_mut(cs);
+        let alarm0 = alarm0.as_mut().unwrap();
+
+        alarm0.set_period(TIMER_DELAY.into());
+        alarm0.clear_interrupt();
+    });
+
+    task_switch(trap_frame);
+}
+
+pub fn yield_task() {
+    unsafe {
+        (&*esp32c3_hal::pac::SYSTEM::PTR)
+            .cpu_intr_from_cpu_3
+            .modify(|_, w| w.cpu_intr_from_cpu_3().set_bit());
     }
 }
 

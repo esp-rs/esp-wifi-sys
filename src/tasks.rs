@@ -8,7 +8,7 @@ use crate::{
     },
     memory_fence::memory_fence,
     preempt::preempt::task_create,
-    timer::get_systimer_count,
+    timer::{get_systimer_count, yield_task},
 };
 
 pub fn init_tasks() {
@@ -23,12 +23,14 @@ pub fn init_tasks() {
 pub extern "C" fn worker_task1() {
     loop {
         compat::work_queue::do_work();
+        yield_task();
     }
 }
 
 pub extern "C" fn worker_task3() {
     loop {
         compat::work_queue::do_work();
+        yield_task();
     }
 }
 
@@ -43,6 +45,7 @@ pub extern "C" fn worker_task2() {
         > = SimpleQueue::new();
 
         critical_section::with(|_| unsafe {
+            memory_fence();
             for i in 0..TIMERS.len() {
                 memory_fence();
                 TIMERS[i] = match &TIMERS[i] {
@@ -87,16 +90,6 @@ pub extern "C" fn worker_task2() {
         #[cfg(feature = "wifi")]
         crate::wifi::send_data_if_needed();
 
-        // ideally we would yield instead of wait here (https://github.com/esp-rs/esp-wifi/issues/10)
-        let start = get_systimer_count();
-        loop {
-            if get_systimer_count().wrapping_sub(start) & crate::timer::COUNTER_BIT_MASK
-                >= crate::timer::TICKS_PER_SECOND / 1000
-            {
-                break;
-            }
-        }
-
-        memory_fence();
+        yield_task();
     }
 }

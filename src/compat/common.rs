@@ -9,6 +9,7 @@ use crate::{
     binary::{c_types::c_void, include::OSI_FUNCS_TIME_BLOCKING},
     memory_fence::memory_fence,
     preempt::preempt::current_task,
+    timer::yield_task,
 };
 
 static mut CURR_SEM: [Option<u32>; 20] = [
@@ -303,6 +304,8 @@ pub fn sem_take(semphr: *mut crate::binary::c_types::c_void, tick: u32) -> i32 {
                     break;
                 }
             }
+
+            yield_task();
         }
     }
 
@@ -380,6 +383,8 @@ pub fn lock_mutex(mutex: *mut crate::binary::c_types::c_void) -> i32 {
             if should_break {
                 break success;
             }
+
+            yield_task();
         };
 
         if success {
@@ -512,6 +517,8 @@ pub fn receive_queued(
                     trace!("queue_recv returns with timeout");
                     return -1;
                 }
+
+                yield_task();
             }
         } else {
             panic!("Unknown queue to handle in queue_recv");
