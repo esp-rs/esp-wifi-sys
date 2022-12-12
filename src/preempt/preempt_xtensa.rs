@@ -1,26 +1,10 @@
-use atomic_polyfill::*;
+use super::*;
 use xtensa_lx_rt::exception::Context;
 
 #[derive(Debug, Clone, Copy)]
 pub struct TaskContext {
     trap_frame: Context,
 }
-
-const STACK_SIZE: usize = 8192 * 2;
-
-#[cfg(coex)]
-const MAX_TASK: usize = 4;
-
-#[cfg(not(coex))]
-const MAX_TASK: usize = 3;
-
-static mut TASK_STACK: [u8; STACK_SIZE * (MAX_TASK - 1)] = [0x0u8; STACK_SIZE * (MAX_TASK - 1)];
-
-pub static mut FIRST_SWITCH: AtomicBool = AtomicBool::new(true);
-
-static mut TASK_TOP: usize = 0;
-
-static mut CTX_NOW: usize = 0;
 
 static mut CTX_TASKS: [TaskContext; MAX_TASK] = [TaskContext {
     trap_frame: Context {
@@ -88,10 +72,12 @@ pub fn task_create(task: extern "C" fn()) -> usize {
 
         CTX_TASKS[i].trap_frame.PC = task as u32;
 
+        let task_stack_size = TASK_STACK_SIZE[i];
+
         // stack must be aligned by 16
         let task_stack_ptr = (&TASK_STACK as *const _ as usize
-            + (STACK_SIZE as usize * i as usize)
-            + STACK_SIZE as usize
+            + (task_stack_size as usize * i as usize)
+            + task_stack_size as usize
             - 4) as u32;
         let stack_ptr = task_stack_ptr - (task_stack_ptr % 0x10);
         CTX_TASKS[i].trap_frame.A1 = stack_ptr;
