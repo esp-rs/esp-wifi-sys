@@ -1,4 +1,4 @@
-use atomic_polyfill::*;
+use super::*;
 use esp32c3_hal::interrupt::TrapFrame;
 
 #[derive(Debug, Default, Clone, Copy)]
@@ -6,22 +6,6 @@ pub struct Context {
     trap_frame: TrapFrame,
     _running: bool,
 }
-
-const STACK_SIZE: usize = 8192 * 2; // TODO how much is enough? would be better to have this per task
-
-#[cfg(coex)]
-const MAX_TASK: usize = 4;
-
-#[cfg(not(coex))]
-const MAX_TASK: usize = 3;
-
-static mut TASK_STACK: [u8; STACK_SIZE * (MAX_TASK - 1)] = [0u8; STACK_SIZE * (MAX_TASK - 1)];
-
-pub static mut FIRST_SWITCH: AtomicBool = AtomicBool::new(true);
-
-static mut TASK_TOP: usize = 0;
-
-static mut CTX_NOW: usize = 0;
 
 static mut CTX_TASKS: [Context; MAX_TASK] = [Context {
     trap_frame: TrapFrame {
@@ -70,10 +54,12 @@ pub fn task_create(task: extern "C" fn()) -> usize {
         TASK_TOP += 1;
         CTX_TASKS[i].trap_frame.pc = task as usize;
 
+        let task_stack_size = TASK_STACK_SIZE[i];
+
         // stack must be aligned by 16
         let task_stack_ptr = &TASK_STACK as *const _ as usize
-            + (STACK_SIZE as usize * i as usize)
-            + STACK_SIZE as usize
+            + (task_stack_size as usize * i as usize)
+            + task_stack_size as usize
             - 4;
         let stack_ptr = task_stack_ptr - (task_stack_ptr % 0x10);
         CTX_TASKS[i].trap_frame.sp = stack_ptr;

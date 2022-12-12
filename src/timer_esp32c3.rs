@@ -57,9 +57,7 @@ pub fn setup_timer_isr(systimer: Alarm<Target, 0>) {
         riscv::interrupt::enable();
     }
 
-    while unsafe {
-        crate::preempt::preempt::FIRST_SWITCH.load(core::sync::atomic::Ordering::Relaxed)
-    } {}
+    while unsafe { crate::preempt::FIRST_SWITCH.load(core::sync::atomic::Ordering::Relaxed) } {}
 }
 
 #[cfg(feature = "wifi")]
