@@ -11,10 +11,10 @@ opt-level = 3
 embedded-hal = "0.2.3"
 nb = "1.0.0"
 void = { version = "1.0.2", default-features = false }
-esp32c3-hal = { version = "0.3.0", optional = true }
-esp32-hal = { version = "0.6.0", optional = true, features = [ "rt" ] }
-esp32s3-hal = { version = "0.3.0", optional = true, features = [ "rt" ] }
-esp32s2-hal = { version = "0.3.0", optional = true, features = [ "rt" ] }
+esp32c3-hal = { version = "0.4.0", optional = true }
+esp32-hal = { version = "0.7.0", optional = true, features = [ "rt" ] }
+esp32s3-hal = { version = "0.4.0", optional = true, features = [ "rt" ] }
+esp32s2-hal = { version = "0.4.0", optional = true, features = [ "rt" ] }
 riscv-rt = { version = "0.10.0", optional = true }
 riscv = { version = "0.10.0", optional = true }
 xtensa-lx-rt = { version = "0.14.0", optional = true }
@@ -67,10 +67,3 @@ enumset = []
 embedded-svc = [ "dep:enumset", "dep:embedded-svc", "utils" ]
 wifi = []
 ble = [ "esp32-hal?/bluetooth" ]
-
-[patch.crates-io]
-esp-hal-common = { git = "https://github.com/esp-rs/esp-hal", package = "esp-hal-common", rev = "4ab05e89235e620287a6c3b24486c0b8c2c05a28" }
-esp32-hal = { git = "https://github.com/esp-rs/esp-hal", package = "esp32-hal", rev = "4ab05e89235e620287a6c3b24486c0b8c2c05a28" }
-esp32s3-hal = { git = "https://github.com/esp-rs/esp-hal", package = "esp32s3-hal", rev = "4ab05e89235e620287a6c3b24486c0b8c2c05a28" }
-esp32s2-hal = { git = "https://github.com/esp-rs/esp-hal", package = "esp32s2-hal", rev = "4ab05e89235e620287a6c3b24486c0b8c2c05a28" }
-esp32c3-hal = { git = "https://github.com/esp-rs/esp-hal", package = "esp32c3-hal", rev = "4ab05e89235e620287a6c3b24486c0b8c2c05a28" }
