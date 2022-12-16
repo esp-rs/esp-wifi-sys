@@ -70,6 +70,8 @@ Additional you can specify these features
 
 ## Important
 
+## Optimization Level
+
 It is necessary to build with optimization level 2 or 3 since otherwise it might not even be able to connect or advertise.
 
 To make it work also for your debug builds add this to your `Cargo.toml`
@@ -78,6 +80,12 @@ To make it work also for your debug builds add this to your `Cargo.toml`
 [profile.dev.package.esp-wifi]
 opt-level = 3
 ```
+
+## Using Serial-JTAG
+
+On ESP32-C3 / ESP32-S3 when using Serial-JTAG you have to activate the feature `phy_enable_usb`.
+
+Don't use this feature if your are _not_ using Serial-JTAG since it might reduce WiFi performance.
 
 ## What works?
 
@@ -128,6 +136,22 @@ If something doesn't work as expected try a different opt-level.
 - esp-now
 - powersafe support
 - maybe SoftAP
+
+## Using in your own binary crate
+
+For now this is not available on _crates.io_. Until then you need to specify a git dependency.
+You might want to pin the dependency to a specific commit since this things might change a lot during development.
+
+Make sure to include
+
+```toml
+rustflags = [
+    "-C", "link-arg=-Tlinkall.x",
+    "-C", "link-arg=-Tesp32_rom_functions.x",
+]
+```
+
+in your `.cargo/config.toml` - otherwise you will get linker errors complaining about missing symbols.
 
 ## License
 

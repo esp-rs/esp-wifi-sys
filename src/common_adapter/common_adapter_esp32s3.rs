@@ -15,6 +15,15 @@ pub(crate) unsafe extern "C" fn phy_enable() {
         phy_enable_clock();
         //        phy_set_wifi_mode_only(!crate::wifi::BLE_ENABLED);
 
+        #[cfg(feature = "phy_enable_usb")]
+        {
+            extern "C" {
+                pub fn phy_bbpll_en_usb(param: bool);
+            }
+
+            phy_bbpll_en_usb(true);
+        }
+
         if G_IS_PHY_CALIBRATED == false {
             let init_data = &PHY_INIT_DATA_DEFAULT;
 

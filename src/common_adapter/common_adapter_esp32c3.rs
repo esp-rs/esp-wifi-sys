@@ -22,11 +22,14 @@ pub(crate) unsafe extern "C" fn phy_enable() {
         if G_IS_PHY_CALIBRATED == false {
             let init_data = &PHY_INIT_DATA_DEFAULT;
 
-            extern "C" {
-                pub fn phy_bbpll_en_usb(param: bool);
-            }
+            #[cfg(feature = "phy_enable_usb")]
+            {
+                extern "C" {
+                    pub fn phy_bbpll_en_usb(param: bool);
+                }
 
-            phy_bbpll_en_usb(true);
+                phy_bbpll_en_usb(true);
+            }
 
             register_chipv7_phy(
                 init_data,
