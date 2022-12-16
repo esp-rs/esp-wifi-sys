@@ -79,7 +79,7 @@ impl<'a> DataFrame<'a> {
     }
 }
 
-pub(crate) static DATA_QUEUE_RX: Mutex<RefCell<SimpleQueue<DataFrame, 3>>> =
+pub(crate) static DATA_QUEUE_RX: Mutex<RefCell<SimpleQueue<DataFrame, 5>>> =
     Mutex::new(RefCell::new(SimpleQueue::new()));
 
 pub(crate) static DATA_QUEUE_TX: Mutex<RefCell<SimpleQueue<DataFrame, 3>>> =
@@ -142,7 +142,7 @@ unsafe extern "C" fn semphr_take_from_isr_wrapper(
     semphr: *mut crate::binary::c_types::c_void,
     hptw: *mut crate::binary::c_types::c_void,
 ) -> i32 {
-    crate::ble::semphr_take_from_isr(semphr as *const (), hptw as *const ())
+    crate::common_adapter::semphr_take_from_isr(semphr as *const (), hptw as *const ())
 }
 
 #[cfg(coex)]
@@ -150,7 +150,7 @@ unsafe extern "C" fn semphr_give_from_isr_wrapper(
     semphr: *mut crate::binary::c_types::c_void,
     hptw: *mut crate::binary::c_types::c_void,
 ) -> i32 {
-    crate::ble::semphr_give_from_isr(semphr as *const (), hptw as *const ())
+    crate::common_adapter::semphr_give_from_isr(semphr as *const (), hptw as *const ())
 }
 
 #[cfg(coex)]
@@ -161,7 +161,7 @@ unsafe extern "C" fn is_in_isr_wrapper() -> i32 {
 
 #[cfg(coex)]
 pub(crate) fn coex_initialize() -> i32 {
-    log::info!("call coex-initialize");
+    log::debug!("call coex-initialize");
     unsafe {
         let res = esp_coex_adapter_register(
             &mut G_COEX_ADAPTER_FUNCS as *mut _ as *mut coex_adapter_funcs_t,
@@ -180,7 +180,7 @@ pub(crate) fn coex_initialize() -> i32 {
 }
 
 pub unsafe extern "C" fn coex_init() -> i32 {
-    log::info!("coex-init");
+    log::debug!("coex-init");
     #[cfg(coex)]
     return crate::binary::include::coex_init();
 
@@ -503,12 +503,12 @@ pub fn wifi_start() -> i32 {
             return res;
         }
 
-        // To make this fully work we probably need to implement some level of PM support!
-        #[cfg(coex)]
-        let res = esp_wifi_set_ps(crate::binary::include::wifi_ps_type_t_WIFI_PS_MAX_MODEM);
+        #[cfg(any(coex, feature = "ps_min_modem"))]
+        let res = esp_wifi_set_ps(crate::binary::include::wifi_ps_type_t_WIFI_PS_MIN_MODEM);
 
-        #[cfg(not(coex))]
+        #[cfg(not(any(coex, feature = "ps_min_modem")))]
         let res = esp_wifi_set_ps(crate::binary::include::wifi_ps_type_t_WIFI_PS_NONE);
+
         if res != 0 {
             return res;
         }
@@ -653,7 +653,6 @@ impl RxToken for WifiRxToken {
             if let Some(mut data) = queue.dequeue() {
                 let buffer =
                     unsafe { core::slice::from_raw_parts(&data.data as *const u8, data.len) };
-                debug!("received {:?}", _timestamp);
                 dump_packet_info(&buffer);
                 f(&mut data.data[..])
             } else {
@@ -709,6 +708,9 @@ pub fn send_data_if_needed() {
                     &packet.data as *const _ as *mut crate::binary::c_types::c_void,
                     packet.len as u16,
                 );
+                if _res != 0 {
+                    log::warn!("esp_wifi_internal_tx {}", _res);
+                }
                 log::trace!("esp_wifi_internal_tx {}", _res);
             }
         }

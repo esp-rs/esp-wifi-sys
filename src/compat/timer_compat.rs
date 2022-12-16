@@ -7,8 +7,6 @@ use crate::{
 
 static ESP_FAKE_TIMER: () = ();
 
-const TIMER_INITIALIZED_VAL: u32 = 0x5aa5a55a;
-
 #[derive(Debug, Clone, Copy)]
 pub struct Timer {
     pub ptimer: *mut crate::binary::c_types::c_void,
@@ -46,6 +44,8 @@ pub fn compat_timer_arm_us(ptimer: *mut crate::binary::c_types::c_void, us: u32,
                     timer.active = true;
                     if repeat {
                         timer.period = ticks as u64;
+                    } else {
+                        timer.period = 0;
                     }
                     TIMERS[i] = Some(timer);
                     break;
@@ -85,7 +85,14 @@ pub fn compat_timer_done(ptimer: *mut crate::binary::c_types::c_void) {
             if let Some(timer) = TIMERS[i] {
                 if timer.ptimer == ptimer {
                     trace!("found timer ...");
-                    TIMERS[i] = None;
+                    TIMERS[i] = Some(Timer {
+                        active: false,
+                        ..timer
+                    });
+
+                    let ets_timer = ptimer as *mut crate::binary::include::ets_timer;
+                    (*ets_timer).priv_ = core::ptr::null_mut();
+                    (*ets_timer).expire = 0;
                     break;
                 }
             }
@@ -98,18 +105,40 @@ pub fn compat_timer_setfn(
     pfunction: *mut crate::binary::c_types::c_void,
     parg: *mut crate::binary::c_types::c_void,
 ) {
-    let ets_timer = ptimer as *mut crate::binary::include::ets_timer;
-    debug!("timer_setfn {:p} {:p} {:p}", ptimer, pfunction, parg,);
+    trace!("timer_setfn {:p} {:p} {:p}", ptimer, pfunction, parg,);
 
     critical_section::with(|_| unsafe {
-        if (*ets_timer).expire != TIMER_INITIALIZED_VAL {
-            (*ets_timer).priv_ = core::ptr::null_mut();
-
-            let mut success = false;
+        memory_fence();
+        let mut success = false;
+        for i in 0..TIMERS.len() {
             memory_fence();
 
+            if let Some(timer) = TIMERS[i] {
+                if timer.ptimer == ptimer {
+                    TIMERS[i] = Some(Timer {
+                        timer_ptr: pfunction,
+                        arg_ptr: parg,
+                        active: false,
+                        ..timer
+                    });
+                    success = true;
+                    break;
+                }
+            }
+        }
+
+        let ets_timer = ptimer as *mut crate::binary::include::ets_timer;
+        (*ets_timer).expire = 0;
+
+        if !success {
             for i in 0..TIMERS.len() {
                 memory_fence();
+
+                (*ets_timer).next = core::ptr::null_mut();
+                (*ets_timer).expire = 0;
+                (*ets_timer).period = 0;
+                (*ets_timer).func = None;
+                (*ets_timer).priv_ = core::ptr::null_mut();
 
                 if TIMERS[i].is_none() {
                     TIMERS[i] = Some(Timer {
@@ -120,15 +149,8 @@ pub fn compat_timer_setfn(
                         timer_ptr: pfunction,
                         arg_ptr: parg,
                     });
-                    (*ets_timer).priv_ = i as *mut crate::binary::c_types::c_void;
-                    (*ets_timer).expire = TIMER_INITIALIZED_VAL;
-                    success = true;
                     break;
                 }
-            }
-
-            if !success {
-                panic!("Ran out of timers!");
             }
         }
     });

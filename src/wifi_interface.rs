@@ -474,6 +474,7 @@ impl<'s, 'n: 's> Socket<'s, 'n> {
                     .network_interface()
                     .get_socket_and_context::<TcpSocket>(self.socket_handle);
                 let remote_endpoint = (addr, port);
+                sock.set_ack_delay(Some(smoltcp::time::Duration::from_millis(100)));
                 sock.connect(cx, remote_endpoint, self.network.next_local_port())
             });
 
