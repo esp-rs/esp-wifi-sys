@@ -91,7 +91,7 @@ pub fn init_heap() {
 /// This will initialize internals and also initialize WiFi and BLE
 pub fn initialize(
     systimer: Alarm<Target, 0>,
-    rng: hal::pac::RNG,
+    rng: hal::Rng,
     clocks: &Clocks,
 ) -> Result<(), InitializationError> {
     if clocks.cpu_clock != MegahertzU32::MHz(160) {
@@ -150,7 +150,7 @@ pub enum InitializationError {
 /// This will initialize internals and also initialize WiFi and BLE
 pub fn initialize(
     timg1_timer0: hal::timer::Timer<hal::timer::Timer0<hal::pac::TIMG1>>,
-    rng: hal::pac::RNG,
+    rng: hal::Rng,
     clocks: &Clocks,
 ) -> Result<(), InitializationError> {
     if clocks.cpu_clock != MegahertzU32::MHz(240) {
