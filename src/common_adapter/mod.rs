@@ -34,9 +34,9 @@ pub(crate) mod phy_init_data;
 
 pub(crate) static mut RANDOM_GENERATOR: Option<Rng> = None;
 
-pub fn init_rng(rng: hal::pac::RNG) {
+pub fn init_rng(rng: hal::Rng) {
     unsafe {
-        crate::common_adapter::RANDOM_GENERATOR = Some(Rng::new(rng));
+        crate::common_adapter::RANDOM_GENERATOR = Some(rng);
     }
 }
 

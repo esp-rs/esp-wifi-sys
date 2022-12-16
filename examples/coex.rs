@@ -28,7 +28,10 @@ use esp_wifi::initialize;
 use esp_wifi::wifi::utils::create_network_interface;
 use esp_wifi::wifi_interface::WifiError;
 use esp_wifi::{create_network_stack_storage, network_stack_storage};
-use hal::clock::{ClockControl, CpuClock};
+use hal::{
+    clock::{ClockControl, CpuClock},
+    Rng,
+};
 use hal::{pac::Peripherals, prelude::*, Rtc};
 use smoltcp::wire::Ipv4Address;
 
@@ -76,13 +79,13 @@ fn main() -> ! {
     {
         use hal::systimer::SystemTimer;
         let syst = SystemTimer::new(peripherals.SYSTIMER);
-        initialize(syst.alarm0, peripherals.RNG, &clocks).unwrap();
+        initialize(syst.alarm0, Rng::new(peripherals.RNG), &clocks).unwrap();
     }
     #[cfg(feature = "esp32")]
     {
         use hal::timer::TimerGroup;
         let timg1 = TimerGroup::new(peripherals.TIMG1, &clocks);
-        initialize(timg1.timer0, peripherals.RNG, &clocks).unwrap();
+        initialize(timg1.timer0, Rng::new(peripherals.RNG), &clocks).unwrap();
     }
 
     println!("is wifi started: {:?}", wifi_interface.is_started());

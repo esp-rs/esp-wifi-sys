@@ -1,5 +1,5 @@
 [target.riscv32imc-unknown-none-elf]
-runner = "espflash --speed 2000000 --monitor"
+runner = "espflash flash --monitor"
 
 rustflags = [
     "-C", "link-arg=-Tlinkall.x",
@@ -9,7 +9,7 @@ rustflags = [
 ]
  
 [target.xtensa-esp32-none-elf]
-runner = "espflash --speed 921600 --monitor"
+runner = "espflash flash --monitor"
 
 rustflags = [
     "-C", "link-arg=-Tlinkall.x",
@@ -17,7 +17,7 @@ rustflags = [
 ]
 
 [target.xtensa-esp32s3-none-elf]
-runner = "espflash --speed 921600 --monitor"
+runner = "espflash flash --monitor"
 
 rustflags = [
     "-C", "link-arg=-Tlinkall.x",
@@ -25,7 +25,7 @@ rustflags = [
 ]
 
 [target.xtensa-esp32s2-none-elf]
-runner = "espflash --speed 921600 --monitor"
+runner = "espflash flash --monitor"
 
 rustflags = [
     "-C", "link-arg=-Tlinkall.x",

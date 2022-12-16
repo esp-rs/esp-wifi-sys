@@ -24,7 +24,7 @@ use hal::{
     clock::{ClockControl, CpuClock},
     pac::Peripherals,
     prelude::*,
-    Rtc,
+    Rng, Rtc,
 };
 
 #[cfg(feature = "esp32c3")]
@@ -64,13 +64,13 @@ fn main() -> ! {
     {
         use hal::systimer::SystemTimer;
         let syst = SystemTimer::new(peripherals.SYSTIMER);
-        initialize(syst.alarm0, peripherals.RNG, &clocks).unwrap();
+        initialize(syst.alarm0, Rng::new(peripherals.RNG), &clocks).unwrap();
     }
     #[cfg(feature = "esp32")]
     {
         use hal::timer::TimerGroup;
         let timg1 = TimerGroup::new(peripherals.TIMG1, &clocks);
-        initialize(timg1.timer0, peripherals.RNG, &clocks).unwrap();
+        initialize(timg1.timer0, Rng::new(peripherals.RNG), &clocks).unwrap();
     }
 
     loop {
