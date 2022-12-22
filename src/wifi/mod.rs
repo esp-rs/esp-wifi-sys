@@ -98,6 +98,34 @@ pub enum WifiError {
     WrongClockConfig,
     Disconnected,
 }
+#[repr(i32)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(FromPrimitive)]
+pub enum WifiEvent {
+    WifiEventWifiReady = 0,           
+    WifiEventScanDone,                
+    WifiEventStaStart,                
+    WifiEventStaStop,                 
+    WifiEventStaConnected,            
+    WifiEventStaDisconnected,         
+    WifiEventStaAuthmodeChange,      
+    WifiEventStaWpsErSuccess,       
+    WifiEventStaWpsErFailed,        
+    WifiEventStaWpsErTimeout,       
+    WifiEventStaWpsErPin,           
+    WifiEventStaWpsErPbcOverlap,   
+    WifiEventApStart,                 
+    WifiEventApStop,                  
+    WifiEventApStaconnected,          
+    WifiEventApStadisconnected,       
+    WifiEventApProbereqrecved,        
+    WifiEventFtmReport,               
+    WifiEventStaBssRssiLow,         
+    WifiEventActionTxStatus,         
+    WifiEventRocDone,                 
+    WifiEventStaBeaconTimeout,       
+    WifiEventMax,                      
+}
 
 #[repr(i32)]
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
