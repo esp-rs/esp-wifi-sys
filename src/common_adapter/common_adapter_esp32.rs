@@ -1,7 +1,17 @@
 use super::phy_init_data::PHY_INIT_DATA_DEFAULT;
 use crate::binary::include::*;
+use atomic_polyfill::AtomicU32;
 use esp32_hal::prelude::ram;
 use log::trace;
+
+const SOC_PHY_DIG_REGS_MEM_SIZE: usize = 21 * 4;
+
+static mut SOC_PHY_DIG_REGS_MEM: [u8; SOC_PHY_DIG_REGS_MEM_SIZE] = [0u8; SOC_PHY_DIG_REGS_MEM_SIZE];
+static mut G_IS_PHY_CALIBRATED: bool = false;
+static mut G_PHY_DIGITAL_REGS_MEM: *mut u32 = core::ptr::null_mut();
+static mut S_IS_PHY_REG_STORED: bool = false;
+static mut PHY_ACCESS_REF: AtomicU32 = AtomicU32::new(0);
+static mut PHY_CLOCK_ENABLE_REF: AtomicU32 = AtomicU32::new(0);
 
 // Mask for clock bits used by both WIFI and Bluetooth
 const DPORT_WIFI_CLK_WIFI_BT_COMMON_M: u32 = 0x000003c9;
@@ -9,58 +19,114 @@ const DPORT_WIFI_CLK_WIFI_BT_COMMON_M: u32 = 0x000003c9;
 const DR_REG_DPORT_BASE: u32 = 0x3ff00000;
 const DPORT_WIFI_CLK_EN_REG: u32 = DR_REG_DPORT_BASE + 0x0CC;
 
-pub(crate) unsafe extern "C" fn phy_enable() {
-    trace!("phy_enable - not fully implemented");
+pub(crate) fn phy_mem_init() {
+    unsafe {
+        G_PHY_DIGITAL_REGS_MEM = SOC_PHY_DIG_REGS_MEM.as_ptr() as *mut u32;
+    }
+}
 
-    static mut G_IS_PHY_CALIBRATED: bool = false;
+pub(crate) unsafe fn phy_enable() {
+    let count = PHY_ACCESS_REF.fetch_add(1, atomic_polyfill::Ordering::SeqCst);
+    if count == 0 {
+        critical_section::with(|_| {
+            // #if CONFIG_IDF_TARGET_ESP32
+            //     // Update time stamp
+            //     s_phy_rf_en_ts = esp_timer_get_time();
+            //     // Update WiFi MAC time before WiFi/BT common clock is enabled
+            //     phy_update_wifi_mac_time(false, s_phy_rf_en_ts);
+            // #endif
 
-    let mut cal_data: [u8; core::mem::size_of::<esp_phy_calibration_data_t>()] =
-        [0u8; core::mem::size_of::<esp_phy_calibration_data_t>()];
-
-    critical_section::with(|_| {
-        if G_IS_PHY_CALIBRATED == false {
             phy_enable_clock();
 
-            let init_data = &PHY_INIT_DATA_DEFAULT;
+            if G_IS_PHY_CALIBRATED == false {
+                let mut cal_data: [u8; core::mem::size_of::<esp_phy_calibration_data_t>()] =
+                    [0u8; core::mem::size_of::<esp_phy_calibration_data_t>()];
 
-            register_chipv7_phy(
-                init_data,
-                &mut cal_data as *mut _ as *mut crate::binary::include::esp_phy_calibration_data_t,
-                esp_phy_calibration_mode_t_PHY_RF_CAL_FULL,
-            );
+                let init_data = &PHY_INIT_DATA_DEFAULT;
 
-            G_IS_PHY_CALIBRATED = true;
-        } else {
-            trace!("implement phy_digital_regs_load");
-            phy_wakeup_init();
-            //phy_digital_regs_load();
-            /*
-            static inline void phy_digital_regs_load(void)
-            {
-            if (g_phy_digital_regs_mem != NULL)
-                {
-                phy_dig_reg_backup(false, g_phy_digital_regs_mem);
-                }
+                register_chipv7_phy(
+                    init_data,
+                    &mut cal_data as *mut _
+                        as *mut crate::binary::include::esp_phy_calibration_data_t,
+                    esp_phy_calibration_mode_t_PHY_RF_CAL_FULL,
+                );
+
+                G_IS_PHY_CALIBRATED = true;
+            } else {
+                phy_wakeup_init();
+                phy_digital_regs_load();
             }
-            */
-        }
 
-        #[cfg(coex)]
-        coex_bt_high_prio();
-    });
+            #[cfg(coex)]
+            coex_bt_high_prio();
+
+            log::trace!("PHY ENABLE");
+        });
+    }
+}
+
+#[allow(unused)]
+pub(crate) unsafe fn phy_disable() {
+    let count = PHY_ACCESS_REF.fetch_sub(1, atomic_polyfill::Ordering::SeqCst);
+    if count == 1 {
+        critical_section::with(|_| {
+            phy_digital_regs_store();
+            // Disable PHY and RF.
+            phy_close_rf();
+
+            // #if CONFIG_IDF_TARGET_ESP32
+            //         // Update WiFi MAC time before disalbe WiFi/BT common peripheral clock
+            //         phy_update_wifi_mac_time(true, esp_timer_get_time());
+            // #endif
+
+            // Disable WiFi/BT common peripheral clock. Do not disable clock for hardware RNG
+            phy_disable_clock();
+            log::trace!("PHY DISABLE");
+        });
+    }
+}
+
+fn phy_digital_regs_load() {
+    unsafe {
+        if S_IS_PHY_REG_STORED && !G_PHY_DIGITAL_REGS_MEM.is_null() {
+            phy_dig_reg_backup(false, G_PHY_DIGITAL_REGS_MEM);
+        }
+    }
+}
+
+fn phy_digital_regs_store() {
+    unsafe {
+        if !G_PHY_DIGITAL_REGS_MEM.is_null() {
+            phy_dig_reg_backup(true, G_PHY_DIGITAL_REGS_MEM);
+            S_IS_PHY_REG_STORED = true;
+        }
+    }
 }
 
 pub(crate) unsafe fn phy_enable_clock() {
     trace!("phy_enable_clock");
 
-    static mut ENABLE_CNT: u32 = 0;
+    let count = PHY_CLOCK_ENABLE_REF.fetch_add(1, atomic_polyfill::Ordering::SeqCst);
+    if count == 0 {
+        critical_section::with(|_| {
+            let ptr = DPORT_WIFI_CLK_EN_REG as *mut u32;
+            let old = ptr.read_volatile();
+            ptr.write_volatile(old | DPORT_WIFI_CLK_WIFI_BT_COMMON_M);
+        });
+    }
+}
 
-    if ENABLE_CNT == 0 {
-        let ptr = DPORT_WIFI_CLK_EN_REG as *mut u32;
-        let old = ptr.read_volatile();
-        ptr.write_volatile(old | DPORT_WIFI_CLK_WIFI_BT_COMMON_M);
+#[allow(unused)]
+pub(crate) unsafe fn phy_disable_clock() {
+    trace!("phy_disable_clock");
 
-        ENABLE_CNT += 1;
+    let count = PHY_CLOCK_ENABLE_REF.fetch_sub(1, atomic_polyfill::Ordering::SeqCst);
+    if count == 1 {
+        critical_section::with(|_| {
+            let ptr = DPORT_WIFI_CLK_EN_REG as *mut u32;
+            let old = ptr.read_volatile();
+            ptr.write_volatile(old & !DPORT_WIFI_CLK_WIFI_BT_COMMON_M);
+        });
     }
 }
 
@@ -132,6 +198,19 @@ unsafe fn putreg32(v: u32, r: u32) {
 #[inline(always)]
 unsafe fn getreg32(r: u32) -> u32 {
     (r as *mut u32).read_volatile()
+}
+
+#[allow(unused)]
+pub(crate) fn wifi_reset_mac() {
+    const SYSCON_WIFI_RST_EN_REG: *mut u32 = (0x3ff00000 + 0xD0) as *mut u32;
+    const SYSTEM_MAC_RST: u32 = 1 << 2;
+
+    unsafe {
+        SYSCON_WIFI_RST_EN_REG
+            .write_volatile(SYSCON_WIFI_RST_EN_REG.read_volatile() | SYSTEM_MAC_RST);
+        SYSCON_WIFI_RST_EN_REG
+            .write_volatile(SYSCON_WIFI_RST_EN_REG.read_volatile() & !SYSTEM_MAC_RST);
+    }
 }
 
 /****************************************************************************

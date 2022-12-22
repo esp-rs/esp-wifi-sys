@@ -40,6 +40,10 @@ pub fn setup_timer_isr(systimer: Alarm<Target, 0>) {
     esp32c3_hal::interrupt::enable(Interrupt::WIFI_MAC, hal::interrupt::Priority::Priority1)
         .unwrap();
 
+    #[cfg(feature = "wifi")]
+    esp32c3_hal::interrupt::enable(Interrupt::WIFI_PWR, hal::interrupt::Priority::Priority1)
+        .unwrap();
+
     #[cfg(feature = "ble")]
     {
         esp32c3_hal::interrupt::enable(Interrupt::RWBT, hal::interrupt::Priority::Priority1)
@@ -67,6 +71,23 @@ fn WIFI_MAC() {
         let (fnc, arg) = crate::wifi::os_adapter::ISR_INTERRUPT_1;
 
         trace!("interrupt WIFI_MAC {:p} {:p}", fnc, arg);
+
+        if !fnc.is_null() {
+            let fnc: fn(*mut binary::c_types::c_void) = core::mem::transmute(fnc);
+            fnc(arg);
+        }
+
+        trace!("interrupt 1 done");
+    };
+}
+
+#[cfg(feature = "wifi")]
+#[interrupt]
+fn WIFI_PWR() {
+    unsafe {
+        let (fnc, arg) = crate::wifi::os_adapter::ISR_INTERRUPT_1;
+
+        trace!("interrupt WIFI_PWR {:p} {:p}", fnc, arg);
 
         if !fnc.is_null() {
             let fnc: fn(*mut binary::c_types::c_void) = core::mem::transmute(fnc);
@@ -182,7 +203,7 @@ pub fn yield_task() {
 /// Current systimer count value
 /// A tick is 1 / 16_000_000 seconds
 pub fn get_systimer_count() -> u64 {
-    unsafe {
+    critical_section::with(|_| unsafe {
         let systimer = &(*pac::SYSTIMER::ptr());
 
         systimer.unit0_op.write(|w| w.bits(1 << 30));
@@ -199,5 +220,5 @@ pub fn get_systimer_count() -> u64 {
         let value_hi = (systimer.unit0_value_hi.read().bits() as u64) << 32;
 
         (value_lo | value_hi) as u64
-    }
+    })
 }

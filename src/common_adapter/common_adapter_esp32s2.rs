@@ -1,64 +1,139 @@
 use super::phy_init_data::PHY_INIT_DATA_DEFAULT;
 use crate::binary::include::*;
+use atomic_polyfill::AtomicU32;
 use esp32s2_hal::prelude::ram;
 use log::trace;
 
-pub(crate) unsafe extern "C" fn phy_enable() {
-    // quite some code needed here
-    trace!("phy_enable - not fully implemented");
+const SYSTEM_WIFI_CLK_EN_REG: u32 = 0x3f426000 + 0x090;
+// Mask for clock bits used by both WIFI and Bluetooth
+const SYSTEM_WIFI_CLK_WIFI_BT_COMMON_M: u32 = 0x000003c9;
 
-    static mut G_IS_PHY_CALIBRATED: bool = false;
+const SOC_PHY_DIG_REGS_MEM_SIZE: usize = 21 * 4;
 
-    let mut cal_data: [u8; core::mem::size_of::<esp_phy_calibration_data_t>()] =
-        [0u8; core::mem::size_of::<esp_phy_calibration_data_t>()];
+static mut SOC_PHY_DIG_REGS_MEM: [u8; SOC_PHY_DIG_REGS_MEM_SIZE] = [0u8; SOC_PHY_DIG_REGS_MEM_SIZE];
+static mut G_IS_PHY_CALIBRATED: bool = false;
+static mut G_PHY_DIGITAL_REGS_MEM: *mut u32 = core::ptr::null_mut();
+static mut S_IS_PHY_REG_STORED: bool = false;
+static mut PHY_ACCESS_REF: AtomicU32 = AtomicU32::new(0);
+static mut PHY_CLOCK_ENABLE_REF: AtomicU32 = AtomicU32::new(0);
 
-    critical_section::with(|_| {
-        phy_enable_clock();
-        //        phy_set_wifi_mode_only(!crate::wifi::BLE_ENABLED);
+pub(crate) fn phy_mem_init() {
+    unsafe {
+        G_PHY_DIGITAL_REGS_MEM = SOC_PHY_DIG_REGS_MEM.as_ptr() as *mut u32;
+    }
+}
 
-        if G_IS_PHY_CALIBRATED == false {
-            let init_data = &PHY_INIT_DATA_DEFAULT;
+pub(crate) unsafe fn phy_enable() {
+    let count = PHY_ACCESS_REF.fetch_add(1, atomic_polyfill::Ordering::SeqCst);
+    if count == 0 {
+        critical_section::with(|_| {
+            phy_enable_clock();
 
-            register_chipv7_phy(
-                init_data,
-                &mut cal_data as *mut _ as *mut crate::binary::include::esp_phy_calibration_data_t,
-                esp_phy_calibration_mode_t_PHY_RF_CAL_FULL,
-            );
+            if G_IS_PHY_CALIBRATED == false {
+                let mut cal_data: [u8; core::mem::size_of::<esp_phy_calibration_data_t>()] =
+                    [0u8; core::mem::size_of::<esp_phy_calibration_data_t>()];
 
-            G_IS_PHY_CALIBRATED = true;
-        } else {
-            trace!("implement phy_digital_regs_load");
-            phy_wakeup_init();
-            //phy_digital_regs_load();
-            /*
-            static inline void phy_digital_regs_load(void)
+                let init_data = &PHY_INIT_DATA_DEFAULT;
+
+                register_chipv7_phy(
+                    init_data,
+                    &mut cal_data as *mut _
+                        as *mut crate::binary::include::esp_phy_calibration_data_t,
+                    esp_phy_calibration_mode_t_PHY_RF_CAL_FULL,
+                );
+
+                G_IS_PHY_CALIBRATED = true;
+            } else {
+                phy_wakeup_init();
+                phy_digital_regs_load();
+            }
+
+            #[cfg(feature = "ble")]
             {
-            if (g_phy_digital_regs_mem != NULL)
-                {
-                phy_dig_reg_backup(false, g_phy_digital_regs_mem);
+                extern "C" {
+                    fn coex_pti_v2();
                 }
+                coex_pti_v2();
             }
-            */
-        }
+        });
+    }
+}
 
-        #[cfg(feature = "ble")]
-        {
-            extern "C" {
-                fn coex_pti_v2();
-            }
-            coex_pti_v2();
+#[allow(unused)]
+pub(crate) unsafe fn phy_disable() {
+    let count = PHY_ACCESS_REF.fetch_sub(1, atomic_polyfill::Ordering::SeqCst);
+    if count == 1 {
+        critical_section::with(|_| {
+            phy_digital_regs_store();
+            // Disable PHY and RF.
+            phy_close_rf();
+
+            // Disable PHY temperature sensor
+            phy_xpd_tsens();
+
+            // Disable WiFi/BT common peripheral clock. Do not disable clock for hardware RNG
+            phy_disable_clock();
+        });
+    }
+}
+
+fn phy_digital_regs_load() {
+    unsafe {
+        if S_IS_PHY_REG_STORED && !G_PHY_DIGITAL_REGS_MEM.is_null() {
+            phy_dig_reg_backup(false, G_PHY_DIGITAL_REGS_MEM);
         }
-    });
+    }
+}
+
+fn phy_digital_regs_store() {
+    unsafe {
+        if !G_PHY_DIGITAL_REGS_MEM.is_null() {
+            phy_dig_reg_backup(true, G_PHY_DIGITAL_REGS_MEM);
+            S_IS_PHY_REG_STORED = true;
+        }
+    }
 }
 
 pub(crate) unsafe fn phy_enable_clock() {
-    trace!("phy_enable_clock");
-    const SYSTEM_WIFI_CLK_EN_REG: u32 = 0x3f426000 + 0x090;
-    critical_section::with(|_| {
-        (SYSTEM_WIFI_CLK_EN_REG as *mut u32).write_volatile(u32::MAX);
-    });
+    let ptr = SYSTEM_WIFI_CLK_EN_REG as *mut u32;
 
-    trace!("phy_enable_clock done!");
+    let count = PHY_CLOCK_ENABLE_REF.fetch_add(1, atomic_polyfill::Ordering::SeqCst);
+    if count == 0 {
+        critical_section::with(|_| {
+            let old = ptr.read_volatile();
+            ptr.write_volatile(old | SYSTEM_WIFI_CLK_WIFI_BT_COMMON_M); // doesn't work with SYSTEM_WIFI_CLK_WIFI_BT_COMMON_M
+        });
+
+        trace!("phy_enable_clock done!");
+    }
+}
+
+#[allow(unused)]
+pub(crate) unsafe fn phy_disable_clock() {
+    let ptr = SYSTEM_WIFI_CLK_EN_REG as *mut u32;
+
+    let count = PHY_CLOCK_ENABLE_REF.fetch_sub(1, atomic_polyfill::Ordering::SeqCst);
+    if count == 1 {
+        critical_section::with(|_| {
+            let old = ptr.read_volatile();
+            ptr.write_volatile(old & !SYSTEM_WIFI_CLK_WIFI_BT_COMMON_M);
+        });
+
+        trace!("phy_enable_clock done!");
+    }
+}
+
+#[allow(unused)]
+pub(crate) fn wifi_reset_mac() {
+    const SYSCON_WIFI_RST_EN_REG: *mut u32 = (0x3f426000 + 0x94) as *mut u32;
+    const SYSTEM_MAC_RST: u32 = 1 << 2;
+
+    unsafe {
+        SYSCON_WIFI_RST_EN_REG
+            .write_volatile(SYSCON_WIFI_RST_EN_REG.read_volatile() | SYSTEM_MAC_RST);
+        SYSCON_WIFI_RST_EN_REG
+            .write_volatile(SYSCON_WIFI_RST_EN_REG.read_volatile() & !SYSTEM_MAC_RST);
+    }
 }
 
 pub(crate) unsafe extern "C" fn read_mac(
@@ -112,7 +187,7 @@ pub(crate) unsafe extern "C" fn read_mac(
 }
 
 pub(crate) fn init_clocks() {
-    log::warn!("init clocks");
+    log::trace!("init clocks");
 
     const RTC_CNTL_DIG_PWC_REG: u32 = DR_REG_RTCCNTL_BASE + 0x008C;
     const DR_REG_RTCCNTL_BASE: u32 = 0x3f408000;

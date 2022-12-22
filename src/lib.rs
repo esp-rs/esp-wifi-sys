@@ -25,6 +25,7 @@ use linked_list_allocator::Heap;
 use crate::common_adapter::init_rng;
 use crate::tasks::init_tasks;
 use crate::timer::setup_timer_isr;
+use common_adapter::chip_specific::phy_mem_init;
 
 #[doc(hidden)]
 pub mod binary;
@@ -69,10 +70,10 @@ pub fn current_millis() -> u64 {
 }
 
 #[cfg(not(coex))]
-const HEAP_SIZE: usize = 64 * 1024;
+const HEAP_SIZE: usize = 42 * 1024;
 
 #[cfg(coex)]
-const HEAP_SIZE: usize = 96 * 1024;
+const HEAP_SIZE: usize = 64 * 1024;
 
 static mut HEAP_DATA: [MaybeUninit<u8>; HEAP_SIZE] = [MaybeUninit::uninit(); HEAP_SIZE];
 
@@ -98,6 +99,7 @@ pub fn initialize(
         return Err(InitializationError::WrongClockConfig);
     }
 
+    phy_mem_init();
     init_rng(rng);
     init_tasks();
     setup_timer_isr(systimer);
@@ -157,6 +159,7 @@ pub fn initialize(
         return Err(InitializationError::WrongClockConfig);
     }
 
+    phy_mem_init();
     init_rng(rng);
     init_tasks();
     setup_timer_isr(timg1_timer0);

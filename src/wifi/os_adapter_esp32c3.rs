@@ -68,34 +68,31 @@ pub(crate) unsafe extern "C" fn set_intr(
     // INFO - set_intr 0 2 1 1 (WIFI_PWR)
     // INFO - set_intr 0 0 1 1 (WIFI_MAC)
 
-    // we do nothing here anymore since all the interrupts are already
+    // we do nothing here since all the interrupts are already
     // configured in `setup_timer_isr` and messing with the interrupts will
     // get us into trouble
-
-    // esp32c3_bind_irq(intr_num, intr_source, intr_prio, ESP32C3_INT_LEVEL);
-
-    /* Disable the CPU interrupt. */
-    // resetbits(1 << cpuint, INTERRUPT_CPU_INT_ENABLE_REG);
-
-    /* Set the interrupt priority. */
-    //  ((0x600c2000 + 0x114 + intr_num * 4) as *mut u32).write_volatile(intr_prio as u32);
-
-    /* Set the interrupt type (Edge or Level). */
-    // ----
-
-    /* Map the CPU interrupt ID to the peripheral. */
-    //  ((0x600c2000 + intr_source * 4) as *mut u32).write_volatile(intr_num as u32);
 }
 
 pub(crate) unsafe extern "C" fn wifi_clock_enable() {
-    // modifyreg32(SYSTEM_WIFI_CLK_EN_REG, 0, SYSTEM_WIFI_CLK_WIFI_EN_M);
     trace!("wifi_clock_enable");
-    // const SYSTEM_WIFI_CLK_EN_REG: u32 = 0x60026000 + 0x014;
-    critical_section::with(|_| {
-        //    (SYSTEM_WIFI_CLK_EN_REG as *mut u32).write_volatile(0);
-    });
+
+    const SYSCON_WIFI_CLK_EN_REG: *mut u32 = (0x60026000 + 0x14) as *mut u32;
+    const SYSTEM_WIFI_CLK_WIFI_EN_M: u32 = 0;
+    const SYSTEM_CORE_RST_EN_REG: *mut u32 = (0x60026000 + 0x18) as *mut u32;
+
+    SYSCON_WIFI_CLK_EN_REG
+        .write_volatile(SYSCON_WIFI_CLK_EN_REG.read_volatile() | SYSTEM_WIFI_CLK_WIFI_EN_M);
+    SYSTEM_CORE_RST_EN_REG.write_volatile(SYSTEM_CORE_RST_EN_REG.read_volatile() & !0);
 }
 
 pub(crate) unsafe extern "C" fn wifi_clock_disable() {
-    trace!("wifi_clock_disable")
+    trace!("wifi_clock_disable");
+
+    const SYSCON_WIFI_CLK_EN_REG: *mut u32 = (0x60026000 + 0x14) as *mut u32;
+    const SYSTEM_WIFI_CLK_WIFI_EN_M: u32 = 0;
+    const SYSTEM_CORE_RST_EN_REG: *mut u32 = (0x60026000 + 0x18) as *mut u32;
+
+    SYSCON_WIFI_CLK_EN_REG
+        .write_volatile(SYSCON_WIFI_CLK_EN_REG.read_volatile() & !SYSTEM_WIFI_CLK_WIFI_EN_M);
+    SYSTEM_CORE_RST_EN_REG.write_volatile(SYSTEM_CORE_RST_EN_REG.read_volatile() | 0);
 }

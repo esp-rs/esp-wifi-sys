@@ -297,7 +297,8 @@ pub unsafe extern "C" fn wifi_int_restore(
  ****************************************************************************/
 pub unsafe extern "C" fn task_yield_from_isr() {
     // original: /* Do nothing */
-    trace!("task_yield_from_isr")
+    trace!("task_yield_from_isr");
+    yield_task();
 }
 
 /****************************************************************************
@@ -485,6 +486,7 @@ pub unsafe extern "C" fn queue_send_from_isr(
     _hptw: *mut crate::binary::c_types::c_void,
 ) -> i32 {
     trace!("queue_send_from_isr");
+    *(_hptw as *mut u32) = 1;
     queue_send(queue, item, 1000)
 }
 
@@ -757,14 +759,12 @@ pub unsafe extern "C" fn task_delete(_task_handle: *mut crate::binary::c_types::
  *
  ****************************************************************************/
 pub unsafe extern "C" fn task_delay(tick: u32) {
-    trace!("task_delay tick {}", tick);
-    let mut now = crate::timer::get_systimer_count();
-    let timeout = now + tick as u64;
+    log::trace!("task_delay tick {}", tick);
+    let timeout = crate::timer::get_systimer_count() + tick as u64;
     loop {
-        if now > timeout {
+        if crate::timer::get_systimer_count() >= timeout {
             break;
         }
-        now = crate::timer::get_systimer_count();
         yield_task();
     }
 }
@@ -1006,7 +1006,9 @@ pub unsafe extern "C" fn wifi_apb80m_release() {
  *
  ****************************************************************************/
 pub unsafe extern "C" fn phy_disable() {
-    trace!("phy_disable")
+    trace!("phy_disable");
+
+    crate::common_adapter::chip_specific::phy_disable();
 }
 
 /****************************************************************************
@@ -1024,7 +1026,7 @@ pub unsafe extern "C" fn phy_disable() {
  ****************************************************************************/
 pub unsafe extern "C" fn phy_enable() {
     // quite some code needed here
-    trace!("phy_enable - not fully implemented");
+    trace!("phy_enable");
 
     crate::common_adapter::chip_specific::phy_enable();
 }
@@ -1078,9 +1080,8 @@ pub unsafe extern "C" fn read_mac(mac: *mut u8, type_: u32) -> crate::binary::c_
  *
  ****************************************************************************/
 pub unsafe extern "C" fn wifi_reset_mac() {
-    trace!("wifi_reset_mac - not implemented");
-    // modifyreg32(SYSCON_WIFI_RST_EN_REG, 0, SYSTEM_MAC_RST);
-    // modifyreg32(SYSCON_WIFI_RST_EN_REG, SYSTEM_MAC_RST, 0);
+    trace!("wifi_reset_mac");
+    crate::common_adapter::chip_specific::wifi_reset_mac();
 }
 
 /****************************************************************************
@@ -1145,19 +1146,16 @@ pub unsafe extern "C" fn wifi_rtc_disable_iso() {
  * Name: esp_timer_get_time
  *
  * Description:
- *   Get system time of type int64_t
- *
- * Input Parameters:
- *   periph - No mean
+ *   Get time in microseconds since boot.
  *
  * Returned Value:
- *   System time
+ *   System time in micros
  *
  ****************************************************************************/
 #[no_mangle]
 pub unsafe extern "C" fn esp_timer_get_time() -> i64 {
     trace!("esp_timer_get_time");
-    (crate::timer::get_systimer_count() / crate::timer::TICKS_PER_SECOND / 1_000) as i64
+    (crate::timer::get_systimer_count() / (crate::timer::TICKS_PER_SECOND / 1_000_000)) as i64
 }
 
 /****************************************************************************
@@ -2067,5 +2065,10 @@ pub unsafe extern "C" fn coex_schm_curr_phase_idx_get() -> crate::binary::c_type
  ****************************************************************************/
 pub unsafe extern "C" fn slowclk_cal_get() -> u32 {
     trace!("slowclk_cal_get");
-    28639
+
+    #[cfg(feature = "esp32s2")]
+    return 44462;
+
+    #[cfg(not(feature = "esp32s2"))]
+    return 28639;
 }

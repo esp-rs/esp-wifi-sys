@@ -161,7 +161,7 @@ fn main() -> ! {
             println!("Connected");
 
             let mut time_out = false;
-            let wait_end = current_millis() + 2 * 1000;
+            let wait_end = current_millis() + 20 * 1000;
             let mut buffer = [0u8; 1024];
             let mut pos = 0;
             loop {

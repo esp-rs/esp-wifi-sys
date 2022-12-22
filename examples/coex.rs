@@ -183,7 +183,7 @@ fn main() -> ! {
             .unwrap();
         socket.flush().unwrap();
 
-        let wait_end = current_millis() + 2 * 1000;
+        let wait_end = current_millis() + 20 * 1000;
         loop {
             let mut buffer = [0u8; 512];
             if let Ok(len) = socket.read(&mut buffer) {

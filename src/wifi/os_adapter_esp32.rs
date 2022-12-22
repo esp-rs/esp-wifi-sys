@@ -33,11 +33,11 @@ pub(crate) unsafe extern "C" fn wifi_int_restore(
 }
 
 pub(crate) unsafe extern "C" fn phy_common_clock_disable() {
-    trace!("phy_common_clock_disable - not implemented");
+    crate::common_adapter::chip_specific::phy_disable_clock();
 }
 
 pub(crate) unsafe extern "C" fn phy_common_clock_enable() {
-    trace!("phy_common_clock_enable - not implemented");
+    crate::common_adapter::chip_specific::phy_enable_clock();
 }
 
 pub(crate) unsafe extern "C" fn set_intr(

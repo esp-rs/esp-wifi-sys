@@ -174,8 +174,8 @@ static G_OSI_FUNCS: osi_funcs_s = osi_funcs_s {
     task_yield_from_isr: Some(task_yield_from_isr),
     semphr_create: Some(semphr_create),
     semphr_delete: Some(semphr_delete),
-    semphr_take_from_isr: Some(semphr_take_from_isr),
-    semphr_give_from_isr: Some(semphr_give_from_isr),
+    semphr_take_from_isr: Some(crate::common_adapter::semphr_take_from_isr),
+    semphr_give_from_isr: Some(crate::common_adapter::semphr_give_from_isr),
     semphr_take: Some(semphr_take),
     semphr_give: Some(semphr_give),
     mutex_create: Some(mutex_create),
@@ -308,8 +308,8 @@ static G_OSI_FUNCS: osi_funcs_s = osi_funcs_s {
     task_yield_from_isr: Some(task_yield_from_isr),
     semphr_create: Some(semphr_create),
     semphr_delete: Some(semphr_delete),
-    semphr_take_from_isr: Some(semphr_take_from_isr),
-    semphr_give_from_isr: Some(semphr_give_from_isr),
+    semphr_take_from_isr: Some(crate::common_adapter::semphr_take_from_isr),
+    semphr_give_from_isr: Some(crate::common_adapter::semphr_give_from_isr),
     semphr_take: Some(semphr_take),
     semphr_give: Some(semphr_give),
     mutex_create: Some(mutex_create),
@@ -408,20 +408,6 @@ unsafe extern "C" fn semphr_delete(sem: *const ()) {
     crate::common_adapter::semphr_delete(sem as *mut crate::binary::c_types::c_void);
 }
 
-#[ram]
-pub(crate) unsafe extern "C" fn semphr_take_from_isr(sem: *const (), hptw: *const ()) -> i32 {
-    trace!("sem take from isr");
-    (hptw as *mut u32).write_volatile(0);
-    crate::common_adapter::semphr_take(sem as *mut crate::binary::c_types::c_void, 0)
-}
-
-#[ram]
-pub(crate) unsafe extern "C" fn semphr_give_from_isr(sem: *const (), hptw: *const ()) -> i32 {
-    trace!("sem give from isr");
-    (hptw as *mut u32).write_volatile(0);
-    crate::common_adapter::semphr_give(sem as *mut crate::binary::c_types::c_void)
-}
-
 unsafe extern "C" fn semphr_take(sem: *const (), block_time_ms: u32) -> i32 {
     crate::common_adapter::semphr_take(sem as *mut crate::binary::c_types::c_void, block_time_ms)
 }
@@ -501,7 +487,9 @@ unsafe extern "C" fn queue_recv(queue: *const (), item: *const (), block_time_ms
         block_time_ms
     );
 
-    let end_time = crate::timer::get_systimer_count() + block_time_ms as u64;
+    // is this ticks or millis?
+    let end_time = crate::timer::get_systimer_count()
+        + (block_time_ms as u64 * (crate::timer::TICKS_PER_SECOND / 1000));
 
     // handle the BT_QUEUE
     if queue == &BT_INTERNAL_QUEUE as *const _ as *const () {
@@ -719,7 +707,7 @@ pub(crate) fn ble_init() {
                 static mut g_bt_plf_log_level: u32;
             }
 
-            log::info!("g_bt_plf_log_level = {}", g_bt_plf_log_level);
+            log::debug!("g_bt_plf_log_level = {}", g_bt_plf_log_level);
             g_bt_plf_log_level = 10;
         }
 

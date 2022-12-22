@@ -48,7 +48,7 @@ pub extern "C" fn worker_task2() {
             memory_fence();
             for i in 0..TIMERS.len() {
                 memory_fence();
-                TIMERS[i] = match &TIMERS[i] {
+                match &TIMERS[i] {
                     Some(old) => {
                         if old.active && get_systimer_count() >= old.expire {
                             debug!("timer is due.... {:p}", old.ptimer);
@@ -56,20 +56,18 @@ pub extern "C" fn worker_task2() {
                                 core::mem::transmute(old.timer_ptr);
                             to_run.enqueue((fnctn, old.arg_ptr));
 
-                            Some(Timer {
+                            TIMERS[i] = Some(Timer {
                                 expire: if old.period != 0 {
                                     get_systimer_count() + old.period
                                 } else {
                                     0
                                 },
-                                active: if old.period != 0 { true } else { false },
+                                active: if old.period != 0 { old.active } else { false },
                                 ..*old
-                            })
-                        } else {
-                            Some(*old)
+                            });
                         }
                     }
-                    None => None,
+                    None => (),
                 };
             }
         });

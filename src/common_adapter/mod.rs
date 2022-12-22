@@ -237,6 +237,22 @@ pub unsafe extern "C" fn timer_arm_us(
     compat_timer_arm_us(ptimer, us, repeat);
 }
 
+#[allow(unused)]
+#[ram]
+pub(crate) unsafe extern "C" fn semphr_take_from_isr(sem: *const (), hptw: *const ()) -> i32 {
+    trace!("sem take from isr");
+    (hptw as *mut u32).write_volatile(0);
+    crate::common_adapter::semphr_take(sem as *mut crate::binary::c_types::c_void, 0)
+}
+
+#[allow(unused)]
+#[ram]
+pub(crate) unsafe extern "C" fn semphr_give_from_isr(sem: *const (), hptw: *const ()) -> i32 {
+    trace!("sem give from isr");
+    (hptw as *mut u32).write_volatile(0);
+    crate::common_adapter::semphr_give(sem as *mut crate::binary::c_types::c_void)
+}
+
 // other functions
 #[no_mangle]
 pub unsafe extern "C" fn puts(s: *const u8) {
