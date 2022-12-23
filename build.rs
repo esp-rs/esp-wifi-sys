@@ -32,10 +32,6 @@ fn main() -> Result<(), String> {
         return Err("You need to use feature `wifi` and/or `ble`".to_string());
     }
 
-    if cfg!(feature = "esp32s3") && cfg!(feature = "ble") {
-        return Err("BLE is not yet supported for ESP32-S3".into());
-    }
-
     if cfg!(feature = "esp32s2") && cfg!(feature = "ble") {
         return Err("BLE is not supported for ESP32-S2".into());
     }
@@ -192,6 +188,8 @@ fn handle_chip() {
         "esp32s3_rom_functions.x",
     );
 
+    copy(out, include_bytes!("libs/esp32s3/libbtbb.a"), "libbtbb.a");
+
     copy(
         out,
         include_bytes!("libs/esp32s3/libbtdm_app.a"),
@@ -228,6 +226,7 @@ fn handle_chip() {
         "libwpa_supplicant.a",
     );
 
+    println!("cargo:rustc-link-lib={}", "btbb");
     println!("cargo:rustc-link-lib={}", "btdm_app");
     println!("cargo:rustc-link-lib={}", "coexist");
     println!("cargo:rustc-link-lib={}", "core");

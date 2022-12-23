@@ -14,10 +14,13 @@ use crate::{
 use esp32_hal as hal;
 #[cfg(feature = "esp32c3")]
 use esp32c3_hal as hal;
+#[cfg(feature = "esp32s3")]
+use esp32s3_hal as hal;
 
 use hal::macros::ram;
 
 #[cfg_attr(feature = "esp32c3", path = "os_adapter_esp32c3.rs")]
+#[cfg_attr(feature = "esp32s3", path = "os_adapter_esp32s3.rs")]
 #[cfg_attr(feature = "esp32", path = "os_adapter_esp32.rs")]
 pub(crate) mod ble_os_adapter_chip_specific;
 
@@ -45,7 +48,7 @@ extern "C" {
     fn btdm_osi_funcs_register(osi_funcs: *const ()) -> i32;
     fn btdm_controller_get_compile_version() -> *const u8;
 
-    #[cfg(feature = "esp32c3")]
+    #[cfg(any(feature = "esp32c3", feature = "esp32s3"))]
     fn btdm_controller_init(config_opts: *const esp_bt_controller_config_t) -> i32;
 
     #[cfg(feature = "esp32")]
@@ -366,6 +369,131 @@ static G_OSI_FUNCS: osi_funcs_s = osi_funcs_s {
     magic: 0xfadebead,
 };
 
+#[cfg(feature = "esp32s3")]
+#[repr(C)]
+struct osi_funcs_s {
+    magic: u32,
+    version: u32,
+    interrupt_set: Option<unsafe extern "C" fn(i32, i32, i32, i32) -> ()>,
+    interrupt_clear: Option<unsafe extern "C" fn(i32, i32) -> ()>,
+    interrupt_handler_set: Option<unsafe extern "C" fn(i32, extern "C" fn(), *const ()) -> ()>,
+    interrupt_disable: Option<unsafe extern "C" fn() -> ()>,
+    interrupt_enable: Option<unsafe extern "C" fn() -> ()>,
+    task_yield: Option<unsafe extern "C" fn() -> ()>,
+    task_yield_from_isr: Option<unsafe extern "C" fn() -> ()>,
+    semphr_create: Option<unsafe extern "C" fn(u32, u32) -> *const ()>,
+    semphr_delete: Option<unsafe extern "C" fn(*const ()) -> ()>,
+    semphr_take_from_isr: Option<unsafe extern "C" fn(*const (), *const ()) -> i32>,
+    semphr_give_from_isr: Option<unsafe extern "C" fn(*const (), *const ()) -> i32>,
+    semphr_take: Option<unsafe extern "C" fn(*const (), u32) -> i32>,
+    semphr_give: Option<unsafe extern "C" fn(*const ()) -> i32>,
+    mutex_create: Option<unsafe extern "C" fn() -> *const ()>,
+    mutex_delete: Option<unsafe extern "C" fn(*const ()) -> ()>,
+    mutex_lock: Option<unsafe extern "C" fn(*const ()) -> i32>,
+    mutex_unlock: Option<unsafe extern "C" fn(*const ()) -> i32>,
+    queue_create: Option<unsafe extern "C" fn(u32, u32) -> *const ()>,
+    queue_delete: Option<unsafe extern "C" fn(*const ()) -> ()>,
+    queue_send: Option<unsafe extern "C" fn(*const (), *const (), u32) -> i32>,
+    queue_send_from_isr: Option<unsafe extern "C" fn(*const (), *const (), *const ()) -> i32>,
+    queue_recv: Option<unsafe extern "C" fn(*const (), *const (), u32) -> i32>,
+    queue_recv_from_isr: Option<unsafe extern "C" fn(*const (), *const (), *const ()) -> i32>,
+    task_create: Option<
+        unsafe extern "C" fn(
+            *mut crate::binary::c_types::c_void,
+            *const u8,
+            u32,
+            *mut crate::binary::c_types::c_void,
+            u32,
+            *mut crate::binary::c_types::c_void,
+            u32,
+        ) -> i32,
+    >,
+    task_delete: Option<unsafe extern "C" fn(*const ()) -> ()>,
+    is_in_isr: Option<unsafe extern "C" fn() -> i32>,
+    cause_sw_intr_to_core: Option<unsafe extern "C" fn(i32, i32) -> i32>,
+    malloc: Option<unsafe extern "C" fn(u32) -> *const ()>,
+    malloc_internal: Option<unsafe extern "C" fn(u32) -> *const ()>,
+    free: Option<unsafe extern "C" fn(*const ()) -> ()>,
+    read_efuse_mac: Option<unsafe extern "C" fn(*const ()) -> i32>,
+    srand: Option<unsafe extern "C" fn(u32) -> ()>,
+    rand: Option<unsafe extern "C" fn() -> i32>,
+    btdm_lpcycles_2_hus: Option<unsafe extern "C" fn(u32, u32) -> u32>,
+    btdm_hus_2_lpcycles: Option<unsafe extern "C" fn(u32) -> u32>,
+    btdm_sleep_check_duration: Option<unsafe extern "C" fn(i32) -> i32>,
+    btdm_sleep_enter_phase1: Option<unsafe extern "C" fn(i32) -> ()>,
+    btdm_sleep_enter_phase2: Option<unsafe extern "C" fn() -> ()>,
+    btdm_sleep_exit_phase1: Option<unsafe extern "C" fn() -> ()>,
+    btdm_sleep_exit_phase2: Option<unsafe extern "C" fn() -> ()>,
+    btdm_sleep_exit_phase3: Option<unsafe extern "C" fn() -> ()>,
+    coex_wifi_sleep_set: Option<unsafe extern "C" fn(i32) -> ()>,
+    coex_core_ble_conn_dyn_prio_get: Option<unsafe extern "C" fn(*mut i32, *mut i32) -> i32>,
+    coex_schm_status_bit_set: Option<unsafe extern "C" fn(i32, i32) -> ()>,
+    coex_schm_status_bit_clear: Option<unsafe extern "C" fn(i32, i32) -> ()>,
+    interrupt_on: Option<unsafe extern "C" fn(i32) -> ()>,
+    interrupt_off: Option<unsafe extern "C" fn(i32) -> ()>,
+    esp_hw_power_down: Option<unsafe extern "C" fn() -> ()>,
+    esp_hw_power_up: Option<unsafe extern "C" fn() -> ()>,
+    ets_backup_dma_copy: Option<unsafe extern "C" fn(u32, u32, u32, i32) -> ()>,
+}
+
+#[cfg(feature = "esp32s3")]
+static G_OSI_FUNCS: osi_funcs_s = osi_funcs_s {
+    magic: 0xfadebead,
+    version: 0x00010006,
+    interrupt_set: Some(ble_os_adapter_chip_specific::interrupt_set),
+    interrupt_clear: Some(ble_os_adapter_chip_specific::interrupt_clear),
+    interrupt_handler_set: Some(ble_os_adapter_chip_specific::interrupt_handler_set),
+    interrupt_disable: Some(interrupt_disable),
+    interrupt_enable: Some(interrupt_enable),
+    task_yield: Some(task_yield),
+    task_yield_from_isr: Some(task_yield_from_isr),
+    semphr_create: Some(semphr_create),
+    semphr_delete: Some(semphr_delete),
+    semphr_take_from_isr: Some(crate::common_adapter::semphr_take_from_isr),
+    semphr_give_from_isr: Some(crate::common_adapter::semphr_give_from_isr),
+    semphr_take: Some(semphr_take),
+    semphr_give: Some(semphr_give),
+    mutex_create: Some(mutex_create),
+    mutex_delete: Some(mutex_delete),
+    mutex_lock: Some(mutex_lock),
+    mutex_unlock: Some(mutex_unlock),
+    queue_create: Some(queue_create),
+    queue_delete: Some(queue_delete),
+    queue_send: Some(queue_send),
+    queue_send_from_isr: Some(queue_send_from_isr),
+    queue_recv: Some(queue_recv),
+    queue_recv_from_isr: Some(queue_recv_from_isr),
+    task_create: Some(task_create),
+    task_delete: Some(task_delete),
+    is_in_isr: Some(is_in_isr),
+    cause_sw_intr_to_core: Some(cause_sw_intr_to_core),
+    malloc: Some(malloc),
+    malloc_internal: Some(malloc_internal),
+    free: Some(free),
+    read_efuse_mac: Some(read_efuse_mac),
+    srand: Some(srand),
+    rand: Some(rand),
+    btdm_lpcycles_2_hus: Some(btdm_lpcycles_2_hus),
+    btdm_hus_2_lpcycles: Some(btdm_hus_2_lpcycles),
+    btdm_sleep_check_duration: Some(btdm_sleep_check_duration),
+    btdm_sleep_enter_phase1: Some(btdm_sleep_enter_phase1),
+    btdm_sleep_enter_phase2: Some(btdm_sleep_enter_phase2),
+    btdm_sleep_exit_phase1: Some(btdm_sleep_exit_phase1),
+    btdm_sleep_exit_phase2: Some(btdm_sleep_exit_phase2),
+    btdm_sleep_exit_phase3: Some(btdm_sleep_exit_phase3),
+    coex_wifi_sleep_set: Some(ble_os_adapter_chip_specific::coex_wifi_sleep_set),
+    coex_core_ble_conn_dyn_prio_get: Some(
+        ble_os_adapter_chip_specific::coex_core_ble_conn_dyn_prio_get,
+    ),
+    coex_schm_status_bit_set: Some(coex_schm_status_bit_set),
+    coex_schm_status_bit_clear: Some(coex_schm_status_bit_clear),
+    interrupt_on: Some(ble_os_adapter_chip_specific::interrupt_on),
+    interrupt_off: Some(ble_os_adapter_chip_specific::interrupt_off),
+    esp_hw_power_down: Some(ble_os_adapter_chip_specific::esp_hw_power_down),
+    esp_hw_power_up: Some(ble_os_adapter_chip_specific::esp_hw_power_up),
+    ets_backup_dma_copy: Some(ble_os_adapter_chip_specific::ets_backup_dma_copy),
+};
+
 #[cfg(target_arch = "riscv32")]
 static mut G_INTER_FLAGS: [u8; 10] = [0; 10];
 
@@ -579,8 +707,8 @@ unsafe extern "C" fn is_in_isr() -> i32 {
 
 #[ram]
 unsafe extern "C" fn cause_sw_intr_to_core(_core: i32, _intr_no: i32) -> i32 {
-    #[cfg(feature = "esp32c3")]
-    todo!("cause_sw_intr_to_core is not implemented for ESP32C3");
+    #[cfg(any(feature = "esp32c3", feature = "esp32s3"))]
+    todo!("cause_sw_intr_to_core is not implemented for this target");
 
     #[cfg(feature = "esp32")]
     {
@@ -737,7 +865,7 @@ pub(crate) fn ble_init() {
 
         ble_os_adapter_chip_specific::disable_sleep_mode();
 
-        #[cfg(feature = "esp32c3")]
+        #[cfg(any(feature = "esp32c3", feature = "esp32s3"))]
         let res = btdm_controller_init(&mut cfg as *mut esp_bt_controller_config_t);
 
         #[cfg(feature = "esp32")]
@@ -755,10 +883,6 @@ pub(crate) fn ble_init() {
         #[cfg(coex)]
         crate::binary::include::coex_enable();
 
-        // esp32_bt_controller_enable
-
-        // modifyreg32(SYSTEM_WIFI_CLK_EN_REG, 0, UINT32_MAX);
-        // bt_phy_enable();
         crate::common_adapter::chip_specific::phy_enable();
 
         #[cfg(feature = "esp32")]

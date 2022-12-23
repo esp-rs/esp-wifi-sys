@@ -49,9 +49,8 @@ pub fn setup_timer_isr(timg1_timer0: Timer<Timer0<TIMG1>>) {
 
     #[cfg(feature = "ble")]
     {
-        interrupt::enable(pac::Interrupt::RWBT, interrupt::Priority::Priority1).unwrap();
-        interrupt::enable(pac::Interrupt::RWBLE, interrupt::Priority::Priority1).unwrap();
-        interrupt::enable(pac::Interrupt::BT_BB, interrupt::Priority::Priority1).unwrap();
+        interrupt::enable(pac::Interrupt::BT_BB_NMI, interrupt::Priority::Priority1).unwrap();
+        interrupt::enable(pac::Interrupt::RWBT_NMI, interrupt::Priority::Priority1).unwrap();
     }
 
     timer1.listen();
@@ -73,21 +72,6 @@ pub fn setup_timer_isr(timg1_timer0: Timer<Timer0<TIMG1>>) {
     }
 
     while unsafe { crate::preempt::FIRST_SWITCH.load(core::sync::atomic::Ordering::Relaxed) } {}
-}
-
-#[cfg(feature = "ble")]
-#[allow(non_snake_case)]
-#[no_mangle]
-fn Software0(_level: u32) {
-    unsafe {
-        let (fnc, arg) = crate::ble::ble_os_adapter_chip_specific::ISR_INTERRUPT_7;
-        trace!("interrupt Software0 {:p} {:p}", fnc, arg);
-
-        if !fnc.is_null() {
-            let fnc: fn(*mut crate::binary::c_types::c_void) = core::mem::transmute(fnc);
-            fnc(arg);
-        }
-    }
 }
 
 #[allow(non_snake_case)]
@@ -130,44 +114,29 @@ fn WIFI_BB() {
 
 #[cfg(feature = "ble")]
 #[interrupt]
-fn RWBT() {
-    unsafe {
+fn RWBT_NMI() {
+    critical_section::with(|_| unsafe {
         let (fnc, arg) = crate::ble::ble_os_adapter_chip_specific::ISR_INTERRUPT_5;
+        trace!("interrupt RWBT_NMI {:p} {:p}", fnc, arg);
+        if !fnc.is_null() {
+            let fnc: fn(*mut crate::binary::c_types::c_void) = core::mem::transmute(fnc);
+            fnc(arg);
+        }
+    });
+}
+
+#[cfg(feature = "ble")]
+#[interrupt]
+fn BT_BB_NMI() {
+    critical_section::with(|_| unsafe {
+        let (fnc, arg) = crate::ble::ble_os_adapter_chip_specific::ISR_INTERRUPT_8;
         trace!("interrupt RWBT {:p} {:p}", fnc, arg);
 
         if !fnc.is_null() {
             let fnc: fn(*mut crate::binary::c_types::c_void) = core::mem::transmute(fnc);
             fnc(arg);
         }
-    }
-}
-
-#[cfg(feature = "ble")]
-#[interrupt]
-fn RWBLE() {
-    unsafe {
-        let (fnc, arg) = crate::ble::ble_os_adapter_chip_specific::ISR_INTERRUPT_5;
-        trace!("interrupt RWBLE {:p} {:p}", fnc, arg);
-
-        if !fnc.is_null() {
-            let fnc: fn(*mut crate::binary::c_types::c_void) = core::mem::transmute(fnc);
-            fnc(arg);
-        }
-    }
-}
-
-#[cfg(feature = "ble")]
-#[interrupt]
-fn BT_BB() {
-    unsafe {
-        let (fnc, arg) = crate::ble::ble_os_adapter_chip_specific::ISR_INTERRUPT_8;
-        trace!("interrupt BT_BB {:p} {:p}", fnc, arg);
-
-        if !fnc.is_null() {
-            let fnc: fn(*mut crate::binary::c_types::c_void) = core::mem::transmute(fnc);
-            fnc(arg);
-        }
-    }
+    });
 }
 
 #[interrupt]

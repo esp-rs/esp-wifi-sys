@@ -2066,9 +2066,17 @@ pub unsafe extern "C" fn coex_schm_curr_phase_idx_get() -> crate::binary::c_type
 pub unsafe extern "C" fn slowclk_cal_get() -> u32 {
     trace!("slowclk_cal_get");
 
+    // TODO not hardcode this
+
     #[cfg(feature = "esp32s2")]
     return 44462;
 
-    #[cfg(not(feature = "esp32s2"))]
+    #[cfg(feature = "esp32s3")]
+    return 44462;
+
+    #[cfg(feature = "esp32c3")]
     return 28639;
+
+    #[cfg(feature = "esp32")]
+    return 28639;    
 }
