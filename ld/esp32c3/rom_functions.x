@@ -962,6 +962,7 @@ r_llc_stop = 0x40000fdc;
 r_llc_ver_exch_loc_proc_continue = 0x40000fe0;
 r_llc_ver_proc_err_cb = 0x40000fe4;
 r_llcp_pdu_handler_tab_p_get = 0x40000fe8;
+r_lld_sync_insert = 0x40001b88;
 r_lld_aa_gen = 0x40000fec;
 r_lld_adv_adv_data_set = 0x40000ff0;
 r_lld_adv_adv_data_update = 0x40000ff4;

@@ -117,6 +117,7 @@ impl<T> ::core::fmt::Debug for __IncompleteArrayField<T> {
         fmt.write_str("__IncompleteArrayField")
     }
 }
+pub const SOC_COEX_HW_PTI: u32 = 1;
 pub const _NEWLIB_VERSION_H__: u32 = 1;
 pub const _NEWLIB_VERSION: &[u8; 6usize] = b"3.3.0\0";
 pub const __NEWLIB__: u32 = 3;
@@ -309,7 +310,8 @@ pub const WIFI_PROTOCOL_11B: u32 = 1;
 pub const WIFI_PROTOCOL_11G: u32 = 2;
 pub const WIFI_PROTOCOL_11N: u32 = 4;
 pub const WIFI_PROTOCOL_LR: u32 = 8;
-pub const ESP_WIFI_MAX_CONN_NUM: u32 = 10;
+pub const WIFI_PROTOCOL_11AX: u32 = 16;
+pub const ESP_WIFI_MAX_CONN_NUM: u32 = 15;
 pub const WIFI_VENDOR_IE_ELEMENT_ID: u32 = 221;
 pub const WIFI_PROMIS_FILTER_MASK_ALL: u32 = 4294967295;
 pub const WIFI_PROMIS_FILTER_MASK_MGMT: u32 = 1;
@@ -367,6 +369,7 @@ pub const ESP_ERR_WIFI_INIT_STATE: u32 = 12307;
 pub const ESP_ERR_WIFI_STOP_STATE: u32 = 12308;
 pub const ESP_ERR_WIFI_NOT_ASSOC: u32 = 12309;
 pub const ESP_ERR_WIFI_TX_DISALLOW: u32 = 12310;
+pub const ESP_ERR_WIFI_TWT_FULL: u32 = 12311;
 pub const WIFI_STATIC_TX_BUFFER_NUM: u32 = 0;
 pub const WIFI_CACHE_TX_BUFFER_NUM: u32 = 0;
 pub const WIFI_DYNAMIC_TX_BUFFER_NUM: u32 = 0;
@@ -386,6 +389,7 @@ pub const CONFIG_FEATURE_WPA3_SAE_BIT: u32 = 1;
 pub const CONFIG_FEATURE_CACHE_TX_BUF_BIT: u32 = 2;
 pub const CONFIG_FEATURE_FTM_INITIATOR_BIT: u32 = 4;
 pub const CONFIG_FEATURE_FTM_RESPONDER_BIT: u32 = 8;
+pub const ESP_WIFI_CONNECTIONLESS_INTERVAL_DEFAULT_MODE: u32 = 0;
 pub const WIFI_LOG_SUBMODULE_ALL: u32 = 0;
 pub const WIFI_LOG_SUBMODULE_INIT: u32 = 1;
 pub const WIFI_LOG_SUBMODULE_IOCTL: u32 = 2;
@@ -2979,7 +2983,29 @@ pub const wifi_err_reason_t_WIFI_REASON_UNSUPP_RSN_IE_VERSION: wifi_err_reason_t
 pub const wifi_err_reason_t_WIFI_REASON_INVALID_RSN_IE_CAP: wifi_err_reason_t = 22;
 pub const wifi_err_reason_t_WIFI_REASON_802_1X_AUTH_FAILED: wifi_err_reason_t = 23;
 pub const wifi_err_reason_t_WIFI_REASON_CIPHER_SUITE_REJECTED: wifi_err_reason_t = 24;
-pub const wifi_err_reason_t_WIFI_REASON_INVALID_PMKID: wifi_err_reason_t = 53;
+pub const wifi_err_reason_t_WIFI_REASON_TDLS_PEER_UNREACHABLE: wifi_err_reason_t = 25;
+pub const wifi_err_reason_t_WIFI_REASON_TDLS_UNSPECIFIED: wifi_err_reason_t = 26;
+pub const wifi_err_reason_t_WIFI_REASON_SSP_REQUESTED_DISASSOC: wifi_err_reason_t = 27;
+pub const wifi_err_reason_t_WIFI_REASON_NO_SSP_ROAMING_AGREEMENT: wifi_err_reason_t = 28;
+pub const wifi_err_reason_t_WIFI_REASON_BAD_CIPHER_OR_AKM: wifi_err_reason_t = 29;
+pub const wifi_err_reason_t_WIFI_REASON_NOT_AUTHORIZED_THIS_LOCATION: wifi_err_reason_t = 30;
+pub const wifi_err_reason_t_WIFI_REASON_SERVICE_CHANGE_PERCLUDES_TS: wifi_err_reason_t = 31;
+pub const wifi_err_reason_t_WIFI_REASON_UNSPECIFIED_QOS: wifi_err_reason_t = 32;
+pub const wifi_err_reason_t_WIFI_REASON_NOT_ENOUGH_BANDWIDTH: wifi_err_reason_t = 33;
+pub const wifi_err_reason_t_WIFI_REASON_MISSING_ACKS: wifi_err_reason_t = 34;
+pub const wifi_err_reason_t_WIFI_REASON_EXCEEDED_TXOP: wifi_err_reason_t = 35;
+pub const wifi_err_reason_t_WIFI_REASON_STA_LEAVING: wifi_err_reason_t = 36;
+pub const wifi_err_reason_t_WIFI_REASON_END_BA: wifi_err_reason_t = 37;
+pub const wifi_err_reason_t_WIFI_REASON_UNKNOWN_BA: wifi_err_reason_t = 38;
+pub const wifi_err_reason_t_WIFI_REASON_TIMEOUT: wifi_err_reason_t = 39;
+pub const wifi_err_reason_t_WIFI_REASON_PEER_INITIATED: wifi_err_reason_t = 46;
+pub const wifi_err_reason_t_WIFI_REASON_AP_INITIATED: wifi_err_reason_t = 47;
+pub const wifi_err_reason_t_WIFI_REASON_INVALID_FT_ACTION_FRAME_COUNT: wifi_err_reason_t = 48;
+pub const wifi_err_reason_t_WIFI_REASON_INVALID_PMKID: wifi_err_reason_t = 49;
+pub const wifi_err_reason_t_WIFI_REASON_INVALID_MDE: wifi_err_reason_t = 50;
+pub const wifi_err_reason_t_WIFI_REASON_INVALID_FTE: wifi_err_reason_t = 51;
+pub const wifi_err_reason_t_WIFI_REASON_TRANSMISSION_LINK_ESTABLISH_FAILED: wifi_err_reason_t = 67;
+pub const wifi_err_reason_t_WIFI_REASON_ALTERATIVE_CHANNEL_OCCUPIED: wifi_err_reason_t = 68;
 pub const wifi_err_reason_t_WIFI_REASON_BEACON_TIMEOUT: wifi_err_reason_t = 200;
 pub const wifi_err_reason_t_WIFI_REASON_NO_AP_FOUND: wifi_err_reason_t = 201;
 pub const wifi_err_reason_t_WIFI_REASON_AUTH_FAIL: wifi_err_reason_t = 202;
@@ -2988,6 +3014,7 @@ pub const wifi_err_reason_t_WIFI_REASON_HANDSHAKE_TIMEOUT: wifi_err_reason_t = 2
 pub const wifi_err_reason_t_WIFI_REASON_CONNECTION_FAIL: wifi_err_reason_t = 205;
 pub const wifi_err_reason_t_WIFI_REASON_AP_TSF_RESET: wifi_err_reason_t = 206;
 pub const wifi_err_reason_t_WIFI_REASON_ROAMING: wifi_err_reason_t = 207;
+pub const wifi_err_reason_t_WIFI_REASON_ASSOC_COMEBACK_TIME_TOO_LONG: wifi_err_reason_t = 208;
 pub type wifi_err_reason_t = crate::binary::c_types::c_uint;
 #[doc = "< the channel width is HT20"]
 pub const wifi_second_chan_t_WIFI_SECOND_CHAN_NONE: wifi_second_chan_t = 0;
@@ -3074,6 +3101,71 @@ pub const wifi_ant_t_WIFI_ANT_MAX: wifi_ant_t = 2;
 #[doc = " @brief WiFi antenna"]
 #[doc = ""]
 pub type wifi_ant_t = crate::binary::c_types::c_uint;
+#[doc = " @brief Description of a WiFi AP HE Info"]
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct wifi_he_ap_info_t {
+    pub _bitfield_align_1: [u8; 0],
+    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 1usize]>,
+    #[doc = "< in M-BSSID set, identifies the nontransmitted BSSID"]
+    pub bssid_index: u8,
+}
+impl wifi_he_ap_info_t {
+    #[inline]
+    pub fn bss_color(&self) -> u8 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(0usize, 6u8) as u8) }
+    }
+    #[inline]
+    pub fn set_bss_color(&mut self, val: u8) {
+        unsafe {
+            let val: u8 = ::core::mem::transmute(val);
+            self._bitfield_1.set(0usize, 6u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn partial_bss_color(&self) -> u8 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(6usize, 1u8) as u8) }
+    }
+    #[inline]
+    pub fn set_partial_bss_color(&mut self, val: u8) {
+        unsafe {
+            let val: u8 = ::core::mem::transmute(val);
+            self._bitfield_1.set(6usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn bss_color_disabled(&self) -> u8 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(7usize, 1u8) as u8) }
+    }
+    #[inline]
+    pub fn set_bss_color_disabled(&mut self, val: u8) {
+        unsafe {
+            let val: u8 = ::core::mem::transmute(val);
+            self._bitfield_1.set(7usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn new_bitfield_1(
+        bss_color: u8,
+        partial_bss_color: u8,
+        bss_color_disabled: u8,
+    ) -> __BindgenBitfieldUnit<[u8; 1usize]> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize]> = Default::default();
+        __bindgen_bitfield_unit.set(0usize, 6u8, {
+            let bss_color: u8 = unsafe { ::core::mem::transmute(bss_color) };
+            bss_color as u64
+        });
+        __bindgen_bitfield_unit.set(6usize, 1u8, {
+            let partial_bss_color: u8 = unsafe { ::core::mem::transmute(partial_bss_color) };
+            partial_bss_color as u64
+        });
+        __bindgen_bitfield_unit.set(7usize, 1u8, {
+            let bss_color_disabled: u8 = unsafe { ::core::mem::transmute(bss_color_disabled) };
+            bss_color_disabled as u64
+        });
+        __bindgen_bitfield_unit
+    }
+}
 #[doc = " @brief Description of a WiFi AP"]
 #[repr(C)]
 #[derive(Copy, Clone)]
@@ -3100,6 +3192,8 @@ pub struct wifi_ap_record_t {
     pub _bitfield_1: __BindgenBitfieldUnit<[u8; 4usize]>,
     #[doc = "< country information of AP"]
     pub country: wifi_country_t,
+    #[doc = "< HE AP info"]
+    pub he_ap: wifi_he_ap_info_t,
 }
 impl wifi_ap_record_t {
     #[inline]
@@ -3147,47 +3241,58 @@ impl wifi_ap_record_t {
         }
     }
     #[inline]
-    pub fn wps(&self) -> u32 {
+    pub fn phy_11ax(&self) -> u32 {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(4usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_wps(&mut self, val: u32) {
+    pub fn set_phy_11ax(&mut self, val: u32) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(4usize, 1u8, val as u64)
         }
     }
     #[inline]
-    pub fn ftm_responder(&self) -> u32 {
+    pub fn wps(&self) -> u32 {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(5usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_ftm_responder(&mut self, val: u32) {
+    pub fn set_wps(&mut self, val: u32) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(5usize, 1u8, val as u64)
         }
     }
     #[inline]
-    pub fn ftm_initiator(&self) -> u32 {
+    pub fn ftm_responder(&self) -> u32 {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(6usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_ftm_initiator(&mut self, val: u32) {
+    pub fn set_ftm_responder(&mut self, val: u32) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(6usize, 1u8, val as u64)
         }
     }
     #[inline]
+    pub fn ftm_initiator(&self) -> u32 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(7usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set_ftm_initiator(&mut self, val: u32) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(7usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
     pub fn reserved(&self) -> u32 {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(7usize, 25u8) as u32) }
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(8usize, 24u8) as u32) }
     }
     #[inline]
     pub fn set_reserved(&mut self, val: u32) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_1.set(7usize, 25u8, val as u64)
+            self._bitfield_1.set(8usize, 24u8, val as u64)
         }
     }
     #[inline]
@@ -3196,6 +3301,7 @@ impl wifi_ap_record_t {
         phy_11g: u32,
         phy_11n: u32,
         phy_lr: u32,
+        phy_11ax: u32,
         wps: u32,
         ftm_responder: u32,
         ftm_initiator: u32,
@@ -3219,18 +3325,22 @@ impl wifi_ap_record_t {
             phy_lr as u64
         });
         __bindgen_bitfield_unit.set(4usize, 1u8, {
+            let phy_11ax: u32 = unsafe { ::core::mem::transmute(phy_11ax) };
+            phy_11ax as u64
+        });
+        __bindgen_bitfield_unit.set(5usize, 1u8, {
             let wps: u32 = unsafe { ::core::mem::transmute(wps) };
             wps as u64
         });
-        __bindgen_bitfield_unit.set(5usize, 1u8, {
+        __bindgen_bitfield_unit.set(6usize, 1u8, {
             let ftm_responder: u32 = unsafe { ::core::mem::transmute(ftm_responder) };
             ftm_responder as u64
         });
-        __bindgen_bitfield_unit.set(6usize, 1u8, {
+        __bindgen_bitfield_unit.set(7usize, 1u8, {
             let ftm_initiator: u32 = unsafe { ::core::mem::transmute(ftm_initiator) };
             ftm_initiator as u64
         });
-        __bindgen_bitfield_unit.set(7usize, 25u8, {
+        __bindgen_bitfield_unit.set(8usize, 24u8, {
             let reserved: u32 = unsafe { ::core::mem::transmute(reserved) };
             reserved as u64
         });
@@ -3298,7 +3408,7 @@ pub struct wifi_ap_config_t {
     pub authmode: wifi_auth_mode_t,
     #[doc = "< Broadcast SSID or not, default 0, broadcast the SSID"]
     pub ssid_hidden: u8,
-    #[doc = "< Max number of stations allowed to connect in, default 4, max 10"]
+    #[doc = "< Max number of stations allowed to connect in"]
     pub max_connection: u8,
     #[doc = "< Beacon interval which should be multiples of 100. Unit: TU(time unit, 1 TU = 1024 us). Range: 100 ~ 60000. Default value: 100"]
     pub beacon_interval: u16,
@@ -3331,12 +3441,18 @@ pub struct wifi_sta_config_t {
     pub sort_method: wifi_sort_method_t,
     #[doc = "< When sort_method is set, only APs which have an auth mode that is more secure than the selected auth mode and a signal stronger than the minimum RSSI will be used."]
     pub threshold: wifi_scan_threshold_t,
-    #[doc = "< Configuration for Protected Management Frame. Will be advertized in RSN Capabilities in RSN IE."]
+    #[doc = "< Configuration for Protected Management Frame. Will be advertised in RSN Capabilities in RSN IE."]
     pub pmf_cfg: wifi_pmf_config_t,
-    pub _bitfield_align_1: [u32; 0],
+    pub _bitfield_align_1: [u16; 0],
     pub _bitfield_1: __BindgenBitfieldUnit<[u8; 4usize]>,
     #[doc = "< Whether SAE hash to element is enabled"]
     pub sae_pwe_h2e: wifi_sae_pwe_method_t,
+    #[doc = "< Number of connection retries station will do before moving to next AP. scan_method should be set as WIFI_ALL_CHANNEL_SCAN to use this config."]
+    #[doc = "Note: Enabling this may cause connection time to increase incase best AP doesn't behave properly."]
+    pub failure_retry_cnt: u8,
+    pub _bitfield_align_2: [u8; 0],
+    pub _bitfield_2: __BindgenBitfieldUnit<[u8; 1usize]>,
+    pub __bindgen_padding_0: u16,
 }
 impl wifi_sta_config_t {
     #[inline]
@@ -3395,14 +3511,47 @@ impl wifi_sta_config_t {
         }
     }
     #[inline]
+    pub fn transition_disable(&self) -> u32 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(5usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set_transition_disable(&mut self, val: u32) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(5usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn aid(&self) -> u32 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(6usize, 12u8) as u32) }
+    }
+    #[inline]
+    pub fn set_aid(&mut self, val: u32) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(6usize, 12u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn phymode(&self) -> u32 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(18usize, 6u8) as u32) }
+    }
+    #[inline]
+    pub fn set_phymode(&mut self, val: u32) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(18usize, 6u8, val as u64)
+        }
+    }
+    #[inline]
     pub fn reserved(&self) -> u32 {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(5usize, 27u8) as u32) }
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(24usize, 8u8) as u32) }
     }
     #[inline]
     pub fn set_reserved(&mut self, val: u32) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_1.set(5usize, 27u8, val as u64)
+            self._bitfield_1.set(24usize, 8u8, val as u64)
         }
     }
     #[inline]
@@ -3412,6 +3561,9 @@ impl wifi_sta_config_t {
         mbo_enabled: u32,
         ft_enabled: u32,
         owe_enabled: u32,
+        transition_disable: u32,
+        aid: u32,
+        phymode: u32,
         reserved: u32,
     ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
@@ -3435,9 +3587,93 @@ impl wifi_sta_config_t {
             let owe_enabled: u32 = unsafe { ::core::mem::transmute(owe_enabled) };
             owe_enabled as u64
         });
-        __bindgen_bitfield_unit.set(5usize, 27u8, {
+        __bindgen_bitfield_unit.set(5usize, 1u8, {
+            let transition_disable: u32 = unsafe { ::core::mem::transmute(transition_disable) };
+            transition_disable as u64
+        });
+        __bindgen_bitfield_unit.set(6usize, 12u8, {
+            let aid: u32 = unsafe { ::core::mem::transmute(aid) };
+            aid as u64
+        });
+        __bindgen_bitfield_unit.set(18usize, 6u8, {
+            let phymode: u32 = unsafe { ::core::mem::transmute(phymode) };
+            phymode as u64
+        });
+        __bindgen_bitfield_unit.set(24usize, 8u8, {
             let reserved: u32 = unsafe { ::core::mem::transmute(reserved) };
             reserved as u64
+        });
+        __bindgen_bitfield_unit
+    }
+    #[inline]
+    pub fn he_dcm_set(&self) -> u8 {
+        unsafe { ::core::mem::transmute(self._bitfield_2.get(0usize, 1u8) as u8) }
+    }
+    #[inline]
+    pub fn set_he_dcm_set(&mut self, val: u8) {
+        unsafe {
+            let val: u8 = ::core::mem::transmute(val);
+            self._bitfield_2.set(0usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn he_dcm_max_constellation_tx(&self) -> u8 {
+        unsafe { ::core::mem::transmute(self._bitfield_2.get(1usize, 2u8) as u8) }
+    }
+    #[inline]
+    pub fn set_he_dcm_max_constellation_tx(&mut self, val: u8) {
+        unsafe {
+            let val: u8 = ::core::mem::transmute(val);
+            self._bitfield_2.set(1usize, 2u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn he_dcm_max_constellation_rx(&self) -> u8 {
+        unsafe { ::core::mem::transmute(self._bitfield_2.get(3usize, 2u8) as u8) }
+    }
+    #[inline]
+    pub fn set_he_dcm_max_constellation_rx(&mut self, val: u8) {
+        unsafe {
+            let val: u8 = ::core::mem::transmute(val);
+            self._bitfield_2.set(3usize, 2u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn he_mcs9_enabled(&self) -> u8 {
+        unsafe { ::core::mem::transmute(self._bitfield_2.get(5usize, 1u8) as u8) }
+    }
+    #[inline]
+    pub fn set_he_mcs9_enabled(&mut self, val: u8) {
+        unsafe {
+            let val: u8 = ::core::mem::transmute(val);
+            self._bitfield_2.set(5usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn new_bitfield_2(
+        he_dcm_set: u8,
+        he_dcm_max_constellation_tx: u8,
+        he_dcm_max_constellation_rx: u8,
+        he_mcs9_enabled: u8,
+    ) -> __BindgenBitfieldUnit<[u8; 1usize]> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize]> = Default::default();
+        __bindgen_bitfield_unit.set(0usize, 1u8, {
+            let he_dcm_set: u8 = unsafe { ::core::mem::transmute(he_dcm_set) };
+            he_dcm_set as u64
+        });
+        __bindgen_bitfield_unit.set(1usize, 2u8, {
+            let he_dcm_max_constellation_tx: u8 =
+                unsafe { ::core::mem::transmute(he_dcm_max_constellation_tx) };
+            he_dcm_max_constellation_tx as u64
+        });
+        __bindgen_bitfield_unit.set(3usize, 2u8, {
+            let he_dcm_max_constellation_rx: u8 =
+                unsafe { ::core::mem::transmute(he_dcm_max_constellation_rx) };
+            he_dcm_max_constellation_rx as u64
+        });
+        __bindgen_bitfield_unit.set(5usize, 1u8, {
+            let he_mcs9_enabled: u8 = unsafe { ::core::mem::transmute(he_mcs9_enabled) };
+            he_mcs9_enabled as u64
         });
         __bindgen_bitfield_unit
     }
@@ -3513,25 +3749,36 @@ impl wifi_sta_info_t {
         }
     }
     #[inline]
-    pub fn is_mesh_child(&self) -> u32 {
+    pub fn phy_11ax(&self) -> u32 {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(4usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_is_mesh_child(&mut self, val: u32) {
+    pub fn set_phy_11ax(&mut self, val: u32) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(4usize, 1u8, val as u64)
         }
     }
     #[inline]
+    pub fn is_mesh_child(&self) -> u32 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(5usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set_is_mesh_child(&mut self, val: u32) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(5usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
     pub fn reserved(&self) -> u32 {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(5usize, 27u8) as u32) }
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(6usize, 26u8) as u32) }
     }
     #[inline]
     pub fn set_reserved(&mut self, val: u32) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_1.set(5usize, 27u8, val as u64)
+            self._bitfield_1.set(6usize, 26u8, val as u64)
         }
     }
     #[inline]
@@ -3540,6 +3787,7 @@ impl wifi_sta_info_t {
         phy_11g: u32,
         phy_11n: u32,
         phy_lr: u32,
+        phy_11ax: u32,
         is_mesh_child: u32,
         reserved: u32,
     ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
@@ -3561,10 +3809,14 @@ impl wifi_sta_info_t {
             phy_lr as u64
         });
         __bindgen_bitfield_unit.set(4usize, 1u8, {
+            let phy_11ax: u32 = unsafe { ::core::mem::transmute(phy_11ax) };
+            phy_11ax as u64
+        });
+        __bindgen_bitfield_unit.set(5usize, 1u8, {
             let is_mesh_child: u32 = unsafe { ::core::mem::transmute(is_mesh_child) };
             is_mesh_child as u64
         });
-        __bindgen_bitfield_unit.set(5usize, 27u8, {
+        __bindgen_bitfield_unit.set(6usize, 26u8, {
             let reserved: u32 = unsafe { ::core::mem::transmute(reserved) };
             reserved as u64
         });
@@ -3576,7 +3828,7 @@ impl wifi_sta_info_t {
 #[derive(Copy, Clone)]
 pub struct wifi_sta_list_t {
     #[doc = "< station list"]
-    pub sta: [wifi_sta_info_t; 10usize],
+    pub sta: [wifi_sta_info_t; 15usize],
     #[doc = "< number of stations in the list (other entries are invalid)"]
     pub num: crate::binary::c_types::c_int,
 }
@@ -3600,6 +3852,20 @@ pub const wifi_vendor_ie_id_t_WIFI_VND_IE_ID_1: wifi_vendor_ie_id_t = 1;
 #[doc = ""]
 #[doc = " Each IE type can have up to two associated vendor ID elements."]
 pub type wifi_vendor_ie_id_t = crate::binary::c_types::c_uint;
+#[doc = "< PHY mode for Low Rate"]
+pub const wifi_phy_mode_t_WIFI_PHY_MODE_LR: wifi_phy_mode_t = 0;
+#[doc = "< PHY mode for 11b"]
+pub const wifi_phy_mode_t_WIFI_PHY_MODE_11B: wifi_phy_mode_t = 1;
+#[doc = "< PHY mode for 11g"]
+pub const wifi_phy_mode_t_WIFI_PHY_MODE_11G: wifi_phy_mode_t = 2;
+#[doc = "< PHY mode for Bandwidth HT20"]
+pub const wifi_phy_mode_t_WIFI_PHY_MODE_HT20: wifi_phy_mode_t = 3;
+#[doc = "< PHY mode for Bandwidth HT40"]
+pub const wifi_phy_mode_t_WIFI_PHY_MODE_HT40: wifi_phy_mode_t = 4;
+#[doc = "< PHY mode for Bandwidth HE20"]
+pub const wifi_phy_mode_t_WIFI_PHY_MODE_HE20: wifi_phy_mode_t = 5;
+#[doc = " @brief     Operation Phymode"]
+pub type wifi_phy_mode_t = crate::binary::c_types::c_uint;
 #[doc = " @brief Vendor Information Element header"]
 #[doc = ""]
 #[doc = " The first bytes of the Information Element will match this header. Payload follows."]
@@ -3863,8 +4129,6 @@ pub struct wifi_promiscuous_filter_t {
     #[doc = "< OR of one or more filter values WIFI_PROMIS_FILTER_*"]
     pub filter_mask: u32,
 }
-#[doc = " @brief Channel state information(CSI) configuration type"]
-#[doc = ""]
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct wifi_csi_config_t {
@@ -3892,6 +4156,8 @@ pub struct wifi_csi_info_t {
     pub rx_ctrl: wifi_pkt_rx_ctrl_t,
     #[doc = "< source MAC address of the CSI data"]
     pub mac: [u8; 6usize],
+    #[doc = "< destination MAC address of the CSI data"]
+    pub dmac: [u8; 6usize],
     #[doc = "< first four bytes of the CSI data is invalid or not"]
     pub first_word_invalid: bool,
     #[doc = "< buffer of CSI data"]
@@ -4181,8 +4447,26 @@ pub const wifi_event_t_WIFI_EVENT_ROC_DONE: wifi_event_t = 20;
 pub const wifi_event_t_WIFI_EVENT_STA_BEACON_TIMEOUT: wifi_event_t = 21;
 #[doc = "< ESP32 connectionless module wake interval start"]
 pub const wifi_event_t_WIFI_EVENT_CONNECTIONLESS_MODULE_WAKE_INTERVAL_START: wifi_event_t = 22;
+#[doc = "< Soft-AP wps succeeds in registrar mode"]
+pub const wifi_event_t_WIFI_EVENT_AP_WPS_RG_SUCCESS: wifi_event_t = 23;
+#[doc = "< Soft-AP wps fails in registrar mode"]
+pub const wifi_event_t_WIFI_EVENT_AP_WPS_RG_FAILED: wifi_event_t = 24;
+#[doc = "< Soft-AP wps timeout in registrar mode"]
+pub const wifi_event_t_WIFI_EVENT_AP_WPS_RG_TIMEOUT: wifi_event_t = 25;
+#[doc = "< Soft-AP wps pin code in registrar mode"]
+pub const wifi_event_t_WIFI_EVENT_AP_WPS_RG_PIN: wifi_event_t = 26;
+#[doc = "< Soft-AP wps overlap in registrar mode"]
+pub const wifi_event_t_WIFI_EVENT_AP_WPS_RG_PBC_OVERLAP: wifi_event_t = 27;
+#[doc = "< iTWT setup"]
+pub const wifi_event_t_WIFI_EVENT_ITWT_SETUP: wifi_event_t = 28;
+#[doc = "< iTWT teardown"]
+pub const wifi_event_t_WIFI_EVENT_ITWT_TEARDOWN: wifi_event_t = 29;
+#[doc = "< iTWT probe"]
+pub const wifi_event_t_WIFI_EVENT_ITWT_PROBE: wifi_event_t = 30;
+#[doc = "< iTWT suspend"]
+pub const wifi_event_t_WIFI_EVENT_ITWT_SUSPEND: wifi_event_t = 31;
 #[doc = "< Invalid WiFi event ID"]
-pub const wifi_event_t_WIFI_EVENT_MAX: wifi_event_t = 23;
+pub const wifi_event_t_WIFI_EVENT_MAX: wifi_event_t = 32;
 #[doc = " WiFi event declarations"]
 pub type wifi_event_t = crate::binary::c_types::c_uint;
 extern "C" {
@@ -4213,6 +4497,8 @@ pub struct wifi_event_sta_connected_t {
     pub channel: u8,
     #[doc = "< authentication mode used by AP"]
     pub authmode: wifi_auth_mode_t,
+    #[doc = "< authentication id assigned by the connected AP"]
+    pub aid: u16,
 }
 #[doc = " Argument structure for WIFI_EVENT_STA_DISCONNECTED event"]
 #[repr(C)]
@@ -4226,6 +4512,8 @@ pub struct wifi_event_sta_disconnected_t {
     pub bssid: [u8; 6usize],
     #[doc = "< reason of disconnection"]
     pub reason: u8,
+    #[doc = "< rssi of disconnection"]
+    pub rssi: i8,
 }
 #[doc = " Argument structure for WIFI_EVENT_STA_AUTHMODE_CHANGE event"]
 #[repr(C)]
@@ -4379,6 +4667,37 @@ pub struct wifi_event_roc_done_t {
     #[doc = "< Context to identify the request"]
     pub context: u32,
 }
+#[doc = " Argument structure for WIFI_EVENT_AP_WPS_RG_PIN event"]
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct wifi_event_ap_wps_rg_pin_t {
+    #[doc = "< PIN code of station in enrollee mode"]
+    pub pin_code: [u8; 8usize],
+}
+#[doc = "< WPS normal fail reason"]
+pub const wps_fail_reason_t_WPS_AP_FAIL_REASON_NORMAL: wps_fail_reason_t = 0;
+#[doc = "< WPS failed due to incorrect config"]
+pub const wps_fail_reason_t_WPS_AP_FAIL_REASON_CONFIG: wps_fail_reason_t = 1;
+#[doc = "< WPS failed during auth"]
+pub const wps_fail_reason_t_WPS_AP_FAIL_REASON_AUTH: wps_fail_reason_t = 2;
+pub const wps_fail_reason_t_WPS_AP_FAIL_REASON_MAX: wps_fail_reason_t = 3;
+pub type wps_fail_reason_t = crate::binary::c_types::c_uint;
+#[doc = " Argument structure for WIFI_EVENT_AP_WPS_RG_FAILED event"]
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct wifi_event_ap_wps_rg_fail_reason_t {
+    #[doc = "< WPS failure reason wps_fail_reason_t"]
+    pub reason: wps_fail_reason_t,
+    #[doc = "< Enrollee mac address"]
+    pub peer_macaddr: [u8; 6usize],
+}
+#[doc = " Argument structure for WIFI_EVENT_AP_WPS_RG_SUCCESS event"]
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct wifi_event_ap_wps_rg_success_t {
+    #[doc = "< Enrollee mac address"]
+    pub peer_macaddr: [u8; 6usize],
+}
 #[doc = " Configuration for creating event loops"]
 #[repr(C)]
 #[derive(Copy, Clone)]
@@ -4474,9 +4793,6 @@ extern "C" {
 extern "C" {
     #[doc = " @brief Register an event handler to the system event loop (legacy)."]
     #[doc = ""]
-    #[doc = " @note This function is obsolete and will be deprecated soon, please use esp_event_handler_instance_register()"]
-    #[doc = "       instead."]
-    #[doc = ""]
     #[doc = " This function can be used to register a handler for either: (1) specific events,"]
     #[doc = " (2) all events of a certain event base, or (3) all events known by the system event loop."]
     #[doc = ""]
@@ -4510,9 +4826,6 @@ extern "C" {
 }
 extern "C" {
     #[doc = " @brief Register an event handler to a specific loop (legacy)."]
-    #[doc = ""]
-    #[doc = " @note This function is obsolete and will be deprecated soon, please use esp_event_handler_instance_register_with()"]
-    #[doc = "       instead."]
     #[doc = ""]
     #[doc = " This function behaves in the same manner as esp_event_handler_register, except the additional"]
     #[doc = " specification of the event loop to register the handler to."]
@@ -4622,9 +4935,6 @@ extern "C" {
 extern "C" {
     #[doc = " @brief Unregister a handler with the system event loop (legacy)."]
     #[doc = ""]
-    #[doc = " @note This function is obsolete and will be deprecated soon, please use esp_event_handler_instance_unregister()"]
-    #[doc = "       instead."]
-    #[doc = ""]
     #[doc = " Unregisters a handler, so it will no longer be called during dispatch."]
     #[doc = " Handlers can be unregistered for any combination of event_base and event_id which were previously registered."]
     #[doc = " To unregister a handler, the event_base and event_id arguments must match exactly the arguments passed to"]
@@ -4650,9 +4960,6 @@ extern "C" {
 }
 extern "C" {
     #[doc = " @brief Unregister a handler from a specific event loop (legacy)."]
-    #[doc = ""]
-    #[doc = " @note This function is obsolete and will be deprecated soon, please use esp_event_handler_instance_unregister_with()"]
-    #[doc = "       instead."]
     #[doc = ""]
     #[doc = " This function behaves in the same manner as esp_event_handler_unregister, except the additional specification of"]
     #[doc = " the event loop to unregister the handler with."]
@@ -5780,7 +6087,7 @@ extern "C" {
     #[doc = " @return pointer to esp-netif instance"]
     pub fn esp_netif_create_wifi(
         wifi_if: wifi_interface_t,
-        esp_netif_config: *mut esp_netif_inherent_config_t,
+        esp_netif_config: *const esp_netif_inherent_config_t,
     ) -> *mut esp_netif_t;
 }
 extern "C" {
@@ -5847,6 +6154,8 @@ pub struct wifi_init_config_t {
     pub feature_caps: u64,
     #[doc = "< WiFi Power Management for station at disconnected status"]
     pub sta_disconnected_pm: bool,
+    #[doc = "< Maximum encrypt number of peers supported by espnow"]
+    pub espnow_max_encrypt_num: crate::binary::c_types::c_int,
     #[doc = "< WiFi init magic number, it should be the last field"]
     pub magic: crate::binary::c_types::c_int,
 }
@@ -6121,9 +6430,10 @@ extern "C" {
 }
 extern "C" {
     #[doc = " @brief     Set protocol type of specified interface"]
-    #[doc = "            The default protocol is (WIFI_PROTOCOL_11B|WIFI_PROTOCOL_11G|WIFI_PROTOCOL_11N)"]
+    #[doc = "            The default protocol is (WIFI_PROTOCOL_11B|WIFI_PROTOCOL_11G|WIFI_PROTOCOL_11N)."]
+    #[doc = "            if CONFIG_SOC_WIFI_HE_SUPPORT, the default protocol is (WIFI_PROTOCOL_11B|WIFI_PROTOCOL_11G|WIFI_PROTOCOL_11N|WIFI_PROTOCOL_11AX)."]
     #[doc = ""]
-    #[doc = " @attention Support 802.11b or 802.11bg or 802.11bgn or LR mode"]
+    #[doc = " @attention Support 802.11b or 802.11bg or 802.11bgn or 802.11bgnax or LR mode"]
     #[doc = ""]
     #[doc = " @param     ifx  interfaces"]
     #[doc = " @param     protocol_bitmap  WiFi protocol bitmap"]
@@ -6188,6 +6498,8 @@ extern "C" {
     #[doc = " @attention 2. When ESP32 is in STA mode, this API should not be called when STA is scanning or connecting to an external AP"]
     #[doc = " @attention 3. When ESP32 is in softAP mode, this API should not be called when softAP has connected to external STAs"]
     #[doc = " @attention 4. When ESP32 is in STA+softAP mode, this API should not be called when in the scenarios described above"]
+    #[doc = " @attention 5. The channel info set by this API will not be stored in NVS. So If you want to remeber the channel used before wifi stop,"]
+    #[doc = "               you need to call this API again after wifi start, or you can call `esp_wifi_set_config()` to store the channel info in NVS."]
     #[doc = ""]
     #[doc = " @param     primary  for HT20, primary is the channel number, for HT40, primary is the primary channel"]
     #[doc = " @param     second   for HT20, second is ignored, for HT40, second is the second channel"]
@@ -6219,18 +6531,19 @@ extern "C" {
     #[doc = " @attention 1. It is discouraged to call this API since this doesn't validate the per-country rules,"]
     #[doc = "               it's up to the user to fill in all fields according to local regulations."]
     #[doc = "               Please use esp_wifi_set_country_code instead."]
-    #[doc = " @attention 2. The default country is CHINA {.cc=\"CN\", .schan=1, .nchan=13, policy=WIFI_COUNTRY_POLICY_AUTO}"]
-    #[doc = " @attention 3. When the country policy is WIFI_COUNTRY_POLICY_AUTO, the country info of the AP to which"]
-    #[doc = "               the station is connected is used. E.g. if the configured country info is {.cc=\"USA\", .schan=1, .nchan=11}"]
+    #[doc = " @attention 2. The default country is \"01\" (world safe mode) {.cc=\"01\", .schan=1, .nchan=11, .policy=WIFI_COUNTRY_POLICY_AUTO}."]
+    #[doc = " @attention 3. The third octect of country code string is one of the following: ' ', 'O', 'I', 'X', otherwise it is considered as ' '."]
+    #[doc = " @attention 4. When the country policy is WIFI_COUNTRY_POLICY_AUTO, the country info of the AP to which"]
+    #[doc = "               the station is connected is used. E.g. if the configured country info is {.cc=\"US\", .schan=1, .nchan=11}"]
     #[doc = "               and the country info of the AP to which the station is connected is {.cc=\"JP\", .schan=1, .nchan=14}"]
     #[doc = "               then the country info that will be used is {.cc=\"JP\", .schan=1, .nchan=14}. If the station disconnected"]
     #[doc = "               from the AP the country info is set back to the country info of the station automatically,"]
     #[doc = "               {.cc=\"US\", .schan=1, .nchan=11} in the example."]
-    #[doc = " @attention 4. When the country policy is WIFI_COUNTRY_POLICY_MANUAL, then the configured country info is used always."]
-    #[doc = " @attention 5. When the country info is changed because of configuration or because the station connects to a different"]
+    #[doc = " @attention 5. When the country policy is WIFI_COUNTRY_POLICY_MANUAL, then the configured country info is used always."]
+    #[doc = " @attention 6. When the country info is changed because of configuration or because the station connects to a different"]
     #[doc = "               external AP, the country IE in probe response/beacon of the soft-AP is also changed."]
-    #[doc = " @attention 6. The country configuration is stored into flash."]
-    #[doc = " @attention 7. When this API is called, the PHY init data will switch to the PHY init data type corresponding to the"]
+    #[doc = " @attention 7. The country configuration is stored into flash."]
+    #[doc = " @attention 8. When this API is called, the PHY init data will switch to the PHY init data type corresponding to the"]
     #[doc = "               country info."]
     #[doc = ""]
     #[doc = " @param     country   the configured country info"]
@@ -6238,7 +6551,6 @@ extern "C" {
     #[doc = " @return"]
     #[doc = "    - ESP_OK: succeed"]
     #[doc = "    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init"]
-    #[doc = "    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start"]
     #[doc = "    - ESP_ERR_INVALID_ARG: invalid argument"]
     pub fn esp_wifi_set_country(country: *const wifi_country_t) -> esp_err_t;
 }
@@ -6389,6 +6701,7 @@ extern "C" {
     #[doc = " @attention 2. For station configuration, bssid_set needs to be 0; and it needs to be 1 only when users need to check the MAC address of the AP."]
     #[doc = " @attention 3. ESP32 is limited to only one channel, so when in the soft-AP+station mode, the soft-AP will adjust its channel automatically to be the same as"]
     #[doc = "               the channel of the ESP32 station."]
+    #[doc = " @attention 4. The configuration will be stored in NVS"]
     #[doc = ""]
     #[doc = " @param     interface  interface"]
     #[doc = " @param     conf  station or soft-AP configuration"]
@@ -6766,7 +7079,9 @@ extern "C" {
     #[doc = " @brief      Start an FTM Initiator session by sending FTM request"]
     #[doc = "             If successful, event WIFI_EVENT_FTM_REPORT is generated with the result of the FTM procedure"]
     #[doc = ""]
-    #[doc = " @attention  Use this API only in Station mode"]
+    #[doc = " @attention  1. Use this API only in Station mode."]
+    #[doc = " @attention  2. If FTM is initiated on a different channel than Station is connected in or internal SoftAP is started in,"]
+    #[doc = "                FTM defaults to a single burst in ASAP mode."]
     #[doc = ""]
     #[doc = " @param      cfg  FTM Initiator session configuration"]
     #[doc = ""]
@@ -6820,6 +7135,7 @@ extern "C" {
     #[doc = "               When ESP_WIFI_STA_DISCONNECTED_PM_ENABLE is enabled, this configuration could work at disconnected status."]
     #[doc = " @attention 3. Event WIFI_EVENT_CONNECTIONLESS_MODULE_WAKE_INTERVAL_START would be posted each time wake interval starts."]
     #[doc = " @attention 4. Recommend to configure interval in multiples of hundred. (e.g. 100ms)"]
+    #[doc = " @attention 5. Recommend to configure interval to ESP_WIFI_CONNECTIONLESS_INTERVAL_DEFAULT_MODE to get stable performance at coexistence mode."]
     #[doc = ""]
     #[doc = " @param      wake_interval  Milliseconds after would the chip wake up, from 1 to 65535."]
     pub fn esp_wifi_connectionless_module_set_wake_interval(wake_interval: u16) -> esp_err_t;
@@ -6846,6 +7162,7 @@ extern "C" {
     #[doc = ""]
     #[doc = " @attention 7. When country code \"01\" (world safe mode) is set, SoftAP mode won't contain country IE."]
     #[doc = " @attention 8. The default country is \"01\" (world safe mode) and ieee80211d_enabled is TRUE."]
+    #[doc = " @attention 9. The third octect of country code string is one of the following: ' ', 'O', 'I', 'X', otherwise it is considered as ' '."]
     #[doc = ""]
     #[doc = " @param     country   the configured country ISO code"]
     #[doc = " @param     ieee80211d_enabled   802.11d is enabled or not"]
@@ -6853,7 +7170,6 @@ extern "C" {
     #[doc = " @return"]
     #[doc = "    - ESP_OK: succeed"]
     #[doc = "    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init"]
-    #[doc = "    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start"]
     #[doc = "    - ESP_ERR_INVALID_ARG: invalid argument"]
     pub fn esp_wifi_set_country_code(
         country: *const crate::binary::c_types::c_char,
@@ -7134,7 +7450,7 @@ extern "C" {
     #[doc = " copy to WiFi driver."]
     #[doc = ""]
     #[doc = " @param  wifi_interface_t wifi_if : wifi interface id"]
-    #[doc = " @param  void *buffer : the buffer to be tansmit"]
+    #[doc = " @param  void *buffer : the buffer to be transmit"]
     #[doc = " @param  uint16_t len : the length of buffer"]
     #[doc = ""]
     #[doc = " @return"]
@@ -7736,16 +8052,26 @@ extern "C" {
     pub fn esp_phy_disable();
 }
 extern "C" {
+    #[doc = " @brief Enable BTBB module"]
+    #[doc = ""]
+    #[doc = " BTBB module should be enabled in order to use IEEE802154 or BT."]
+    #[doc = " Now BTBB enabling job is done automatically when start IEEE802154 or BT. Users should not"]
+    #[doc = " call this API in their application."]
+    #[doc = ""]
+    pub fn esp_btbb_enable();
+}
+extern "C" {
     #[doc = " @brief Load calibration data from NVS and initialize PHY and RF module"]
     pub fn esp_phy_load_cal_and_init();
 }
 extern "C" {
     #[doc = " @brief Initialize backup memory for Phy power up/down"]
-    pub fn esp_phy_pd_mem_init();
+    pub fn esp_phy_modem_init();
 }
 extern "C" {
     #[doc = " @brief Deinitialize backup memory for Phy power up/down"]
-    pub fn esp_phy_pd_mem_deinit();
+    #[doc = " Set phy_init_flag if all modems deinit on ESP32C3"]
+    pub fn esp_phy_modem_deinit();
 }
 extern "C" {
     #[doc = " @brief Enable WiFi/BT common clock"]
@@ -7833,6 +8159,137 @@ extern "C" {
 extern "C" {
     #[doc = " @brief Phy version select for ESP32S2"]
     pub fn phy_eco_version_sel(chip_ver: u8);
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct esp_etm_channel_t {
+    _unused: [u8; 0],
+}
+#[doc = " @brief ETM channel handle"]
+pub type esp_etm_channel_handle_t = *mut esp_etm_channel_t;
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct esp_etm_event_t {
+    _unused: [u8; 0],
+}
+#[doc = " @brief ETM event handle"]
+pub type esp_etm_event_handle_t = *mut esp_etm_event_t;
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct esp_etm_task_t {
+    _unused: [u8; 0],
+}
+#[doc = " @brief ETM task handle"]
+pub type esp_etm_task_handle_t = *mut esp_etm_task_t;
+#[doc = " @brief ETM channel configuration"]
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct esp_etm_channel_config_t {}
+extern "C" {
+    #[doc = " @brief Allocate an ETM channel"]
+    #[doc = ""]
+    #[doc = " @note The channel can later be freed by `esp_etm_del_channel`"]
+    #[doc = ""]
+    #[doc = " @param[in] config ETM channel configuration"]
+    #[doc = " @param[out] ret_chan Returned ETM channel handle"]
+    #[doc = " @return"]
+    #[doc = "      - ESP_OK: Allocate ETM channel successfully"]
+    #[doc = "      - ESP_ERR_INVALID_ARG: Allocate ETM channel failed because of invalid argument"]
+    #[doc = "      - ESP_ERR_NO_MEM: Allocate ETM channel failed because of out of memory"]
+    #[doc = "      - ESP_ERR_NOT_FOUND: Allocate ETM channel failed because all channels are used up and no more free one"]
+    #[doc = "      - ESP_FAIL: Allocate ETM channel failed because of other reasons"]
+    pub fn esp_etm_new_channel(
+        config: *const esp_etm_channel_config_t,
+        ret_chan: *mut esp_etm_channel_handle_t,
+    ) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Delete an ETM channel"]
+    #[doc = ""]
+    #[doc = " @param[in] chan ETM channel handle that created by `esp_etm_new_channel`"]
+    #[doc = " @return"]
+    #[doc = "      - ESP_OK: Delete ETM channel successfully"]
+    #[doc = "      - ESP_ERR_INVALID_ARG: Delete ETM channel failed because of invalid argument"]
+    #[doc = "      - ESP_FAIL: Delete ETM channel failed because of other reasons"]
+    pub fn esp_etm_del_channel(chan: esp_etm_channel_handle_t) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Enable ETM channel"]
+    #[doc = ""]
+    #[doc = " @note This function will transit the channel state from init to enable."]
+    #[doc = ""]
+    #[doc = " @param[in] chan ETM channel handle that created by `esp_etm_new_channel`"]
+    #[doc = " @return"]
+    #[doc = "      - ESP_OK: Enable ETM channel successfully"]
+    #[doc = "      - ESP_ERR_INVALID_ARG: Enable ETM channel failed because of invalid argument"]
+    #[doc = "      - ESP_ERR_INVALID_STATE: Enable ETM channel failed because the channel has been enabled already"]
+    #[doc = "      - ESP_FAIL: Enable ETM channel failed because of other reasons"]
+    pub fn esp_etm_channel_enable(chan: esp_etm_channel_handle_t) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Disable ETM channel"]
+    #[doc = ""]
+    #[doc = " @note This function will transit the channel state from enable to init."]
+    #[doc = ""]
+    #[doc = " @param[in] chan ETM channel handle that created by `esp_etm_new_channel`"]
+    #[doc = " @return"]
+    #[doc = "      - ESP_OK: Disable ETM channel successfully"]
+    #[doc = "      - ESP_ERR_INVALID_ARG: Disable ETM channel failed because of invalid argument"]
+    #[doc = "      - ESP_ERR_INVALID_STATE: Disable ETM channel failed because the channel is not enabled yet"]
+    #[doc = "      - ESP_FAIL: Disable ETM channel failed because of other reasons"]
+    pub fn esp_etm_channel_disable(chan: esp_etm_channel_handle_t) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Connect an ETM event to an ETM task via a previously allocated ETM channel"]
+    #[doc = ""]
+    #[doc = " @note Setting the ETM event/task handle to NULL means to disconnect the channel from any event/task"]
+    #[doc = ""]
+    #[doc = " @param[in] chan ETM channel handle that created by `esp_etm_new_channel`"]
+    #[doc = " @param[in] event ETM event handle obtained from a driver/peripheral, e.g. `xxx_new_etm_event`"]
+    #[doc = " @param[in] task ETM task handle obtained from a driver/peripheral, e.g. `xxx_new_etm_task`"]
+    #[doc = " @return"]
+    #[doc = "      - ESP_OK: Connect ETM event and task to the channel successfully"]
+    #[doc = "      - ESP_ERR_INVALID_ARG: Connect ETM event and task to the channel failed because of invalid argument"]
+    #[doc = "      - ESP_FAIL: Connect ETM event and task to the channel failed because of other reasons"]
+    pub fn esp_etm_channel_connect(
+        chan: esp_etm_channel_handle_t,
+        event: esp_etm_event_handle_t,
+        task: esp_etm_task_handle_t,
+    ) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Delete ETM event"]
+    #[doc = ""]
+    #[doc = " @note Although the ETM event comes from various peripherals, we provide the same user API to delete the event handle seamlessly."]
+    #[doc = ""]
+    #[doc = " @param[in] event ETM event handle obtained from a driver/peripheral, e.g. `xxx_new_etm_event`"]
+    #[doc = " @return"]
+    #[doc = "      - ESP_OK: Delete ETM event successfully"]
+    #[doc = "      - ESP_ERR_INVALID_ARG: Delete ETM event failed because of invalid argument"]
+    #[doc = "      - ESP_FAIL: Delete ETM event failed because of other reasons"]
+    pub fn esp_etm_del_event(event: esp_etm_event_handle_t) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Delete ETM task"]
+    #[doc = ""]
+    #[doc = " @note Although the ETM task comes from various peripherals, we provide the same user API to delete the task handle seamlessly."]
+    #[doc = ""]
+    #[doc = " @param[in] task ETM task handle obtained from a driver/peripheral, e.g. `xxx_new_etm_task`"]
+    #[doc = " @return"]
+    #[doc = "      - ESP_OK: Delete ETM task successfully"]
+    #[doc = "      - ESP_ERR_INVALID_ARG: Delete ETM task failed because of invalid argument"]
+    #[doc = "      - ESP_FAIL: Delete ETM task failed because of other reasons"]
+    pub fn esp_etm_del_task(task: esp_etm_task_handle_t) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Dump ETM channel usages to the given IO stream"]
+    #[doc = ""]
+    #[doc = " @param[in] out_stream IO stream (e.g. stdout)"]
+    #[doc = " @return"]
+    #[doc = "      - ESP_OK: Dump ETM channel usages successfully"]
+    #[doc = "      - ESP_ERR_INVALID_ARG: Dump ETM channel usages failed because of invalid argument"]
+    #[doc = "      - ESP_FAIL: Dump ETM channel usages failed because of other reasons"]
+    pub fn esp_etm_dump(out_stream: *mut FILE) -> esp_err_t;
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
@@ -7952,6 +8409,21 @@ extern "C" {
     pub fn esp_timer_start_periodic(timer: esp_timer_handle_t, period: u64) -> esp_err_t;
 }
 extern "C" {
+    #[doc = " @brief Restart a currently running timer"]
+    #[doc = ""]
+    #[doc = " If the given timer is a one-shot timer, the timer is restarted immediately and will timeout once in `timeout_us` microseconds."]
+    #[doc = " If the given timer is a periodic timer, the timer is restarted immediately with a new period of `timeout_us` microseconds."]
+    #[doc = ""]
+    #[doc = " @param timer timer Handle created using esp_timer_create"]
+    #[doc = " @param timeout_us Timeout, in microseconds relative to the current time."]
+    #[doc = "                   In case of a periodic timer, also represents the new period."]
+    #[doc = " @return"]
+    #[doc = "      - ESP_OK on success"]
+    #[doc = "      - ESP_ERR_INVALID_ARG if the handle is invalid"]
+    #[doc = "      - ESP_ERR_INVALID_STATE if the timer is not running"]
+    pub fn esp_timer_restart(timer: esp_timer_handle_t, timeout_us: u64) -> esp_err_t;
+}
+extern "C" {
     #[doc = " @brief Stop the timer"]
     #[doc = ""]
     #[doc = " This function stops the timer previously started using esp_timer_start_once"]
@@ -8062,6 +8534,20 @@ extern "C" {
     #[doc = "      - 1 if timer is still active"]
     #[doc = "      - 0 if timer is not active."]
     pub fn esp_timer_is_active(timer: esp_timer_handle_t) -> bool;
+}
+extern "C" {
+    #[doc = " @brief Get the ETM event handle of esp_timer underlying alarm event"]
+    #[doc = ""]
+    #[doc = " @note The created ETM event object can be deleted later by calling `esp_etm_del_event`"]
+    #[doc = ""]
+    #[doc = " @note The ETM event is generated by the underlying hardware -- systimer,"]
+    #[doc = "       therefore, if the esp_timer is not clocked by systimer, then no ETM event will be generated."]
+    #[doc = ""]
+    #[doc = " @param[out] out_event Returned ETM event handle"]
+    #[doc = " @return"]
+    #[doc = "      - ESP_OK Success"]
+    #[doc = "      - ESP_ERR_INVALID_ARG Parameter error"]
+    pub fn esp_timer_new_etm_alarm_event(out_event: *mut esp_etm_event_handle_t) -> esp_err_t;
 }
 #[repr(C)]
 #[derive(Copy, Clone)]

@@ -109,7 +109,8 @@ pub(crate) fn create_ble_config() -> esp_bt_controller_config_t {
         pcm_role: 0,
         pcm_polar: 0,
         hli: false,
-        magic: 0x20200622,
+        dup_list_refresh_period: 0,
+        magic: 0x20221207,
     }
 }
 

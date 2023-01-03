@@ -396,6 +396,7 @@ static mut G_CONFIG: wifi_init_config_t = wifi_init_config_t {
     mgmt_sbuf_num: 32,
     feature_caps: CONFIG_FEATURE_WPA3_SAE_BIT,
     sta_disconnected_pm: false,
+    espnow_max_encrypt_num: 7, // 2 for ESP32-C2
     magic: WIFI_INIT_CONFIG_MAGIC as i32,
 };
 
@@ -456,8 +457,12 @@ pub fn wifi_init() -> i32 {
                     required: false,
                 },
                 sae_pwe_h2e: 3,
-                _bitfield_align_1: [0u32; 0],
+                _bitfield_align_1: [0u16; 0],
                 _bitfield_1: __BindgenBitfieldUnit::new([0u8; 4usize]),
+                failure_retry_cnt: 1,
+                _bitfield_align_2: [0u8; 0],
+                _bitfield_2: __BindgenBitfieldUnit::new([0u8; 1usize]),
+                __bindgen_padding_0: 0u16,
             },
         };
         let res = esp_wifi_set_config(wifi_interface_t_WIFI_IF_STA, &mut cfg);
@@ -598,8 +603,12 @@ pub fn wifi_connect(ssid: &str, password: &str) -> i32 {
                     required: false,
                 },
                 sae_pwe_h2e: 3,
-                _bitfield_align_1: [0u32; 0],
+                _bitfield_align_1: [0u16; 0],
                 _bitfield_1: __BindgenBitfieldUnit::new([0u8; 4usize]),
+                failure_retry_cnt: 1,
+                _bitfield_align_2: [0u8; 0],
+                _bitfield_2: __BindgenBitfieldUnit::new([0u8; 1usize]),
+                __bindgen_padding_0: 0u16,
             },
         };
 

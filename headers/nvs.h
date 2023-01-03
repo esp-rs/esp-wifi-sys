@@ -58,6 +58,7 @@ typedef nvs_handle_t nvs_handle IDF_DEPRECATED("Replace with nvs_handle_t");
 
 #define NVS_PART_NAME_MAX_SIZE              16   /*!< maximum length of partition name (excluding null terminator) */
 #define NVS_KEY_NAME_MAX_SIZE               16   /*!< Maximum length of NVS key name (including null terminator) */
+#define NVS_NS_NAME_MAX_SIZE                NVS_KEY_NAME_MAX_SIZE /*!< Maximum length of NVS namespace name (including null terminator) */
 
 /**
  * @brief Mode of opening the non-volatile storage
@@ -95,9 +96,9 @@ typedef enum {
  * @brief information about entry obtained from nvs_entry_info function
  */
 typedef struct {
-    char namespace_name[16];    /*!< Namespace to which key-value belong */
-    char key[NVS_KEY_NAME_MAX_SIZE];               /*!< Key of stored key-value pair */
-    nvs_type_t type;            /*!< Type of stored key-value pair */
+    char namespace_name[NVS_NS_NAME_MAX_SIZE];  /*!< Namespace to which key-value belong */
+    char key[NVS_KEY_NAME_MAX_SIZE];            /*!< Key of stored key-value pair */
+    nvs_type_t type;                            /*!< Type of stored key-value pair */
 } nvs_entry_info_t;
 
 /**
@@ -131,6 +132,8 @@ typedef struct nvs_opaque_iterator_t *nvs_iterator_t;
  *               mode is NVS_READONLY
  *             - ESP_ERR_NVS_INVALID_NAME if namespace name doesn't satisfy constraints
  *             - ESP_ERR_NO_MEM in case memory could not be allocated for the internal structures
+ *             - ESP_ERR_NVS_NOT_ENOUGH_SPACE if there is no space for a new entry or there are too many different
+ *                                  namespaces (maximum allowed different namespaces: 254)
  *             - other error codes from the underlying storage driver
  */
 esp_err_t nvs_open(const char* namespace_name, nvs_open_mode_t open_mode, nvs_handle_t *out_handle);
@@ -160,6 +163,8 @@ esp_err_t nvs_open(const char* namespace_name, nvs_open_mode_t open_mode, nvs_ha
  *               mode is NVS_READONLY
  *             - ESP_ERR_NVS_INVALID_NAME if namespace name doesn't satisfy constraints
  *             - ESP_ERR_NO_MEM in case memory could not be allocated for the internal structures
+ *             - ESP_ERR_NVS_NOT_ENOUGH_SPACE if there is no space for a new entry or there are too many different
+ *                                  namespaces (maximum allowed different namespaces: 254)
  *             - other error codes from the underlying storage driver
  */
 esp_err_t nvs_open_from_partition(const char *part_name, const char* namespace_name, nvs_open_mode_t open_mode, nvs_handle_t *out_handle);

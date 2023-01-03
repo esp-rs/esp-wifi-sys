@@ -4,7 +4,9 @@
 
 This is experimental and work-in-progress! You are welcome to experiment with it and contribute but probably shouldn't use this for something real yet.
 
-WiFi / BTLE coexistence is implemented but currently only works (to some extend) on ESP32-C3. In general COEX shouldn't be used currently.
+WiFi / BTLE coexistence is implemented but currently only works (to some extend) on ESP32-C3 and ESP32-S3. In general COEX shouldn't be used currently.
+
+On ESP32-S3 you currently need to use opt-level 1.
 
 Minimum supported Rust compiler version: 1.65.0.0
 
@@ -12,9 +14,9 @@ This uses the WiFi drivers from https://github.com/esp-rs/esp-wireless-drivers-3
 
 ## Version used
 
-v5.0-beta1-427-g4532e6e0b2 commit 4532e6e0b2ddd02b5bdbc1119e37aac3c306e65d
+v5.1-dev-2658-g0025915dc4 commit 0025915dc489a9d45f99aed74920346f8ac4ec09
 
-https://github.com/esp-rs/esp-wireless-drivers-3rdparty/ (commit 839bcd7cb89d69571cda26df1caf42a3a6548b2e)
+https://github.com/esp-rs/esp-wireless-drivers-3rdparty/ (commit f4caebff200e8f6f51b0a11d2b69ca56c76bb1c9)
 
 ## Examples
 
@@ -51,9 +53,10 @@ https://github.com/esp-rs/esp-wireless-drivers-3rdparty/ (commit 839bcd7cb89d695
 | `cargo "+esp" run --example ble --release --target xtensa-esp32-none-elf --features "esp32,ble"`                                | ESP32   |
 | `cargo "+esp" run --example dhcp --release --target xtensa-esp32-none-elf --features "esp32,embedded-svc,wifi"`                 | ESP32   |
 | `cargo "+esp" run --example static_ip --release --target xtensa-esp32-none-elf --features "esp32,embedded-svc,wifi"`            | ESP32   |
-| `cargo "+esp" run --example ble --release --target xtensa-esp32s3-none-elf --features "esp32s3,ble"`                                | ESP32-S3 |
-| `cargo "+esp" run --example dhcp --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi"`             | ESP32-S3|
-| `cargo "+esp" run --example static_ip --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi"`        | ESP32-S3|
+| `CARGO_PROFILE_RELEASE_OPT_LEVEL=1 cargo "+esp" run --example ble --release --target xtensa-esp32s3-none-elf --features "esp32s3,ble"`                                | ESP32-S3 |
+| `CARGO_PROFILE_RELEASE_OPT_LEVEL=1 cargo "+esp" run --example dhcp --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi"`             | ESP32-S3|
+| `CARGO_PROFILE_RELEASE_OPT_LEVEL=1 cargo "+esp" run --example static_ip --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi"`        | ESP32-S3|
+| `CARGO_PROFILE_RELEASE_OPT_LEVEL=1 cargo "+esp" run --example coex --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi,ble"`        | ESP32-S3|
 | `cargo "+esp" run --example dhcp --release --target xtensa-esp32s2-none-elf --features "esp32s2,embedded-svc,wifi"`             | ESP32-S2|
 | `cargo "+esp" run --example static_ip --release --target xtensa-esp32s2-none-elf --features "esp32s2,embedded-svc,wifi"`        | ESP32-S2|
 
@@ -72,6 +75,8 @@ Additionally you can specify these features
 ## Optimization Level
 
 It is necessary to build with optimization level 2 or 3 since otherwise it might not even be able to connect or advertise.
+
+On ESP32-S3 you need to use optimization level 1 for now.
 
 To make it work also for your debug builds add this to your `Cargo.toml`
 
