@@ -110,6 +110,25 @@ static mut G_COEX_ADAPTER_FUNCS: coex_adapter_funcs_t = coex_adapter_funcs_t {
     _magic: crate::binary::include::COEX_ADAPTER_MAGIC as i32,
 };
 
+#[cfg(all(feature = "esp32s3", coex))]
+static mut G_COEX_ADAPTER_FUNCS: coex_adapter_funcs_t = coex_adapter_funcs_t {
+    _version: crate::binary::include::COEX_ADAPTER_VERSION as i32,
+    _task_yield_from_isr: Some(task_yield_from_isr),
+    _semphr_create: Some(semphr_create),
+    _semphr_delete: Some(semphr_delete),
+    _semphr_take_from_isr: Some(semphr_take_from_isr_wrapper),
+    _semphr_give_from_isr: Some(semphr_give_from_isr_wrapper),
+    _semphr_take: Some(semphr_take),
+    _semphr_give: Some(semphr_give),
+    _is_in_isr: Some(is_in_isr_wrapper),
+    _malloc_internal: Some(malloc),
+    _free: Some(free),
+    _esp_timer_get_time: Some(esp_timer_get_time),
+    _env_is_chip: Some(env_is_chip),
+    _slowclk_cal_get: Some(slowclk_cal_get),
+    _magic: crate::binary::include::COEX_ADAPTER_MAGIC as i32,
+};
+
 #[cfg(all(feature = "esp32", coex))]
 static mut G_COEX_ADAPTER_FUNCS: coex_adapter_funcs_t = coex_adapter_funcs_t {
     _version: crate::binary::include::COEX_ADAPTER_VERSION as i32,

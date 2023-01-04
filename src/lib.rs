@@ -159,6 +159,18 @@ pub fn initialize(
         return Err(InitializationError::WrongClockConfig);
     }
 
+    #[cfg(feature = "esp32s3")]
+    unsafe {
+        // should be done by the HAL in `ClockControl::configure`
+        const ETS_UPDATE_CPU_FREQUENCY: u32 = 0x40001a4c;
+
+        // cast to usize is just needed because of the way we run clippy in CI
+        let rom_ets_update_cpu_frequency: fn(ticks_per_us: u32) =
+            core::mem::transmute(ETS_UPDATE_CPU_FREQUENCY as usize);
+
+        rom_ets_update_cpu_frequency(240); // we know it's 240MHz because of the check above
+    }
+
     phy_mem_init();
     init_rng(rng);
     init_tasks();

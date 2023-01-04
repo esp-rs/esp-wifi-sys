@@ -6,8 +6,6 @@ This is experimental and work-in-progress! You are welcome to experiment with it
 
 WiFi / BTLE coexistence is implemented but currently only works (to some extend) on ESP32-C3. In general COEX shouldn't be used currently.
 
-On ESP32-S3 only WiFi is currently supported.
-
 Minimum supported Rust compiler version: 1.65.0.0
 
 This uses the WiFi drivers from https://github.com/esp-rs/esp-wireless-drivers-3rdparty
@@ -53,12 +51,13 @@ https://github.com/esp-rs/esp-wireless-drivers-3rdparty/ (commit 839bcd7cb89d695
 | `cargo "+esp" run --example ble --release --target xtensa-esp32-none-elf --features "esp32,ble"`                                | ESP32   |
 | `cargo "+esp" run --example dhcp --release --target xtensa-esp32-none-elf --features "esp32,embedded-svc,wifi"`                 | ESP32   |
 | `cargo "+esp" run --example static_ip --release --target xtensa-esp32-none-elf --features "esp32,embedded-svc,wifi"`            | ESP32   |
+| `cargo "+esp" run --example ble --release --target xtensa-esp32s3-none-elf --features "esp32s3,ble"`                                | ESP32-S3 |
 | `cargo "+esp" run --example dhcp --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi"`             | ESP32-S3|
 | `cargo "+esp" run --example static_ip --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi"`        | ESP32-S3|
 | `cargo "+esp" run --example dhcp --release --target xtensa-esp32s2-none-elf --features "esp32s2,embedded-svc,wifi"`             | ESP32-S2|
 | `cargo "+esp" run --example static_ip --release --target xtensa-esp32s2-none-elf --features "esp32s2,embedded-svc,wifi"`        | ESP32-S2|
 
-Additional you can specify these features
+Additionally you can specify these features
 |Feature|Meaning|
 |---|---|
 |wifi_logs|logs the WiFi logs from the driver at log level info|

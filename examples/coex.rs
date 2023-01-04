@@ -7,6 +7,8 @@
 use esp32_hal as hal;
 #[cfg(feature = "esp32c3")]
 use esp32c3_hal as hal;
+#[cfg(feature = "esp32s3")]
+use esp32s3_hal as hal;
 
 use bleps::{
     ad_structure::{
@@ -40,7 +42,7 @@ use hal::system::SystemExt;
 
 #[cfg(feature = "esp32c3")]
 use riscv_rt::entry;
-#[cfg(feature = "esp32")]
+#[cfg(any(feature = "esp32", feature = "esp32s3"))]
 use xtensa_lx_rt::entry;
 
 const SSID: &str = env!("SSID");
@@ -60,7 +62,7 @@ fn main() -> ! {
 
     #[cfg(feature = "esp32c3")]
     let clocks = ClockControl::configure(system.clock_control, CpuClock::Clock160MHz).freeze();
-    #[cfg(feature = "esp32")]
+    #[cfg(any(feature = "esp32", feature = "esp32s3"))]
     let clocks = ClockControl::configure(system.clock_control, CpuClock::Clock240MHz).freeze();
 
     let mut rtc = Rtc::new(peripherals.RTC_CNTL);
@@ -81,7 +83,7 @@ fn main() -> ! {
         let syst = SystemTimer::new(peripherals.SYSTIMER);
         initialize(syst.alarm0, Rng::new(peripherals.RNG), &clocks).unwrap();
     }
-    #[cfg(feature = "esp32")]
+    #[cfg(any(feature = "esp32", feature = "esp32s3"))]
     {
         use hal::timer::TimerGroup;
         let timg1 = TimerGroup::new(peripherals.TIMG1, &clocks);
@@ -158,6 +160,8 @@ fn main() -> ! {
             AdStructure::CompleteLocalName("ESP32-C3 BLE"),
             #[cfg(feature = "esp32")]
             AdStructure::CompleteLocalName("ESP32 BLE"),
+            #[cfg(feature = "esp32s3")]
+            AdStructure::CompleteLocalName("ESP32-S3 BLE"),
         ]))
     );
     println!("{:?}", ble.cmd_set_le_advertise_enable(true));

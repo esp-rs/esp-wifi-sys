@@ -50,7 +50,6 @@ pub fn setup_timer_isr(timg1_timer0: Timer<Timer0<TIMG1>>) {
     #[cfg(feature = "ble")]
     {
         interrupt::enable(pac::Interrupt::RWBT, interrupt::Priority::Priority1).unwrap();
-        interrupt::enable(pac::Interrupt::RWBLE, interrupt::Priority::Priority1).unwrap();
         interrupt::enable(pac::Interrupt::BT_BB, interrupt::Priority::Priority1).unwrap();
     }
 
