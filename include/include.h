@@ -1,3 +1,5 @@
+#define SOC_COEX_HW_PTI 1
+
 #include "espidf_types.h"
 #include "esp_private/wifi.h"
 #include "esp_wpa.h"

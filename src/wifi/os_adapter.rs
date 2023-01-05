@@ -2078,5 +2078,5 @@ pub unsafe extern "C" fn slowclk_cal_get() -> u32 {
     return 28639;
 
     #[cfg(feature = "esp32")]
-    return 28639;    
+    return 28639;
 }

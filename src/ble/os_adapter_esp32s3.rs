@@ -18,7 +18,7 @@ extern "C" {
 pub(crate) fn create_ble_config() -> esp_bt_controller_config_t {
     esp_bt_controller_config_t {
         magic: 0x5A5AA5A5,
-        version: 0x02112280,
+        version: 0x02212090,
         controller_task_stack_size: 8192,
         controller_task_prio: 200,
         controller_task_run_cpu: 0,
@@ -47,6 +47,8 @@ pub(crate) fn create_ble_config() -> esp_bt_controller_config_t {
         slave_ce_len_min: 5,
         hw_recorrect_en: 1 << 0,
         cca_thresh: 20,
+        dup_list_refresh_period: 0,
+        scan_backoff_upperlimitmax: 0,
     }
 }
 
