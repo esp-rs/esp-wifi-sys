@@ -5,6 +5,7 @@ use std::path::PathBuf;
 
 #[cfg(any(
     feature = "esp32c3",
+    feature = "esp32c2",
     feature = "esp32",
     feature = "esp32s3",
     feature = "esp32s2"
@@ -50,6 +51,10 @@ fn main() -> Result<(), String> {
         return Err("BLE is not supported for ESP32-S2".into());
     }
 
+    if cfg!(feature = "esp32c2") && cfg!(feature = "ble") {
+        return Err("BLE is not yet supported for ESP32-C2".into());
+    }
+
     if features >= 2 {
         println!("cargo:rustc-cfg=coex");
     }
@@ -57,6 +62,64 @@ fn main() -> Result<(), String> {
     handle_chip();
 
     Ok(())
+}
+
+#[cfg(feature = "esp32c2")]
+fn handle_chip() {
+    // Put the linker script somewhere the linker can find it
+    let out = &PathBuf::from(env::var_os("OUT_DIR").unwrap());
+
+    copy(
+        out,
+        include_bytes!("ld/esp32c2/rom_functions.x"),
+        "esp32c3_rom_functions.x",
+    );
+
+    copy(out, include_bytes!("libs/esp32c2/libbtbb.a"), "libbtbb.a");
+    copy(
+        out,
+        include_bytes!("libs/esp32c2/libcoexist.a"),
+        "libcoexist.a",
+    );
+    copy(out, include_bytes!("libs/esp32c2/libcore.a"), "libcore.a");
+    copy(
+        out,
+        include_bytes!("libs/esp32c2/libespnow.a"),
+        "libespnow.a",
+    );
+    copy(
+        out,
+        include_bytes!("libs/esp32c2/libnet80211.a"),
+        "libnet80211.a",
+    );
+    copy(out, include_bytes!("libs/esp32c2/libphy.a"), "libphy.a");
+    copy(out, include_bytes!("libs/esp32c2/libpp.a"), "libpp.a");
+    copy(
+        out,
+        include_bytes!("libs/esp32c2/libsmartconfig.a"),
+        "libsmartconfig.a",
+    );
+    copy(
+        out,
+        include_bytes!("libs/esp32c2/libwpa_supplicant.a"),
+        "libwpa_supplicant.a",
+    );
+
+    println!("cargo:rustc-link-lib={}", "btbb");
+    println!("cargo:rustc-link-lib={}", "coexist");
+    println!("cargo:rustc-link-lib={}", "core");
+    println!("cargo:rustc-link-lib={}", "espnow");
+    println!("cargo:rustc-link-lib={}", "net80211");
+    println!("cargo:rustc-link-lib={}", "phy");
+    println!("cargo:rustc-link-lib={}", "pp");
+    println!("cargo:rustc-link-lib={}", "smartconfig");
+    println!("cargo:rustc-link-lib={}", "wpa_supplicant");
+
+    println!("cargo:rustc-link-search={}", out.display());
+
+    // Only re-run the build script when memory.x is changed,
+    // instead of when any part of the source code changes.
+    println!("cargo:rerun-if-changed=memory.x");
 }
 
 #[cfg(feature = "esp32c3")]
@@ -329,6 +392,7 @@ fn copy(path: &PathBuf, data: &[u8], name: &str) {
 
 #[cfg(not(any(
     feature = "esp32c3",
+    feature = "esp32c2",
     feature = "esp32",
     feature = "esp32s3",
     feature = "esp32s2"

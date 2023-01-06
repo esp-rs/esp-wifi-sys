@@ -37,3 +37,10 @@ echo Connect ESP32-S2
 pause
 cargo "+esp" run --example dhcp --release --target xtensa-esp32s2-none-elf --features "esp32s2,embedded-svc,wifi"
 cargo "+esp" run --example static_ip --release --target xtensa-esp32s2-none-elf --features "esp32s2,embedded-svc,wifi"
+
+set CARGO_PROFILE_RELEASE_OPT_LEVEL=3
+echo.
+echo Connect ESP32-C2 and modify the 'target.riscv32imc-unknown-none-elf.dev-dependencies' section
+pause
+cargo "+nightly" run --example dhcp --release --target riscv32imc-unknown-none-elf --features "esp32c2,embedded-svc,wifi"
+cargo "+nightly" run --example static_ip --release --target riscv32imc-unknown-none-elf --features "esp32c2,embedded-svc,wifi"
