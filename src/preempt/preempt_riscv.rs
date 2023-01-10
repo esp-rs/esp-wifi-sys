@@ -1,5 +1,6 @@
 use super::*;
-use esp32c3_hal::interrupt::TrapFrame;
+
+use crate::hal::interrupt::TrapFrame;
 
 #[derive(Debug, Default, Clone, Copy)]
 pub struct Context {

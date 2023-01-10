@@ -1,4 +1,5 @@
 #[cfg_attr(feature = "esp32c3", path = "os_adapter_esp32c3.rs")]
+#[cfg_attr(feature = "esp32c2", path = "os_adapter_esp32c2.rs")]
 #[cfg_attr(feature = "esp32", path = "os_adapter_esp32.rs")]
 #[cfg_attr(feature = "esp32s3", path = "os_adapter_esp32s3.rs")]
 #[cfg_attr(feature = "esp32s2", path = "os_adapter_esp32s2.rs")]
@@ -1899,7 +1900,7 @@ pub unsafe extern "C" fn coex_event_duration_get(
  *   Don't support
  *
  ****************************************************************************/
-#[cfg(any(feature = "esp32c3", feature = "esp32s3"))]
+#[cfg(any(feature = "esp32c3", feature = "esp32c2", feature = "esp32s3"))]
 #[allow(unused_variables)]
 pub unsafe extern "C" fn coex_pti_get(event: u32, pti: *mut u8) -> crate::binary::c_types::c_int {
     log::debug!("coex_pti_get");
@@ -2075,6 +2076,9 @@ pub unsafe extern "C" fn slowclk_cal_get() -> u32 {
     return 44462;
 
     #[cfg(feature = "esp32c3")]
+    return 28639;
+
+    #[cfg(feature = "esp32c2")]
     return 28639;
 
     #[cfg(feature = "esp32")]

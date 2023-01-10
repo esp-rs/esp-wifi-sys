@@ -9,6 +9,10 @@ use core::mem::MaybeUninit;
 use critical_section::Mutex;
 #[cfg(feature = "esp32")]
 use esp32_hal as hal;
+#[cfg(feature = "esp32c2")]
+use esp32c2_hal as hal;
+#[cfg(feature = "esp32c2")]
+use esp32c2_hal::systimer::{Alarm, Target};
 #[cfg(feature = "esp32c3")]
 use esp32c3_hal as hal;
 #[cfg(feature = "esp32c3")]
@@ -39,6 +43,7 @@ pub mod preempt;
 #[doc(hidden)]
 #[cfg_attr(feature = "esp32", path = "timer_esp32.rs")]
 #[cfg_attr(feature = "esp32c3", path = "timer_esp32c3.rs")]
+#[cfg_attr(feature = "esp32c2", path = "timer_esp32c2.rs")]
 #[cfg_attr(feature = "esp32s3", path = "timer_esp32s3.rs")]
 #[cfg_attr(feature = "esp32s2", path = "timer_esp32s2.rs")]
 pub mod timer;
@@ -65,6 +70,9 @@ pub mod wifi_interface;
 #[cfg(feature = "esp32c3")]
 use esp32c3_hal::interrupt;
 
+#[cfg(feature = "esp32c2")]
+use esp32c2_hal::interrupt;
+
 pub fn current_millis() -> u64 {
     get_systimer_count() / (TICKS_PER_SECOND / 1000)
 }
@@ -87,7 +95,7 @@ pub fn init_heap() {
     });
 }
 
-#[cfg(feature = "esp32c3")]
+#[cfg(any(feature = "esp32c3", feature = "esp32c2"))]
 /// Initialize for using WiFi / BLE
 /// This will initialize internals and also initialize WiFi and BLE
 pub fn initialize(
@@ -95,7 +103,13 @@ pub fn initialize(
     rng: hal::Rng,
     clocks: &Clocks,
 ) -> Result<(), InitializationError> {
+    #[cfg(feature = "esp32c3")]
     if clocks.cpu_clock != MegahertzU32::MHz(160) {
+        return Err(InitializationError::WrongClockConfig);
+    }
+
+    #[cfg(feature = "esp32c2")]
+    if clocks.cpu_clock != MegahertzU32::MHz(120) {
         return Err(InitializationError::WrongClockConfig);
     }
 

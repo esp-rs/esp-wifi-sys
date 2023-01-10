@@ -4,6 +4,10 @@ set SYSROOT=%HOMEPATH%/.espressif/tools/riscv32-esp-elf/esp-2021r2-8.4.0/riscv32
 set INCL=%HOMEPATH%\.espressif\tools\riscv32-esp-elf\esp-2021r2-8.4.0\riscv32-esp-elf\riscv32-esp-elf\include\
 bindgen %OPTS% include\include.h > src\binary\include_esp32c3.rs -- -I./headers/ -I%INCL% -I./include/ -DCONFIG_IDF_TARGET_ESP32C3 -I./headers/esp32c3/ --sysroot=%SYSROOT% --target=riscv32
 
+set SYSROOT=%HOMEPATH%/.espressif/tools/riscv32-esp-elf/esp-2021r2-8.4.0/riscv32-esp-elf/"
+set INCL=%HOMEPATH%\.espressif\tools\riscv32-esp-elf\esp-2021r2-8.4.0\riscv32-esp-elf\riscv32-esp-elf\include\
+bindgen %OPTS% include\include.h > src\binary\include_esp32c2.rs -- -I./headers/ -I%INCL% -I./include/ -DCONFIG_IDF_TARGET_ESP32C2 -I./headers/esp32c2/ --sysroot=%SYSROOT% --target=riscv32
+
 set SYSROOT=%HOMEPATH%/.espressif\tools\xtensa-esp32-elf\esp-2021r2-8.4.0\xtensa-esp32-elf/"
 set INCL=%HOMEPATH%\.espressif\tools\xtensa-esp32-elf\esp-2021r2-8.4.0\xtensa-esp32-elf\xtensa-esp32-elf\include
 bindgen %OPTS% include\include.h > src\binary\include_esp32.rs -- -I./headers/ -I%INCL% -I./include/ -DCONFIG_IDF_TARGET_ESP32 -I./headers/esp32/ --sysroot=%SYSROOT% --target=xtensa

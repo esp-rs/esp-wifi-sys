@@ -12,6 +12,8 @@ use smoltcp::phy::{Device, DeviceCapabilities, RxToken, TxToken};
 
 #[cfg(feature = "esp32")]
 use esp32_hal as hal;
+#[cfg(feature = "esp32c2")]
+use esp32c2_hal as hal;
 #[cfg(feature = "esp32c3")]
 use esp32c3_hal as hal;
 #[cfg(feature = "esp32s2")]
@@ -323,7 +325,12 @@ static g_wifi_osi_funcs: wifi_osi_funcs_t = wifi_osi_funcs_t {
     _coex_schm_curr_phase_get: Some(coex_schm_curr_phase_get),
     _coex_schm_curr_phase_idx_set: Some(coex_schm_curr_phase_idx_set),
     _coex_schm_curr_phase_idx_get: Some(coex_schm_curr_phase_idx_get),
-    #[cfg(any(feature = "esp32c3", feature = "esp32s3", feature = "esp32s2"))]
+    #[cfg(any(
+        feature = "esp32c3",
+        feature = "esp32c2",
+        feature = "esp32s3",
+        feature = "esp32s2"
+    ))]
     _slowclk_cal_get: Some(slowclk_cal_get),
     #[cfg(any(feature = "esp32", feature = "esp32s2"))]
     _phy_common_clock_disable: Some(

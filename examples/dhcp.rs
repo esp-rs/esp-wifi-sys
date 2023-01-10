@@ -5,6 +5,8 @@
 
 #[cfg(feature = "esp32")]
 use esp32_hal as hal;
+#[cfg(feature = "esp32c2")]
+use esp32c2_hal as hal;
 #[cfg(feature = "esp32c3")]
 use esp32c3_hal as hal;
 #[cfg(feature = "esp32s2")]
@@ -28,10 +30,10 @@ use hal::Rng;
 use hal::{pac::Peripherals, prelude::*, Rtc};
 use smoltcp::wire::Ipv4Address;
 
-#[cfg(any(feature = "esp32c3"))]
+#[cfg(any(feature = "esp32c3", feature = "esp32c2"))]
 use hal::system::SystemExt;
 
-#[cfg(feature = "esp32c3")]
+#[cfg(any(feature = "esp32c3", feature = "esp32c2"))]
 use riscv_rt::entry;
 #[cfg(any(feature = "esp32", feature = "esp32s3", feature = "esp32s2"))]
 use xtensa_lx_rt::entry;
@@ -53,6 +55,8 @@ fn main() -> ! {
 
     #[cfg(feature = "esp32c3")]
     let clocks = ClockControl::configure(system.clock_control, CpuClock::Clock160MHz).freeze();
+    #[cfg(feature = "esp32c2")]
+    let clocks = ClockControl::configure(system.clock_control, CpuClock::Clock120MHz).freeze();
     #[cfg(any(feature = "esp32", feature = "esp32s3", feature = "esp32s2"))]
     let clocks = ClockControl::configure(system.clock_control, CpuClock::Clock240MHz).freeze();
 
@@ -68,7 +72,7 @@ fn main() -> ! {
     let ethernet = create_network_interface(network_stack_storage!(storage));
     let mut wifi_interface = esp_wifi::wifi_interface::Wifi::new(ethernet);
 
-    #[cfg(feature = "esp32c3")]
+    #[cfg(any(feature = "esp32c3", feature = "esp32c2"))]
     {
         use hal::systimer::SystemTimer;
         let syst = SystemTimer::new(peripherals.SYSTIMER);
