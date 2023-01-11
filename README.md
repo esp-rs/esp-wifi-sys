@@ -1,4 +1,4 @@
-# Wifi and Bluetooth LE on ESP32-C3,ESP32,ESP32-S3 and ESP32-S2 (on bare-metal Rust)
+# Wifi and Bluetooth LE on ESP32-C3, ESP32-C2, ESP32, ESP32-S3 and ESP32-S2 (on bare-metal Rust)
 
 ## About
 
@@ -59,6 +59,7 @@ https://github.com/esp-rs/esp-wireless-drivers-3rdparty/ (commit f4caebff200e8f6
 | `CARGO_PROFILE_RELEASE_OPT_LEVEL=1 cargo "+esp" run --example coex --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi,ble"`        | ESP32-S3|
 | `cargo "+esp" run --example dhcp --release --target xtensa-esp32s2-none-elf --features "esp32s2,embedded-svc,wifi"`             | ESP32-S2|
 | `cargo "+esp" run --example static_ip --release --target xtensa-esp32s2-none-elf --features "esp32s2,embedded-svc,wifi"`        | ESP32-S2|
+| `cargo "+nightly" run --example ble --release --target riscv32imc-unknown-none-elf --features "esp32c2,ble"`                    | ESP32-C2|
 | `cargo "+nightly" run --example dhcp --release --target riscv32imc-unknown-none-elf --features "esp32c2,embedded-svc,wifi"`     | ESP32-C2|
 | `cargo "+nightly" run --example static_ip --release --target riscv32imc-unknown-none-elf --features "esp32c2,embedded-svc,wifi"`| ESP32-C2|
 
@@ -128,7 +129,6 @@ If something doesn't work as expected try a different opt-level.
 
 - `src/timer-espXXX.rs`: systimer code used for timing and task switching
 - `src/preemt/`: a bare minimum RISCV and Xtensa round-robin task scheduler
-- `src/log/`: code used for logging
 - `src/binary/`: generated bindings to the WiFi driver (per chip)
 - `src/compat/`: code needed to emulate enough of an (RT)OS to use the driver
   - `common.rs`: basics like semaphores and recursive mutexes
@@ -144,7 +144,6 @@ If something doesn't work as expected try a different opt-level.
 - lots of refactoring
 - make CoEx work on ESP32 (it kind of works when commenting out setting the country in wifi_start, probably some mis-compilation since it then crashes in a totally different code path)
 - esp-now
-- powersafe support
 - maybe SoftAP
 
 ## Using in your own binary crate
@@ -152,7 +151,7 @@ If something doesn't work as expected try a different opt-level.
 For now this is not available on _crates.io_. Until then you need to specify a git dependency.
 You might want to pin the dependency to a specific commit since this things might change a lot during development.
 
-Make sure to include
+Make sure to include the rom functions for your target like this
 
 ```toml
 rustflags = [

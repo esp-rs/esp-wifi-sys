@@ -208,3 +208,9 @@ pub(crate) fn wifi_reset_mac() {
             .write_volatile(SYSCON_WIFI_RST_EN_REG.read_volatile() & !SYSTEM_MAC_RST);
     }
 }
+
+#[no_mangle]
+pub extern "C" fn rtc_clk_xtal_freq_get() -> i32 {
+    // JUST SUPPORT 40MHz XTAL for now
+    40
+}

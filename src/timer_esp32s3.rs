@@ -116,7 +116,7 @@ fn WIFI_BB() {
 #[interrupt]
 fn RWBT_NMI() {
     critical_section::with(|_| unsafe {
-        let (fnc, arg) = crate::ble::ble_os_adapter_chip_specific::ISR_INTERRUPT_5;
+        let (fnc, arg) = crate::ble::btdm::ble_os_adapter_chip_specific::ISR_INTERRUPT_5;
         trace!("interrupt RWBT_NMI {:p} {:p}", fnc, arg);
         if !fnc.is_null() {
             let fnc: fn(*mut crate::binary::c_types::c_void) = core::mem::transmute(fnc);
@@ -129,7 +129,7 @@ fn RWBT_NMI() {
 #[interrupt]
 fn BT_BB_NMI() {
     critical_section::with(|_| unsafe {
-        let (fnc, arg) = crate::ble::ble_os_adapter_chip_specific::ISR_INTERRUPT_8;
+        let (fnc, arg) = crate::ble::btdm::ble_os_adapter_chip_specific::ISR_INTERRUPT_8;
         trace!("interrupt RWBT {:p} {:p}", fnc, arg);
 
         if !fnc.is_null() {

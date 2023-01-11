@@ -51,10 +51,6 @@ fn main() -> Result<(), String> {
         return Err("BLE is not supported for ESP32-S2".into());
     }
 
-    if cfg!(feature = "esp32c2") && cfg!(feature = "ble") {
-        return Err("BLE is not yet supported for ESP32-C2".into());
-    }
-
     if features >= 2 {
         println!("cargo:rustc-cfg=coex");
     }
@@ -75,6 +71,11 @@ fn handle_chip() {
         "esp32c3_rom_functions.x",
     );
 
+    copy(
+        out,
+        include_bytes!("libs/esp32c2/libble_app.a"),
+        "libble_app.a",
+    );
     copy(out, include_bytes!("libs/esp32c2/libbtbb.a"), "libbtbb.a");
     copy(
         out,
@@ -105,6 +106,7 @@ fn handle_chip() {
         "libwpa_supplicant.a",
     );
 
+    println!("cargo:rustc-link-lib={}", "ble_app");
     println!("cargo:rustc-link-lib={}", "btbb");
     println!("cargo:rustc-link-lib={}", "coexist");
     println!("cargo:rustc-link-lib={}", "core");

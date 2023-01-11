@@ -5,6 +5,8 @@
 
 #[cfg(feature = "esp32")]
 use esp32_hal as hal;
+#[cfg(feature = "esp32c2")]
+use esp32c2_hal as hal;
 #[cfg(feature = "esp32c3")]
 use esp32c3_hal as hal;
 #[cfg(feature = "esp32s3")]
@@ -32,7 +34,7 @@ use hal::{
 #[cfg(any(feature = "esp32", feature = "esp32s3"))]
 use hal::system::SystemExt;
 
-#[cfg(feature = "esp32c3")]
+#[cfg(any(feature = "esp32c3", feature = "esp32c2"))]
 use riscv_rt::entry;
 #[cfg(any(feature = "esp32", feature = "esp32s3"))]
 use xtensa_lx_rt::entry;
@@ -51,6 +53,8 @@ fn main() -> ! {
 
     #[cfg(feature = "esp32c3")]
     let clocks = ClockControl::configure(system.clock_control, CpuClock::Clock160MHz).freeze();
+    #[cfg(feature = "esp32c2")]
+    let clocks = ClockControl::configure(system.clock_control, CpuClock::Clock120MHz).freeze();
     #[cfg(any(feature = "esp32", feature = "esp32s3"))]
     let clocks = ClockControl::configure(system.clock_control, CpuClock::Clock240MHz).freeze();
 
@@ -62,7 +66,7 @@ fn main() -> ! {
 
     rtc.rwdt.disable();
 
-    #[cfg(feature = "esp32c3")]
+    #[cfg(any(feature = "esp32c3", feature = "esp32c2"))]
     {
         use hal::systimer::SystemTimer;
         let syst = SystemTimer::new(peripherals.SYSTIMER);
@@ -89,6 +93,8 @@ fn main() -> ! {
                 AdStructure::ServiceUuids16(&[Uuid::Uuid16(0x1809)]),
                 #[cfg(feature = "esp32c3")]
                 AdStructure::CompleteLocalName("ESP32-C3 BLE"),
+                #[cfg(feature = "esp32c2")]
+                AdStructure::CompleteLocalName("ESP32-C2 BLE"),
                 #[cfg(feature = "esp32")]
                 AdStructure::CompleteLocalName("ESP32 BLE"),
                 #[cfg(feature = "esp32s3")]
