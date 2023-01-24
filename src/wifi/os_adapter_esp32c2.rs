@@ -1,4 +1,3 @@
-use esp32c2_hal as hal;
 use log::trace;
 
 pub(crate) fn chip_ints_on(mask: u32) {
@@ -10,7 +9,7 @@ pub(crate) fn chip_ints_on(mask: u32) {
     trace!("ints_on n={}", cpuint);
 
     unsafe {
-        (*hal::pac::INTERRUPT_CORE0::PTR)
+        (*esp32c2::INTERRUPT_CORE0::PTR)
             .cpu_int_enable
             .modify(|r, w| w.bits(r.bits() | 1 << cpuint));
     }

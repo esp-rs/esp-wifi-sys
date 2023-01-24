@@ -22,6 +22,8 @@ use esp32s2_hal as hal;
 #[cfg(feature = "esp32s3")]
 use esp32s3_hal as hal;
 
+use hal::*;
+
 use fugit::MegahertzU32;
 use hal::clock::Clocks;
 use linked_list_allocator::Heap;
@@ -165,7 +167,7 @@ pub enum InitializationError {
 /// Initialize for using WiFi / BLE
 /// This will initialize internals and also initialize WiFi and BLE
 pub fn initialize(
-    timg1_timer0: hal::timer::Timer<hal::timer::Timer0<hal::pac::TIMG1>>,
+    timg1_timer0: hal::timer::Timer<hal::timer::Timer0<hal::peripherals::TIMG1>>,
     rng: hal::Rng,
     clocks: &Clocks,
 ) -> Result<(), InitializationError> {

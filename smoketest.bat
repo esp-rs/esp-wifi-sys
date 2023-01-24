@@ -22,7 +22,7 @@ cargo "+esp" run --example ble --release --target xtensa-esp32-none-elf --featur
 cargo "+esp" run --example dhcp --release --target xtensa-esp32-none-elf --features "esp32,embedded-svc,wifi"
 cargo "+esp" run --example static_ip --release --target xtensa-esp32-none-elf --features "esp32,embedded-svc,wifi"
 
-set CARGO_PROFILE_RELEASE_OPT_LEVEL=1
+set CARGO_PROFILE_RELEASE_OPT_LEVEL=3
 echo.
 echo Connect ESP32-S3
 pause
@@ -31,7 +31,7 @@ cargo "+esp" run --example dhcp --release --target xtensa-esp32s3-none-elf --fea
 cargo "+esp" run --example static_ip --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi"
 cargo "+esp" run --example coex --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi,ble"
 
-set CARGO_PROFILE_RELEASE_OPT_LEVEL=3
+set CARGO_PROFILE_RELEASE_OPT_LEVEL=2
 echo.
 echo Connect ESP32-S2
 pause

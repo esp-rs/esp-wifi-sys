@@ -13,7 +13,7 @@ use std::path::PathBuf;
 fn main() -> Result<(), String> {
     match std::env::var("OPT_LEVEL") {
         Ok(level) => {
-            #[cfg(not(feature = "esp32s3"))]
+            #[cfg(not(feature = "esp32s2"))]
             if level != "2" && level != "3" {
                 let message = format!(
                     "esp-wifi should be built with optimization level 2 or 3 - yours is {}. 
@@ -24,9 +24,9 @@ fn main() -> Result<(), String> {
                 println!("cargo:warning={}", message);
             }
 
-            // on ESP32-S3 we currently need opt-level 1 because of mis-optimizations
-            #[cfg(feature = "esp32s3")]
-            if level != "1" {
+            // on ESP32-S2 we currently need opt-level 2 because of mis-optimizations
+            #[cfg(feature = "esp32s2")]
+            if level != "2" {
                 let message = format!(
                     "esp-wifi should be built with optimization level 1 for ESP32-S3 for now - yours is {}. 
                     See https://github.com/esp-rs/esp-wifi",
