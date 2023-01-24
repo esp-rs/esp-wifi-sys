@@ -79,7 +79,7 @@ pub fn setup_timer_isr(timg1_timer0: Timer<Timer0<TIMG1>>) {
 #[no_mangle]
 fn Software0(_level: u32) {
     unsafe {
-        let (fnc, arg) = crate::ble::ble_os_adapter_chip_specific::ISR_INTERRUPT_7;
+        let (fnc, arg) = crate::ble::btdm::ble_os_adapter_chip_specific::ISR_INTERRUPT_7;
         trace!("interrupt Software0 {:p} {:p}", fnc, arg);
 
         if !fnc.is_null() {
@@ -131,7 +131,7 @@ fn WIFI_BB() {
 #[interrupt]
 fn RWBT() {
     unsafe {
-        let (fnc, arg) = crate::ble::ble_os_adapter_chip_specific::ISR_INTERRUPT_5;
+        let (fnc, arg) = crate::ble::btdm::ble_os_adapter_chip_specific::ISR_INTERRUPT_5;
         trace!("interrupt RWBT {:p} {:p}", fnc, arg);
 
         if !fnc.is_null() {
@@ -145,7 +145,7 @@ fn RWBT() {
 #[interrupt]
 fn RWBLE() {
     unsafe {
-        let (fnc, arg) = crate::ble::ble_os_adapter_chip_specific::ISR_INTERRUPT_5;
+        let (fnc, arg) = crate::ble::btdm::ble_os_adapter_chip_specific::ISR_INTERRUPT_5;
         trace!("interrupt RWBLE {:p} {:p}", fnc, arg);
 
         if !fnc.is_null() {
@@ -159,7 +159,7 @@ fn RWBLE() {
 #[interrupt]
 fn BT_BB() {
     unsafe {
-        let (fnc, arg) = crate::ble::ble_os_adapter_chip_specific::ISR_INTERRUPT_8;
+        let (fnc, arg) = crate::ble::btdm::ble_os_adapter_chip_specific::ISR_INTERRUPT_8;
         trace!("interrupt BT_BB {:p} {:p}", fnc, arg);
 
         if !fnc.is_null() {

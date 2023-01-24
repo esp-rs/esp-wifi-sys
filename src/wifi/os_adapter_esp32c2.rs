@@ -96,9 +96,3 @@ pub(crate) unsafe extern "C" fn wifi_clock_disable() {
         .write_volatile(SYSCON_WIFI_CLK_EN_REG.read_volatile() & !SYSTEM_WIFI_CLK_WIFI_EN_M);
     SYSTEM_CORE_RST_EN_REG.write_volatile(SYSTEM_CORE_RST_EN_REG.read_volatile() | 0);
 }
-
-#[no_mangle]
-pub extern "C" fn rtc_clk_xtal_freq_get() -> i32 {
-    // JUST SUPPORT 40MHz XTAL for now
-    40
-}

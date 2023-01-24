@@ -58,6 +58,7 @@ pub fn init_rng(rng: hal::Rng) {
  *   Semaphore data pointer
  *
  ****************************************************************************/
+#[allow(unused)]
 pub unsafe extern "C" fn semphr_create(max: u32, init: u32) -> *mut crate::binary::c_types::c_void {
     trace!("semphr_create - max {} init {}", max, init);
     sem_create(max, init)
@@ -76,6 +77,7 @@ pub unsafe extern "C" fn semphr_create(max: u32, init: u32) -> *mut crate::binar
  *   None
  *
  ****************************************************************************/
+#[allow(unused)]
 pub unsafe extern "C" fn semphr_delete(semphr: *mut crate::binary::c_types::c_void) {
     trace!("semphr_delete {:p}", semphr);
     sem_delete(semphr);
@@ -124,6 +126,7 @@ pub unsafe extern "C" fn semphr_give(semphr: *mut crate::binary::c_types::c_void
 /****************************************************************************
  * Name: esp_random_ulong
  ****************************************************************************/
+#[allow(unused)]
 #[ram]
 pub unsafe extern "C" fn random() -> crate::binary::c_types::c_ulong {
     trace!("random");

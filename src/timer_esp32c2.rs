@@ -46,11 +46,9 @@ pub fn setup_timer_isr(systimer: Alarm<Target, 0>) {
 
     #[cfg(feature = "ble")]
     {
-        esp32c2_hal::interrupt::enable(Interrupt::RWBT, hal::interrupt::Priority::Priority1)
+        esp32c2_hal::interrupt::enable(Interrupt::LP_TIMER, hal::interrupt::Priority::Priority1)
             .unwrap();
-        esp32c2_hal::interrupt::enable(Interrupt::RWBLE, hal::interrupt::Priority::Priority1)
-            .unwrap();
-        esp32c2_hal::interrupt::enable(Interrupt::BT_BB, hal::interrupt::Priority::Priority1)
+        esp32c2_hal::interrupt::enable(Interrupt::BT_MAC, hal::interrupt::Priority::Priority1)
             .unwrap();
     }
 
@@ -100,61 +98,45 @@ fn WIFI_PWR() {
 
 #[cfg(feature = "ble")]
 #[interrupt]
-fn RWBT() {
+fn LP_TIMER() {
     unsafe {
-        let intr = &*pac::INTERRUPT_CORE0::ptr();
-        intr.cpu_int_clear.write(|w| w.bits(1 << 1));
+        log::trace!("LP_TIMER interrupt");
 
-        let (fnc, arg) = crate::ble::ble_os_adapter_chip_specific::BT_INTERRUPT_FUNCTION5;
+        let (fnc, arg) = crate::ble::npl::ble_os_adapter_chip_specific::ISR_INTERRUPT_7;
 
-        trace!("interrupt RWBT {:p} {:p}", fnc, arg);
+        trace!("interrupt LP_TIMER {:p} {:p}", fnc, arg);
 
         if !fnc.is_null() {
+            trace!("interrupt LP_TIMER call");
+
             let fnc: fn(*mut binary::c_types::c_void) = core::mem::transmute(fnc);
             fnc(arg);
+            trace!("LP_TIMER done");
         }
 
-        trace!("interrupt 5 done");
+        trace!("interrupt LP_TIMER done");
     };
 }
 
 #[cfg(feature = "ble")]
 #[interrupt]
-fn RWBLE() {
+fn BT_MAC() {
     unsafe {
-        let intr = &*pac::INTERRUPT_CORE0::ptr();
-        intr.cpu_int_clear.write(|w| w.bits(1 << 1));
+        log::trace!("BT_MAC interrupt");
 
-        let (fnc, arg) = crate::ble::ble_os_adapter_chip_specific::BT_INTERRUPT_FUNCTION5;
+        let (fnc, arg) = crate::ble::npl::ble_os_adapter_chip_specific::ISR_INTERRUPT_4;
 
-        trace!("interrupt RWBLE {:p} {:p}", fnc, arg);
+        trace!("interrupt BT_MAC {:p} {:p}", fnc, arg);
 
         if !fnc.is_null() {
+            trace!("interrupt BT_MAC call");
+
             let fnc: fn(*mut binary::c_types::c_void) = core::mem::transmute(fnc);
             fnc(arg);
+            trace!("BT_MAC done");
         }
 
-        trace!("interrupt 5 done");
-    };
-}
-
-#[cfg(feature = "ble")]
-#[interrupt]
-fn BT_BB(_trap_frame: &mut TrapFrame) {
-    unsafe {
-        let intr = &*pac::INTERRUPT_CORE0::ptr();
-        intr.cpu_int_clear.write(|w| w.bits(1 << 1));
-
-        let (fnc, arg) = crate::ble::ble_os_adapter_chip_specific::BT_INTERRUPT_FUNCTION8;
-
-        trace!("interrupt BT_BB {:p} {:p}", fnc, arg);
-
-        if !fnc.is_null() {
-            let fnc: fn(*mut binary::c_types::c_void) = core::mem::transmute(fnc);
-            fnc(arg);
-        }
-
-        trace!("interrupt 8 done");
+        trace!("interrupt BT_MAC done");
     };
 }
 
