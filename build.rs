@@ -28,7 +28,7 @@ fn main() -> Result<(), String> {
             #[cfg(feature = "esp32s2")]
             if level != "2" {
                 let message = format!(
-                    "esp-wifi should be built with optimization level 1 for ESP32-S3 for now - yours is {}. 
+                    "esp-wifi should be built with optimization level 1 for ESP32-S2 for now - yours is {}. 
                     See https://github.com/esp-rs/esp-wifi",
                     level
                 )
