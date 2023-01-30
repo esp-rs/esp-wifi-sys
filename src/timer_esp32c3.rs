@@ -1,11 +1,11 @@
 use core::cell::RefCell;
 
 use critical_section::Mutex;
+use esp32c3 as pac;
 use esp32c3_hal as hal;
 use esp32c3_hal::interrupt::TrapFrame;
 use esp32c3_hal::prelude::*;
-use hal::pac;
-use hal::pac::Interrupt;
+use hal::peripherals::Interrupt;
 use hal::systimer::{Alarm, Periodic, Target};
 
 use crate::{binary, preempt::preempt::task_switch};
@@ -176,7 +176,7 @@ fn SYSTIMER_TARGET0(trap_frame: &mut TrapFrame) {
 fn SW_INTR_3(trap_frame: &mut TrapFrame) {
     unsafe {
         // clear SW_INTR_3
-        (&*esp32c3_hal::pac::SYSTEM::PTR)
+        (&*pac::SYSTEM::PTR)
             .cpu_intr_from_cpu_3
             .modify(|_, w| w.cpu_intr_from_cpu_3().clear_bit());
     }
@@ -194,7 +194,7 @@ fn SW_INTR_3(trap_frame: &mut TrapFrame) {
 
 pub fn yield_task() {
     unsafe {
-        (&*esp32c3_hal::pac::SYSTEM::PTR)
+        (&*pac::SYSTEM::PTR)
             .cpu_intr_from_cpu_3
             .modify(|_, w| w.cpu_intr_from_cpu_3().set_bit());
     }

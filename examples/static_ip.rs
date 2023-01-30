@@ -27,7 +27,7 @@ use esp_wifi::{create_network_stack_storage, network_stack_storage};
 use esp_wifi::{current_millis, initialize};
 use hal::clock::{ClockControl, CpuClock};
 use hal::Rng;
-use hal::{pac::Peripherals, prelude::*, Rtc};
+use hal::{peripherals::Peripherals, prelude::*, Rtc};
 
 #[cfg(any(feature = "esp32c3", feature = "esp32c2"))]
 use hal::system::SystemExt;
@@ -47,7 +47,7 @@ fn main() -> ! {
     init_logger(log::LevelFilter::Info);
     esp_wifi::init_heap();
 
-    let peripherals = Peripherals::take().unwrap();
+    let peripherals = Peripherals::take();
 
     #[cfg(not(feature = "esp32"))]
     let system = peripherals.SYSTEM.split();

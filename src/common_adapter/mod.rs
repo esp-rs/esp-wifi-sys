@@ -40,7 +40,7 @@ pub(crate) static mut RANDOM_GENERATOR: Option<Rng> = None;
 
 pub fn init_rng(rng: hal::Rng) {
     unsafe {
-        crate::common_adapter::RANDOM_GENERATOR = Some(rng);
+        crate::common_adapter::RANDOM_GENERATOR = Some(core::mem::transmute(rng));
     }
 }
 

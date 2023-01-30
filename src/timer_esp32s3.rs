@@ -4,7 +4,7 @@ use atomic_polyfill::{AtomicU64, Ordering};
 use critical_section::Mutex;
 use esp32s3_hal::{
     interrupt,
-    pac::{self, TIMG1},
+    peripherals::{self, TIMG1},
     prelude::*,
     timer::{Timer, Timer0},
 };
@@ -39,18 +39,38 @@ fn read_timer_value() -> u64 {
 
 pub fn setup_timer_isr(timg1_timer0: Timer<Timer0<TIMG1>>) {
     let mut timer1 = timg1_timer0;
-    interrupt::enable(pac::Interrupt::TG1_T0_LEVEL, interrupt::Priority::Priority2).unwrap();
+    interrupt::enable(
+        peripherals::Interrupt::TG1_T0_LEVEL,
+        interrupt::Priority::Priority2,
+    )
+    .unwrap();
 
     #[cfg(feature = "wifi")]
-    interrupt::enable(pac::Interrupt::WIFI_MAC, interrupt::Priority::Priority1).unwrap();
+    interrupt::enable(
+        peripherals::Interrupt::WIFI_MAC,
+        interrupt::Priority::Priority1,
+    )
+    .unwrap();
 
     #[cfg(feature = "wifi")]
-    interrupt::enable(pac::Interrupt::WIFI_BB, interrupt::Priority::Priority1).unwrap();
+    interrupt::enable(
+        peripherals::Interrupt::WIFI_BB,
+        interrupt::Priority::Priority1,
+    )
+    .unwrap();
 
     #[cfg(feature = "ble")]
     {
-        interrupt::enable(pac::Interrupt::BT_BB_NMI, interrupt::Priority::Priority1).unwrap();
-        interrupt::enable(pac::Interrupt::RWBT_NMI, interrupt::Priority::Priority1).unwrap();
+        interrupt::enable(
+            peripherals::Interrupt::BT_BB_NMI,
+            interrupt::Priority::Priority1,
+        )
+        .unwrap();
+        interrupt::enable(
+            peripherals::Interrupt::RWBT_NMI,
+            interrupt::Priority::Priority1,
+        )
+        .unwrap();
     }
 
     timer1.listen();

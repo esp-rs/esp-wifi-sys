@@ -26,7 +26,7 @@ use esp_println::{logger::init_logger, println};
 use esp_wifi::{ble::controller::BleConnector, initialize};
 use hal::{
     clock::{ClockControl, CpuClock},
-    pac::Peripherals,
+    peripherals::*,
     prelude::*,
     Rng, Rtc,
 };
@@ -44,7 +44,7 @@ fn main() -> ! {
     init_logger(log::LevelFilter::Info);
     esp_wifi::init_heap();
 
-    let peripherals = Peripherals::take().unwrap();
+    let peripherals = Peripherals::take();
 
     #[cfg(not(feature = "esp32"))]
     let system = peripherals.SYSTEM.split();

@@ -12,6 +12,8 @@ rustflags = [
 runner = "espflash flash --monitor"
 
 rustflags = [
+    #"-C", "linker=rust-lld",    
+
     "-C", "link-arg=-Tlinkall.x",
     "-C", "link-arg=-Tesp32_rom_functions.x",
 ]
@@ -20,6 +22,8 @@ rustflags = [
 runner = "espflash flash --monitor"
 
 rustflags = [
+    #"-C", "linker=rust-lld",    
+
     "-C", "link-arg=-Tlinkall.x",
     "-C", "link-arg=-Tesp32s3_rom_functions.x",
 ]
@@ -28,6 +32,8 @@ rustflags = [
 runner = "espflash flash --monitor"
 
 rustflags = [
+    #"-C", "linker=rust-lld",    
+    
     "-C", "link-arg=-Tlinkall.x",
     "-C", "link-arg=-Tesp32s2_rom_functions.x",
 

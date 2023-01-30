@@ -1,6 +1,5 @@
 use super::*;
 use crate::binary::include::esp_bt_controller_config_t;
-use esp32c3_hal as hal;
 use log::trace;
 
 pub(crate) static mut BT_INTERRUPT_FUNCTION5: (
@@ -180,7 +179,7 @@ pub(crate) fn create_ble_config() -> esp_bt_controller_config_t {
 pub(crate) unsafe extern "C" fn interrupt_on(intr_num: i32) {
     trace!("interrupt_on {}", intr_num);
 
-    (*hal::pac::INTERRUPT_CORE0::PTR)
+    (*esp32c3::INTERRUPT_CORE0::PTR)
         .cpu_int_enable
         .modify(|r, w| w.bits(r.bits() | 1 << intr_num));
 }
