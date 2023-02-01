@@ -37,8 +37,8 @@ heapless = { version = "0.7.14", default-features = false }
 riscv-target = { version = "0.1.2", optional = true }
 
 [dev-dependencies]
-bleps = { git = "https://github.com/bjoernQ/bleps", package = "bleps", rev = "06e1f7b3810b7271d1004635842b691adaea4818" }
-bleps-macros = { git = "https://github.com/bjoernQ/bleps", package = "bleps-macros", rev = "06e1f7b3810b7271d1004635842b691adaea4818" }
+bleps = { git = "https://github.com/bjoernQ/bleps", package = "bleps", rev = "5ce5ca139fe85c0120e9c2f9607d165d1c32d725" }
+bleps-macros = { git = "https://github.com/bjoernQ/bleps", package = "bleps-macros", rev = "5ce5ca139fe85c0120e9c2f9607d165d1c32d725" }
 
 [target.xtensa-esp32-none-elf.dev-dependencies]
 esp-println = { version = "0.3.1", features = [ "esp32", "log" ] }
