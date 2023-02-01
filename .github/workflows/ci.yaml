@@ -1,0 +1,76 @@
+---
+name: Continuous Integration
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - "**/README.md"
+  pull_request:
+    paths-ignore:
+      - "**/README.md"
+
+env:
+  CARGO_TERM_COLOR: always
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  example-checks:
+    name: Check examples
+    runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: false
+      matrix:
+        action:
+          - arg: --example ble --release --target riscv32imc-unknown-none-elf --features "esp32c3,ble"
+            toolchain: nightly
+          - arg: --example dhcp --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc,wifi"
+            toolchain: nightly
+          - arg: --example static_ip --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc,wifi"
+            toolchain: nightly
+          - arg: --example coex --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc,wifi,ble"
+            toolchain: nightly
+          - arg: --example ble --release --target xtensa-esp32-none-elf --features "esp32,ble"
+            toolchain: esp
+          - arg: --example dhcp --release --target xtensa-esp32-none-elf --features "esp32,embedded-svc,wifi"
+            toolchain: esp
+          - arg: --example static_ip --release --target xtensa-esp32-none-elf --features "esp32,embedded-svc,wifi"
+            toolchain: esp
+          - arg: --example ble --release --target xtensa-esp32s3-none-elf --features "esp32s3,ble"
+            toolchain: esp
+          - arg: --example dhcp --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi"
+            toolchain: esp
+          - arg: --example static_ip --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi"
+            toolchain: esp
+          - arg: --example coex --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi,ble"
+            toolchain: esp
+          - arg: --example dhcp --release --target xtensa-esp32s2-none-elf --features "esp32s2,embedded-svc,wifi"
+            toolchain: esp
+            profile: CARGO_PROFILE_RELEASE_OPT_LEVEL=2
+          - arg: --example static_ip --release --target xtensa-esp32s2-none-elf --features "esp32s2,embedded-svc,wifi"
+            toolchain: esp
+            profile: CARGO_PROFILE_RELEASE_OPT_LEVEL=2
+          - arg: --example ble --release --target riscv32imc-unknown-none-elf --features "esp32c2,ble"
+            toolchain: nightly
+          - arg: --example dhcp --release --target riscv32imc-unknown-none-elf --features "esp32c2,embedded-svc,wifi"
+            toolchain: nightly
+          - arg: --example static_ip --release --target riscv32imc-unknown-none-elf --features "esp32c2,embedded-svc,wifi"
+            toolchain: nightly
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Setup Rust nightly toolchain
+        if: ${{ matrix.action.toolchain == 'nightly' }}
+        uses: dtolnay/rust-toolchain@nightly
+      - name: Setup Rust esp toolchain
+        if: ${{ matrix.action.toolchain == 'esp' }}
+        uses: esp-rs/xtensa-toolchain@v1.5
+        with:
+          default: true
+          ldproxy: false
+      - name: Enable caching
+        uses: Swatinem/rust-cache@v2
+      - name: Cargo command
+        run: cargo build ${{ matrix.action.arg }}
