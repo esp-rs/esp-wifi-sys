@@ -34,7 +34,8 @@ https://github.com/esp-rs/esp-wireless-drivers-3rdparty/ (commit f4caebff200e8f6
 
 - ble
     - starts Bluetooth advertising
-    - offers one service with two characteristics (one is read/write, one is write only)
+    - offers one service with three characteristics (one is read/write, one is write only, one is read/write/notify)
+    - pressing the boot-button on a dev-board will send a notification if it is subscribed
     - this uses a toy level BLE stack - might not work with every BLE central device (tested with Android and Windows Bluetooth LE Explorer)
 
 - coex (ESP32-C3 only)
