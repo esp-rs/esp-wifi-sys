@@ -14,6 +14,10 @@ on:
 env:
   CARGO_TERM_COLOR: always
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  SSID: SSID
+  PASSWORD: PASSWORD
+  STATIC_IP: STATIC_IP
+  GATEWAY_IP: GATEWAY_IP
 
 jobs:
   example-checks:
