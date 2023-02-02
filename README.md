@@ -57,8 +57,8 @@ https://github.com/esp-rs/esp-wireless-drivers-3rdparty/ (commit f4caebff200e8f6
 | `cargo "+esp" run --example dhcp --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi"`             | ESP32-S3|
 | `cargo "+esp" run --example static_ip --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi"`        | ESP32-S3|
 | `cargo "+esp" run --example coex --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi,ble"`        | ESP32-S3|
-| `CARGO_PROFILE_RELEASE_OPT_LEVEL=2 cargo "+esp" run --example dhcp --release --target xtensa-esp32s2-none-elf --features "esp32s2,embedded-svc,wifi"`             | ESP32-S2|
-| `CARGO_PROFILE_RELEASE_OPT_LEVEL=2 cargo "+esp" run --example static_ip --release --target xtensa-esp32s2-none-elf --features "esp32s2,embedded-svc,wifi"`        | ESP32-S2|
+| `cargo "+esp" run --example dhcp --release --target xtensa-esp32s2-none-elf --features "esp32s2,embedded-svc,wifi"`             | ESP32-S2|
+| `cargo "+esp" run --example static_ip --release --target xtensa-esp32s2-none-elf --features "esp32s2,embedded-svc,wifi"`        | ESP32-S2|
 | `cargo "+nightly" run --example ble --release --target riscv32imc-unknown-none-elf --features "esp32c2,ble"`                    | ESP32-C2|
 | `cargo "+nightly" run --example dhcp --release --target riscv32imc-unknown-none-elf --features "esp32c2,embedded-svc,wifi"`     | ESP32-C2|
 | `cargo "+nightly" run --example static_ip --release --target riscv32imc-unknown-none-elf --features "esp32c2,embedded-svc,wifi"`| ESP32-C2|
@@ -79,14 +79,16 @@ Additionally you can specify these features
 
 It is necessary to build with optimization level 2 or 3 since otherwise it might not even be able to connect or advertise.
 
-On ESP32-S2 you need to use optimization level 2 for now.
-
 To make it work also for your debug builds add this to your `Cargo.toml`
 
 ```toml
 [profile.dev.package.esp-wifi]
 opt-level = 3
 ```
+
+## LTO
+
+Link time optimization is not yet recommended for use, please ensure `lto = 'off'` is in your `Cargo.toml` for both release and debug profiles.
 
 ## Using Serial-JTAG
 
