@@ -4,7 +4,7 @@ use embedded_io::blocking::{Read, Write};
 use embedded_io::Io;
 
 use embedded_svc::ipv4;
-use embedded_svc::wifi::{AccessPointInfo, AuthMethod, SecondaryChannel};
+use embedded_svc::wifi::AccessPointInfo;
 use enumset::EnumSet;
 use smoltcp::iface::{Interface, SocketHandle};
 use smoltcp::socket::{Dhcpv4Socket, TcpSocket};
@@ -18,7 +18,6 @@ use crate::wifi::WifiDevice;
 /// An implementation of `embedded-svc`'s wifi trait.
 pub struct Wifi<'a> {
     network_interface: Interface<'a, WifiDevice>,
-    current_config: embedded_svc::wifi::Configuration,
     pub(crate) network_config: ipv4::Configuration,
     pub(crate) ip_info: Option<ipv4::IpInfo>,
     dhcp_socket_handle: Option<SocketHandle>,
@@ -38,7 +37,6 @@ impl<'a> Wifi<'a> {
 
         Wifi {
             network_interface,
-            current_config: embedded_svc::wifi::Configuration::default(),
             network_config: ipv4::Configuration::Client(ipv4::ClientConfiguration::DHCP(
                 ipv4::DHCPClientSettings {
                     //FIXME: smoltcp currently doesn't have a way of giving a hostname through DHCP
@@ -56,7 +54,7 @@ impl<'a> Wifi<'a> {
     }
 
     /// Convenience function to poll the DHCP socket.
-    pub fn poll_dhcp(&mut self) -> Result<(), WifiError> {
+    pub fn poll_dhcp(&mut self) -> Result<(), WifiStackError> {
         if let Some(dhcp_handle) = self.dhcp_socket_handle {
             let dhcp_socket = self
                 .network_interface
@@ -119,219 +117,69 @@ impl<'a> Wifi<'a> {
 }
 
 #[derive(Debug, Copy, Clone)]
-pub enum WifiError {
+pub enum WifiStackError {
     Unknown(i32),
     SmolTcpError(smoltcp::Error),
     InitializationError(crate::InitializationError),
+    DeviceError(crate::wifi::WifiError),
     MissingIp,
-    Disconnected,
 }
 
-impl From<smoltcp::Error> for WifiError {
+impl From<smoltcp::Error> for WifiStackError {
     fn from(error: smoltcp::Error) -> Self {
-        WifiError::SmolTcpError(error)
+        WifiStackError::SmolTcpError(error)
     }
 }
 
-impl Display for WifiError {
+impl Display for WifiStackError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{:?}", self)
     }
 }
 
-impl<'a> embedded_svc::wifi::Wifi for Wifi<'a> {
-    type Error = WifiError;
+impl embedded_svc::wifi::Wifi for Wifi<'_> {
+    type Error = crate::wifi::WifiError;
 
-    /// This currently only supports the `Client` capability.
     fn get_capabilities(&self) -> Result<EnumSet<embedded_svc::wifi::Capability>, Self::Error> {
-        // for now we only support STA mode
-        let mut caps = EnumSet::empty();
-        caps.insert(embedded_svc::wifi::Capability::Client);
-        Ok(caps)
+        self.network_interface.device().get_capabilities()
     }
 
-    /// A blocking wifi network scan.
-    fn scan_n<const N: usize>(
-        &mut self,
-    ) -> Result<(heapless::Vec<AccessPointInfo, N>, usize), Self::Error> {
-        crate::wifi::wifi_start_scan();
-
-        let mut scanned = heapless::Vec::<AccessPointInfo, N>::new();
-        let mut bss_total: u16 = N as u16;
-
-        unsafe {
-            crate::binary::include::esp_wifi_scan_get_ap_num(&mut bss_total);
-            if bss_total as usize > N {
-                bss_total = N as u16;
-            }
-
-            let mut records = [crate::binary::include::wifi_ap_record_t {
-                bssid: [0u8; 6],
-                ssid: [0u8; 33],
-                primary: 0u8,
-                second: 0u32,
-                rssi: 0i8,
-                authmode: 0u32,
-                pairwise_cipher: 0u32,
-                group_cipher: 0u32,
-                ant: 0u32,
-                _bitfield_align_1: [0u32; 0],
-                _bitfield_1: crate::binary::include::__BindgenBitfieldUnit::new([0u8; 4usize]),
-                country: crate::binary::include::wifi_country_t {
-                    cc: [0; 3],
-                    schan: 0u8,
-                    nchan: 0u8,
-                    max_tx_power: 0i8,
-                    policy: 0u32,
-                },
-                he_ap: crate::binary::include::wifi_he_ap_info_t {
-                    _bitfield_align_1: [0u8; 0],
-                    _bitfield_1: crate::binary::include::wifi_he_ap_info_t::new_bitfield_1(0, 0, 0),
-                    bssid_index: 0,
-                },
-            }; N];
-
-            crate::binary::include::esp_wifi_scan_get_ap_records(
-                &mut bss_total,
-                &mut records as *mut crate::binary::include::wifi_ap_record_t,
-            );
-
-            for i in 0..bss_total {
-                let record = records[i as usize];
-                let ssid_strbuf = crate::compat::common::StrBuf::from(&record.ssid as *const u8);
-
-                let auth_method = match record.authmode {
-                    crate::binary::include::wifi_auth_mode_t_WIFI_AUTH_OPEN => AuthMethod::None,
-                    crate::binary::include::wifi_auth_mode_t_WIFI_AUTH_WEP => AuthMethod::WEP,
-                    crate::binary::include::wifi_auth_mode_t_WIFI_AUTH_WPA_PSK => AuthMethod::WPA,
-                    crate::binary::include::wifi_auth_mode_t_WIFI_AUTH_WPA2_PSK => {
-                        AuthMethod::WPA2Personal
-                    }
-                    crate::binary::include::wifi_auth_mode_t_WIFI_AUTH_WPA_WPA2_PSK => {
-                        AuthMethod::WPAWPA2Personal
-                    }
-                    crate::binary::include::wifi_auth_mode_t_WIFI_AUTH_WPA2_ENTERPRISE => {
-                        AuthMethod::WPA2Enterprise
-                    }
-                    crate::binary::include::wifi_auth_mode_t_WIFI_AUTH_WPA3_PSK => {
-                        AuthMethod::WPA3Personal
-                    }
-                    crate::binary::include::wifi_auth_mode_t_WIFI_AUTH_WPA2_WPA3_PSK => {
-                        AuthMethod::WPA2WPA3Personal
-                    }
-                    crate::binary::include::wifi_auth_mode_t_WIFI_AUTH_WAPI_PSK => {
-                        AuthMethod::WAPIPersonal
-                    }
-                    _ => panic!(),
-                };
-
-                let mut ssid = heapless::String::<32>::new();
-                ssid.push_str(ssid_strbuf.as_str_ref()).ok();
-
-                let ap_info = AccessPointInfo {
-                    ssid: ssid,
-                    bssid: record.bssid,
-                    channel: record.primary,
-                    secondary_channel: match record.second {
-                        crate::binary::include::wifi_second_chan_t_WIFI_SECOND_CHAN_NONE => {
-                            SecondaryChannel::None
-                        }
-                        crate::binary::include::wifi_second_chan_t_WIFI_SECOND_CHAN_ABOVE => {
-                            SecondaryChannel::Above
-                        }
-                        crate::binary::include::wifi_second_chan_t_WIFI_SECOND_CHAN_BELOW => {
-                            SecondaryChannel::Below
-                        }
-                        _ => panic!(),
-                    },
-                    signal_strength: record.rssi,
-                    protocols: EnumSet::empty(), // TODO
-                    auth_method: auth_method,
-                };
-
-                scanned.push(ap_info).ok();
-            }
-        }
-
-        Ok((scanned, bss_total as usize))
-    }
-
-    /// Get the currently used configuration.
     fn get_configuration(&self) -> Result<embedded_svc::wifi::Configuration, Self::Error> {
-        Ok(self.current_config.clone())
+        self.network_interface.device().get_configuration()
     }
 
-    /// Set the configuration, you need to use Wifi::connect() for connecting
-    /// Currently only `ssid` and `password` is used. Trying anything but `Configuration::Client` will result in a panic!
-    fn set_configuration(
-        &mut self,
-        conf: &embedded_svc::wifi::Configuration,
-    ) -> Result<(), Self::Error> {
-        self.current_config = conf.clone();
-
-        match conf {
-            embedded_svc::wifi::Configuration::None => panic!(),
-            embedded_svc::wifi::Configuration::Client(_) => {}
-            embedded_svc::wifi::Configuration::AccessPoint(_) => panic!(),
-            embedded_svc::wifi::Configuration::Mixed(_, _) => panic!(),
-        };
-
-        Ok(())
+    fn set_configuration(&mut self, conf: &embedded_svc::wifi::Configuration) -> Result<(), Self::Error> {
+        self.network_interface.device_mut().set_configuration(conf)
     }
 
     fn start(&mut self) -> Result<(), Self::Error> {
-        let res = crate::wifi::wifi_start();
-        if res != 0 {
-            return Err(WifiError::InitializationError(
-                crate::InitializationError::General(res),
-            ));
-        }
-        Ok(())
+        self.network_interface.device_mut().start()
     }
 
     fn stop(&mut self) -> Result<(), Self::Error> {
-        let res = crate::wifi::wifi_stop();
-        if res != 0 {
-            return Err(WifiError::InitializationError(
-                crate::InitializationError::General(res),
-            ));
-        }
-        Ok(())
+        self.network_interface.device_mut().stop()
     }
 
     fn connect(&mut self) -> Result<(), Self::Error> {
-        if let embedded_svc::wifi::Configuration::Client(config) = &self.current_config {
-            let res = crate::wifi::wifi_connect(&config.ssid, &config.password);
-            if res != 0 {
-                return Err(WifiError::Unknown(res));
-            }
-        } else {
-            panic!();
-        }
-        Ok(())
+        self.network_interface.device_mut().connect()
     }
 
     fn disconnect(&mut self) -> Result<(), Self::Error> {
-        //FIXME: Is there a way to disconnect from Wifi?
-        Ok(())
+        self.network_interface.device_mut().disconnect()
     }
 
     fn is_started(&self) -> Result<bool, Self::Error> {
-        match crate::wifi::get_wifi_state() {
-            crate::wifi::WifiState::StaStart => Ok(true),
-            crate::wifi::WifiState::StaConnected => Ok(true),
-            //FIXME: Should any of the enum values trigger an error instead of returning false?
-            _ => Ok(false),
-        }
+        self.network_interface.device().is_started()
     }
 
     fn is_connected(&self) -> Result<bool, Self::Error> {
-        match crate::wifi::get_wifi_state() {
-            crate::wifi::WifiState::StaConnected => Ok(true),
-            crate::wifi::WifiState::StaDisconnected => Err(WifiError::Disconnected),
-            //FIXME: Should any other enum value trigger an error instead of returning false?
-            _ => Ok(false),
-        }
+        self.network_interface.device().is_connected()
+    }
+
+    fn scan_n<const N: usize>(
+        &mut self,
+    ) -> Result<(heapless::Vec<AccessPointInfo, N>, usize), Self::Error> {
+        self.network_interface.device_mut().scan_n::<N>()
     }
 }
 
@@ -369,7 +217,7 @@ impl<'a> Network<'a> {
         f(&mut interface)
     }
 
-    pub fn poll_dhcp(&self) -> Result<(), WifiError> {
+    pub fn poll_dhcp(&self) -> Result<(), WifiStackError> {
         self.with_interface(|i| i.poll_dhcp())
     }
 
@@ -443,7 +291,7 @@ impl<'a> Network<'a> {
 }
 
 impl<'a> ipv4::Interface for Network<'a> {
-    type Error = WifiError;
+    type Error = WifiStackError;
 
     fn get_iface_configuration(&self) -> Result<ipv4::Configuration, Self::Error> {
         Ok(self.interface.borrow().network_config.clone())
@@ -459,7 +307,7 @@ impl<'a> ipv4::Interface for Network<'a> {
     }
 
     fn get_ip_info(&self) -> Result<ipv4::IpInfo, Self::Error> {
-        self.interface.borrow().ip_info.ok_or(WifiError::MissingIp)
+        self.interface.borrow().ip_info.ok_or(WifiStackError::MissingIp)
     }
 }
 

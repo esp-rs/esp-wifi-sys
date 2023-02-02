@@ -27,8 +27,7 @@ use embedded_svc::wifi::{AccessPointInfo, ClientConfiguration, Configuration, Wi
 use esp_backtrace as _;
 use esp_println::{logger::init_logger, print, println};
 use esp_wifi::initialize;
-use esp_wifi::wifi::utils::create_network_interface;
-use esp_wifi::wifi_interface::WifiError;
+use esp_wifi::wifi::{WifiError, utils::create_network_interface};
 use esp_wifi::{create_network_stack_storage, network_stack_storage};
 use hal::{
     clock::{ClockControl, CpuClock},
