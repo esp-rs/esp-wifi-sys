@@ -48,7 +48,7 @@ fn configure_linker_for_chip(out: &PathBuf, chip: &str) -> Result<()> {
     copy_file(
         out,
         &format!("ld/{chip}/rom_functions.x"),
-        &format!("{chip}_rom_functions.x"),
+        "rom_functions.x",
     )
 }
 
