@@ -2,6 +2,7 @@
 members = [
     "esp-wifi",
     "esp-wifi-sys",
+    "xtask",
 ]
 resolver = "2"
 
