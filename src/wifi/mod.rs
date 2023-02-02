@@ -503,11 +503,7 @@ pub fn wifi_init() -> Result<(), WifiError> {
 
         #[cfg(coex)]
         {
-            let res = coex_init();
-            if res != 0 {
-                log::error!("coex_init failed");
-                return res;
-            }
+            esp_wifi_result!(coex_init())?;
         }
 
         esp_wifi_result!(esp_wifi_init_internal(&G_CONFIG))?;

@@ -27,6 +27,7 @@ use hal::*;
 use fugit::MegahertzU32;
 use hal::clock::Clocks;
 use linked_list_allocator::Heap;
+#[cfg(feature = "wifi")]
 use wifi::WifiError;
 
 use crate::common_adapter::init_rng;
@@ -155,10 +156,12 @@ pub fn initialize(
 #[derive(Debug, Clone, Copy)]
 pub enum InitializationError {
     General(i32),
+    #[cfg(feature = "wifi")]
     WifiError(WifiError),
     WrongClockConfig,
 }
 
+#[cfg(feature = "wifi")]
 impl From<WifiError> for InitializationError {
     fn from(value: WifiError) -> Self {
         InitializationError::WifiError(value)
