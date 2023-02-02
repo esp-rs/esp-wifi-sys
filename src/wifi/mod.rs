@@ -888,6 +888,11 @@ impl embedded_svc::wifi::Wifi for WifiDevice {
                     max_tx_power: 0i8,
                     policy: 0u32,
                 },
+                he_ap: crate::binary::include::wifi_he_ap_info_t {
+                    _bitfield_align_1: [0u8; 0],
+                    _bitfield_1: crate::binary::include::wifi_he_ap_info_t::new_bitfield_1(0, 0, 0),
+                    bssid_index: 0,
+                },
             }; N];
 
             crate::binary::include::esp_wifi_scan_get_ap_records(
