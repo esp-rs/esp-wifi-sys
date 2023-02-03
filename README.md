@@ -1,12 +1,8 @@
-# Wifi and Bluetooth LE on ESP32-C3, ESP32-C2, ESP32, ESP32-S3 and ESP32-S2 (on bare-metal Rust)
+# esp-wifi
 
-## About
+This is experimental and a work-in-progress! You are welcome to experiment with it and contribute but probably shouldn't use this for something real yet.
 
-This is experimental and work-in-progress! You are welcome to experiment with it and contribute but probably shouldn't use this for something real yet.
-
-WiFi / BTLE coexistence is implemented but currently only works (to some extend) on ESP32-C3 and ESP32-S3. In general COEX shouldn't be used currently.
-
-On ESP32-S3 you currently need to use opt-level 1.
+Wi-Fi/BTLE coexistence is implemented but currently only works (to some extent) on ESP32-C3 and ESP32-S3. In general COEX shouldn't be used currently.
 
 Minimum supported Rust compiler version: 1.65.0.0
 
@@ -20,59 +16,77 @@ https://github.com/esp-rs/esp-wireless-drivers-3rdparty/ (commit f4caebff200e8f6
 
 ## Examples
 
-- dhcp
-  - set SSID and PASSWORD env variable
-  - gets an ip address via DHCP
-  - performs an HTTP get request to some "random" server
+### dhcp
 
-- static_ip
-  - set SSID and PASSWORD env variable
-  - set STATIC_IP and GATEWAY_IP env variable (e.g. "192.168.2.191" / "192.168.2.1")
-  - might be necessary to configure your WiFi access point accordingly
-  - uses the given static IP
-  - responds with some HTML content when connecting to port 8080
+- set SSID and PASSWORD env variable
+- gets an ip address via DHCP
+- performs an HTTP get request to some "random" server
 
-- ble
-    - starts Bluetooth advertising
-    - offers one service with three characteristics (one is read/write, one is write only, one is read/write/notify)
-    - pressing the boot-button on a dev-board will send a notification if it is subscribed
-    - this uses a toy level BLE stack - might not work with every BLE central device (tested with Android and Windows Bluetooth LE Explorer)
+|   Chip   | Command                                                                                                                   |
+| :------: | ------------------------------------------------------------------------------------------------------------------------- |
+|  ESP32   | `cargo +esp run --example dhcp --release --target xtensa-esp32-none-elf --features "esp32,embedded-svc,wifi"`             |
+| ESP32-C2 | `cargo +nightly run --example dhcp --release --target riscv32imc-unknown-none-elf --features "esp32c2,embedded-svc,wifi"` |
+| ESP32-C3 | `cargo +nightly run --example dhcp --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc,wifi"` |
+| ESP32-S2 | `cargo +esp run --example dhcp --release --target xtensa-esp32s2-none-elf --features "esp32s2,embedded-svc,wifi"`         |
+| ESP32-S3 | `cargo +esp run --example dhcp --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi"`         |
 
-- coex (ESP32-C3 only)
-  - set SSID and PASSWORD env variable
-  - gets an ip address via DHCP
-  - performs an HTTP get request to some "random" server
-  - does BLE advertising
-  - coex support is still somewhat flaky
+### static_ip
 
-| Command                                                                                                                         | Chip    |
-| ------------------------------------------------------------------------------------------------------------------------------- | ------- |
-| `cargo "+nightly" run --example ble --release --target riscv32imc-unknown-none-elf --features "esp32c3,ble"`                    | ESP32-C3|
-| `cargo "+nightly" run --example dhcp --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc,wifi"`     | ESP32-C3|
-| `cargo "+nightly" run --example static_ip --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc,wifi"`| ESP32-C3|
-| `cargo "+nightly" run --example coex --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc,wifi,ble"` | ESP32-C3|
-| `cargo "+esp" run --example ble --release --target xtensa-esp32-none-elf --features "esp32,ble"`                                | ESP32   |
-| `cargo "+esp" run --example dhcp --release --target xtensa-esp32-none-elf --features "esp32,embedded-svc,wifi"`                 | ESP32   |
-| `cargo "+esp" run --example static_ip --release --target xtensa-esp32-none-elf --features "esp32,embedded-svc,wifi"`            | ESP32   |
-| `cargo "+esp" run --example ble --release --target xtensa-esp32s3-none-elf --features "esp32s3,ble"`                                | ESP32-S3 |
-| `cargo "+esp" run --example dhcp --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi"`             | ESP32-S3|
-| `cargo "+esp" run --example static_ip --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi"`        | ESP32-S3|
-| `cargo "+esp" run --example coex --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi,ble"`        | ESP32-S3|
-| `cargo "+esp" run --example dhcp --release --target xtensa-esp32s2-none-elf --features "esp32s2,embedded-svc,wifi"`             | ESP32-S2|
-| `cargo "+esp" run --example static_ip --release --target xtensa-esp32s2-none-elf --features "esp32s2,embedded-svc,wifi"`        | ESP32-S2|
-| `CARGO_PROFILE_RELEASE_LTO=false cargo "+nightly" run --example ble --release --target riscv32imc-unknown-none-elf --features "esp32c2,ble"`                    | ESP32-C2|
-| `cargo "+nightly" run --example dhcp --release --target riscv32imc-unknown-none-elf --features "esp32c2,embedded-svc,wifi"`     | ESP32-C2|
-| `cargo "+nightly" run --example static_ip --release --target riscv32imc-unknown-none-elf --features "esp32c2,embedded-svc,wifi"`| ESP32-C2|
+- set SSID and PASSWORD env variable
+- set STATIC_IP and GATEWAY_IP env variable (e.g. "192.168.2.191" / "192.168.2.1")
+- might be necessary to configure your WiFi access point accordingly
+- uses the given static IP
+- responds with some HTML content when connecting to port 8080
 
-Additionally you can specify these features
-|Feature|Meaning|
-|---|---|
-|wifi_logs|logs the WiFi logs from the driver at log level info|
-|dump_packets|dumps some packet info at log level info|
-|utils|Provide utilities for smoltcp initialization, this is a default feature|
-|embedded-svc|Provides a (very limited) implementation of the `embedded-svc` WiFi trait, includes `utils` feature|
-|ble|Enable BLE support|
-|wifi|Enable WiFi support|
+|   Chip   | Command                                                                                                                        |
+| :------: | ------------------------------------------------------------------------------------------------------------------------------ |
+|  ESP32   | `cargo +esp run --example static_ip --release --target xtensa-esp32-none-elf --features "esp32,embedded-svc,wifi"`             |
+| ESP32-C2 | `cargo +nightly run --example static_ip --release --target riscv32imc-unknown-none-elf --features "esp32c2,embedded-svc,wifi"` |
+| ESP32-C3 | `cargo +nightly run --example static_ip --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc,wifi"` |
+| ESP32-S2 | `cargo +esp run --example static_ip --release --target xtensa-esp32s2-none-elf --features "esp32s2,embedded-svc,wifi"`         |
+| ESP32-S3 | `cargo +esp run --example static_ip --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi"`         |
+
+### ble
+
+- starts Bluetooth advertising
+- offers one service with three characteristics (one is read/write, one is write only, one is read/write/notify)
+- pressing the boot-button on a dev-board will send a notification if it is subscribed
+- this uses a toy level BLE stack - might not work with every BLE central device (tested with Android and Windows Bluetooth LE Explorer)
+
+|   Chip   | Command                                                                                                                                    |
+| :------: | ------------------------------------------------------------------------------------------------------------------------------------------ |
+|  ESP32   | `cargo +esp run --example ble --release --target xtensa-esp32-none-elf --features "esp32,ble"`                                             |
+| ESP32-C2 | `CARGO_PROFILE_RELEASE_LTO=false cargo +nightly run --example ble --release --target riscv32imc-unknown-none-elf --features "esp32c2,ble"` |
+| ESP32-C3 | `cargo +nightly run --example ble --release --target riscv32imc-unknown-none-elf --features "esp32c3,ble"`                                 |
+| ESP32-S3 | `cargo +esp run --example ble --release --target xtensa-esp32s3-none-elf --features "esp32s3,ble"`                                         |
+
+**NOTE:** Not currently available for the ESP32-S2
+
+### coex
+
+- set SSID and PASSWORD env variable
+- gets an ip address via DHCP
+- performs an HTTP get request to some "random" server
+- does BLE advertising
+- coex support is still somewhat flaky
+
+|   Chip   | Command                                                                                                                       |
+| :------: | ----------------------------------------------------------------------------------------------------------------------------- |
+| ESP32-C3 | `cargo +nightly run --example coex --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc,wifi,ble"` |
+| ESP32-S3 | `cargo +esp run --example coex --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi,ble"`         |
+
+**NOTE:** Not currently available for the ESP32, ESP32-C2, or ESP32-S2
+
+## Features
+
+| Feature      | Meaning                                                                                             |
+| ------------ | --------------------------------------------------------------------------------------------------- |
+| wifi_logs    | logs the WiFi logs from the driver at log level info                                                |
+| dump_packets | dumps some packet info at log level info                                                            |
+| utils        | Provide utilities for smoltcp initialization, this is a default feature                             |
+| embedded-svc | Provides a (very limited) implementation of the `embedded-svc` WiFi trait, includes `utils` feature |
+| ble          | Enable BLE support                                                                                  |
+| wifi         | Enable WiFi support                                                                                 |
 
 ## Important
 
@@ -89,17 +103,13 @@ opt-level = 3
 
 ## LTO
 
-Link time optimization is not yet recommended for use, please ensure `lto = 'off'` is in your `Cargo.toml` for both release and debug profiles.
+Link time optimization is not yet recommended for use, please ensure `lto = "off"` is in your `Cargo.toml` for both release and debug profiles.
 
 ## Using Serial-JTAG
 
 On ESP32-C3 / ESP32-S3 when using Serial-JTAG you have to activate the feature `phy_enable_usb`.
 
 Don't use this feature if your are _not_ using Serial-JTAG since it might reduce WiFi performance.
-
-## Running examples on ESP32-C2
-
-To run the examples on ESP32-C2 you need to modify Cargo-toml, section `target.riscv32imc-unknown-none-elf.dev-dependencies`
 
 ## What works?
 
@@ -132,14 +142,9 @@ If something doesn't work as expected try a different opt-level.
 
 - `src/timer-espXXX.rs`: systimer code used for timing and task switching
 - `src/preemt/`: a bare minimum RISCV and Xtensa round-robin task scheduler
-- `src/binary/`: generated bindings to the WiFi driver (per chip)
 - `src/compat/`: code needed to emulate enough of an (RT)OS to use the driver
   - `common.rs`: basics like semaphores and recursive mutexes
   - `timer_compat.rs`: code to emulate timer related functionality
-- `headers`: headers found in the WiFi driver archive (bindings are generated from these)
-- `libs/espXXX`: static libraries found in the WiFi driver archive (these get linked into the binary)
-- `mkbindings.bat`: generate the bindings / just calls `bindgen`
-- `ld/espXXX/rom_functions.x`: the WiFi driver uses some of these so it needs to get linked
 - `examples/*.rs`: examples
 
 ## Missing / To be done

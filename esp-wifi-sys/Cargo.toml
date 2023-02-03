@@ -1,0 +1,19 @@
+[package]
+name    = "esp-wifi-sys"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+
+[build-dependencies]
+anyhow = "1.0.68"
+
+[features]
+default = []
+
+# Exactly *one* chip MUST be selected via its feature:
+esp32   = []
+esp32c2 = []
+esp32c3 = []
+esp32s2 = []
+esp32s3 = []

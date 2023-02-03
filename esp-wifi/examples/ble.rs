@@ -3,6 +3,18 @@
 #![feature(c_variadic)]
 #![feature(const_mut_refs)]
 
+use bleps::{
+    ad_structure::{
+        create_advertising_data,
+        AdStructure,
+        BR_EDR_NOT_SUPPORTED,
+        LE_GENERAL_DISCOVERABLE,
+    },
+    attribute_server::{AttributeServer, NotificationData, WorkResult},
+    Ble,
+    HciConnector,
+};
+use bleps_macros::gatt;
 #[cfg(feature = "esp32")]
 use esp32_hal as hal;
 #[cfg(feature = "esp32c2")]
@@ -11,29 +23,19 @@ use esp32c2_hal as hal;
 use esp32c3_hal as hal;
 #[cfg(feature = "esp32s3")]
 use esp32s3_hal as hal;
-
-use bleps::{
-    ad_structure::{
-        create_advertising_data, AdStructure, BR_EDR_NOT_SUPPORTED, LE_GENERAL_DISCOVERABLE,
-    },
-    attribute_server::{AttributeServer, NotificationData, WorkResult},
-    Ble, HciConnector,
-};
-use bleps_macros::gatt;
-
 use esp_backtrace as _;
 use esp_println::{logger::init_logger, println};
 use esp_wifi::{ble::controller::BleConnector, initialize};
+#[cfg(any(feature = "esp32", feature = "esp32s3"))]
+use hal::system::SystemExt;
 use hal::{
     clock::{ClockControl, CpuClock},
     peripherals::*,
     prelude::*,
-    Rng, Rtc, IO,
+    Rng,
+    Rtc,
+    IO,
 };
-
-#[cfg(any(feature = "esp32", feature = "esp32s3"))]
-use hal::system::SystemExt;
-
 #[cfg(any(feature = "esp32c3", feature = "esp32c2"))]
 use riscv_rt::entry;
 #[cfg(any(feature = "esp32", feature = "esp32s3"))]

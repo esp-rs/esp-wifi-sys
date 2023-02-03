@@ -1,0 +1,116 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  # Examples:
+  SSID: ""
+  PASSWORD: ""
+  STATIC_IP: ""
+  GATEWAY_IP: ""
+
+# Cancel any currently running workflows from the same PR, branch, or
+# tag when a new workflow is triggered.
+#
+# https://stackoverflow.com/a/66336834
+concurrency:
+  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+
+jobs:
+  esp32:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: esp-rs/xtensa-toolchain@v1.5
+        with:
+          default: true
+          buildtargets: esp32
+          ldproxy: false
+      - uses: Swatinem/rust-cache@v1
+
+      - name: build (ble)
+        run: cd esp-wifi/ && cargo build --release --example=ble --target=xtensa-esp32-none-elf --features=esp32,ble
+      - name: build (dhcp)
+        run: cd esp-wifi/ && cargo build --release --example=dhcp --target=xtensa-esp32-none-elf --features=esp32,embedded-svc,wifi
+      - name: build (static_ip)
+        run: cd esp-wifi/ && cargo build --release --example=static_ip --target=xtensa-esp32-none-elf --features=esp32,embedded-svc,wifi
+
+  esp32c2:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dtolnay/rust-toolchain@nightly
+        with:
+          targets: riscv32imc-unknown-none-elf
+          components: rust-src
+      - uses: Swatinem/rust-cache@v1
+
+      - name: build (ble)
+        run: cd esp-wifi/ && cargo build --release --example=ble --target=riscv32imc-unknown-none-elf --features=esp32c2,ble
+      - name: build (dhcp)
+        run: cd esp-wifi/ && cargo build --release --example=dhcp --target=riscv32imc-unknown-none-elf --features=esp32c2,embedded-svc,wifi
+      - name: build (static_ip)
+        run: cd esp-wifi/ && cargo build --release --example=static_ip --target=riscv32imc-unknown-none-elf --features=esp32c2,embedded-svc,wifi
+
+  esp32c3:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dtolnay/rust-toolchain@nightly
+        with:
+          targets: riscv32imc-unknown-none-elf
+          components: rust-src
+      - uses: Swatinem/rust-cache@v1
+
+      - name: build (ble)
+        run: cd esp-wifi/ && cargo build --release --example=ble --target=riscv32imc-unknown-none-elf --features=esp32c3,ble
+      - name: build (coex)
+        run: cd esp-wifi/ && cargo build --release --example=coex --target=riscv32imc-unknown-none-elf --features=esp32c3,embedded-svc,wifi,ble
+      - name: build (dhcp)
+        run: cd esp-wifi/ && cargo build --release --example=dhcp --target=riscv32imc-unknown-none-elf --features=esp32c3,embedded-svc,wifi
+      - name: build (static_ip)
+        run: cd esp-wifi/ && cargo build --release --example=static_ip --target=riscv32imc-unknown-none-elf --features=esp32c3,embedded-svc,wifi
+
+  esp32s2:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: esp-rs/xtensa-toolchain@v1.5
+        with:
+          default: true
+          buildtargets: esp32s2
+          ldproxy: false
+      - uses: Swatinem/rust-cache@v1
+
+      - name: build (dhcp)
+        run: cd esp-wifi/ && cargo build --release --example=dhcp --target=xtensa-esp32s2-none-elf --features=esp32s2,embedded-svc,wifi
+      - name: build (static_ip)
+        run: cd esp-wifi/ && cargo build --release --example=static_ip --target=xtensa-esp32s2-none-elf --features=esp32s2,embedded-svc,wifi
+
+  esp32s3:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: esp-rs/xtensa-toolchain@v1.5
+        with:
+          default: true
+          buildtargets: esp32s3
+          ldproxy: false
+      - uses: Swatinem/rust-cache@v1
+
+      - name: build (ble)
+        run: cd esp-wifi/ && cargo build --release --example=ble --target=xtensa-esp32s3-none-elf --features=esp32s3,ble
+      - name: build (coex)
+        run: cd esp-wifi/ && cargo build --release --example=coex --target=xtensa-esp32s3-none-elf --features=esp32s3,embedded-svc,wifi,ble
+      - name: build (dhcp)
+        run: cd esp-wifi/ && cargo build --release --example=dhcp --target=xtensa-esp32s3-none-elf --features=esp32s3,embedded-svc,wifi
+      - name: build (static_ip)
+        run: cd esp-wifi/ && cargo build --release --example=static_ip --target=xtensa-esp32s3-none-elf --features=esp32s3,embedded-svc,wifi

@@ -36,7 +36,9 @@ use crate::timer::setup_timer_isr;
 use common_adapter::chip_specific::phy_mem_init;
 
 #[doc(hidden)]
-pub mod binary;
+pub mod binary {
+    pub use esp_wifi_sys::*;
+}
 
 #[doc(hidden)]
 pub mod compat;
