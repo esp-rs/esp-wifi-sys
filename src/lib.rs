@@ -27,6 +27,8 @@ use hal::*;
 use fugit::MegahertzU32;
 use hal::clock::Clocks;
 use linked_list_allocator::Heap;
+#[cfg(feature = "wifi")]
+use wifi::WifiError;
 
 use crate::common_adapter::init_rng;
 use crate::tasks::init_tasks;
@@ -135,14 +137,8 @@ pub fn initialize(
     {
         log::debug!("wifi init");
         // wifi init
-        let res = crate::wifi::wifi_init();
-        if res != 0 {
-            return Err(InitializationError::General(res));
-        }
-        let res = crate::wifi::wifi_start();
-        if res != 0 {
-            return Err(InitializationError::General(res));
-        }
+        crate::wifi::wifi_init()?;
+        crate::wifi::wifi_start()?;
     }
 
     #[cfg(feature = "ble")]
@@ -160,7 +156,16 @@ pub fn initialize(
 #[derive(Debug, Clone, Copy)]
 pub enum InitializationError {
     General(i32),
+    #[cfg(feature = "wifi")]
+    WifiError(WifiError),
     WrongClockConfig,
+}
+
+#[cfg(feature = "wifi")]
+impl From<WifiError> for InitializationError {
+    fn from(value: WifiError) -> Self {
+        InitializationError::WifiError(value)
+    }
 }
 
 #[cfg(any(feature = "esp32", feature = "esp32s3", feature = "esp32s2"))]
@@ -206,14 +211,8 @@ pub fn initialize(
     #[cfg(feature = "wifi")]
     {
         log::debug!("wifi init");
-        let res = crate::wifi::wifi_init();
-        if res != 0 {
-            return Err(InitializationError::General(res));
-        }
-        let res = crate::wifi::wifi_start();
-        if res != 0 {
-            return Err(InitializationError::General(res));
-        }
+        crate::wifi::wifi_init()?;
+        crate::wifi::wifi_start()?;
     }
 
     #[cfg(feature = "ble")]

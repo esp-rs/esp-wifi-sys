@@ -905,7 +905,11 @@ pub unsafe extern "C" fn event_post(
         wifi_event_t_WIFI_EVENT_STA_STOP => true,
         wifi_event_t_WIFI_EVENT_STA_CONNECTED => true,
         wifi_event_t_WIFI_EVENT_STA_DISCONNECTED => true,
-        _ => false,
+        _ => {
+            use num_traits::FromPrimitive;
+            log::info!("Unhandled event: {:?}", crate::wifi::WifiEvent::from_i32(event_id));
+            false
+        },
     };
 
     if take_state {

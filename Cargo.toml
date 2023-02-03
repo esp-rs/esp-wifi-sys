@@ -5,7 +5,12 @@ edition = "2021"
 license = "MIT OR Apache-2.0"
 
 [profile.release]
-opt-level = 3
+# Explicitly disable LTO which the Xtensa codegen backend has issues
+lto = 'off'
+
+[profile.dev]
+# Explicitly disable LTO which the Xtensa codegen backend has issues
+lto = 'off'
 
 [dependencies]
 embedded-hal = "0.2.3"
@@ -32,13 +37,15 @@ linked_list_allocator = { version = "0.10.3", default-features = false, features
 embedded-io = "0.3.1"
 fugit = "0.3.6"
 heapless = { version = "0.7.14", default-features = false }
+num-derive = { version = "0.3", features = ["full-syntax"] }
+num-traits = { version = "0.2", default-features = false }
 
 [build-dependencies]
 riscv-target = { version = "0.1.2", optional = true }
 
 [dev-dependencies]
-bleps = { git = "https://github.com/bjoernQ/bleps", package = "bleps", rev = "06e1f7b3810b7271d1004635842b691adaea4818" }
-bleps-macros = { git = "https://github.com/bjoernQ/bleps", package = "bleps-macros", rev = "06e1f7b3810b7271d1004635842b691adaea4818" }
+bleps = { git = "https://github.com/bjoernQ/bleps", package = "bleps", rev = "5ce5ca139fe85c0120e9c2f9607d165d1c32d725" }
+bleps-macros = { git = "https://github.com/bjoernQ/bleps", package = "bleps-macros", rev = "5ce5ca139fe85c0120e9c2f9607d165d1c32d725" }
 
 [target.xtensa-esp32-none-elf.dev-dependencies]
 esp-println = { version = "0.3.1", features = [ "esp32", "log" ] }
