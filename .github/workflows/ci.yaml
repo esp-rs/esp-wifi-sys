@@ -17,7 +17,7 @@ env:
 
 jobs:
   rust-checks:
-    name: cargo ${{ matrix.action.command }} - ${{ matrix.board }} (alloc=${{ matrix.alloc }})
+    name: cargo ${{ matrix.action.command }} - ${{ matrix.config.features }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
