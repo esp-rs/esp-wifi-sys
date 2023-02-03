@@ -74,7 +74,7 @@ jobs:
           ldproxy: false
       - uses: Swatinem/rust-cache@v2
       - name: cargo ${{ matrix.action.command }}
-        run: ${{ matrix.condig.lto-profile }} cargo +${{ matrix.condig.channel }} --features ${{ matrix.config.features }} --target ${{ matrix.config.target }} --release
+        run: ${{ matrix.config.lto-profile }} cargo +${{ matrix.config.channel }} --features ${{ matrix.config.features }} --target ${{ matrix.config.target }} --release
   example-checks:
     env:
       SSID: SSID
