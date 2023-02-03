@@ -50,31 +50,31 @@ If a cell contains am em dash (&mdash;) this means that the particular feature i
     - pressing the boot-button on a dev-board will send a notification if it is subscribed
     - this uses a toy level BLE stack - might not work with every BLE central device (tested with Android and Windows Bluetooth LE Explorer)
 
-- coex (ESP32-C3 only)
+- coex (ESP32-C3 and ESP32-S3 only)
   - set SSID and PASSWORD env variable
   - gets an ip address via DHCP
   - performs an HTTP get request to some "random" server
   - does BLE advertising
   - coex support is still somewhat flaky
 
-| Command                                                                                                                         | Chip    |
-| ------------------------------------------------------------------------------------------------------------------------------- | ------- |
-| `cargo "+nightly" run --example ble --release --target riscv32imc-unknown-none-elf --features "esp32c3,ble"`                    | ESP32-C3|
-| `cargo "+nightly" run --example dhcp --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc,wifi"`     | ESP32-C3|
-| `cargo "+nightly" run --example static_ip --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc,wifi"`| ESP32-C3|
-| `cargo "+nightly" run --example coex --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc,wifi,ble"` | ESP32-C3|
-| `cargo "+esp" run --example ble --release --target xtensa-esp32-none-elf --features "esp32,ble"`                                | ESP32   |
-| `cargo "+esp" run --example dhcp --release --target xtensa-esp32-none-elf --features "esp32,embedded-svc,wifi"`                 | ESP32   |
-| `cargo "+esp" run --example static_ip --release --target xtensa-esp32-none-elf --features "esp32,embedded-svc,wifi"`            | ESP32   |
-| `cargo "+esp" run --example ble --release --target xtensa-esp32s3-none-elf --features "esp32s3,ble"`                                | ESP32-S3 |
-| `cargo "+esp" run --example dhcp --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi"`             | ESP32-S3|
-| `cargo "+esp" run --example static_ip --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi"`        | ESP32-S3|
-| `cargo "+esp" run --example coex --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi,ble"`        | ESP32-S3|
-| `cargo "+esp" run --example dhcp --release --target xtensa-esp32s2-none-elf --features "esp32s2,embedded-svc,wifi"`             | ESP32-S2|
-| `cargo "+esp" run --example static_ip --release --target xtensa-esp32s2-none-elf --features "esp32s2,embedded-svc,wifi"`        | ESP32-S2|
-| `CARGO_PROFILE_RELEASE_LTO=false cargo "+nightly" run --example ble --release --target riscv32imc-unknown-none-elf --features "esp32c2,ble"`                    | ESP32-C2|
-| `cargo "+nightly" run --example dhcp --release --target riscv32imc-unknown-none-elf --features "esp32c2,embedded-svc,wifi"`     | ESP32-C2|
-| `cargo "+nightly" run --example static_ip --release --target riscv32imc-unknown-none-elf --features "esp32c2,embedded-svc,wifi"`| ESP32-C2|
+| Command                                                                                                                                      | Chip     |
+| -------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| `cargo "+nightly" run --example ble --release --target riscv32imc-unknown-none-elf --features "esp32c3,ble"`                                 | ESP32-C3 |
+| `cargo "+nightly" run --example dhcp --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc,wifi"`                  | ESP32-C3 |
+| `cargo "+nightly" run --example static_ip --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc,wifi"`             | ESP32-C3 |
+| `cargo "+nightly" run --example coex --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc,wifi,ble"`              | ESP32-C3 |
+| `cargo "+esp" run --example ble --release --target xtensa-esp32-none-elf --features "esp32,ble"`                                             | ESP32    |
+| `cargo "+esp" run --example dhcp --release --target xtensa-esp32-none-elf --features "esp32,embedded-svc,wifi"`                              | ESP32    |
+| `cargo "+esp" run --example static_ip --release --target xtensa-esp32-none-elf --features "esp32,embedded-svc,wifi"`                         | ESP32    |
+| `cargo "+esp" run --example ble --release --target xtensa-esp32s3-none-elf --features "esp32s3,ble"`                                         | ESP32-S3 |
+| `cargo "+esp" run --example dhcp --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi"`                          | ESP32-S3 |
+| `cargo "+esp" run --example static_ip --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi"`                     | ESP32-S3 |
+| `cargo "+esp" run --example coex --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi,ble"`                      | ESP32-S3 |
+| `cargo "+esp" run --example dhcp --release --target xtensa-esp32s2-none-elf --features "esp32s2,embedded-svc,wifi"`                          | ESP32-S2 |
+| `cargo "+esp" run --example static_ip --release --target xtensa-esp32s2-none-elf --features "esp32s2,embedded-svc,wifi"`                     | ESP32-S2 |
+| `CARGO_PROFILE_RELEASE_LTO=false cargo "+nightly" run --example ble --release --target riscv32imc-unknown-none-elf --features "esp32c2,ble"` | ESP32-C2 |
+| `cargo "+nightly" run --example dhcp --release --target riscv32imc-unknown-none-elf --features "esp32c2,embedded-svc,wifi"`                  | ESP32-C2 |
+| `cargo "+nightly" run --example static_ip --release --target riscv32imc-unknown-none-elf --features "esp32c2,embedded-svc,wifi"`             | ESP32-C2 |
 
 Additionally you can specify these features
 | Feature      | Meaning                                                                                             |
