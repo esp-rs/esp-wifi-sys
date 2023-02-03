@@ -74,7 +74,11 @@ jobs:
           ldproxy: false
       - uses: Swatinem/rust-cache@v2
       - name: cargo ${{ matrix.action.command }}
-        run: ${{ matrix.config.lto-profile }} cargo +${{ matrix.config.channel }} --features ${{ matrix.config.features }} --target ${{ matrix.config.target }} --release
+        if: matrix.action.command == 'build'
+        run: ${{ matrix.config.lto-profile }} cargo +${{ matrix.config.channel }} ${{ matrix.action.command }} --features ${{ matrix.config.features }} --target ${{ matrix.config.target }} ${{ matrix.action.args }}
+      - name: cargo ${{ matrix.action.command }}
+        if: matrix.action.command == 'fmt'
+        run: cargo +${{ matrix.config.channel }} ${{ matrix.action.command }} ${{ matrix.action.args }}
   example-checks:
     env:
       SSID: SSID
