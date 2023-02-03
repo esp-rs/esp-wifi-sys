@@ -14,13 +14,73 @@ on:
 env:
   CARGO_TERM_COLOR: always
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  SSID: SSID
-  PASSWORD: PASSWORD
-  STATIC_IP: STATIC_IP
-  GATEWAY_IP: GATEWAY_IP
 
 jobs:
+  rust-checks:
+    name: cargo ${{ matrix.action.command }} - ${{ matrix.board }} (alloc=${{ matrix.alloc }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - target: riscv32imc-unknown-none-elf
+            features: esp32c3,embedded-svc,wifi,ble
+            channel: nightly
+          - target: xtensa-esp32-none-elf
+            board: esp32
+            features: esp32,embedded-svc,wifi
+            channel: esp
+          - target: xtensa-esp32-none-elf
+            board: esp32
+            features: esp32,ble
+            channel: esp
+          - target: xtensa-esp32s3-none-elf
+            board: esp32s3
+            features: esp32s3,embedded-svc,wifi,ble
+            channel: esp
+          - target: xtensa-esp32s2-none-elf
+            board: esp32s2
+            features: esp32s2,embedded-svc,wifi
+            channel: esp
+          - target: riscv32imc-unknown-none-elf
+            features: esp32c2,embedded-svc,wifi
+            channel: nightly
+          - target: riscv32imc-unknown-none-elf
+            features: esp32c2,ble
+            lto-profile: CARGO_PROFILE_RELEASE_LTO=false
+            channel: nightly
+        action:
+          - command: build
+            args: --release
+          - command: fmt
+            args: -- --check
+          # - command: clippy
+          #   args: --no-deps
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup | RISC-V Rust
+        if: matrix.config.target == 'riscv32imc-unknown-none-elf'
+        uses: dtolnay/rust-toolchain@v1
+        with:
+          target: riscv32imc-unknown-none-elf
+          toolchain: nightly
+          components: clippy, rustfmt, rust-src
+      - name: Setup | Xtensa Rust
+        if: matrix.config.target != 'riscv32imc-unknown-none-elf'
+        uses: esp-rs/xtensa-toolchain@v1.5
+        with:
+          default: true
+          buildtargets: ${{ matrix.board }}
+          ldproxy: false
+      - uses: Swatinem/rust-cache@v2
+      - name: cargo ${{ matrix.action.command }}
+        run: ${{ matrix.condig.lto-profile }} cargo +${{ matrix.condig.channel }} --features ${{ matrix.config.features }} --target ${{ matrix.config.target }} --release
   example-checks:
+    env:
+      SSID: SSID
+      PASSWORD: PASSWORD
+      STATIC_IP: STATIC_IP
+      GATEWAY_IP: GATEWAY_IP
     name: Check examples
     runs-on: ubuntu-20.04
     strategy:
@@ -61,7 +121,6 @@ jobs:
             toolchain: nightly
           - arg: --example static_ip --release --target riscv32imc-unknown-none-elf --features "esp32c2,embedded-svc,wifi"
             toolchain: nightly
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
