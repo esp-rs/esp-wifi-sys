@@ -18,6 +18,18 @@ v5.1-dev-2658-g0025915dc4 commit 0025915dc489a9d45f99aed74920346f8ac4ec09
 
 https://github.com/esp-rs/esp-wireless-drivers-3rdparty/ (commit f4caebff200e8f6f51b0a11d2b69ca56c76bb1c9)
 
+## Current support
+
+If a cell contains am em dash (&mdash;) this means that the particular feature is not present for a chip. A check mark (✓) means that some driver implementation exists. An empty cell means that the feature is present in the chip but not implemented yet.
+
+|          | Wifi  |  BLE  |  Coex   |
+| :------: | :---: | :---: | :-----: |
+|  ESP32   |   ✓   |   ✓   |         |
+| ESP32-S2 |   ✓   |       | &mdash; |
+| ESP32-S3 |   ✓   |   ✓   |    ✓    |
+| ESP32-C3 |   ✓   |   ✓   |    ✓    |
+| ESP32-C2 |   ✓   |   ✓   |         |
+
 ## Examples
 
 - dhcp
@@ -44,34 +56,34 @@ https://github.com/esp-rs/esp-wireless-drivers-3rdparty/ (commit f4caebff200e8f6
   - does BLE advertising
   - coex support is still somewhat flaky
 
-| Command                                                                                                                         | Chip    |
-| ------------------------------------------------------------------------------------------------------------------------------- | ------- |
-| `cargo "+nightly" run --example ble --release --target riscv32imc-unknown-none-elf --features "esp32c3,ble"`                    | ESP32-C3|
-| `cargo "+nightly" run --example dhcp --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc,wifi"`     | ESP32-C3|
-| `cargo "+nightly" run --example static_ip --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc,wifi"`| ESP32-C3|
-| `cargo "+nightly" run --example coex --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc,wifi,ble"` | ESP32-C3|
-| `cargo "+esp" run --example ble --release --target xtensa-esp32-none-elf --features "esp32,ble"`                                | ESP32   |
-| `cargo "+esp" run --example dhcp --release --target xtensa-esp32-none-elf --features "esp32,embedded-svc,wifi"`                 | ESP32   |
-| `cargo "+esp" run --example static_ip --release --target xtensa-esp32-none-elf --features "esp32,embedded-svc,wifi"`            | ESP32   |
-| `cargo "+esp" run --example ble --release --target xtensa-esp32s3-none-elf --features "esp32s3,ble"`                                | ESP32-S3 |
-| `cargo "+esp" run --example dhcp --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi"`             | ESP32-S3|
-| `cargo "+esp" run --example static_ip --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi"`        | ESP32-S3|
-| `cargo "+esp" run --example coex --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi,ble"`        | ESP32-S3|
-| `CARGO_PROFILE_RELEASE_OPT_LEVEL=2 cargo "+esp" run --example dhcp --release --target xtensa-esp32s2-none-elf --features "esp32s2,embedded-svc,wifi"`             | ESP32-S2|
-| `CARGO_PROFILE_RELEASE_OPT_LEVEL=2 cargo "+esp" run --example static_ip --release --target xtensa-esp32s2-none-elf --features "esp32s2,embedded-svc,wifi"`        | ESP32-S2|
-| `cargo "+nightly" run --example ble --release --target riscv32imc-unknown-none-elf --features "esp32c2,ble"`                    | ESP32-C2|
-| `cargo "+nightly" run --example dhcp --release --target riscv32imc-unknown-none-elf --features "esp32c2,embedded-svc,wifi"`     | ESP32-C2|
-| `cargo "+nightly" run --example static_ip --release --target riscv32imc-unknown-none-elf --features "esp32c2,embedded-svc,wifi"`| ESP32-C2|
+| Command                                                                                                                                                    | Chip     |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| `cargo "+nightly" run --example ble --release --target riscv32imc-unknown-none-elf --features "esp32c3,ble"`                                               | ESP32-C3 |
+| `cargo "+nightly" run --example dhcp --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc,wifi"`                                | ESP32-C3 |
+| `cargo "+nightly" run --example static_ip --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc,wifi"`                           | ESP32-C3 |
+| `cargo "+nightly" run --example coex --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc,wifi,ble"`                            | ESP32-C3 |
+| `cargo "+esp" run --example ble --release --target xtensa-esp32-none-elf --features "esp32,ble"`                                                           | ESP32    |
+| `cargo "+esp" run --example dhcp --release --target xtensa-esp32-none-elf --features "esp32,embedded-svc,wifi"`                                            | ESP32    |
+| `cargo "+esp" run --example static_ip --release --target xtensa-esp32-none-elf --features "esp32,embedded-svc,wifi"`                                       | ESP32    |
+| `cargo "+esp" run --example ble --release --target xtensa-esp32s3-none-elf --features "esp32s3,ble"`                                                       | ESP32-S3 |
+| `cargo "+esp" run --example dhcp --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi"`                                        | ESP32-S3 |
+| `cargo "+esp" run --example static_ip --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi"`                                   | ESP32-S3 |
+| `cargo "+esp" run --example coex --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi,ble"`                                    | ESP32-S3 |
+| `CARGO_PROFILE_RELEASE_OPT_LEVEL=2 cargo "+esp" run --example dhcp --release --target xtensa-esp32s2-none-elf --features "esp32s2,embedded-svc,wifi"`      | ESP32-S2 |
+| `CARGO_PROFILE_RELEASE_OPT_LEVEL=2 cargo "+esp" run --example static_ip --release --target xtensa-esp32s2-none-elf --features "esp32s2,embedded-svc,wifi"` | ESP32-S2 |
+| `cargo "+nightly" run --example ble --release --target riscv32imc-unknown-none-elf --features "esp32c2,ble"`                                               | ESP32-C2 |
+| `cargo "+nightly" run --example dhcp --release --target riscv32imc-unknown-none-elf --features "esp32c2,embedded-svc,wifi"`                                | ESP32-C2 |
+| `cargo "+nightly" run --example static_ip --release --target riscv32imc-unknown-none-elf --features "esp32c2,embedded-svc,wifi"`                           | ESP32-C2 |
 
 Additionally you can specify these features
-|Feature|Meaning|
-|---|---|
-|wifi_logs|logs the WiFi logs from the driver at log level info|
-|dump_packets|dumps some packet info at log level info|
-|utils|Provide utilities for smoltcp initialization, this is a default feature|
-|embedded-svc|Provides a (very limited) implementation of the `embedded-svc` WiFi trait, includes `utils` feature|
-|ble|Enable BLE support|
-|wifi|Enable WiFi support|
+| Feature      | Meaning                                                                                             |
+| ------------ | --------------------------------------------------------------------------------------------------- |
+| wifi_logs    | logs the WiFi logs from the driver at log level info                                                |
+| dump_packets | dumps some packet info at log level info                                                            |
+| utils        | Provide utilities for smoltcp initialization, this is a default feature                             |
+| embedded-svc | Provides a (very limited) implementation of the `embedded-svc` WiFi trait, includes `utils` feature |
+| ble          | Enable BLE support                                                                                  |
+| wifi         | Enable WiFi support                                                                                 |
 
 ## Important
 
