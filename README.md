@@ -22,13 +22,13 @@ https://github.com/esp-rs/esp-wireless-drivers-3rdparty/ (commit f4caebff200e8f6
 
 If a cell contains am em dash (&mdash;) this means that the particular feature is not present for a chip. A check mark (✓) means that some driver implementation exists. An empty cell means that the feature is present in the chip but not implemented yet.
 
-|          | Wifi  |  BLE  |  Coex   |
-| :------: | :---: | :---: | :-----: |
-|  ESP32   |   ✓   |   ✓   |         |
-| ESP32-S2 |   ✓   |       | &mdash; |
-| ESP32-S3 |   ✓   |   ✓   |    ✓    |
-| ESP32-C3 |   ✓   |   ✓   |    ✓    |
-| ESP32-C2 |   ✓   |   ✓   |         |
+|          | [Wifi](https://github.com/esp-rs/esp-wifi/issues/94) | [BLE](https://github.com/esp-rs/esp-wifi/issues/93) | [Coex](https://github.com/esp-rs/esp-wifi/issues/92) |
+| :------: | :--------------------------------------------------: | :-------------------------------------------------: | :--------------------------------------------------: |
+|  ESP32   |                          ✓                           |                          ✓                          |                                                      |
+| ESP32-S2 |                          ✓                           |                       &mdash;                       |                       &mdash;                        |
+| ESP32-S3 |                          ✓                           |                          ✓                          |                          ✓                           |
+| ESP32-C3 |                          ✓                           |                          ✓                          |                          ✓                           |
+| ESP32-C2 |                          ✓                           |                          ✓                          |                                                      |
 
 ## Examples
 
