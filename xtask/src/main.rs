@@ -89,11 +89,50 @@ fn generate_bindings_for_chip(
     let bindings = Builder::default()
         .clang_args([
             &format!("-DCONFIG_IDF_TARGET_{}", chip.to_uppercase()),
-            &format!("-I{}", sys_path.join("headers").display()),
-            &format!("-I{}", sys_path.join("headers").join(chip).display()),
-            &format!("-I{}", sys_path.join("include").display()),
-            &format!("-I{}", include_path.display()),
-            &format!("--sysroot={}", sysroot_path.display()),
+            &format!(
+                "-I{}",
+                sys_path
+                    .join("headers")
+                    .display()
+                    .to_string()
+                    .replace("\\", "/")
+                    .replace("//?/C:", "")
+            ),
+            &format!(
+                "-I{}",
+                sys_path
+                    .join("headers")
+                    .join(chip)
+                    .display()
+                    .to_string()
+                    .replace("\\", "/")
+                    .replace("//?/C:", "")
+            ),
+            &format!(
+                "-I{}",
+                sys_path
+                    .join("include")
+                    .display()
+                    .to_string()
+                    .replace("\\", "/")
+                    .replace("//?/C:", "")
+            ),
+            &format!(
+                "-I{}",
+                include_path
+                    .display()
+                    .to_string()
+                    .replace("\\", "/")
+                    .replace("//?/C:", "")
+            ),
+            &format!(
+                "--sysroot={}",
+                sysroot_path
+                    .display()
+                    .to_string()
+                    .replace("\\", "/")
+                    .replace("//?/C:", "")
+            ),
             &format!(
                 "--target={}",
                 if arch == Arch::Xtensa {
@@ -113,7 +152,10 @@ fn generate_bindings_for_chip(
         .map_err(|_| anyhow!("Failed to generate bindings"))?;
 
     // Write out the bindings to the appropriate path:
-    let path = sys_path.join("src").join("include").join(format!("{chip}.rs"));
+    let path = sys_path
+        .join("src")
+        .join("include")
+        .join(format!("{chip}.rs"));
     log::info!("Writing out bindings to: {}", path.display());
     bindings.write_to_file(&path)?;
 
