@@ -60,6 +60,9 @@ pub mod wifi;
 #[cfg(feature = "ble")]
 pub mod ble;
 
+#[cfg(feature = "esp-now")]
+pub mod esp_now;
+
 pub(crate) mod common_adapter;
 
 #[doc(hidden)]
@@ -230,7 +233,7 @@ pub fn initialize(
 }
 
 pub fn wifi_set_log_verbose() {
-    #[cfg(feature = "wifi_logs")]
+    #[cfg(feature = "wifi-logs")]
     unsafe {
         use crate::binary::include::{esp_wifi_internal_set_log_level, wifi_log_level_t};
 

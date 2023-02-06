@@ -12,3 +12,5 @@
 #include "esp_coexist_internal.h"
 #include "esp_coexist_adapter.h"
 #endif
+
+#include "esp_now.h"
