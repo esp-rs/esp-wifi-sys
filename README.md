@@ -83,11 +83,11 @@ https://github.com/esp-rs/esp-wireless-drivers-3rdparty/ (commit f4caebff200e8f6
 
 |   Chip   | Command                                                                                                                                    |
 | :------: | ------------------------------------------------------------------------------------------------------------------------------------------ |
-|  ESP32   | `cargo +esp run --example esp_now --release --target xtensa-esp32-none-elf --features "esp32,esp_now"`                                             |
-| ESP32-C2 | `CARGO_PROFILE_RELEASE_LTO=false cargo +nightly run --example esp_now --release --target riscv32imc-unknown-none-elf --features "esp32c2,esp_now"` |
-| ESP32-C3 | `cargo +nightly run --example esp_now --release --target riscv32imc-unknown-none-elf --features "esp32c3,esp_now"`                                |
-| ESP32-S2 | `cargo +esp run --example esp_now --release --target xtensa-esp32s2-none-elf --features "esp32s2,esp_now"`                                          |
-| ESP32-S3 | `cargo +esp run --example esp_now --release --target xtensa-esp32s3-none-elf --features "esp32s3,esp_now"`                                          |
+|  ESP32   | `cargo +esp run --example esp_now --release --target xtensa-esp32-none-elf --features "esp32,esp-now"`                                             |
+| ESP32-C2 | `CARGO_PROFILE_RELEASE_LTO=false cargo +nightly run --example esp_now --release --target riscv32imc-unknown-none-elf --features "esp32c2,esp-now"` |
+| ESP32-C3 | `cargo +nightly run --example esp_now --release --target riscv32imc-unknown-none-elf --features "esp32c3,esp-now"`                                |
+| ESP32-S2 | `cargo +esp run --example esp_now --release --target xtensa-esp32s2-none-elf --features "esp32s2,esp-now"`                                          |
+| ESP32-S3 | `cargo +esp run --example esp_now --release --target xtensa-esp32s3-none-elf --features "esp32s3,esp-now"`                                          |
 
 ### embassy_esp_now
 
@@ -95,22 +95,23 @@ https://github.com/esp-rs/esp-wireless-drivers-3rdparty/ (commit f4caebff200e8f6
 
 |   Chip   | Command                                                                                                                                    |
 | :------: | ------------------------------------------------------------------------------------------------------------------------------------------ |
-|  ESP32   | `cargo +esp run --example embassy_esp_now --release --target xtensa-esp32-none-elf --features "esp32,esp32-async,esp_now"`                                             |
-| ESP32-C2 | `CARGO_PROFILE_RELEASE_LTO=false cargo +nightly run --example embassy_esp_now --release --target riscv32imc-unknown-none-elf --features "esp32c2,esp32c2-async,esp_now"` |
-| ESP32-C3 | `cargo +nightly run --example embassy_esp_now --release --target riscv32imc-unknown-none-elf --features "esp32c3,esp32c3-async,esp_now"`                                |
-| ESP32-S2 | `cargo +esp run --example embassy_esp_now --release --target xtensa-esp32s2-none-elf --features "esp32s2,esp32s2-async,esp_now"`                                          |
-| ESP32-S3 | `cargo +esp run --example embassy_esp_now --release --target xtensa-esp32s3-none-elf --features "esp32s3,esp32s3-async,esp_now"`  
+|  ESP32   | `cargo +esp run --example embassy_esp_now --release --target xtensa-esp32-none-elf --features "esp32,esp32-async,esp-now"`                                             |
+| ESP32-C2 | `CARGO_PROFILE_RELEASE_LTO=false cargo +nightly run --example embassy_esp_now --release --target riscv32imc-unknown-none-elf --features "esp32c2,esp32c2-async,esp-now"` |
+| ESP32-C3 | `cargo +nightly run --example embassy_esp_now --release --target riscv32imc-unknown-none-elf --features "esp32c3,esp32c3-async,esp-now"`                                |
+| ESP32-S2 | `cargo +esp run --example embassy_esp_now --release --target xtensa-esp32s2-none-elf --features "esp32s2,esp32s2-async,esp-now"`                                          |
+| ESP32-S3 | `cargo +esp run --example embassy_esp_now --release --target xtensa-esp32s3-none-elf --features "esp32s3,esp32s3-async,esp-now"`  
 
 ## Features
 
 | Feature      | Meaning                                                                                             |
 | ------------ | --------------------------------------------------------------------------------------------------- |
-| wifi_logs    | logs the WiFi logs from the driver at log level info                                                |
-| dump_packets | dumps some packet info at log level info                                                            |
+| wifi-logs    | logs the WiFi logs from the driver at log level info                                                |
+| dump-packets | dumps some packet info at log level info                                                            |
 | utils        | Provide utilities for smoltcp initialization, this is a default feature                             |
 | embedded-svc | Provides a (very limited) implementation of the `embedded-svc` WiFi trait, includes `utils` feature |
 | ble          | Enable BLE support                                                                                  |
 | wifi         | Enable WiFi support                                                                                 |
+| esp-now      | Enable esp-now support                                                                              |
 
 ## Important
 
@@ -131,7 +132,7 @@ Link time optimization is not yet recommended for use, please ensure `lto = "off
 
 ## Using Serial-JTAG
 
-On ESP32-C3 / ESP32-S3 when using Serial-JTAG you have to activate the feature `phy_enable_usb`.
+On ESP32-C3 / ESP32-S3 when using Serial-JTAG you have to activate the feature `phy-enable-usb`.
 
 Don't use this feature if your are _not_ using Serial-JTAG since it might reduce WiFi performance.
 
