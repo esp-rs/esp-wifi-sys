@@ -14,6 +14,18 @@ v5.1-dev-2658-g0025915dc4 commit 0025915dc489a9d45f99aed74920346f8ac4ec09
 
 https://github.com/esp-rs/esp-wireless-drivers-3rdparty/ (commit f4caebff200e8f6f51b0a11d2b69ca56c76bb1c9)
 
+## Current support
+
+If a cell contains am em dash (&mdash;) this means that the particular feature is not present for a chip. A check mark (✓) means that some driver implementation exists. An empty cell means that the feature is present in the chip but not implemented yet.
+
+|          | [Wifi](https://github.com/esp-rs/esp-wifi/issues/94) | [BLE](https://github.com/esp-rs/esp-wifi/issues/93) | [Coex](https://github.com/esp-rs/esp-wifi/issues/92) | ESP-NOW |
+| :------: | :--------------------------------------------------: | :-------------------------------------------------: | :--------------------------------------------------: | :-----: |
+|  ESP32   |                          ✓                           |                          ✓                          |                                                      |    ✓    |
+| ESP32-S2 |                          ✓                           |                       &mdash;                       |                       &mdash;                        |    ✓    |
+| ESP32-S3 |                          ✓                           |                          ✓                          |                          ✓                           |    ✓    |
+| ESP32-C3 |                          ✓                           |                          ✓                          |                          ✓                           |    ✓    |
+| ESP32-C2 |                          ✓                           |                          ✓                          |                                                      |    ✓    |
+
 ## Examples
 
 ### dhcp
@@ -81,25 +93,25 @@ https://github.com/esp-rs/esp-wireless-drivers-3rdparty/ (commit f4caebff200e8f6
 
 - broadcasts, receives and sends messages via esp-now
 
-|   Chip   | Command                                                                                                                                    |
-| :------: | ------------------------------------------------------------------------------------------------------------------------------------------ |
+|   Chip   | Command                                                                                                                                            |
+| :------: | -------------------------------------------------------------------------------------------------------------------------------------------------- |
 |  ESP32   | `cargo +esp run --example esp_now --release --target xtensa-esp32-none-elf --features "esp32,esp-now"`                                             |
 | ESP32-C2 | `CARGO_PROFILE_RELEASE_LTO=false cargo +nightly run --example esp_now --release --target riscv32imc-unknown-none-elf --features "esp32c2,esp-now"` |
-| ESP32-C3 | `cargo +nightly run --example esp_now --release --target riscv32imc-unknown-none-elf --features "esp32c3,esp-now"`                                |
-| ESP32-S2 | `cargo +esp run --example esp_now --release --target xtensa-esp32s2-none-elf --features "esp32s2,esp-now"`                                          |
-| ESP32-S3 | `cargo +esp run --example esp_now --release --target xtensa-esp32s3-none-elf --features "esp32s3,esp-now"`                                          |
+| ESP32-C3 | `cargo +nightly run --example esp_now --release --target riscv32imc-unknown-none-elf --features "esp32c3,esp-now"`                                 |
+| ESP32-S2 | `cargo +esp run --example esp_now --release --target xtensa-esp32s2-none-elf --features "esp32s2,esp-now"`                                         |
+| ESP32-S3 | `cargo +esp run --example esp_now --release --target xtensa-esp32s3-none-elf --features "esp32s3,esp-now"`                                         |
 
 ### embassy_esp_now
 
 - broadcasts, receives and sends messages via esp-now in an async way
 
-|   Chip   | Command                                                                                                                                    |
-| :------: | ------------------------------------------------------------------------------------------------------------------------------------------ |
-|  ESP32   | `cargo +esp run --example embassy_esp_now --release --target xtensa-esp32-none-elf --features "esp32,esp32-async,esp-now"`                                             |
+|   Chip   | Command                                                                                                                                                                  |
+| :------: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+|  ESP32   | `cargo +esp run --example embassy_esp_now --release --target xtensa-esp32-none-elf --features "esp32,esp32-async,esp-now"`                                               |
 | ESP32-C2 | `CARGO_PROFILE_RELEASE_LTO=false cargo +nightly run --example embassy_esp_now --release --target riscv32imc-unknown-none-elf --features "esp32c2,esp32c2-async,esp-now"` |
-| ESP32-C3 | `cargo +nightly run --example embassy_esp_now --release --target riscv32imc-unknown-none-elf --features "esp32c3,esp32c3-async,esp-now"`                                |
-| ESP32-S2 | `cargo +esp run --example embassy_esp_now --release --target xtensa-esp32s2-none-elf --features "esp32s2,esp32s2-async,esp-now"`                                          |
-| ESP32-S3 | `cargo +esp run --example embassy_esp_now --release --target xtensa-esp32s3-none-elf --features "esp32s3,esp32s3-async,esp-now"`  
+| ESP32-C3 | `cargo +nightly run --example embassy_esp_now --release --target riscv32imc-unknown-none-elf --features "esp32c3,esp32c3-async,esp-now"`                                 |
+| ESP32-S2 | `cargo +esp run --example embassy_esp_now --release --target xtensa-esp32s2-none-elf --features "esp32s2,esp32s2-async,esp-now"`                                         |
+| ESP32-S3 | `cargo +esp run --example embassy_esp_now --release --target xtensa-esp32s3-none-elf --features "esp32s3,esp32s3-async,esp-now"`                                         |
 
 ## Features
 
