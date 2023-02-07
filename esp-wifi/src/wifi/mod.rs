@@ -564,7 +564,7 @@ unsafe extern "C" fn recv_cb(
         if !queue.is_full() {
             let src = core::slice::from_raw_parts_mut(buffer as *mut u8, len as usize);
             let packet = DataFrame::from_bytes(src);
-            queue.enqueue(packet);
+            queue.enqueue(packet).unwrap();
             esp_wifi_internal_free_rx_buffer(eb);
             0
         } else {
@@ -770,7 +770,7 @@ impl TxToken for WifiTxToken {
                 let mut packet = DataFrame::new();
                 packet.len = len;
                 let res = f(&mut packet.data[..len]);
-                queue.enqueue(packet);
+                queue.enqueue(packet).unwrap();
                 res
             }
         });
