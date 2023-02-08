@@ -27,13 +27,13 @@ use embedded_svc::wifi::{AccessPointInfo, ClientConfiguration, Configuration, Wi
 use esp_backtrace as _;
 use esp_println::{logger::init_logger, print, println};
 use esp_wifi::initialize;
-use esp_wifi::wifi::{WifiError, utils::create_network_interface};
+use esp_wifi::wifi::{utils::create_network_interface, WifiError};
 use hal::{
     clock::{ClockControl, CpuClock},
     Rng,
 };
 use hal::{peripherals::Peripherals, prelude::*, Rtc};
-use smoltcp::{wire::Ipv4Address, iface::SocketStorage};
+use smoltcp::{iface::SocketStorage, wire::Ipv4Address};
 
 #[cfg(feature = "esp32c3")]
 use hal::system::SystemExt;
@@ -91,8 +91,7 @@ fn main() -> ! {
     println!("is wifi started: {:?}", wifi_stack.is_started());
 
     println!("Start Wifi Scan");
-    let res: Result<(heapless::Vec<AccessPointInfo, 10>, usize), WifiError> =
-        wifi_stack.scan_n();
+    let res: Result<(heapless::Vec<AccessPointInfo, 10>, usize), WifiError> = wifi_stack.scan_n();
     if let Ok((res, _count)) = res {
         for ap in res {
             println!("{:?}", ap);

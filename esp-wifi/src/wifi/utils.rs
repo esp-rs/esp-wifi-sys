@@ -1,7 +1,8 @@
 use smoltcp::{
-    iface::{Interface, SocketStorage, Config, SocketSet},
+    iface::{Config, Interface, SocketSet, SocketStorage},
+    phy::{Device, Medium},
     socket::dhcpv4::Socket as Dhcpv4Socket,
-    wire::EthernetAddress, phy::{Device, Medium},
+    wire::EthernetAddress,
 };
 
 use crate::wifi::get_sta_mac;
@@ -11,8 +12,7 @@ use super::WifiDevice;
 /// Convenient way to create an `smoltcp` ethernet interface
 /// You can use the provided macros to create and pass a suitable backing storage.
 pub fn create_network_interface<'a>(
-    storage: 
-        &'a mut [SocketStorage<'a>],
+    storage: &'a mut [SocketStorage<'a>],
 ) -> (Interface, WifiDevice, SocketSet<'a>) {
     let socket_set_entries = storage;
 

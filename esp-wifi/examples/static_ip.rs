@@ -21,10 +21,10 @@ use embedded_svc::wifi::{AccessPointInfo, ClientConfiguration, Configuration, Wi
 use esp_backtrace as _;
 use esp_println::logger::init_logger;
 use esp_println::{print, println};
-use esp_wifi::wifi::{WifiError, utils::create_network_interface};
-use esp_wifi::wifi_interface::WifiStack;
 use esp_wifi::current_millis;
 use esp_wifi::initialize;
+use esp_wifi::wifi::{utils::create_network_interface, WifiError};
+use esp_wifi::wifi_interface::WifiStack;
 use hal::clock::{ClockControl, CpuClock};
 use hal::Rng;
 use hal::{peripherals::Peripherals, prelude::*, Rtc};
@@ -90,8 +90,7 @@ fn main() -> ! {
     println!("is wifi started: {:?}", wifi_stack.is_started());
 
     println!("Start Wifi Scan");
-    let res: Result<(heapless::Vec<AccessPointInfo, 10>, usize), WifiError> =
-        wifi_stack.scan_n();
+    let res: Result<(heapless::Vec<AccessPointInfo, 10>, usize), WifiError> = wifi_stack.scan_n();
     if let Ok((res, _count)) = res {
         for ap in res {
             println!("{:?}", ap);
@@ -129,7 +128,7 @@ fn main() -> ! {
     println!("{:?}", wifi_stack.is_connected());
 
     println!("Setting static IP {}", STATIC_IP);
-    
+
     wifi_stack
         .set_iface_configuration(&embedded_svc::ipv4::Configuration::Client(
             embedded_svc::ipv4::ClientConfiguration::Fixed(embedded_svc::ipv4::ClientSettings {
