@@ -21,8 +21,9 @@ use embedded_svc::wifi::{AccessPointInfo, ClientConfiguration, Configuration, Wi
 use esp_backtrace as _;
 use esp_println::logger::init_logger;
 use esp_println::{print, println};
-use esp_wifi::wifi::{WifiError, utils::create_network_interface};
-use esp_wifi::wifi_interface::Network;
+use esp_wifi::wifi::WifiError;
+use esp_wifi::wifi::utils::create_network_interface;
+use esp_wifi::wifi_interface::WifiStack;
 use esp_wifi::{create_network_stack_storage, network_stack_storage};
 use esp_wifi::{current_millis, initialize};
 use hal::clock::{ClockControl, CpuClock};
@@ -68,9 +69,9 @@ fn main() -> ! {
 
     rtc.rwdt.disable();
 
-    let mut storage = create_network_stack_storage!(3, 8, 1, 1);
-    let ethernet = create_network_interface(network_stack_storage!(storage));
-    let mut wifi_interface = esp_wifi::wifi_interface::Wifi::new(ethernet);
+    let mut storage = create_network_stack_storage!(3, 1, 1);
+    let (iface, device, sockets) = create_network_interface(network_stack_storage!(storage));
+    let mut wifi_interface = esp_wifi::wifi_interface::WifiStack::new(iface, device, sockets, current_millis);
 
     #[cfg(any(feature = "esp32c3", feature = "esp32c2"))]
     {
@@ -128,10 +129,8 @@ fn main() -> ! {
 
     // wait for getting an ip address
     println!("Wait to get an ip address");
-    let network = Network::new(wifi_interface, current_millis);
+    let mut network = wifi_interface;
     loop {
-        network.poll_dhcp().unwrap();
-
         network.work();
 
         if network.is_iface_up() {

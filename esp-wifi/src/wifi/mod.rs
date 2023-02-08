@@ -696,16 +696,15 @@ impl WifiDevice {
 }
 
 // see https://docs.rs/smoltcp/0.7.1/smoltcp/phy/index.html
-impl<'a> Device<'a> for WifiDevice {
-    type RxToken = WifiRxToken;
+impl Device for WifiDevice {
+    type RxToken<'a> = WifiRxToken;
+    type TxToken<'a> = WifiTxToken;
 
-    type TxToken = WifiTxToken;
-
-    fn receive(&'a mut self) -> Option<(Self::RxToken, Self::TxToken)> {
+    fn receive(&mut self, _instant: smoltcp::time::Instant) -> Option<(Self::RxToken<'_>, Self::TxToken<'_>)> {
         critical_section::with(|cs| {
-            let queue = DATA_QUEUE_RX.borrow_ref_mut(cs);
-
-            if !queue.is_empty() {
+            let rx = DATA_QUEUE_RX.borrow_ref_mut(cs);
+            let tx = DATA_QUEUE_TX.borrow_ref_mut(cs);
+            if !rx.is_empty() && !tx.is_full() {
                 Some((WifiRxToken::default(), WifiTxToken::default()))
             } else {
                 None
@@ -713,8 +712,15 @@ impl<'a> Device<'a> for WifiDevice {
         })
     }
 
-    fn transmit(&'a mut self) -> Option<Self::TxToken> {
-        Some(WifiTxToken::default())
+    fn transmit(&mut self, _instant: smoltcp::time::Instant) -> Option<Self::TxToken<'_>> {
+        critical_section::with(|cs| {
+            let tx = DATA_QUEUE_TX.borrow_ref_mut(cs);
+            if !tx.is_full() {
+                Some(WifiTxToken::default())
+            } else {
+                None
+            }
+        })
     }
 
     fn capabilities(&self) -> smoltcp::phy::DeviceCapabilities {
@@ -729,21 +735,18 @@ impl<'a> Device<'a> for WifiDevice {
 pub struct WifiRxToken {}
 
 impl RxToken for WifiRxToken {
-    fn consume<R, F>(self, _timestamp: smoltcp::time::Instant, f: F) -> smoltcp::Result<R>
+    fn consume<R, F>(self, f: F) -> R
     where
-        F: FnOnce(&mut [u8]) -> smoltcp::Result<R>,
+        F: FnOnce(&mut [u8]) -> R,
     {
         critical_section::with(|cs| {
             let mut queue = DATA_QUEUE_RX.borrow_ref_mut(cs);
 
-            if let Some(mut data) = queue.dequeue() {
-                let buffer =
-                    unsafe { core::slice::from_raw_parts(&data.data as *const u8, data.len) };
-                dump_packet_info(&buffer);
-                f(&mut data.data[..])
-            } else {
-                Err(smoltcp::Error::Exhausted)
-            }
+            let mut data = queue.dequeue().expect("unreachable: transmit()/receive() ensures there is a packet to process");
+            let buffer =
+                unsafe { core::slice::from_raw_parts(&data.data as *const u8, data.len) };
+            dump_packet_info(&buffer);
+            f(&mut data.data[..])
         })
     }
 }
@@ -754,25 +757,20 @@ pub struct WifiTxToken {}
 impl TxToken for WifiTxToken {
     fn consume<R, F>(
         self,
-        _timestamp: smoltcp::time::Instant,
         len: usize,
         f: F,
-    ) -> smoltcp::Result<R>
+    ) -> R
     where
-        F: FnOnce(&mut [u8]) -> smoltcp::Result<R>,
+        F: FnOnce(&mut [u8]) -> R,
     {
         let res = critical_section::with(|cs| {
             let mut queue = DATA_QUEUE_TX.borrow_ref_mut(cs);
 
-            if queue.is_full() {
-                Err(smoltcp::Error::Exhausted)
-            } else {
-                let mut packet = DataFrame::new();
-                packet.len = len;
-                let res = f(&mut packet.data[..len]);
-                queue.enqueue(packet).unwrap();
-                res
-            }
+            let mut packet = DataFrame::new();
+            packet.len = len;
+            let res = f(&mut packet.data[..len]);
+            queue.enqueue(packet).expect("unreachable: transmit()/receive() ensures there is a buffer free");
+            res
         });
 
         send_data_if_needed();
@@ -989,55 +987,55 @@ fn dump_packet_info(buffer: &[u8]) {
         return;
     }
 
-    let ef = smoltcp::wire::EthernetFrame::new_unchecked(buffer);
-    info!(
-        "src={:x?} dst={:x?} type={:x?}",
-        ef.src_addr(),
-        ef.dst_addr(),
-        ef.ethertype()
-    );
-    match ef.ethertype() {
-        smoltcp::wire::EthernetProtocol::Ipv4 => {
-            let ip = smoltcp::wire::Ipv4Packet::new_unchecked(ef.payload());
-            info!(
-                "src={:?} dst={:?} proto={:x?}",
-                ip.src_addr(),
-                ip.dst_addr(),
-                ip.protocol()
-            );
+    // let ef = smoltcp::wire::EthernetFrame::new_unchecked(buffer);
+    // info!(
+    //     "src={:x?} dst={:x?} type={:x?}",
+    //     ef.src_addr(),
+    //     ef.dst_addr(),
+    //     ef.ethertype()
+    // );
+    // match ef.ethertype() {
+    //     smoltcp::wire::EthernetProtocol::Ipv4 => {
+    //         let ip = smoltcp::wire::Ipv4Packet::new_unchecked(ef.payload());
+    //         info!(
+    //             "src={:?} dst={:?} proto={:x?}",
+    //             ip.src_addr(),
+    //             ip.dst_addr(),
+    //             ip.protocol()
+    //         );
 
-            match ip.protocol() {
-                smoltcp::wire::IpProtocol::HopByHop => {}
-                smoltcp::wire::IpProtocol::Icmp => {}
-                smoltcp::wire::IpProtocol::Igmp => {}
-                smoltcp::wire::IpProtocol::Tcp => {
-                    let tp = smoltcp::wire::TcpPacket::new_unchecked(ip.payload());
-                    info!("src={:?} dst={:?}", tp.src_port(), tp.dst_port());
-                }
-                smoltcp::wire::IpProtocol::Udp => {
-                    let up = smoltcp::wire::UdpPacket::new_unchecked(ip.payload());
-                    info!("src={:?} dst={:?}", up.src_port(), up.dst_port());
-                }
-                smoltcp::wire::IpProtocol::Ipv6Route => {}
-                smoltcp::wire::IpProtocol::Ipv6Frag => {}
-                smoltcp::wire::IpProtocol::Icmpv6 => {}
-                smoltcp::wire::IpProtocol::Ipv6NoNxt => {}
-                smoltcp::wire::IpProtocol::Ipv6Opts => {}
-                smoltcp::wire::IpProtocol::Unknown(_) => {}
-            }
-        }
-        smoltcp::wire::EthernetProtocol::Arp => {
-            let ap = smoltcp::wire::ArpPacket::new_unchecked(ef.payload());
-            info!(
-                "src={:x?} dst={:x?} src proto addr={:x?}",
-                ap.source_hardware_addr(),
-                ap.target_hardware_addr(),
-                ap.source_protocol_addr()
-            );
-        }
-        smoltcp::wire::EthernetProtocol::Ipv6 => {}
-        smoltcp::wire::EthernetProtocol::Unknown(_) => {}
-    }
+    //         match ip.protocol() {
+    //             smoltcp::wire::IpProtocol::HopByHop => {}
+    //             smoltcp::wire::IpProtocol::Icmp => {}
+    //             smoltcp::wire::IpProtocol::Igmp => {}
+    //             smoltcp::wire::IpProtocol::Tcp => {
+    //                 let tp = smoltcp::wire::TcpPacket::new_unchecked(ip.payload());
+    //                 info!("src={:?} dst={:?}", tp.src_port(), tp.dst_port());
+    //             }
+    //             smoltcp::wire::IpProtocol::Udp => {
+    //                 let up = smoltcp::wire::UdpPacket::new_unchecked(ip.payload());
+    //                 info!("src={:?} dst={:?}", up.src_port(), up.dst_port());
+    //             }
+    //             smoltcp::wire::IpProtocol::Ipv6Route => {}
+    //             smoltcp::wire::IpProtocol::Ipv6Frag => {}
+    //             smoltcp::wire::IpProtocol::Icmpv6 => {}
+    //             smoltcp::wire::IpProtocol::Ipv6NoNxt => {}
+    //             smoltcp::wire::IpProtocol::Ipv6Opts => {}
+    //             smoltcp::wire::IpProtocol::Unknown(_) => {}
+    //         }
+    //     }
+    //     smoltcp::wire::EthernetProtocol::Arp => {
+    //         let ap = smoltcp::wire::ArpPacket::new_unchecked(ef.payload());
+    //         info!(
+    //             "src={:x?} dst={:x?} src proto addr={:x?}",
+    //             ap.source_hardware_addr(),
+    //             ap.target_hardware_addr(),
+    //             ap.source_protocol_addr()
+    //         );
+    //     }
+    //     smoltcp::wire::EthernetProtocol::Ipv6 => {}
+    //     smoltcp::wire::EthernetProtocol::Unknown(_) => {}
+    // }
 }
 
 #[macro_export]
