@@ -647,11 +647,7 @@ impl<'s, 'n: 's> UdpSocket<'s, 'n> {
 
         self.work();
 
-        // match res {
-        //     Ok(res) => Ok(res),
-        //     Err(e) => Err(e.into()),
-        // }
-        todo!()
+        Ok(())
     }
 
     pub fn receive(&mut self, data: &mut [u8]) -> Result<(usize, [u8; 4], u16), IoError> {
