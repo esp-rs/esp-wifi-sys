@@ -987,55 +987,55 @@ fn dump_packet_info(buffer: &[u8]) {
         return;
     }
 
-    // let ef = smoltcp::wire::EthernetFrame::new_unchecked(buffer);
-    // info!(
-    //     "src={:x?} dst={:x?} type={:x?}",
-    //     ef.src_addr(),
-    //     ef.dst_addr(),
-    //     ef.ethertype()
-    // );
-    // match ef.ethertype() {
-    //     smoltcp::wire::EthernetProtocol::Ipv4 => {
-    //         let ip = smoltcp::wire::Ipv4Packet::new_unchecked(ef.payload());
-    //         info!(
-    //             "src={:?} dst={:?} proto={:x?}",
-    //             ip.src_addr(),
-    //             ip.dst_addr(),
-    //             ip.protocol()
-    //         );
+    let ef = smoltcp::wire::EthernetFrame::new_unchecked(buffer);
+    info!(
+        "src={:x?} dst={:x?} type={:x?}",
+        ef.src_addr(),
+        ef.dst_addr(),
+        ef.ethertype()
+    );
+    match ef.ethertype() {
+        smoltcp::wire::EthernetProtocol::Ipv4 => {
+            let ip = smoltcp::wire::Ipv4Packet::new_unchecked(ef.payload());
+            info!(
+                "src={:?} dst={:?} proto={:x?}",
+                ip.src_addr(),
+                ip.dst_addr(),
+                ip.next_header()
+            );
 
-    //         match ip.protocol() {
-    //             smoltcp::wire::IpProtocol::HopByHop => {}
-    //             smoltcp::wire::IpProtocol::Icmp => {}
-    //             smoltcp::wire::IpProtocol::Igmp => {}
-    //             smoltcp::wire::IpProtocol::Tcp => {
-    //                 let tp = smoltcp::wire::TcpPacket::new_unchecked(ip.payload());
-    //                 info!("src={:?} dst={:?}", tp.src_port(), tp.dst_port());
-    //             }
-    //             smoltcp::wire::IpProtocol::Udp => {
-    //                 let up = smoltcp::wire::UdpPacket::new_unchecked(ip.payload());
-    //                 info!("src={:?} dst={:?}", up.src_port(), up.dst_port());
-    //             }
-    //             smoltcp::wire::IpProtocol::Ipv6Route => {}
-    //             smoltcp::wire::IpProtocol::Ipv6Frag => {}
-    //             smoltcp::wire::IpProtocol::Icmpv6 => {}
-    //             smoltcp::wire::IpProtocol::Ipv6NoNxt => {}
-    //             smoltcp::wire::IpProtocol::Ipv6Opts => {}
-    //             smoltcp::wire::IpProtocol::Unknown(_) => {}
-    //         }
-    //     }
-    //     smoltcp::wire::EthernetProtocol::Arp => {
-    //         let ap = smoltcp::wire::ArpPacket::new_unchecked(ef.payload());
-    //         info!(
-    //             "src={:x?} dst={:x?} src proto addr={:x?}",
-    //             ap.source_hardware_addr(),
-    //             ap.target_hardware_addr(),
-    //             ap.source_protocol_addr()
-    //         );
-    //     }
-    //     smoltcp::wire::EthernetProtocol::Ipv6 => {}
-    //     smoltcp::wire::EthernetProtocol::Unknown(_) => {}
-    // }
+            match ip.next_header() {
+                smoltcp::wire::IpProtocol::HopByHop => {}
+                smoltcp::wire::IpProtocol::Icmp => {}
+                smoltcp::wire::IpProtocol::Igmp => {}
+                smoltcp::wire::IpProtocol::Tcp => {
+                    let tp = smoltcp::wire::TcpPacket::new_unchecked(ip.payload());
+                    info!("src={:?} dst={:?}", tp.src_port(), tp.dst_port());
+                }
+                smoltcp::wire::IpProtocol::Udp => {
+                    let up = smoltcp::wire::UdpPacket::new_unchecked(ip.payload());
+                    info!("src={:?} dst={:?}", up.src_port(), up.dst_port());
+                }
+                smoltcp::wire::IpProtocol::Ipv6Route => {}
+                smoltcp::wire::IpProtocol::Ipv6Frag => {}
+                smoltcp::wire::IpProtocol::Icmpv6 => {}
+                smoltcp::wire::IpProtocol::Ipv6NoNxt => {}
+                smoltcp::wire::IpProtocol::Ipv6Opts => {}
+                smoltcp::wire::IpProtocol::Unknown(_) => {}
+            }
+        }
+        smoltcp::wire::EthernetProtocol::Arp => {
+            let ap = smoltcp::wire::ArpPacket::new_unchecked(ef.payload());
+            info!(
+                "src={:x?} dst={:x?} src proto addr={:x?}",
+                ap.source_hardware_addr(),
+                ap.target_hardware_addr(),
+                ap.source_protocol_addr()
+            );
+        }
+        smoltcp::wire::EthernetProtocol::Ipv6 => {}
+        smoltcp::wire::EthernetProtocol::Unknown(_) => {}
+    }
 }
 
 #[macro_export]

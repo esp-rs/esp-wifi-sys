@@ -1,4 +1,4 @@
-use core::cell::{RefCell, Ref};
+use core::cell::RefCell;
 use core::fmt::Display;
 use embedded_io::blocking::{Read, Write};
 use embedded_io::Io;
@@ -10,7 +10,7 @@ use smoltcp::iface::{Interface, SocketHandle, SocketSet};
 use smoltcp::socket::{dhcpv4::Socket as Dhcpv4Socket, tcp::Socket as TcpSocket};
 use smoltcp::storage::PacketMetadata;
 use smoltcp::time::Instant;
-use smoltcp::wire::{IpAddress, IpCidr, IpEndpoint, Ipv4Address};
+use smoltcp::wire::{IpAddress, IpEndpoint, Ipv4Address};
 
 use crate::current_millis;
 use crate::wifi::WifiDevice;
@@ -30,7 +30,7 @@ pub struct WifiStack<'a> {
 
 impl<'a> WifiStack<'a> {
 
-    pub fn new(mut network_interface: Interface, device: WifiDevice, mut sockets: SocketSet<'a>, current_millis_fn: fn() -> u64) -> WifiStack<'a> {
+    pub fn new(network_interface: Interface, device: WifiDevice, mut sockets: SocketSet<'a>, current_millis_fn: fn() -> u64) -> WifiStack<'a> {
         let mut dhcp_socket_handle: Option<SocketHandle> = None;
 
         for (handle, socket) in sockets.iter_mut() {
@@ -60,7 +60,7 @@ impl<'a> WifiStack<'a> {
     /// Convenience function to poll the DHCP socket.
     pub fn poll_dhcp(&self, interface: &mut Interface, sockets: &mut SocketSet<'a>) -> Result<(), WifiStackError> {
         if let Some(dhcp_handle) = self.dhcp_socket_handle {
-                let mut dhcp_socket = sockets.get_mut::<Dhcpv4Socket>(dhcp_handle);
+                let dhcp_socket = sockets.get_mut::<Dhcpv4Socket>(dhcp_handle);
                 let event = dhcp_socket.poll();
                 if let Some(event) = event {
                     match event {
@@ -117,7 +117,7 @@ impl<'a> WifiStack<'a> {
         );
 
         let socket_handle =
-            self.with_mut(|interface, device, sockets| sockets.borrow_mut().add(socket));
+            self.with_mut(|_interface, _device, sockets| sockets.borrow_mut().add(socket));
 
         Socket {
             socket_handle,
@@ -125,29 +125,29 @@ impl<'a> WifiStack<'a> {
         }
     }
 
-    // pub fn get_udp_socket<'s>(
-    //     &'s self,
-    //     rx_meta: &'a mut [PacketMetadata<IpEndpoint>],
-    //     rx_buffer: &'a mut [u8],
-    //     tx_meta: &'a mut [PacketMetadata<IpEndpoint>],
-    //     tx_buffer: &'a mut [u8],
-    // ) -> UdpSocket<'s, 'a>
-    // where
-    //     'a: 's,
-    // {
-    //     let socket = smoltcp::socket::udp::Socket::new(
-    //         smoltcp::socket::udp::PacketBuffer::new(rx_meta, rx_buffer),
-    //         smoltcp::socket::udp::PacketBuffer::new(tx_meta, tx_buffer),
-    //     );
+    pub fn get_udp_socket<'s>(
+        &'s self,
+        rx_meta: &'a mut [PacketMetadata<IpEndpoint>],
+        rx_buffer: &'a mut [u8],
+        tx_meta: &'a mut [PacketMetadata<IpEndpoint>],
+        tx_buffer: &'a mut [u8],
+    ) -> UdpSocket<'s, 'a>
+    where
+        'a: 's,
+    {
+        let socket = smoltcp::socket::udp::Socket::new(
+            smoltcp::socket::udp::PacketBuffer::new(rx_meta, rx_buffer),
+            smoltcp::socket::udp::PacketBuffer::new(tx_meta, tx_buffer),
+        );
 
-    //     let socket_handle =
-    //         self.with_mut(|interface, device, sockets| sockets.borrow_mut().add(socket));
+        let socket_handle =
+            self.with_mut(|_interface, _device, sockets| sockets.borrow_mut().add(socket));
 
-    //     UdpSocket {
-    //         socket_handle,
-    //         network: self,
-    //     }
-    // }
+        UdpSocket {
+            socket_handle,
+            network: self,
+        }
+    }
 
     pub fn work(&self) {
         loop {
@@ -174,6 +174,7 @@ impl<'a> WifiStack<'a> {
         *local_port
     }
 
+    #[allow(unused)]
     fn with<R>(&self, f: impl FnOnce(&Interface, &WifiDevice, &SocketSet<'a>) -> R) -> R{
         f(&self.network_interface.borrow(), &self.device.borrow(), &self.sockets.borrow())
     }
@@ -279,7 +280,7 @@ impl<'s, 'n: 's> Socket<'s, 'n> {
         's: 'i,
     {
         {
-            let res = self.network.with_mut(|interface, device, sockets| {
+            let res = self.network.with_mut(|interface, _device, sockets| {
                 let sock = sockets.get_mut::<TcpSocket>(self.socket_handle);
                 let cx = interface.context();
                 let remote_endpoint = (addr, port);
@@ -291,7 +292,7 @@ impl<'s, 'n: 's> Socket<'s, 'n> {
         }
 
         loop {
-            let can_send = self.network.with_mut(|interface, device, sockets| {
+            let can_send = self.network.with_mut(|_interface, _device, sockets| {
                 let sock = sockets.get_mut::<TcpSocket>(self.socket_handle);
                 if sock.can_send() {
                     true
@@ -315,7 +316,7 @@ impl<'s, 'n: 's> Socket<'s, 'n> {
         's: 'i,
     {
         {
-            let res = self.network.with_mut(|interface, device, sockets| {
+            let res = self.network.with_mut(|_interface, _device, sockets| {
                 let sock = sockets.get_mut::<TcpSocket>(self.socket_handle);
                 sock.listen(port)
             });
@@ -324,7 +325,7 @@ impl<'s, 'n: 's> Socket<'s, 'n> {
         }
 
         loop {
-            let can_send = self.network.with_mut(|interface, device, sockets| {
+            let can_send = self.network.with_mut(|_interface, _device, sockets| {
                 let sock = sockets.get_mut::<TcpSocket>(self.socket_handle);
                 if sock.can_send() {
                     true
@@ -344,7 +345,7 @@ impl<'s, 'n: 's> Socket<'s, 'n> {
     }
 
     pub fn close(&mut self) {
-        self.network.with_mut(|interface, device, sockets| {
+        self.network.with_mut(|_interface, _device, sockets| {
             sockets.get_mut::<TcpSocket>(self.socket_handle)
                 .close();
         });
@@ -353,7 +354,7 @@ impl<'s, 'n: 's> Socket<'s, 'n> {
     }
 
     pub fn disconnect(&mut self) {
-        self.network.with_mut(|interface, device, sockets| {
+        self.network.with_mut(|_interface, _device, sockets| {
             sockets.get_mut::<TcpSocket>(self.socket_handle)
                 .abort();
         });
@@ -362,14 +363,14 @@ impl<'s, 'n: 's> Socket<'s, 'n> {
     }
 
     pub fn is_open(&mut self) -> bool {
-        self.network.with_mut(|interface, device, sockets| {
+        self.network.with_mut(|_interface, _device, sockets| {
             sockets.get_mut::<TcpSocket>(self.socket_handle)
                 .is_open()
         })
     }
 
     pub fn is_connected(&mut self) -> bool {
-        self.network.with_mut(|interface, device, sockets| {
+        self.network.with_mut(|_interface, _device, sockets| {
             let socket = sockets.get_mut::<TcpSocket>(self.socket_handle);
 
             socket.may_recv() && socket.may_send()
@@ -377,57 +378,27 @@ impl<'s, 'n: 's> Socket<'s, 'n> {
     }
 
     pub fn work(&mut self) {
-        loop {
-            self.network.with_mut(|interface, device, sockets| {
-                if let ipv4::Configuration::Client(ipv4::ClientConfiguration::DHCP(_)) =
-                    self.network.network_config.borrow().clone()
-                {
-                    self.network.poll_dhcp(interface, sockets).ok();
-                } else if let ipv4::Configuration::Client(ipv4::ClientConfiguration::Fixed(
-                    settings,
-                )) = self.network.network_config.borrow().clone() // TODO remove clone
-                {
-                    let addr = Ipv4Address::from_bytes(&settings.ip.octets());
-                    if !interface.has_ip_addr(addr) {
-                        let gateway = Ipv4Address::from_bytes(&settings.subnet.gateway.octets());
-                        interface
-                            .routes_mut()
-                            .add_default_ipv4_route(gateway)
-                            .ok();
-                        interface.update_ip_addrs(|addrs| {
-                            addrs[0] = IpCidr::new(addr.into(), settings.subnet.mask.0);
-                        });
-                    }
-                }
-            });
-                
-            if let false = self.network.with_mut(|interface, device, sockets| {
-                interface
-                    .poll(Instant::from_millis(
-                        (self.network.current_millis_fn)() as i64),
-                        device,
-                        sockets,
-                    )
-            }) {
-                break;
-            }
-        }
+        self.network.work()
     }
 }
 
-// impl<'s, 'n: 's> Drop for Socket<'s, 'n> {
-//     fn drop(&mut self) {
-//         self.network.with_mut(|interface, device, sockets| {
-//             sockets
-//                 .remove(self.socket_handle)
-//         });
-//     }
-// }
+impl<'s, 'n: 's> Drop for Socket<'s, 'n> {
+    fn drop(&mut self) {
+        self.network.with_mut(|_interface, _device, sockets| {
+            sockets
+                .remove(self.socket_handle)
+        });
+    }
+}
 
 #[derive(Debug)]
 pub enum IoError {
     SocketClosed,
-    Unknown,
+    MultiCastError/* (MulticastError) */, // TODO not accessible with current release
+    TcpRecvError(smoltcp::socket::tcp::RecvError),
+    UdpRecvError(smoltcp::socket::udp::RecvError),
+    TcpSendError(smoltcp::socket::tcp::SendError),
+    UdpSendError(smoltcp::socket::udp::SendError),
 }
 
 impl embedded_io::Error for IoError {
@@ -454,7 +425,7 @@ impl<'s, 'n: 's> Read for Socket<'s, 'n> {
                     )
             });
 
-            let (may_recv, is_open, can_recv) = self.network.with_mut(|interface, device, sockets| {
+            let (may_recv, is_open, can_recv) = self.network.with_mut(|_interface, _device, sockets| {
                 let socket = sockets.get_mut::<TcpSocket>(self.socket_handle);
 
                 (socket.may_recv(), socket.is_open(), socket.can_recv())
@@ -480,7 +451,7 @@ impl<'s, 'n: 's> Read for Socket<'s, 'n> {
                     .poll(Instant::from_millis(
                         (self.network.current_millis_fn)() as i64),
                         device,
-                         sockets,
+                        sockets,
                     )
             });
 
@@ -489,10 +460,10 @@ impl<'s, 'n: 's> Read for Socket<'s, 'n> {
             }
         }
 
-        self.network.with_mut(|interface, device, sockets| {
+        self.network.with_mut(|_interface, _device, sockets| {
             let socket = sockets.get_mut::<TcpSocket>(self.socket_handle);
 
-            socket.recv_slice(buf).map_err(|e| IoError::Unknown)
+            socket.recv_slice(buf).map_err(|e| IoError::TcpRecvError(e))
         })
     }
 }
@@ -500,7 +471,7 @@ impl<'s, 'n: 's> Read for Socket<'s, 'n> {
 impl<'s, 'n: 's> Write for Socket<'s, 'n> {
     fn write(&mut self, buf: &[u8]) -> Result<usize, Self::Error> {
         loop {
-            let res = self.network.with_mut(|interface, device, sockets| {
+            self.network.with_mut(|interface, device, sockets| {
                 
                 
                 interface
@@ -511,7 +482,7 @@ impl<'s, 'n: 's> Write for Socket<'s, 'n> {
                     )
             });
 
-            let (may_send, is_open, can_send) = self.network.with_mut(|interface, device, sockets| {
+            let (may_send, is_open, can_send) = self.network.with_mut(|_interface, _device, sockets| {
                 let socket = sockets.get_mut::<TcpSocket>(self.socket_handle);
 
                 (socket.may_send(), socket.is_open(), socket.can_send())
@@ -547,7 +518,7 @@ impl<'s, 'n: 's> Write for Socket<'s, 'n> {
             }
         }
 
-        let res = self.network.with_mut(|interface, device, sockets| {
+        let res = self.network.with_mut(|_interface, _device, sockets| {
             let socket = sockets
                 .get_mut::<TcpSocket>(self.socket_handle);
 
@@ -563,7 +534,7 @@ impl<'s, 'n: 's> Write for Socket<'s, 'n> {
 
                         log::info!("not fully written: {}", len);
                     }
-                    Err(err) => break Err(IoError::Unknown),
+                    Err(err) => break Err(IoError::TcpSendError(err)),
                 }
             }
         });
@@ -593,156 +564,141 @@ impl<'s, 'n: 's> Write for Socket<'s, 'n> {
     }
 }
 
-// pub struct UdpSocket<'s, 'n: 's> {
-//     socket_handle: SocketHandle,
-//     network: &'s Network<'n>,
-// }
+pub struct UdpSocket<'s, 'n: 's> {
+    socket_handle: SocketHandle,
+    network: &'s WifiStack<'n>,
+}
 
-// impl<'s, 'n: 's> UdpSocket<'s, 'n> {
-//     pub fn bind<'i>(&'i mut self, port: u16) -> Result<(), IoError>
-//     where
-//         's: 'i,
-//     {
-//         self.work();
+impl<'s, 'n: 's> UdpSocket<'s, 'n> {
+    pub fn bind<'i>(&'i mut self, port: u16) -> Result<(), IoError>
+    where
+        's: 'i,
+    {
+        self.work();
 
-//         {
-//             let res = self.network.with_mut(|interface, device, sockets| {
-//                 let sock = sockets.get_mut::<smoltcp::socket::udp::Socket>(self.socket_handle);
-//                 sock.bind(port)
-//             });
+        {
+            let res = self.network.with_mut(|_interface, _device, sockets| {
+                let sock = sockets.get_mut::<smoltcp::socket::udp::Socket>(self.socket_handle);
+                sock.bind(port)
+            });
 
-//             res.unwrap()
-//             // if let Err(err) = res {
-//             //     return Err(err.into());
-//             // }
-//         }
+            res.unwrap()
+            // if let Err(err) = res {
+            //     return Err(err.into());
+            // }
+        }
 
-//         loop {
-//             let can_send = self.network.with_mut(|interface, device, sockets| {
-//                 let sock = sockets.get_mut::<smoltcp::socket::udp::Socket>(self.socket_handle);
-//                 if sock.can_send() {
-//                     true
-//                 } else {
-//                     false
-//                 }
-//             });
+        loop {
+            let can_send = self.network.with_mut(|_interface, _device, sockets| {
+                let sock = sockets.get_mut::<smoltcp::socket::udp::Socket>(self.socket_handle);
+                if sock.can_send() {
+                    true
+                } else {
+                    false
+                }
+            });
 
-//             if can_send {
-//                 break;
-//             }
+            if can_send {
+                break;
+            }
 
-//             self.work();
-//         }
+            self.work();
+        }
 
-//         Ok(())
-//     }
+        Ok(())
+    }
 
-//     pub fn close(&mut self) {
-//         self.network.with_mut(|interface, device, sockets| {
-//             sockets.get_mut::<smoltcp::socket::udp::Socket>(self.socket_handle)
-//                 .close();
-//         });
+    pub fn close(&mut self) {
+        self.network.with_mut(|_interface, _device, sockets| {
+            sockets.get_mut::<smoltcp::socket::udp::Socket>(self.socket_handle)
+                .close();
+        });
 
-//         self.work();
-//     }
+        self.work();
+    }
 
-//     pub fn send(&mut self, addr: Ipv4Address, port: u16, data: &[u8]) -> Result<(), IoError> {
-//         loop {
-//             self.work();
+    pub fn send(&mut self, addr: Ipv4Address, port: u16, data: &[u8]) -> Result<(), IoError> {
+        loop {
+            self.work();
 
-//             let (can_send, packet_capacity, payload_capacity) =
-//                 self.network.with_mut(|interface, device, sockets| {
-//                     let sock = sockets.get_mut::<smoltcp::socket::udp::Socket>(self.socket_handle);
-//                     (
-//                         sock.can_send(),
-//                         sock.packet_send_capacity(),
-//                         sock.payload_send_capacity(),
-//                     )
-//                 });
+            let (can_send, packet_capacity, payload_capacity) =
+                self.network.with_mut(|_interface, _device, sockets| {
+                    let sock = sockets.get_mut::<smoltcp::socket::udp::Socket>(self.socket_handle);
+                    (
+                        sock.can_send(),
+                        sock.packet_send_capacity(),
+                        sock.payload_send_capacity(),
+                    )
+                });
 
-//             if can_send && packet_capacity > 0 && payload_capacity > data.len() {
-//                 break;
-//             }
-//         }
+            if can_send && packet_capacity > 0 && payload_capacity > data.len() {
+                break;
+            }
+        }
 
-//         let res = self.network.with_mut(|interface, device, sockets| {
-//             let endpoint = (addr, port);
+        self.network.with_mut(|_interface, _device, sockets| {
+            let endpoint = (addr, port);
 
             
-//             sockets.get_mut::<smoltcp::socket::udp::Socket>(self.socket_handle)
-//                 .send_slice(data, endpoint.into())
-//         });
+            sockets.get_mut::<smoltcp::socket::udp::Socket>(self.socket_handle)
+                .send_slice(data, endpoint.into())
+        }).map_err(|e| IoError::UdpSendError(e))?;
 
-//         self.work();
+        self.work();
 
-//         // match res {
-//         //     Ok(res) => Ok(res),
-//         //     Err(e) => Err(e.into()),
-//         // }
-//         todo!()
-//     }
+        // match res {
+        //     Ok(res) => Ok(res),
+        //     Err(e) => Err(e.into()),
+        // }
+        todo!()
+    }
 
-//     pub fn receive(&mut self, data: &mut [u8]) -> Result<(usize, [u8; 4], u16), IoError> {
-//         self.work();
+    pub fn receive(&mut self, data: &mut [u8]) -> Result<(usize, [u8; 4], u16), IoError> {
+        self.work();
 
-//         let res = self.network.with_mut(|interface, device, sockets| {
-//                 sockets.get_mut::<smoltcp::socket::udp::Socket>(self.socket_handle)
-//                 .recv_slice(data)
-//         });
+        let res = self.network.with_mut(|_interface, _device, sockets| {
+                sockets.get_mut::<smoltcp::socket::udp::Socket>(self.socket_handle)
+                .recv_slice(data)
+        });
 
-//         match res {
-//             Ok((len, endpoint)) => {
-//                 let addr = match endpoint.addr {
-//                     IpAddress::Ipv4(ipv4) => ipv4,
-//                     _ => todo!(),
-//                 };
-//                 Ok((len, addr.0, endpoint.port))
-//             }
-//             Err(e) => Err(e).unwrap() /* Err(e.into()) */,
-//         }
-//     }
+        match res {
+            Ok((len, endpoint)) => {
+                let addr = match endpoint.addr {
+                    IpAddress::Ipv4(ipv4) => ipv4,
+                };
+                Ok((len, addr.0, endpoint.port))
+            }
+            Err(e) => Err(e).unwrap() /* Err(e.into()) */,
+        }
+    }
 
-//     pub fn join_multicast_group(&mut self, addr: Ipv4Address) -> Result<bool, IoError> {
-//         self.work();
+    pub fn join_multicast_group(&mut self, addr: Ipv4Address) -> Result<bool, IoError> {
+        self.work();
 
-//         let res = self.network.with_mut(|interface, device,_| {
-//             interface.join_multicast_group(
-//                 device,
-//                 addr,
-//                 Instant::from_millis((self.network.current_millis_fn)() as i64),
-//             )
-//         });
+        let res = self.network.with_mut(|interface, device,_| {
+            interface.join_multicast_group(
+                device,
+                addr,
+                Instant::from_millis((self.network.current_millis_fn)() as i64),
+            )
+        });
 
-//         self.work();
+        self.work();
 
-//         // match res {
-//         //     Ok(res) => Ok(res),
-//         //     Err(e) => Err(e.into()),
-//         // }
-//         todo!()
-//     }
+        res.map_err(|_| IoError::MultiCastError)
+    }
 
-//     pub fn work(&mut self) {
-//         loop {
-//             self.network.with_mut(|interface, device, sockets| {
-//                 device.poll_dhcp().ok();
-//                 interface
-//                     .poll(Instant::from_millis(
-//                         (self.network.current_millis_fn)() as i64),
-//                         device,
-//                         sockets,
-//                     );
-//             })
-//         }
-//     }
-// }
+    pub fn work(&mut self) {
+        self.network.work()
+    }
+}
 
-// impl<'s, 'n: 's> Drop for UdpSocket<'s, 'n> {
-//     fn drop(&mut self) {
-//         self.network.with_mut(|_, _, sockets| {
-//                 sockets
-//                 .borrow_mut()
-//                 .remove(self.socket_handle)
-//         });
-//     }
-// }
+impl<'s, 'n: 's> Drop for UdpSocket<'s, 'n> {
+    fn drop(&mut self) {
+        self.network.with_mut(|_, _, sockets| {
+                sockets
+                .borrow_mut()
+                .remove(self.socket_handle)
+        });
+    }
+}
