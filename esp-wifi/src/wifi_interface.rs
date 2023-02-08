@@ -288,7 +288,7 @@ impl<'s, 'n: 's> Socket<'s, 'n> {
                 sock.connect(cx, remote_endpoint, self.network.next_local_port())
             });
 
-            res.unwrap()
+            res.map_err(|e| IoError::ConnectError(e))?;
         }
 
         loop {
@@ -321,7 +321,7 @@ impl<'s, 'n: 's> Socket<'s, 'n> {
                 sock.listen(port)
             });
 
-            res.unwrap();
+            res.map_err(|e| IoError::ListenError(e))?;
         }
 
         loop {
@@ -394,11 +394,14 @@ impl<'s, 'n: 's> Drop for Socket<'s, 'n> {
 #[derive(Debug)]
 pub enum IoError {
     SocketClosed,
-    MultiCastError/* (MulticastError) */, // TODO not accessible with current release
+    MultiCastError(smoltcp::iface::MulticastError),
     TcpRecvError(smoltcp::socket::tcp::RecvError),
     UdpRecvError(smoltcp::socket::udp::RecvError),
     TcpSendError(smoltcp::socket::tcp::SendError),
     UdpSendError(smoltcp::socket::udp::SendError),
+    ConnectError(smoltcp::socket::tcp::ConnectError),
+    BindError(smoltcp::socket::udp::BindError),
+    ListenError(smoltcp::socket::tcp::ListenError)
 }
 
 impl embedded_io::Error for IoError {
@@ -582,10 +585,9 @@ impl<'s, 'n: 's> UdpSocket<'s, 'n> {
                 sock.bind(port)
             });
 
-            res.unwrap()
-            // if let Err(err) = res {
-            //     return Err(err.into());
-            // }
+            if let Err(err) = res {
+                return Err(IoError::BindError(err));
+            }
         }
 
         loop {
@@ -668,7 +670,7 @@ impl<'s, 'n: 's> UdpSocket<'s, 'n> {
                 };
                 Ok((len, addr.0, endpoint.port))
             }
-            Err(e) => Err(e).unwrap() /* Err(e.into()) */,
+            Err(e) => Err(IoError::UdpRecvError(e)),
         }
     }
 
@@ -685,7 +687,7 @@ impl<'s, 'n: 's> UdpSocket<'s, 'n> {
 
         self.work();
 
-        res.map_err(|_| IoError::MultiCastError)
+        res.map_err(|e| IoError::MultiCastError(e))
     }
 
     pub fn work(&mut self) {
