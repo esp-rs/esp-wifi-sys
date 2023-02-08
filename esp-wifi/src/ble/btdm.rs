@@ -91,7 +91,7 @@ extern "C" fn notify_host_recv(data: *mut u8, len: u16) -> i32 {
 
         critical_section::with(|cs| {
             let mut queue = BT_RECEIVE_QUEUE.borrow_ref_mut(cs);
-            queue.enqueue(packet);
+            queue.enqueue(packet).unwrap();
         });
     }
 
@@ -189,7 +189,7 @@ unsafe extern "C" fn queue_send(queue: *const (), item: *const (), _block_time_m
 
             critical_section::with(|cs| {
                 let mut queue = BT_INTERNAL_QUEUE.borrow_ref_mut(cs);
-                queue.enqueue(data);
+                queue.enqueue(data).unwrap();
             });
             memory_fence();
         });
