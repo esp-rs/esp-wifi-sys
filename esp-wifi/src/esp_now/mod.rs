@@ -491,7 +491,7 @@ unsafe extern "C" fn rcv_cb(
             len: slice.len() as u8,
             data: data,
             info,
-        });
+        }).unwrap();
 
         #[cfg(feature = "async")]
         asynch::ESP_NOW_WAKER.wake();
