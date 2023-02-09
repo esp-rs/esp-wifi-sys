@@ -167,6 +167,15 @@ async fn task(stack: &'static Stack<WifiDevice>) {
     let mut rx_buffer = [0; 4096];
     let mut tx_buffer = [0; 4096];
 
+    println!("Waiting to get IP address...");
+    loop {
+        if let Some(config) = stack.config() {
+            println!("Got IP: {}", config.address);
+            break;
+        }
+        Timer::after(Duration::from_millis(500)).await;
+    }
+
     loop {
         Timer::after(Duration::from_millis(1_000)).await;
 
