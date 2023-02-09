@@ -10,7 +10,7 @@ use smoltcp::iface::{Interface, SocketHandle, SocketSet};
 use smoltcp::socket::{dhcpv4::Socket as Dhcpv4Socket, tcp::Socket as TcpSocket};
 use smoltcp::storage::PacketMetadata;
 use smoltcp::time::Instant;
-use smoltcp::wire::{IpAddress, IpEndpoint, Ipv4Address};
+use smoltcp::wire::{IpAddress, IpCidr, IpEndpoint, Ipv4Address};
 
 use crate::current_millis;
 use crate::wifi::WifiDevice;
@@ -154,7 +154,26 @@ impl<'a> WifiStack<'a> {
     pub fn work(&self) {
         loop {
             if let false = self.with_mut(|interface, device, sockets| {
-                self.poll_dhcp(interface, sockets).ok();
+                let network_config = self.network_config.borrow().clone();
+                if let ipv4::Configuration::Client(ipv4::ClientConfiguration::DHCP(_)) =
+                    network_config
+                {
+                    self.poll_dhcp(interface, sockets).ok();
+                } else if let ipv4::Configuration::Client(ipv4::ClientConfiguration::Fixed(
+                    settings,
+                )) = network_config
+                {
+                    let addr = Ipv4Address::from_bytes(&settings.ip.octets());
+                    if !interface.has_ip_addr(addr) {
+                        let gateway = Ipv4Address::from_bytes(&settings.subnet.gateway.octets());
+                        interface.routes_mut().add_default_ipv4_route(gateway).ok();
+                        interface.update_ip_addrs(|addrs| {
+                            addrs
+                                .push(IpCidr::new(addr.into(), settings.subnet.mask.0))
+                                .unwrap();
+                        });
+                    }
+                }
                 interface.poll(
                     Instant::from_millis((self.current_millis_fn)() as i64),
                     device,
