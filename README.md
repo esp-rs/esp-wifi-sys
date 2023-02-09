@@ -111,7 +111,15 @@ If a cell contains am em dash (&mdash;) this means that the particular feature i
 | ESP32-C2 | `CARGO_PROFILE_RELEASE_LTO=false cargo +nightly run --example embassy_esp_now --release --target riscv32imc-unknown-none-elf --features "esp32c2,esp32c2-async,esp-now"` |
 | ESP32-C3 | `cargo +nightly run --example embassy_esp_now --release --target riscv32imc-unknown-none-elf --features "esp32c3,esp32c3-async,esp-now"`                                 |
 | ESP32-S2 | `cargo +esp run --example embassy_esp_now --release --target xtensa-esp32s2-none-elf --features "esp32s2,esp32s2-async,esp-now"`                                         |
-| ESP32-S3 | `cargo +esp run --example embassy_esp_now --release --target xtensa-esp32s3-none-elf --features "esp32s3,esp32s3-async,esp-now"`                                         |
+| ESP32-S3 | `cargo +esp run --example embassy_esp_now --release --target xtensa-esp32s3-none-elf --features "esp32s3,esp32s3-async,esp-now"`        
+
+|   Chip   | Command                                                                                                                                                                  |
+| :------: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+|  ESP32   | `cargo +esp run --example embassy_dhcp --release --target xtensa-esp32-none-elf --features "esp32,esp32-async,embedded-svc,wifi"`                                               |
+| ESP32-C2 | `CARGO_PROFILE_RELEASE_LTO=false cargo +nightly run --example embassy_dhcp --release --target riscv32imc-unknown-none-elf --features "esp32c2,esp32c2-async,embedded-svc,wifi"` |
+| ESP32-C3 | `cargo +nightly run --example embassy_dhcp --release --target riscv32imc-unknown-none-elf --features "esp32c3,esp32c3-async,embedded-svc,wifi"`                                 |
+| ESP32-S2 | `cargo +esp run --example embassy_dhcp --release --target xtensa-esp32s2-none-elf --features "esp32s2,esp32s2-async,embedded-svc,wifi"`                                         |
+| ESP32-S3 | `cargo +esp run --example embassy_dhcp --release --target xtensa-esp32s3-none-elf --features "esp32s3,esp32s3-async,embedded-svc,wifi"`                                    |
 
 ## Features
 
