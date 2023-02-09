@@ -568,7 +568,7 @@ unsafe extern "C" fn recv_cb(
             queue.enqueue(packet).unwrap();
             esp_wifi_internal_free_rx_buffer(eb);
 
-            #[cfg(feature = "async")]
+            #[cfg(feature = "embassy-net")]
             embassy::RECEIVE_WAKER.wake();
 
             0
@@ -810,7 +810,7 @@ pub fn send_data_if_needed() {
             }
         }
 
-        #[cfg(feature = "async")]
+        #[cfg(feature = "embassy-net")]
         embassy::TRANSMIT_WAKER.wake();
     });
 }
@@ -1067,7 +1067,7 @@ macro_rules! esp_wifi_result {
     };
 }
 
-#[cfg(all(feature = "wifi", feature = "async"))]
+#[cfg(feature = "embassy-net")]
 pub(crate) mod embassy {
     use super::*;
     use embassy_net_driver::{Driver, RxToken, TxToken, Capabilities};
