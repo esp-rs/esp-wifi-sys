@@ -113,6 +113,10 @@ If a cell contains am em dash (&mdash;) this means that the particular feature i
 | ESP32-S2 | `cargo +esp run --example embassy_esp_now --release --target xtensa-esp32s2-none-elf --features "esp32s2,esp32s2-async,esp-now"`                                         |
 | ESP32-S3 | `cargo +esp run --example embassy_esp_now --release --target xtensa-esp32s3-none-elf --features "esp32s3,esp32s3-async,esp-now"`        
 
+### embassy_dhcp
+
+- Read and Write to sockets over WiFi asyncronously using embassy-executor.
+
 |   Chip   | Command                                                                                                                                                                  |
 | :------: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 |  ESP32   | `cargo +esp run --example embassy_dhcp --release --target xtensa-esp32-none-elf --features "esp32,esp32-async,embedded-svc,wifi,embassy-net"`                                               |
