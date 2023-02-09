@@ -6,7 +6,7 @@
 
 use embassy_executor::_export::StaticCell;
 use embassy_net::tcp::TcpSocket;
-use embassy_net::{StackResources, Stack, Config, Ipv4Address};
+use embassy_net::{Config, Ipv4Address, Stack, StackResources};
 #[cfg(feature = "esp32")]
 use esp32_hal as hal;
 #[cfg(feature = "esp32c2")]
@@ -20,6 +20,7 @@ use esp32s3_hal as hal;
 
 use embassy_executor::Executor;
 use embassy_time::{Duration, Timer};
+use embedded_svc::wifi::{AccessPointInfo, ClientConfiguration, Configuration, Wifi};
 use esp_backtrace as _;
 use esp_println::logger::init_logger;
 use esp_println::println;
@@ -28,7 +29,6 @@ use esp_wifi::wifi::{WifiDevice, WifiError};
 use hal::clock::{ClockControl, CpuClock};
 use hal::Rng;
 use hal::{embassy, peripherals::Peripherals, prelude::*, timer::TimerGroup, Rtc};
-use embedded_svc::wifi::{Wifi, ClientConfiguration, Configuration, AccessPointInfo};
 
 #[cfg(any(feature = "esp32c3", feature = "esp32c2"))]
 use hal::system::SystemExt;
@@ -194,7 +194,9 @@ async fn task(stack: &'static Stack<WifiDevice>) {
         let mut buf = [0; 1024];
         loop {
             use embedded_io::asynch::Write;
-            let r = socket.write_all(b"GET / HTTP/1.0\r\nHost: www.mobile-j.de\r\n\r\n").await;
+            let r = socket
+                .write_all(b"GET / HTTP/1.0\r\nHost: www.mobile-j.de\r\n\r\n")
+                .await;
             if let Err(e) = r {
                 println!("write error: {:?}", e);
                 break;

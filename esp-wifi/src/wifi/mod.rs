@@ -1070,7 +1070,7 @@ macro_rules! esp_wifi_result {
 #[cfg(feature = "embassy-net")]
 pub(crate) mod embassy {
     use super::*;
-    use embassy_net_driver::{Driver, RxToken, TxToken, Capabilities};
+    use embassy_net_driver::{Capabilities, Driver, RxToken, TxToken};
     use embassy_sync::waitqueue::AtomicWaker;
 
     pub(crate) static TRANSMIT_WAKER: AtomicWaker = AtomicWaker::new();
@@ -1084,10 +1084,11 @@ pub(crate) mod embassy {
             critical_section::with(|cs| {
                 let mut queue = DATA_QUEUE_RX.borrow_ref_mut(cs);
 
-                let mut data = queue
-                    .dequeue()
-                    .expect("unreachable: transmit()/receive() ensures there is a packet to process");
-                let buffer = unsafe { core::slice::from_raw_parts(&data.data as *const u8, data.len) };
+                let mut data = queue.dequeue().expect(
+                    "unreachable: transmit()/receive() ensures there is a packet to process",
+                );
+                let buffer =
+                    unsafe { core::slice::from_raw_parts(&data.data as *const u8, data.len) };
                 dump_packet_info(&buffer);
                 f(&mut data.data[..])
             })
@@ -1096,24 +1097,24 @@ pub(crate) mod embassy {
 
     impl TxToken for WifiTxToken {
         fn consume<R, F>(self, len: usize, f: F) -> R
-    where
-        F: FnOnce(&mut [u8]) -> R,
-    {
-        let res = critical_section::with(|cs| {
-            let mut queue = DATA_QUEUE_TX.borrow_ref_mut(cs);
+        where
+            F: FnOnce(&mut [u8]) -> R,
+        {
+            let res = critical_section::with(|cs| {
+                let mut queue = DATA_QUEUE_TX.borrow_ref_mut(cs);
 
-            let mut packet = DataFrame::new();
-            packet.len = len;
-            let res = f(&mut packet.data[..len]);
-            queue
-                .enqueue(packet)
-                .expect("unreachable: transmit()/receive() ensures there is a buffer free");
+                let mut packet = DataFrame::new();
+                packet.len = len;
+                let res = f(&mut packet.data[..len]);
+                queue
+                    .enqueue(packet)
+                    .expect("unreachable: transmit()/receive() ensures there is a buffer free");
+                res
+            });
+
+            send_data_if_needed();
             res
-        });
-
-        send_data_if_needed();
-        res
-    }
+        }
     }
 
     impl Driver for WifiDevice {
@@ -1156,7 +1157,7 @@ pub(crate) mod embassy {
         fn link_state(&mut self, _cx: &mut core::task::Context) -> embassy_net_driver::LinkState {
             // TODO once we have an async way of connecting to wifi, use here
             // for now just assume the link is up
-            embassy_net_driver::LinkState::Up 
+            embassy_net_driver::LinkState::Up
         }
 
         fn capabilities(&self) -> Capabilities {
