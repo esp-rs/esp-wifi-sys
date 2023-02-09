@@ -36,7 +36,7 @@ pub struct ReceivedPacket {
     pub data: [u8; 256],
 }
 
-static BT_INTERNAL_QUEUE: Mutex<RefCell<SimpleQueue<[u8; 8], 5>>> =
+static BT_INTERNAL_QUEUE: Mutex<RefCell<SimpleQueue<[u8; 8], 10>>> =
     Mutex::new(RefCell::new(SimpleQueue::new()));
 
 #[repr(C)]
