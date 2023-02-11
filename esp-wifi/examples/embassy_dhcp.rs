@@ -165,7 +165,7 @@ async fn scanner(mut wifi_interface: WifiDevice) {
     loop {
         println!("Begin scan...");
         let res: Result<(heapless::Vec<AccessPointInfo, 10>, usize), WifiError> =
-            wifi_interface.scan_n_async().await;
+            wifi_interface.scan_n().await;
         match res {
             Ok((res, n)) => {
                 println!("Scan returned {} results, ", n);

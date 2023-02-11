@@ -918,7 +918,7 @@ pub unsafe extern "C" fn event_post(
     }
 
     #[cfg(feature = "async")]
-    crate::wifi::asynch::WIFI_EVENT_WAKER.wake();
+    event.waker().map(|w| w.wake());
 
     memory_fence();
 

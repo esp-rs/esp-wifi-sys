@@ -707,7 +707,6 @@ impl WifiDevice {
         &mut self,
     ) -> Result<(heapless::Vec<AccessPointInfo, N>, usize), WifiError> {
         let scan = || -> Result<(heapless::Vec<AccessPointInfo, N>, usize), WifiError> {
-
             let mut scanned = heapless::Vec::<AccessPointInfo, N>::new();
             let mut bss_total: u16 = N as u16;
 
@@ -740,7 +739,9 @@ impl WifiDevice {
                     },
                     he_ap: crate::binary::include::wifi_he_ap_info_t {
                         _bitfield_align_1: [0u8; 0],
-                        _bitfield_1: crate::binary::include::wifi_he_ap_info_t::new_bitfield_1(0, 0, 0),
+                        _bitfield_1: crate::binary::include::wifi_he_ap_info_t::new_bitfield_1(
+                            0, 0, 0,
+                        ),
                         bssid_index: 0,
                     },
                 }; N];
@@ -752,12 +753,15 @@ impl WifiDevice {
 
                 for i in 0..bss_total {
                     let record = records[i as usize];
-                    let ssid_strbuf = crate::compat::common::StrBuf::from(&record.ssid as *const u8);
+                    let ssid_strbuf =
+                        crate::compat::common::StrBuf::from(&record.ssid as *const u8);
 
                     let auth_method = match record.authmode {
                         crate::binary::include::wifi_auth_mode_t_WIFI_AUTH_OPEN => AuthMethod::None,
                         crate::binary::include::wifi_auth_mode_t_WIFI_AUTH_WEP => AuthMethod::WEP,
-                        crate::binary::include::wifi_auth_mode_t_WIFI_AUTH_WPA_PSK => AuthMethod::WPA,
+                        crate::binary::include::wifi_auth_mode_t_WIFI_AUTH_WPA_PSK => {
+                            AuthMethod::WPA
+                        }
                         crate::binary::include::wifi_auth_mode_t_WIFI_AUTH_WPA2_PSK => {
                             AuthMethod::WPA2Personal
                         }
@@ -1189,7 +1193,6 @@ pub(crate) mod embassy {
     }
 }
 
-
 #[cfg(feature = "async")]
 mod asynch {
     use core::task::Poll;
@@ -1200,34 +1203,92 @@ mod asynch {
     use super::*;
 
     impl WifiDevice {
-        pub async fn scan_n_async<const N: usize>(
+        pub async fn scan_n<const N: usize>(
             &mut self,
         ) -> Result<(heapless::Vec<AccessPointInfo, N>, usize), WifiError> {
             esp_wifi_result!(crate::wifi::wifi_start_scan(false))?;
 
-            WiFiEventFuture(WifiEvent::ScanDone, false).await;
+            WifiEventFuture::new(WifiEvent::ScanDone).await;
 
             self.scan_results()
         }
+
+        pub async fn start(&mut self) -> Result<(), WifiError> {
+            todo!()
+        }
+
+        pub async fn stop(&mut self) -> Result<(), WifiError> {
+            todo!()
+        }
+
+        pub async fn connect(&mut self) -> Result<(), WifiError> {
+            todo!()
+        }
+        
+        pub async fn disconnect(&mut self) -> Result<(), WifiError> {
+            todo!()
+        }
     }
 
-    // TODO this probably needs to be a waker per event we want to await on?
-    // because if we try and await for two things one will overwrite the other
-    pub(crate) static WIFI_EVENT_WAKER: AtomicWaker = AtomicWaker::new();
+    impl WifiEvent {
+        pub(crate) fn waker(&self) -> Option<&'static AtomicWaker> {
+            Some(match self {
+                WifiEvent::ScanDone => {
+                    static WAKER: AtomicWaker = AtomicWaker::new();
+                    &WAKER
+                }
+                WifiEvent::WifiReady
+                | WifiEvent::StaStart
+                | WifiEvent::StaStop
+                | WifiEvent::StaConnected
+                | WifiEvent::StaDisconnected
+                | WifiEvent::StaAuthmodeChange
+                | WifiEvent::StaWpsErSuccess
+                | WifiEvent::StaWpsErFailed
+                | WifiEvent::StaWpsErTimeout
+                | WifiEvent::StaWpsErPin
+                | WifiEvent::StaWpsErPbcOverlap
+                | WifiEvent::ApStart
+                | WifiEvent::ApStop
+                | WifiEvent::ApStaconnected
+                | WifiEvent::ApStadisconnected
+                | WifiEvent::ApProbereqrecved
+                | WifiEvent::FtmReport
+                | WifiEvent::StaBssRssiLow
+                | WifiEvent::ActionTxStatus
+                | WifiEvent::RocDone
+                | WifiEvent::StaBeaconTimeout => return None,
+            })
+        }
+    }
 
-    pub(crate) struct WiFiEventFuture(WifiEvent, bool);
+    pub(crate) struct WifiEventFuture {
+        event: WifiEvent,
+        setup: bool,
+    }
 
-    impl core::future::Future for WiFiEventFuture {
+    impl WifiEventFuture {
+        pub fn new(event: WifiEvent) -> Self {
+            Self {
+                event,
+                setup: false,
+            }
+        }
+    }
+
+    impl core::future::Future for WifiEventFuture {
         type Output = ();
 
-        fn poll(mut self: core::pin::Pin<&mut Self>, cx: &mut core::task::Context<'_>) -> Poll<Self::Output> {
-            WIFI_EVENT_WAKER.register(cx.waker());
+        fn poll(
+            mut self: core::pin::Pin<&mut Self>,
+            cx: &mut core::task::Context<'_>,
+        ) -> Poll<Self::Output> {
+            self.event.waker().expect("Not yet implemented, unable to await this event").register(cx.waker());
             let event = WifiEvent::from_i32(unsafe { WIFI_STATE }).unwrap();
-            if event == self.0 && self.1 {
+            if event == self.event && self.setup {
                 Poll::Ready(())
             } else {
-                // set flag
-                self.1 = true;
+                self.setup = true; // future initialized
                 Poll::Pending
             }
         }
