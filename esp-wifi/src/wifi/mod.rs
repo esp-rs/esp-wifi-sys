@@ -1202,6 +1202,8 @@ mod asynch {
 
     use super::*;
 
+    // TODO timeouts on some
+    // TODO assumes STA mode only
     impl WifiDevice {
         pub async fn scan_n<const N: usize>(
             &mut self,
@@ -1214,17 +1216,32 @@ mod asynch {
         }
 
         pub async fn start(&mut self) -> Result<(), WifiError> {
-            todo!()
+            wifi_start()?;
+            WifiEventFuture::new(WifiEvent::StaStart).await;
+            Ok(())
         }
 
         pub async fn stop(&mut self) -> Result<(), WifiError> {
-            todo!()
+            crate::wifi::wifi_stop()?;
+            WifiEventFuture::new(WifiEvent::StaStop).await;
+            Ok(())
         }
 
         pub async fn connect(&mut self) -> Result<(), WifiError> {
-            todo!()
+            let embedded_svc::wifi::Configuration::Client(config) = &self.config else {
+                panic!("Missing config")
+            };
+            crate::wifi::wifi_connect(&config.ssid, &config.password)?;
+            match embassy_futures::select::select(
+                WifiEventFuture::new(WifiEvent::StaConnected),
+                WifiEventFuture::new(WifiEvent::StaDisconnected),
+            )
+            .await {
+                embassy_futures::select::Either::First(_) => Ok(()),
+                embassy_futures::select::Either::Second(_) => Err(WifiError::Disconnected),
+            }
         }
-        
+
         pub async fn disconnect(&mut self) -> Result<(), WifiError> {
             todo!()
         }
@@ -1237,11 +1254,23 @@ mod asynch {
                     static WAKER: AtomicWaker = AtomicWaker::new();
                     &WAKER
                 }
+                WifiEvent::StaStart => {
+                    static WAKER: AtomicWaker = AtomicWaker::new();
+                    &WAKER
+                }
+                WifiEvent::StaConnected => {
+                    static WAKER: AtomicWaker = AtomicWaker::new();
+                    &WAKER
+                }
+                WifiEvent::StaDisconnected => {
+                    static WAKER: AtomicWaker = AtomicWaker::new();
+                    &WAKER
+                }
+                WifiEvent::StaStop => {
+                    static WAKER: AtomicWaker = AtomicWaker::new();
+                    &WAKER
+                }
                 WifiEvent::WifiReady
-                | WifiEvent::StaStart
-                | WifiEvent::StaStop
-                | WifiEvent::StaConnected
-                | WifiEvent::StaDisconnected
                 | WifiEvent::StaAuthmodeChange
                 | WifiEvent::StaWpsErSuccess
                 | WifiEvent::StaWpsErFailed
@@ -1262,7 +1291,7 @@ mod asynch {
         }
     }
 
-    pub(crate) struct WifiEventFuture {
+    pub struct WifiEventFuture {
         event: WifiEvent,
         setup: bool,
     }
@@ -1276,6 +1305,16 @@ mod asynch {
         }
     }
 
+    impl core::future::IntoFuture for WifiEvent {
+        type Output = <Self::IntoFuture as core::future::Future>::Output;
+
+        type IntoFuture = WifiEventFuture;
+
+        fn into_future(self) -> Self::IntoFuture {
+            WifiEventFuture::new(self)
+        }
+    }
+
     impl core::future::Future for WifiEventFuture {
         type Output = ();
 
@@ -1283,7 +1322,10 @@ mod asynch {
             mut self: core::pin::Pin<&mut Self>,
             cx: &mut core::task::Context<'_>,
         ) -> Poll<Self::Output> {
-            self.event.waker().expect("Not yet implemented, unable to await this event").register(cx.waker());
+            self.event
+                .waker()
+                .expect("Not yet implemented, unable to await this event")
+                .register(cx.waker());
             let event = WifiEvent::from_i32(unsafe { WIFI_STATE }).unwrap();
             if event == self.event && self.setup {
                 Poll::Ready(())

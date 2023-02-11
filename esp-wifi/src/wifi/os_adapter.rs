@@ -900,9 +900,11 @@ pub unsafe extern "C" fn event_post(
     use num_traits::FromPrimitive;
 
     let event = WifiEvent::from_i32(event_id).unwrap();
+    log::info!("EVENT: {:?}", event);
 
     let take_state = match event {
         WifiEvent::StaConnected
+        | WifiEvent::StaDisconnected
         | WifiEvent::StaStart
         | WifiEvent::StaStop
         | WifiEvent::WifiReady
