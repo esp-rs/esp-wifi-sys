@@ -896,21 +896,19 @@ pub unsafe extern "C" fn event_post(
         event_data_size,
         ticks_to_wait
     );
+    use crate::wifi::WifiEvent;
+    use num_traits::FromPrimitive;
 
-    // probably also need to look at event_base
-    #[allow(non_upper_case_globals)]
-    let take_state = match event_id as u32 {
-        wifi_event_t_WIFI_EVENT_WIFI_READY => true,
-        wifi_event_t_WIFI_EVENT_STA_START => true,
-        wifi_event_t_WIFI_EVENT_STA_STOP => true,
-        wifi_event_t_WIFI_EVENT_STA_CONNECTED => true,
-        wifi_event_t_WIFI_EVENT_STA_DISCONNECTED => true,
-        _ => {
-            use num_traits::FromPrimitive;
-            log::info!(
-                "Unhandled event: {:?}",
-                crate::wifi::WifiEvent::from_i32(event_id)
-            );
+    let event = WifiEvent::from_i32(event_id).unwrap();
+
+    let take_state = match event {
+        WifiEvent::StaConnected
+        | WifiEvent::StaStart
+        | WifiEvent::StaStop
+        | WifiEvent::WifiReady
+        | WifiEvent::ScanDone => true,
+        other => {
+            log::info!("Unhandled event: {:?}", other);
             false
         }
     };
@@ -918,6 +916,9 @@ pub unsafe extern "C" fn event_post(
     if take_state {
         WIFI_STATE = event_id;
     }
+
+    #[cfg(feature = "async")]
+    crate::wifi::asynch::WIFI_EVENT_WAKER.wake();
 
     memory_fence();
 
