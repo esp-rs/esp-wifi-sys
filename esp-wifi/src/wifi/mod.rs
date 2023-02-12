@@ -1208,7 +1208,13 @@ mod asynch {
         }
 
         pub async fn start(&mut self) -> Result<(), WifiError> {
-            wifi_start()?; // starts immediately - non blocking?
+            use embedded_svc::wifi::Wifi;
+
+            wifi_start()?;
+            // if start doesn't start immediatly, wait for event
+            if !matches!(self.is_started(), Ok(true)) {
+                WifiEvent::StaStart.await;
+            }
             Ok(())
         }
 
@@ -1232,7 +1238,9 @@ mod asynch {
         }
 
         pub async fn disconnect(&mut self) -> Result<(), WifiError> {
-            todo!()
+            embedded_svc::wifi::Wifi::disconnect(self)?;
+            WifiEventFuture::new(WifiEvent::StaDisconnected).await;
+            Ok(())
         }
     }
 

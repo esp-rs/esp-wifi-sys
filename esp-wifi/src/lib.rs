@@ -216,7 +216,6 @@ pub fn initialize(
     {
         log::debug!("wifi init");
         crate::wifi::wifi_init()?;
-        crate::wifi::wifi_start()?;
     }
 
     #[cfg(feature = "ble")]
