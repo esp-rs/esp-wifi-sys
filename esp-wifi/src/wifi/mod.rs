@@ -638,6 +638,13 @@ impl WifiDevice {
         }
     }
 
+    fn is_sta_enabled(&self) -> Result<bool, WifiError> {
+        let mut mode: esp_wifi_sys::include::wifi_mode_t = 0;
+        esp_wifi_result!(unsafe { esp_wifi_sys::include::esp_wifi_get_mode(&mut mode) })?;
+
+        Ok(mode == wifi_mode_t_WIFI_MODE_STA)
+    }
+
     fn scan_results<const N: usize>(
         &mut self,
     ) -> Result<(heapless::Vec<AccessPointInfo, N>, usize), WifiError> {
@@ -905,7 +912,7 @@ impl embedded_svc::wifi::Wifi for WifiDevice {
             embedded_svc::wifi::Configuration::Client(config) => {
                 esp_wifi_result!(unsafe { esp_wifi_set_mode(wifi_mode_t_WIFI_MODE_STA) })?;
 
-                info!("Wifi mode STA set");
+                debug!("Wifi mode STA set");
                 let bssid: [u8; 6] = match &config.bssid {
                     Some(bssid_ref) => *bssid_ref,
                     None => [0; 6],
@@ -990,12 +997,7 @@ impl embedded_svc::wifi::Wifi for WifiDevice {
     }
 
     fn is_started(&self) -> Result<bool, Self::Error> {
-        match crate::wifi::get_wifi_state() {
-            crate::wifi::WifiState::StaStart => Ok(true),
-            crate::wifi::WifiState::StaConnected => Ok(true),
-            //FIXME: Should any of the enum values trigger an error instead of returning false?
-            _ => Ok(false),
-        }
+        self.is_sta_enabled() // TODO handle AP mode when we support that
     }
 
     fn is_connected(&self) -> Result<bool, Self::Error> {

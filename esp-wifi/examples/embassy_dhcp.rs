@@ -122,7 +122,6 @@ fn main() -> ! {
 #[embassy_executor::task]
 async fn connection(_stack: &'static Stack<WifiDevice>) {
     println!("start connection task");
-    let mut is_started = false; // this is a replacement for buggy device.is_started().unwrap() impl
     let mut device = WifiDevice::new(); // TODO THIS IS BAD - but there is no way to get access to the device in the stack at the moment :()
     println!("Device capabilities: {:?}", device.get_capabilities());
     loop {
@@ -132,9 +131,9 @@ async fn connection(_stack: &'static Stack<WifiDevice>) {
                 WifiEvent::StaDisconnected.await;
                 Timer::after(Duration::from_millis(5000)).await
             },
-            s => println!("In state: {s:?}, moving to connect")
+            _ => {}
         }
-        if !is_started {
+        if !matches!(device.is_started(), Ok(true)) {
             let client_config = Configuration::Client(ClientConfiguration {
                 ssid: SSID.into(),
                 password: PASSWORD.into(),
@@ -143,10 +142,8 @@ async fn connection(_stack: &'static Stack<WifiDevice>) {
             device.set_configuration(&client_config).unwrap();
             println!("Starting wifi");
             device.start().await.unwrap();
-            is_started = true;
             println!("Wifi started!");
         }
-        
         println!("About to connect...");
         
         match device.connect().await {
