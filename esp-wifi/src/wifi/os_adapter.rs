@@ -922,6 +922,12 @@ pub unsafe extern "C" fn event_post(
     #[cfg(feature = "async")]
     event.waker().map(|w| w.wake());
 
+    #[cfg(feature = "embassy-net")]
+    if matches!(event, WifiEvent::StaConnected | WifiEvent::StaDisconnected) {
+        log::info!("Waking LINK_STATE");
+        crate::wifi::embassy::LINK_STATE.wake();
+    }
+
     memory_fence();
 
     0

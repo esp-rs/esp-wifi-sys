@@ -111,11 +111,9 @@ fn main() -> ! {
 
     let executor = EXECUTOR.init(Executor::new());
     executor.run(|spawner| {
-        // spawner.spawn(net_task(&stack)).ok();
-        // spawner.spawn(task(&stack)).ok();
-        // spawner.spawn(pinger()).ok();
-        // spawner.spawn(scanner(wifi_interface)).ok();
         spawner.spawn(connection(&stack)).ok();
+        spawner.spawn(net_task(&stack)).ok();
+        spawner.spawn(task(&stack)).ok();
     });
 }
 
@@ -156,34 +154,6 @@ async fn connection(_stack: &'static Stack<WifiDevice>) {
     }
 }
 
-
-// #[embassy_executor::task]
-// async fn scanner(mut wifi_interface: WifiDevice) {
-//     loop {
-//         println!("Begin scan...");
-//         let res: Result<(heapless::Vec<AccessPointInfo, 10>, usize), WifiError> =
-//             wifi_interface.scan_n().await;
-//         match res {
-//             Ok((res, n)) => {
-//                 println!("Scan returned {} results, ", n);
-//                 for ap in res {
-//                     println!("{:?}", ap);
-//                 }
-//             },
-//             Err(e) => println!("Scan error: {:?}", e)
-//         }
-//         Timer::after(Duration::from_millis(3000)).await;
-//     }
-// }
-
-#[embassy_executor::task]
-async fn pinger() {
-    loop {
-        println!("Ping!");
-        Timer::after(Duration::from_millis(1000)).await;
-    }
-}
-
 #[embassy_executor::task]
 async fn net_task(stack: &'static Stack<WifiDevice>) {
     stack.run().await
@@ -193,6 +163,13 @@ async fn net_task(stack: &'static Stack<WifiDevice>) {
 async fn task(stack: &'static Stack<WifiDevice>) {
     let mut rx_buffer = [0; 4096];
     let mut tx_buffer = [0; 4096];
+
+    loop {
+        if stack.is_link_up() {
+            break;
+        }
+        Timer::after(Duration::from_millis(500)).await;
+    }
 
     println!("Waiting to get IP address...");
     loop {
@@ -241,6 +218,6 @@ async fn task(stack: &'static Stack<WifiDevice>) {
             };
             println!("{}", core::str::from_utf8(&buf[..n]).unwrap());
         }
-        Timer::after(Duration::from_millis(1000)).await;
+        Timer::after(Duration::from_millis(3000)).await;
     }
 }

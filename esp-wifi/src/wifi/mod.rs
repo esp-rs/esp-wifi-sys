@@ -1084,9 +1084,11 @@ pub(crate) mod embassy {
     use super::*;
     use embassy_net_driver::{Capabilities, Driver, RxToken, TxToken};
     use embassy_sync::waitqueue::AtomicWaker;
+    use embedded_svc::wifi::Wifi;
 
     pub(crate) static TRANSMIT_WAKER: AtomicWaker = AtomicWaker::new();
     pub(crate) static RECEIVE_WAKER: AtomicWaker = AtomicWaker::new();
+    pub(crate) static LINK_STATE: AtomicWaker = AtomicWaker::new();
 
     impl RxToken for WifiRxToken {
         fn consume<R, F>(self, f: F) -> R
@@ -1166,10 +1168,13 @@ pub(crate) mod embassy {
             })
         }
 
-        fn link_state(&mut self, _cx: &mut core::task::Context) -> embassy_net_driver::LinkState {
-            // TODO once we have an async way of connecting to wifi, use here
-            // for now just assume the link is up
-            embassy_net_driver::LinkState::Up
+        fn link_state(&mut self, cx: &mut core::task::Context) -> embassy_net_driver::LinkState {
+            LINK_STATE.register(cx.waker());
+            if matches!(self.is_connected(), Ok(true)) {
+                embassy_net_driver::LinkState::Up
+            } else {
+                embassy_net_driver::LinkState::Down
+            }
         }
 
         fn capabilities(&self) -> Capabilities {
