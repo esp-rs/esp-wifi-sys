@@ -86,6 +86,16 @@ fn main() -> ! {
         initialize(timg1.timer0, Rng::new(peripherals.RNG), &clocks).unwrap();
     }
 
+    println!("Call wifi_connect");
+    let client_config = Configuration::Client(ClientConfiguration {
+        ssid: SSID.into(),
+        password: PASSWORD.into(),
+        ..Default::default()
+    });
+    let res = wifi_stack.set_configuration(&client_config);
+    println!("wifi_set_configuration returned {:?}", res);
+
+    wifi_stack.start().unwrap();
     println!("is wifi started: {:?}", wifi_stack.is_started());
 
     println!("Start Wifi Scan");
@@ -95,15 +105,6 @@ fn main() -> ! {
             println!("{:?}", ap);
         }
     }
-
-    println!("Call wifi_connect");
-    let client_config = Configuration::Client(ClientConfiguration {
-        ssid: SSID.into(),
-        password: PASSWORD.into(),
-        ..Default::default()
-    });
-    let res = wifi_stack.set_configuration(&client_config);
-    println!("wifi_set_configuration returned {:?}", res);
 
     println!("{:?}", wifi_stack.get_capabilities());
     println!("wifi_connect {:?}", wifi_stack.connect());

@@ -20,12 +20,12 @@ use esp32s3_hal as hal;
 
 use embassy_executor::Executor;
 use embassy_time::{Duration, Timer};
-use embedded_svc::wifi::{AccessPointInfo, ClientConfiguration, Configuration, Wifi};
+use embedded_svc::wifi::{ClientConfiguration, Configuration, Wifi};
 use esp_backtrace as _;
 use esp_println::logger::init_logger;
 use esp_println::println;
 use esp_wifi::initialize;
-use esp_wifi::wifi::{WifiDevice, WifiError, WifiState, WifiEvent};
+use esp_wifi::wifi::{WifiDevice, WifiState, WifiEvent};
 use hal::clock::{ClockControl, CpuClock};
 use hal::Rng;
 use hal::{embassy, peripherals::Peripherals, prelude::*, timer::TimerGroup, Rtc};
@@ -123,37 +123,39 @@ fn main() -> ! {
 async fn connection(_stack: &'static Stack<WifiDevice>) {
     println!("start connection task");
     let mut is_started = false; // this is a replacement for buggy device.is_started().unwrap() impl
+    let mut device = WifiDevice::new(); // TODO THIS IS BAD - but there is no way to get access to the device in the stack at the moment :()
+    println!("Device capabilities: {:?}", device.get_capabilities());
     loop {
-        let mut device = WifiDevice::new(); // TODO THIS IS BAD - but there is no way to get access to the device in the stack at the moment :()
         match esp_wifi::wifi::get_wifi_state() {
             WifiState::StaConnected => {
                 // wait until we're no longer connected
                 WifiEvent::StaDisconnected.await;
+                Timer::after(Duration::from_millis(5000)).await
             },
             s => println!("In state: {s:?}, moving to connect")
         }
         if !is_started {
+            let client_config = Configuration::Client(ClientConfiguration {
+                ssid: SSID.into(),
+                password: PASSWORD.into(),
+                ..Default::default()
+            });
+            device.set_configuration(&client_config).unwrap();
             println!("Starting wifi");
             device.start().await.unwrap();
             is_started = true;
             println!("Wifi started!");
         }
-        let client_config = Configuration::Client(ClientConfiguration {
-            ssid: SSID.into(),
-            password: PASSWORD.into(),
-            ..Default::default()
-        });
-        device.set_configuration(&client_config).unwrap();
-
-        println!("{:?}", device.get_capabilities());
+        
         println!("About to connect...");
-
+        
         match device.connect().await {
             Ok(_) => println!("Wifi connected!"),
-            Err(e) => println!("Failed to connect to wifi: {e:?}"),
+            Err(e) => { 
+                println!("Failed to connect to wifi: {e:?}");
+                Timer::after(Duration::from_millis(5000)).await
+            },
         }
-
-        Timer::after(Duration::from_millis(1000)).await
     }
 }
 

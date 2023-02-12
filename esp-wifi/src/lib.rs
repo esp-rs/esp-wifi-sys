@@ -87,7 +87,7 @@ pub fn current_millis() -> u64 {
 }
 
 #[cfg(not(coex))]
-const HEAP_SIZE: usize = 42 * 1024;
+const HEAP_SIZE: usize = 64 * 1024;
 
 #[cfg(coex)]
 const HEAP_SIZE: usize = 64 * 1024;
