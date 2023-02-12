@@ -868,10 +868,10 @@ pub fn send_data_if_needed() {
                 }
                 log::trace!("esp_wifi_internal_tx {}", _res);
             }
+            #[cfg(feature = "embassy-net")]
+            embassy::TRANSMIT_WAKER.wake();
         }
 
-        #[cfg(feature = "embassy-net")]
-        embassy::TRANSMIT_WAKER.wake();
     });
 }
 
