@@ -1005,16 +1005,15 @@ impl embedded_svc::wifi::Wifi for WifiController {
     }
 
     fn stop(&mut self) -> Result<(), Self::Error> {
-        unsafe { esp_wifi_result!(esp_wifi_stop()) }
+        esp_wifi_result!(unsafe { esp_wifi_stop() })
     }
 
     fn connect(&mut self) -> Result<(), Self::Error> {
-        unsafe { esp_wifi_result!(esp_wifi_connect()) }
+        esp_wifi_result!(unsafe { esp_wifi_connect() })
     }
 
     fn disconnect(&mut self) -> Result<(), Self::Error> {
-        unsafe { esp_wifi_result!(esp_wifi_disconnect()) }?;
-        Ok(())
+        esp_wifi_result!(unsafe { esp_wifi_disconnect() })
     }
 
     fn is_started(&self) -> Result<bool, Self::Error> {
@@ -1236,12 +1235,8 @@ mod asynch {
 
         pub async fn start(&mut self) -> Result<(), WifiError> {
             critical_section::with(|cs| WIFI_EVENTS.borrow_ref_mut(cs).remove(WifiEvent::StaStart));
-
             wifi_start()?;
-            // if start doesn't start immediatly, wait for event
-            if !matches!(embedded_svc::wifi::Wifi::is_started(self), Ok(true)) {
-                WifiEvent::StaStart.await;
-            }
+            WifiEvent::StaStart.await;
             Ok(())
         }
 
@@ -1254,7 +1249,7 @@ mod asynch {
 
         pub async fn connect(&mut self) -> Result<(), WifiError> {
             critical_section::with(|cs| WIFI_EVENTS.borrow_ref_mut(cs).remove_all(WifiEvent::StaConnected | WifiEvent::StaDisconnected));
-            embedded_svc::wifi::Wifi::connect(self).ok(); // connect will still try, so ignore errors      
+            let err = embedded_svc::wifi::Wifi::connect(self).err();
             match embassy_futures::select::select(
                 WifiEventFuture::new(WifiEvent::StaConnected),
                 WifiEventFuture::new(WifiEvent::StaDisconnected),
@@ -1262,7 +1257,7 @@ mod asynch {
             .await
             {
                 embassy_futures::select::Either::First(_) => Ok(()),
-                embassy_futures::select::Either::Second(_) => Err(WifiError::Disconnected),
+                embassy_futures::select::Either::Second(_) => Err(err.unwrap_or(WifiError::Disconnected)),
             }
         }
 
