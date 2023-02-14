@@ -623,20 +623,40 @@ pub fn wifi_start_scan(block: bool) -> i32 {
     unsafe { esp_wifi_scan_start(&scan_config, block) }
 }
 
+pub fn new_with_config(config: embedded_svc::wifi::Configuration) -> (WifiDevice, WifiController) {
+    (WifiDevice::new(), WifiController::new_with_config(config))
+}
+
+pub fn new() -> (WifiDevice, WifiController) {
+    (WifiDevice::new(), WifiController::new())
+}
+
 /// A wifi device implementing smoltcp's Device trait.
 pub struct WifiDevice {
-    config: embedded_svc::wifi::Configuration,
+    _private: ()
 }
 
 impl WifiDevice {
-    pub fn new_with_config(config: embedded_svc::wifi::Configuration) -> WifiDevice {
-        WifiDevice { config }
+    pub(crate) fn new() -> WifiDevice {
+        Self {
+            _private: ()
+        }
+    }
+}
+
+/// A wifi controller implementing embedded_svc::Wifi traits
+pub struct WifiController {
+    config: embedded_svc::wifi::Configuration,
+}
+
+impl WifiController {
+
+    pub(crate) fn new_with_config(config: embedded_svc::wifi::Configuration) -> Self {
+        Self { config }
     }
 
-    pub fn new() -> WifiDevice {
-        Self {
-            config: Default::default(),
-        }
+    pub(crate) fn new() -> Self {
+        Self { config: Default::default() }
     }
 
     fn is_sta_enabled(&self) -> Result<bool, WifiError> {
@@ -876,7 +896,7 @@ pub fn send_data_if_needed() {
     });
 }
 
-impl embedded_svc::wifi::Wifi for WifiDevice {
+impl embedded_svc::wifi::Wifi for WifiController {
     type Error = WifiError;
 
     /// This currently only supports the `Client` capability.
@@ -1085,7 +1105,6 @@ pub(crate) mod embassy {
     use super::*;
     use embassy_net_driver::{Capabilities, Driver, RxToken, TxToken};
     use embassy_sync::waitqueue::AtomicWaker;
-    use embedded_svc::wifi::Wifi;
 
     pub(crate) static TRANSMIT_WAKER: AtomicWaker = AtomicWaker::new();
     pub(crate) static RECEIVE_WAKER: AtomicWaker = AtomicWaker::new();
@@ -1171,7 +1190,7 @@ pub(crate) mod embassy {
 
         fn link_state(&mut self, cx: &mut core::task::Context) -> embassy_net_driver::LinkState {
             LINK_STATE.register(cx.waker());
-            if matches!(self.is_connected(), Ok(true)) {
+            if matches!(get_wifi_state(), WifiState::StaConnected) {
                 embassy_net_driver::LinkState::Up
             } else {
                 embassy_net_driver::LinkState::Down
@@ -1203,7 +1222,7 @@ mod asynch {
     use super::*;
 
     // TODO assumes STA mode only
-    impl WifiDevice {
+    impl WifiController {
         pub async fn scan_n<const N: usize>(
             &mut self,
         ) -> Result<(heapless::Vec<AccessPointInfo, N>, usize), WifiError> {

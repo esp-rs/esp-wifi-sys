@@ -25,7 +25,7 @@ use esp_backtrace as _;
 use esp_println::logger::init_logger;
 use esp_println::println;
 use esp_wifi::initialize;
-use esp_wifi::wifi::{WifiDevice, WifiState, WifiEvent};
+use esp_wifi::wifi::{WifiDevice, WifiState, WifiEvent, WifiController};
 use hal::clock::{ClockControl, CpuClock};
 use hal::Rng;
 use hal::{embassy, peripherals::Peripherals, prelude::*, timer::TimerGroup, Rtc};
@@ -92,7 +92,7 @@ fn main() -> ! {
         initialize(timg1.timer0, Rng::new(peripherals.RNG), &clocks).unwrap();
     }
 
-    let wifi_interface = WifiDevice::new();
+    let (wifi_interface, controller) = esp_wifi::wifi::new();
 
     let timer_group0 = TimerGroup::new(peripherals.TIMG0, &clocks);
     embassy::init(&clocks, timer_group0.timer0);
@@ -111,17 +111,16 @@ fn main() -> ! {
 
     let executor = EXECUTOR.init(Executor::new());
     executor.run(|spawner| {
-        spawner.spawn(connection(&stack)).ok();
+        spawner.spawn(connection(controller)).ok();
         spawner.spawn(net_task(&stack)).ok();
         spawner.spawn(task(&stack)).ok();
     });
 }
 
 #[embassy_executor::task]
-async fn connection(_stack: &'static Stack<WifiDevice>) {
+async fn connection(mut controller: WifiController) {
     println!("start connection task");
-    let mut device = WifiDevice::new(); // TODO THIS IS BAD - but there is no way to get access to the device in the stack at the moment :()
-    println!("Device capabilities: {:?}", device.get_capabilities());
+    println!("Device capabilities: {:?}", controller.get_capabilities());
     loop {
         match esp_wifi::wifi::get_wifi_state() {
             WifiState::StaConnected => {
@@ -132,20 +131,20 @@ async fn connection(_stack: &'static Stack<WifiDevice>) {
             },
             _ => {}
         }
-        if !matches!(device.is_started(), Ok(true)) {
+        if !matches!(controller.is_started(), Ok(true)) {
             let client_config = Configuration::Client(ClientConfiguration {
                 ssid: SSID.into(),
                 password: PASSWORD.into(),
                 ..Default::default()
             });
-            device.set_configuration(&client_config).unwrap();
+            controller.set_configuration(&client_config).unwrap();
             println!("Starting wifi");
-            device.start().await.unwrap();
+            controller.start().await.unwrap();
             println!("Wifi started!");
         }
         println!("About to connect...");
         
-        match device.connect().await {
+        match controller.connect().await {
             Ok(_) => println!("Wifi connected!"),
             Err(e) => { 
                 println!("Failed to connect to wifi: {e:?}");
