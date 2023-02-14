@@ -30,9 +30,9 @@ use crate::compat::common::syslog;
 
 use super::WifiEvent;
 
-pub static mut WIFI_STATE: i32 = -1;
+pub(crate) static mut WIFI_STATE: i32 = -1;
 
-pub static WIFI_EVENTS: Mutex<RefCell<EnumSet<WifiEvent>>> =
+pub(crate) static WIFI_EVENTS: Mutex<RefCell<EnumSet<WifiEvent>>> =
     Mutex::new(RefCell::new(enumset::enum_set!()));
 
 pub fn is_connected() -> bool {
