@@ -7,7 +7,7 @@ use smoltcp::{
 
 use crate::wifi::get_sta_mac;
 
-use super::{WifiDevice, WifiController};
+use super::{WifiController, WifiDevice};
 
 /// Convenient way to create an `smoltcp` ethernet interface
 /// You can use the provided macros to create and pass a suitable backing storage.

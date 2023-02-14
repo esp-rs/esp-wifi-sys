@@ -25,7 +25,7 @@ use esp_backtrace as _;
 use esp_println::logger::init_logger;
 use esp_println::println;
 use esp_wifi::initialize;
-use esp_wifi::wifi::{WifiDevice, WifiState, WifiEvent, WifiController};
+use esp_wifi::wifi::{WifiController, WifiDevice, WifiEvent, WifiState};
 use hal::clock::{ClockControl, CpuClock};
 use hal::Rng;
 use hal::{embassy, peripherals::Peripherals, prelude::*, timer::TimerGroup, Rtc};
@@ -127,7 +127,7 @@ async fn connection(mut controller: WifiController) {
                 // wait until we're no longer connected
                 controller.wait_for_event(WifiEvent::StaDisconnected).await;
                 Timer::after(Duration::from_millis(5000)).await
-            },
+            }
             _ => {}
         }
         if !matches!(controller.is_started(), Ok(true)) {
@@ -142,13 +142,13 @@ async fn connection(mut controller: WifiController) {
             println!("Wifi started!");
         }
         println!("About to connect...");
-        
+
         match controller.connect().await {
             Ok(_) => println!("Wifi connected!"),
-            Err(e) => { 
+            Err(e) => {
                 println!("Failed to connect to wifi: {e:?}");
                 Timer::after(Duration::from_millis(5000)).await
-            },
+            }
         }
     }
 }

@@ -633,14 +633,12 @@ pub fn new() -> (WifiDevice, WifiController) {
 
 /// A wifi device implementing smoltcp's Device trait.
 pub struct WifiDevice {
-    _private: ()
+    _private: (),
 }
 
 impl WifiDevice {
     pub(crate) fn new() -> WifiDevice {
-        Self {
-            _private: ()
-        }
+        Self { _private: () }
     }
 }
 
@@ -650,13 +648,14 @@ pub struct WifiController {
 }
 
 impl WifiController {
-
     pub(crate) fn new_with_config(config: embedded_svc::wifi::Configuration) -> Self {
         Self { config }
     }
 
     pub(crate) fn new() -> Self {
-        Self { config: Default::default() }
+        Self {
+            config: Default::default(),
+        }
     }
 
     fn is_sta_enabled(&self) -> Result<bool, WifiError> {
@@ -892,7 +891,6 @@ pub fn send_data_if_needed() {
             #[cfg(feature = "embassy-net")]
             embassy::TRANSMIT_WAKER.wake();
         }
-
     });
 }
 
@@ -962,9 +960,7 @@ impl embedded_svc::wifi::Wifi for WifiController {
                                 AuthMethod::WPA2Enterprise => {
                                     wifi_auth_mode_t_WIFI_AUTH_WPA2_ENTERPRISE
                                 }
-                                AuthMethod::WPA3Personal => {
-                                    wifi_auth_mode_t_WIFI_AUTH_WPA3_PSK
-                                },
+                                AuthMethod::WPA3Personal => wifi_auth_mode_t_WIFI_AUTH_WPA3_PSK,
                                 AuthMethod::WPA2WPA3Personal => {
                                     wifi_auth_mode_t_WIFI_AUTH_WPA2_WPA3_PSK
                                 }
@@ -987,7 +983,8 @@ impl embedded_svc::wifi::Wifi for WifiController {
 
                 unsafe {
                     cfg.sta.ssid[0..(config.ssid.len())].copy_from_slice(config.ssid.as_bytes());
-                    cfg.sta.password[0..(config.password.len())].copy_from_slice(config.password.as_bytes());
+                    cfg.sta.password[0..(config.password.len())]
+                        .copy_from_slice(config.password.as_bytes());
                 }
                 esp_wifi_result!(unsafe {
                     esp_wifi_set_config(wifi_interface_t_WIFI_IF_STA, &mut cfg)
@@ -1248,7 +1245,11 @@ mod asynch {
         }
 
         pub async fn connect(&mut self) -> Result<(), WifiError> {
-            critical_section::with(|cs| WIFI_EVENTS.borrow_ref_mut(cs).remove_all(WifiEvent::StaConnected | WifiEvent::StaDisconnected));
+            critical_section::with(|cs| {
+                WIFI_EVENTS
+                    .borrow_ref_mut(cs)
+                    .remove_all(WifiEvent::StaConnected | WifiEvent::StaDisconnected)
+            });
             let err = embedded_svc::wifi::Wifi::connect(self).err();
             match embassy_futures::select::select(
                 WifiEventFuture::new(WifiEvent::StaConnected),
@@ -1257,12 +1258,18 @@ mod asynch {
             .await
             {
                 embassy_futures::select::Either::First(_) => Ok(()),
-                embassy_futures::select::Either::Second(_) => Err(err.unwrap_or(WifiError::Disconnected)),
+                embassy_futures::select::Either::Second(_) => {
+                    Err(err.unwrap_or(WifiError::Disconnected))
+                }
             }
         }
 
         pub async fn disconnect(&mut self) -> Result<(), WifiError> {
-            critical_section::with(|cs| WIFI_EVENTS.borrow_ref_mut(cs).remove(WifiEvent::StaDisconnected));
+            critical_section::with(|cs| {
+                WIFI_EVENTS
+                    .borrow_ref_mut(cs)
+                    .remove(WifiEvent::StaDisconnected)
+            });
             embedded_svc::wifi::Wifi::disconnect(self)?;
             WifiEventFuture::new(WifiEvent::StaDisconnected).await;
             Ok(())
@@ -1324,9 +1331,7 @@ mod asynch {
 
     impl WifiEventFuture {
         pub fn new(event: WifiEvent) -> Self {
-            Self {
-                event,
-            }
+            Self { event }
         }
     }
 

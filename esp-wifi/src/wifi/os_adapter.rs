@@ -32,7 +32,8 @@ use super::WifiEvent;
 
 pub static mut WIFI_STATE: i32 = -1;
 
-pub static WIFI_EVENTS: Mutex<RefCell<EnumSet<WifiEvent>>> = Mutex::new(RefCell::new(enumset::enum_set!()));
+pub static WIFI_EVENTS: Mutex<RefCell<EnumSet<WifiEvent>>> =
+    Mutex::new(RefCell::new(enumset::enum_set!()));
 
 pub fn is_connected() -> bool {
     unsafe { WIFI_STATE == wifi_event_t_WIFI_EVENT_STA_CONNECTED as i32 }

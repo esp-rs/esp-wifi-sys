@@ -71,7 +71,8 @@ fn main() -> ! {
     rtc.rwdt.disable();
 
     let mut socket_set_entries: [SocketStorage; 3] = Default::default();
-    let (iface, device, mut controller, sockets) = create_network_interface(&mut socket_set_entries);
+    let (iface, device, mut controller, sockets) =
+        create_network_interface(&mut socket_set_entries);
     let mut wifi_stack = WifiStack::new(iface, device, sockets, current_millis);
 
     #[cfg(any(feature = "esp32c3", feature = "esp32c2"))]
