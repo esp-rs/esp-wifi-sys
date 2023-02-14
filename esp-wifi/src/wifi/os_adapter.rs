@@ -5,6 +5,10 @@
 #[cfg_attr(feature = "esp32s2", path = "os_adapter_esp32s2.rs")]
 pub(crate) mod os_adapter_chip_specific;
 
+use core::cell::RefCell;
+
+use critical_section::Mutex;
+use enumset::EnumSet;
 use log::{debug, trace};
 
 use crate::{
@@ -24,7 +28,11 @@ use crate::{
 #[cfg(feature = "esp32c3")]
 use crate::compat::common::syslog;
 
+use super::WifiEvent;
+
 pub static mut WIFI_STATE: i32 = -1;
+
+pub static WIFI_EVENTS: Mutex<RefCell<EnumSet<WifiEvent>>> = Mutex::new(RefCell::new(enumset::enum_set!()));
 
 pub fn is_connected() -> bool {
     unsafe { WIFI_STATE == wifi_event_t_WIFI_EVENT_STA_CONNECTED as i32 }
@@ -896,11 +904,11 @@ pub unsafe extern "C" fn event_post(
         event_data_size,
         ticks_to_wait
     );
-    use crate::wifi::WifiEvent;
     use num_traits::FromPrimitive;
 
     let event = WifiEvent::from_i32(event_id).unwrap();
     log::trace!("EVENT: {:?}", event);
+    critical_section::with(|cs| WIFI_EVENTS.borrow_ref_mut(cs).insert(event));
 
     let take_state = match event {
         WifiEvent::StaConnected
@@ -924,7 +932,6 @@ pub unsafe extern "C" fn event_post(
 
     #[cfg(feature = "embassy-net")]
     if matches!(event, WifiEvent::StaConnected | WifiEvent::StaDisconnected) {
-        log::info!("Waking LINK_STATE");
         crate::wifi::embassy::LINK_STATE.wake();
     }
 

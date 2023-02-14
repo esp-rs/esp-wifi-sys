@@ -9,6 +9,7 @@ use crate::esp_wifi_result;
 use critical_section::Mutex;
 use embedded_svc::wifi::{AccessPointInfo, AuthMethod, SecondaryChannel};
 use enumset::EnumSet;
+use enumset::EnumSetType;
 use esp_wifi_sys::include::esp_wifi_disconnect;
 use esp_wifi_sys::include::wifi_auth_mode_t_WIFI_AUTH_WAPI_PSK;
 use esp_wifi_sys::include::wifi_auth_mode_t_WIFI_AUTH_WEP;
@@ -109,7 +110,7 @@ pub enum WifiError {
     Disconnected,
 }
 #[repr(i32)]
-#[derive(Copy, Clone, Debug, PartialEq, Eq, FromPrimitive)]
+#[derive(Debug, FromPrimitive, EnumSetType)]
 pub enum WifiEvent {
     WifiReady = 0,
     ScanDone,
@@ -1201,12 +1202,12 @@ mod asynch {
 
     use super::*;
 
-    // TODO timeouts on some
     // TODO assumes STA mode only
     impl WifiDevice {
         pub async fn scan_n<const N: usize>(
             &mut self,
         ) -> Result<(heapless::Vec<AccessPointInfo, N>, usize), WifiError> {
+            critical_section::with(|cs| WIFI_EVENTS.borrow_ref_mut(cs).remove(WifiEvent::ScanDone));
             esp_wifi_result!(crate::wifi::wifi_start_scan(false))?;
 
             WifiEventFuture::new(WifiEvent::ScanDone).await;
@@ -1215,23 +1216,25 @@ mod asynch {
         }
 
         pub async fn start(&mut self) -> Result<(), WifiError> {
-            use embedded_svc::wifi::Wifi;
+            critical_section::with(|cs| WIFI_EVENTS.borrow_ref_mut(cs).remove(WifiEvent::StaStart));
 
             wifi_start()?;
             // if start doesn't start immediatly, wait for event
-            if !matches!(self.is_started(), Ok(true)) {
+            if !matches!(embedded_svc::wifi::Wifi::is_started(self), Ok(true)) {
                 WifiEvent::StaStart.await;
             }
             Ok(())
         }
 
         pub async fn stop(&mut self) -> Result<(), WifiError> {
+            critical_section::with(|cs| WIFI_EVENTS.borrow_ref_mut(cs).remove(WifiEvent::StaStop));
             embedded_svc::wifi::Wifi::stop(self)?;
             WifiEventFuture::new(WifiEvent::StaStop).await;
             Ok(())
         }
 
         pub async fn connect(&mut self) -> Result<(), WifiError> {
+            critical_section::with(|cs| WIFI_EVENTS.borrow_ref_mut(cs).remove_all(WifiEvent::StaConnected | WifiEvent::StaDisconnected));
             embedded_svc::wifi::Wifi::connect(self).ok(); // connect will still try, so ignore errors      
             match embassy_futures::select::select(
                 WifiEventFuture::new(WifiEvent::StaConnected),
@@ -1245,6 +1248,7 @@ mod asynch {
         }
 
         pub async fn disconnect(&mut self) -> Result<(), WifiError> {
+            critical_section::with(|cs| WIFI_EVENTS.borrow_ref_mut(cs).remove(WifiEvent::StaDisconnected));
             embedded_svc::wifi::Wifi::disconnect(self)?;
             WifiEventFuture::new(WifiEvent::StaDisconnected).await;
             Ok(())
@@ -1297,14 +1301,12 @@ mod asynch {
 
     pub struct WifiEventFuture {
         event: WifiEvent,
-        setup: bool,
     }
 
     impl WifiEventFuture {
         pub fn new(event: WifiEvent) -> Self {
             Self {
                 event,
-                setup: false,
             }
         }
     }
@@ -1323,18 +1325,16 @@ mod asynch {
         type Output = ();
 
         fn poll(
-            mut self: core::pin::Pin<&mut Self>,
+            self: core::pin::Pin<&mut Self>,
             cx: &mut core::task::Context<'_>,
         ) -> Poll<Self::Output> {
             self.event
                 .waker()
                 .expect("Not yet implemented, unable to await this event")
                 .register(cx.waker());
-            let event = WifiEvent::from_i32(unsafe { WIFI_STATE }).unwrap();
-            if self.event == event && self.setup {
+            if critical_section::with(|cs| WIFI_EVENTS.borrow_ref(cs).contains(self.event)) {
                 Poll::Ready(())
             } else {
-                self.setup = true; // future initialized
                 Poll::Pending
             }
         }
