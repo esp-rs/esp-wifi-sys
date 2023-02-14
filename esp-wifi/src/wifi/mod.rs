@@ -1219,17 +1219,17 @@ mod asynch {
 
     // TODO assumes STA mode only
     impl WifiController {
+        /// Async version of [`embedded_svc::wifi::Wifi`]'s `scan_n` method
         pub async fn scan_n<const N: usize>(
             &mut self,
         ) -> Result<(heapless::Vec<AccessPointInfo, N>, usize), WifiError> {
             critical_section::with(|cs| WIFI_EVENTS.borrow_ref_mut(cs).remove(WifiEvent::ScanDone));
             esp_wifi_result!(crate::wifi::wifi_start_scan(false))?;
-
             WifiEventFuture::new(WifiEvent::ScanDone).await;
-
             self.scan_results()
         }
 
+        /// Async version of [`embedded_svc::wifi::Wifi`]'s `start` method
         pub async fn start(&mut self) -> Result<(), WifiError> {
             critical_section::with(|cs| WIFI_EVENTS.borrow_ref_mut(cs).remove(WifiEvent::StaStart));
             wifi_start()?;
@@ -1237,6 +1237,7 @@ mod asynch {
             Ok(())
         }
 
+        /// Async version of [`embedded_svc::wifi::Wifi`]'s `stop` method
         pub async fn stop(&mut self) -> Result<(), WifiError> {
             critical_section::with(|cs| WIFI_EVENTS.borrow_ref_mut(cs).remove(WifiEvent::StaStop));
             embedded_svc::wifi::Wifi::stop(self)?;
@@ -1244,6 +1245,7 @@ mod asynch {
             Ok(())
         }
 
+        /// Async version of [`embedded_svc::wifi::Wifi`]'s `connect` method
         pub async fn connect(&mut self) -> Result<(), WifiError> {
             critical_section::with(|cs| {
                 WIFI_EVENTS
@@ -1264,6 +1266,7 @@ mod asynch {
             }
         }
 
+        /// Async version of [`embedded_svc::wifi::Wifi`]'s `Disconnect` method
         pub async fn disconnect(&mut self) -> Result<(), WifiError> {
             critical_section::with(|cs| {
                 WIFI_EVENTS
@@ -1275,6 +1278,7 @@ mod asynch {
             Ok(())
         }
 
+        /// Wait for a [`WifiEvent`].
         pub async fn wait_for_event(&mut self, event: WifiEvent) {
             critical_section::with(|cs| WIFI_EVENTS.borrow_ref_mut(cs).remove(event));
             WifiEventFuture::new(event).await;
@@ -1282,8 +1286,8 @@ mod asynch {
     }
 
     impl WifiEvent {
-        pub(crate) fn waker(&self) -> Option<&'static AtomicWaker> {
-            Some(match self {
+        pub(crate) fn waker(&self) -> &'static AtomicWaker {
+            match self {
                 WifiEvent::ScanDone => {
                     static WAKER: AtomicWaker = AtomicWaker::new();
                     &WAKER
@@ -1304,28 +1308,79 @@ mod asynch {
                     static WAKER: AtomicWaker = AtomicWaker::new();
                     &WAKER
                 }
-                WifiEvent::WifiReady
-                | WifiEvent::StaAuthmodeChange
-                | WifiEvent::StaWpsErSuccess
-                | WifiEvent::StaWpsErFailed
-                | WifiEvent::StaWpsErTimeout
-                | WifiEvent::StaWpsErPin
-                | WifiEvent::StaWpsErPbcOverlap
-                | WifiEvent::ApStart
-                | WifiEvent::ApStop
-                | WifiEvent::ApStaconnected
-                | WifiEvent::ApStadisconnected
-                | WifiEvent::ApProbereqrecved
-                | WifiEvent::FtmReport
-                | WifiEvent::StaBssRssiLow
-                | WifiEvent::ActionTxStatus
-                | WifiEvent::RocDone
-                | WifiEvent::StaBeaconTimeout => return None,
-            })
+                WifiEvent::WifiReady => {
+                    static WAKER: AtomicWaker = AtomicWaker::new();
+                    &WAKER
+                }
+                WifiEvent::StaAuthmodeChange => {
+                    static WAKER: AtomicWaker = AtomicWaker::new();
+                    &WAKER
+                }
+                WifiEvent::StaWpsErSuccess => {
+                    static WAKER: AtomicWaker = AtomicWaker::new();
+                    &WAKER
+                }
+                WifiEvent::StaWpsErFailed => {
+                    static WAKER: AtomicWaker = AtomicWaker::new();
+                    &WAKER
+                }
+                WifiEvent::StaWpsErTimeout => {
+                    static WAKER: AtomicWaker = AtomicWaker::new();
+                    &WAKER
+                }
+                WifiEvent::StaWpsErPin => {
+                    static WAKER: AtomicWaker = AtomicWaker::new();
+                    &WAKER
+                }
+                WifiEvent::StaWpsErPbcOverlap => {
+                    static WAKER: AtomicWaker = AtomicWaker::new();
+                    &WAKER
+                }
+                WifiEvent::ApStart => {
+                    static WAKER: AtomicWaker = AtomicWaker::new();
+                    &WAKER
+                }
+                WifiEvent::ApStop => {
+                    static WAKER: AtomicWaker = AtomicWaker::new();
+                    &WAKER
+                }
+                WifiEvent::ApStaconnected => {
+                    static WAKER: AtomicWaker = AtomicWaker::new();
+                    &WAKER
+                }
+                WifiEvent::ApStadisconnected => {
+                    static WAKER: AtomicWaker = AtomicWaker::new();
+                    &WAKER
+                }
+                WifiEvent::ApProbereqrecved => {
+                    static WAKER: AtomicWaker = AtomicWaker::new();
+                    &WAKER
+                }
+                WifiEvent::FtmReport => {
+                    static WAKER: AtomicWaker = AtomicWaker::new();
+                    &WAKER
+                }
+                WifiEvent::StaBssRssiLow => {
+                    static WAKER: AtomicWaker = AtomicWaker::new();
+                    &WAKER
+                }
+                WifiEvent::ActionTxStatus => {
+                    static WAKER: AtomicWaker = AtomicWaker::new();
+                    &WAKER
+                }
+                WifiEvent::RocDone => {
+                    static WAKER: AtomicWaker = AtomicWaker::new();
+                    &WAKER
+                }
+                WifiEvent::StaBeaconTimeout => {
+                    static WAKER: AtomicWaker = AtomicWaker::new();
+                    &WAKER
+                }
+            }
         }
     }
 
-    pub struct WifiEventFuture {
+    pub(crate) struct WifiEventFuture {
         event: WifiEvent,
     }
 
@@ -1342,10 +1397,7 @@ mod asynch {
             self: core::pin::Pin<&mut Self>,
             cx: &mut core::task::Context<'_>,
         ) -> Poll<Self::Output> {
-            self.event
-                .waker()
-                .expect("Not yet implemented, unable to await this event")
-                .register(cx.waker());
+            self.event.waker().register(cx.waker());
             if critical_section::with(|cs| WIFI_EVENTS.borrow_ref(cs).contains(self.event)) {
                 Poll::Ready(())
             } else {

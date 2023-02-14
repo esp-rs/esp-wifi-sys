@@ -929,7 +929,7 @@ pub unsafe extern "C" fn event_post(
     }
 
     #[cfg(feature = "async")]
-    event.waker().map(|w| w.wake());
+    event.waker().wake();
 
     #[cfg(feature = "embassy-net")]
     if matches!(event, WifiEvent::StaConnected | WifiEvent::StaDisconnected) {
