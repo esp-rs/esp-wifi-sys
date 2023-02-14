@@ -125,8 +125,7 @@ async fn connection(mut controller: WifiController) {
         match esp_wifi::wifi::get_wifi_state() {
             WifiState::StaConnected => {
                 // wait until we're no longer connected
-                // TODO this is probably bad design, two calls too the same event will result in the the first being overwritten by the second call
-                WifiEvent::StaDisconnected.await;
+                controller.wait_for_event(WifiEvent::StaDisconnected).await;
                 Timer::after(Duration::from_millis(5000)).await
             },
             _ => {}

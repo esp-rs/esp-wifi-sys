@@ -1236,7 +1236,7 @@ mod asynch {
         pub async fn start(&mut self) -> Result<(), WifiError> {
             critical_section::with(|cs| WIFI_EVENTS.borrow_ref_mut(cs).remove(WifiEvent::StaStart));
             wifi_start()?;
-            WifiEvent::StaStart.await;
+            WifiEventFuture::new(WifiEvent::StaStart).await;
             Ok(())
         }
 
@@ -1266,6 +1266,11 @@ mod asynch {
             embedded_svc::wifi::Wifi::disconnect(self)?;
             WifiEventFuture::new(WifiEvent::StaDisconnected).await;
             Ok(())
+        }
+
+        pub async fn wait_for_event(&mut self, event: WifiEvent) {
+            critical_section::with(|cs| WIFI_EVENTS.borrow_ref_mut(cs).remove(event));
+            WifiEventFuture::new(event).await;
         }
     }
 
@@ -1322,16 +1327,6 @@ mod asynch {
             Self {
                 event,
             }
-        }
-    }
-
-    impl core::future::IntoFuture for WifiEvent {
-        type Output = <Self::IntoFuture as core::future::Future>::Output;
-
-        type IntoFuture = WifiEventFuture;
-
-        fn into_future(self) -> Self::IntoFuture {
-            WifiEventFuture::new(self)
         }
     }
 
