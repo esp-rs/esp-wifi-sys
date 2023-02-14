@@ -2,6 +2,7 @@ use core::cell::RefCell;
 
 use atomic_polyfill::{AtomicU64, Ordering};
 use critical_section::Mutex;
+use esp32s3_hal::trapframe::TrapFrame;
 use esp32s3_hal::{
     interrupt,
     peripherals::{self, TIMG1},
@@ -9,7 +10,6 @@ use esp32s3_hal::{
     timer::{Timer, Timer0},
 };
 use log::trace;
-use xtensa_lx_rt::exception::Context;
 
 use crate::preempt::preempt::task_switch;
 use esp32s3_hal::macros::interrupt;
@@ -33,7 +33,7 @@ pub fn get_systimer_count() -> u64 {
 
 #[inline(always)]
 fn read_timer_value() -> u64 {
-    let value = xtensa_lx::timer::get_cycle_count() as u64;
+    let value = esp32s3_hal::xtensa_lx::timer::get_cycle_count() as u64;
     value * 40_000_000 / 240_000_000
 }
 
@@ -79,15 +79,15 @@ pub fn setup_timer_isr(timg1_timer0: Timer<Timer0<TIMG1>>) {
         TIMER1.borrow_ref_mut(cs).replace(timer1);
     });
 
-    xtensa_lx::timer::set_ccompare0(0xffffffff);
+    esp32s3_hal::xtensa_lx::timer::set_ccompare0(0xffffffff);
 
     unsafe {
-        xtensa_lx::interrupt::disable();
-        xtensa_lx::interrupt::enable_mask(
+        esp32s3_hal::xtensa_lx::interrupt::disable();
+        esp32s3_hal::xtensa_lx::interrupt::enable_mask(
             1 << 6 // Timer0
             | 1 << 29 // Software1
-                | xtensa_lx_rt::interrupt::CpuInterruptLevel::Level2.mask()
-                | xtensa_lx_rt::interrupt::CpuInterruptLevel::Level6.mask(),
+                | esp32s3_hal::xtensa_lx_rt::interrupt::CpuInterruptLevel::Level2.mask()
+                | esp32s3_hal::xtensa_lx_rt::interrupt::CpuInterruptLevel::Level6.mask(),
         );
     }
 
@@ -99,7 +99,7 @@ pub fn setup_timer_isr(timg1_timer0: Timer<Timer0<TIMG1>>) {
 fn Timer0(_level: u32) {
     TIME.fetch_add(0x1_0000_0000 * 40_000_000 / 240_000_000, Ordering::Relaxed);
 
-    xtensa_lx::timer::set_ccompare0(0xffffffff);
+    esp32s3_hal::xtensa_lx::timer::set_ccompare0(0xffffffff);
 }
 
 #[cfg(feature = "wifi")]
@@ -160,7 +160,7 @@ fn BT_BB_NMI() {
 }
 
 #[interrupt]
-fn TG1_T0_LEVEL(context: &mut Context) {
+fn TG1_T0_LEVEL(context: &mut TrapFrame) {
     task_switch(context);
 
     critical_section::with(|cs| {
@@ -175,7 +175,7 @@ fn TG1_T0_LEVEL(context: &mut Context) {
 
 #[allow(non_snake_case)]
 #[no_mangle]
-fn Software1(_level: u32, context: &mut Context) {
+fn Software1(_level: u32, context: &mut TrapFrame) {
     let intr = 1 << 29;
     unsafe {
         core::arch::asm!("wsr.227  {0}", in(reg) intr, options(nostack)); // 227 = "intclear"
