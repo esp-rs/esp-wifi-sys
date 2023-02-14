@@ -73,7 +73,7 @@ pub(crate) mod memory_fence;
 pub use critical_section;
 use timer::{get_systimer_count, TICKS_PER_SECOND};
 
-#[cfg(all(feature = "embedded-svc", feature = "wifi", not(feature = "embassy-net")))]
+#[cfg(all(feature = "embedded-svc", feature = "wifi"))]
 pub mod wifi_interface;
 
 #[cfg(feature = "esp32c3")]
