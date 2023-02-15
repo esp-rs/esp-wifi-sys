@@ -28,6 +28,8 @@ If a cell contains am em dash (&mdash;) this means that the particular feature i
 
 ## Examples
 
+To build these ensure you are in the `esp-wifi` directory as othewise the `config.toml` will not apply
+
 ### dhcp
 
 - set SSID and PASSWORD env variable
