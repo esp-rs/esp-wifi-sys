@@ -32,6 +32,7 @@ use super::WifiEvent;
 
 pub(crate) static mut WIFI_STATE: i32 = -1;
 
+// useful for waiting for events - clear and wait for the event bit to be set again
 pub(crate) static WIFI_EVENTS: Mutex<RefCell<EnumSet<WifiEvent>>> =
     Mutex::new(RefCell::new(enumset::enum_set!()));
 
