@@ -10,7 +10,9 @@ use critical_section::Mutex;
 use embedded_svc::wifi::{AccessPointInfo, AuthMethod, SecondaryChannel};
 use enumset::EnumSet;
 use enumset::EnumSetType;
+use esp_wifi_sys::include::esp_interface_t_ESP_IF_WIFI_AP;
 use esp_wifi_sys::include::esp_wifi_disconnect;
+use esp_wifi_sys::include::wifi_ap_config_t;
 use esp_wifi_sys::include::wifi_auth_mode_t_WIFI_AUTH_WAPI_PSK;
 use esp_wifi_sys::include::wifi_auth_mode_t_WIFI_AUTH_WEP;
 use esp_wifi_sys::include::wifi_auth_mode_t_WIFI_AUTH_WPA2_ENTERPRISE;
@@ -19,6 +21,10 @@ use esp_wifi_sys::include::wifi_auth_mode_t_WIFI_AUTH_WPA2_WPA3_PSK;
 use esp_wifi_sys::include::wifi_auth_mode_t_WIFI_AUTH_WPA3_PSK;
 use esp_wifi_sys::include::wifi_auth_mode_t_WIFI_AUTH_WPA_PSK;
 use esp_wifi_sys::include::wifi_auth_mode_t_WIFI_AUTH_WPA_WPA2_PSK;
+use esp_wifi_sys::include::wifi_cipher_type_t_WIFI_CIPHER_TYPE_TKIP;
+use esp_wifi_sys::include::wifi_interface_t_WIFI_IF_AP;
+use esp_wifi_sys::include::wifi_mode_t_WIFI_MODE_AP;
+use esp_wifi_sys::include::wifi_mode_t_WIFI_MODE_NULL;
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
 
@@ -64,6 +70,21 @@ use crate::{
 };
 use log::{debug, info};
 
+#[derive(Debug, Clone, Copy)]
+pub enum WifiMode {
+    Sta,
+    Ap,
+}
+
+impl WifiMode {
+    pub fn is_ap(&self) -> bool {
+        match self {
+            WifiMode::Sta => false,
+            WifiMode::Ap => true,
+        }
+    }
+}
+
 #[cfg(feature = "dump-packets")]
 static DUMP_PACKETS: bool = true;
 #[cfg(not(feature = "dump-packets"))]
@@ -103,6 +124,9 @@ pub(crate) static DATA_QUEUE_RX: Mutex<RefCell<SimpleQueue<DataFrame, 5>>> =
 pub(crate) static DATA_QUEUE_TX: Mutex<RefCell<SimpleQueue<DataFrame, 3>>> =
     Mutex::new(RefCell::new(SimpleQueue::new()));
 
+// this won't work this way once we want to support APSTA
+pub(crate) static IS_AP: Mutex<RefCell<bool>> = Mutex::new(RefCell::new(false));
+
 #[derive(Debug, Clone, Copy)]
 pub enum WifiError {
     InternalError(InternalWifiError),
@@ -139,6 +163,8 @@ pub enum WifiEvent {
 #[repr(i32)]
 #[derive(Copy, Clone, Debug, PartialEq, Eq, FromPrimitive)]
 pub enum InternalWifiError {
+    ///Invalid argument
+    EspErrInvalidArg = 0x102,
     ///WiFi driver was not installed by esp_wifi_init */
     EspErrWifiNotInit = 0x3001,
     ///WiFi driver was not started by esp_wifi_start */
@@ -498,6 +524,12 @@ pub fn get_sta_mac(mac: &mut [u8; 6]) {
     }
 }
 
+pub fn get_ap_mac(mac: &mut [u8; 6]) {
+    unsafe {
+        read_mac(mac as *mut u8, 1);
+    }
+}
+
 pub fn wifi_init() -> Result<(), WifiError> {
     unsafe {
         G_CONFIG.wpa_crypto_funcs = g_wifi_default_wpa_crypto_funcs;
@@ -511,6 +543,7 @@ pub fn wifi_init() -> Result<(), WifiError> {
         }
 
         esp_wifi_result!(esp_wifi_init_internal(&G_CONFIG))?;
+        esp_wifi_result!(esp_wifi_set_mode(wifi_mode_t_WIFI_MODE_NULL))?;
 
         crate::wifi_set_log_verbose();
         esp_wifi_result!(esp_supplicant_init())?;
@@ -519,6 +552,12 @@ pub fn wifi_init() -> Result<(), WifiError> {
 
         esp_wifi_result!(esp_wifi_internal_reg_rxcb(
             esp_interface_t_ESP_IF_WIFI_STA,
+            Some(recv_cb)
+        ))?;
+
+        // until we support APSTA we just register the same callback for AP and STA
+        esp_wifi_result!(esp_wifi_internal_reg_rxcb(
+            esp_interface_t_ESP_IF_WIFI_AP,
             Some(recv_cb)
         ))?;
 
@@ -624,21 +663,34 @@ pub fn wifi_start_scan(block: bool) -> i32 {
 }
 
 pub fn new_with_config(config: embedded_svc::wifi::Configuration) -> (WifiDevice, WifiController) {
-    (WifiDevice::new(), WifiController::new_with_config(config))
+    let mode = match config {
+        embedded_svc::wifi::Configuration::None => panic!(),
+        embedded_svc::wifi::Configuration::Client(_) => WifiMode::Sta,
+        embedded_svc::wifi::Configuration::AccessPoint(_) => WifiMode::Ap,
+        embedded_svc::wifi::Configuration::Mixed(_, _) => panic!(),
+    };
+    (
+        WifiDevice::new(mode),
+        WifiController::new_with_config(config),
+    )
 }
 
-pub fn new() -> (WifiDevice, WifiController) {
-    (WifiDevice::new(), WifiController::new())
+pub fn new(mode: WifiMode) -> (WifiDevice, WifiController) {
+    (WifiDevice::new(mode), WifiController::new())
 }
 
 /// A wifi device implementing smoltcp's Device trait.
 pub struct WifiDevice {
     _private: (),
+
+    // only used by embassy-net
+    #[allow(unused)]
+    mode: WifiMode,
 }
 
 impl WifiDevice {
-    pub(crate) fn new() -> WifiDevice {
-        Self { _private: () }
+    pub(crate) fn new(mode: WifiMode) -> WifiDevice {
+        Self { _private: (), mode }
     }
 }
 
@@ -663,6 +715,13 @@ impl WifiController {
         esp_wifi_result!(unsafe { esp_wifi_sys::include::esp_wifi_get_mode(&mut mode) })?;
 
         Ok(mode == wifi_mode_t_WIFI_MODE_STA)
+    }
+
+    fn is_ap_enabled(&self) -> Result<bool, WifiError> {
+        let mut mode: esp_wifi_sys::include::wifi_mode_t = 0;
+        esp_wifi_result!(unsafe { esp_wifi_sys::include::esp_wifi_get_mode(&mut mode) })?;
+
+        Ok(mode == wifi_mode_t_WIFI_MODE_AP) // should also match APSTA which is not supported yet
     }
 
     fn scan_results<const N: usize>(
@@ -872,14 +931,21 @@ impl TxToken for WifiTxToken {
 pub fn send_data_if_needed() {
     critical_section::with(|cs| {
         let mut queue = DATA_QUEUE_TX.borrow_ref_mut(cs);
+        let is_ap = *(IS_AP.borrow_ref(cs));
 
         while let Some(packet) = queue.dequeue() {
             log::trace!("sending... {} bytes", packet.len);
             dump_packet_info(packet.slice());
 
+            let interface = if is_ap {
+                wifi_interface_t_WIFI_IF_AP
+            } else {
+                wifi_interface_t_WIFI_IF_STA
+            };
+
             unsafe {
                 let _res = esp_wifi_internal_tx(
-                    wifi_interface_t_WIFI_IF_STA,
+                    interface,
                     &packet.data as *const _ as *mut crate::binary::c_types::c_void,
                     packet.len as u16,
                 );
@@ -897,11 +963,12 @@ pub fn send_data_if_needed() {
 impl embedded_svc::wifi::Wifi for WifiController {
     type Error = WifiError;
 
-    /// This currently only supports the `Client` capability.
+    /// This currently only supports the `Client` and `AccessPoint` capability.
     fn get_capabilities(&self) -> Result<EnumSet<embedded_svc::wifi::Capability>, Self::Error> {
-        // for now we only support STA mode
+        // we only support STA and AP mode
         let mut caps = EnumSet::empty();
         caps.insert(embedded_svc::wifi::Capability::Client);
+        caps.insert(embedded_svc::wifi::Capability::AccessPoint);
         Ok(caps)
     }
 
@@ -918,8 +985,8 @@ impl embedded_svc::wifi::Wifi for WifiController {
         Ok(self.config.clone())
     }
 
-    /// Set the configuration, you need to use Wifi::connect() for connecting
-    /// Currently only `ssid` and `password` is used. Trying anything but `Configuration::Client` will result in a panic!
+    /// Set the configuration, you need to use Wifi::connect() for connecting to an AP
+    /// Trying anything but `Configuration::Client` or `Configuration::AccessPoint` will result in a panic!
     fn set_configuration(
         &mut self,
         conf: &embedded_svc::wifi::Configuration,
@@ -930,6 +997,7 @@ impl embedded_svc::wifi::Wifi for WifiController {
             embedded_svc::wifi::Configuration::None => panic!(),
             embedded_svc::wifi::Configuration::Client(config) => {
                 esp_wifi_result!(unsafe { esp_wifi_set_mode(wifi_mode_t_WIFI_MODE_STA) })?;
+                critical_section::with(|cs| *(IS_AP.borrow_ref_mut(cs)) = false);
 
                 debug!("Wifi mode STA set");
                 let bssid: [u8; 6] = match &config.bssid {
@@ -990,7 +1058,55 @@ impl embedded_svc::wifi::Wifi for WifiController {
                     esp_wifi_set_config(wifi_interface_t_WIFI_IF_STA, &mut cfg)
                 })?;
             }
-            embedded_svc::wifi::Configuration::AccessPoint(_) => panic!(),
+            embedded_svc::wifi::Configuration::AccessPoint(config) => {
+                esp_wifi_result!(unsafe { esp_wifi_set_mode(wifi_mode_t_WIFI_MODE_AP) })?;
+                critical_section::with(|cs| *(IS_AP.borrow_ref_mut(cs)) = true);
+
+                debug!("Wifi mode AP set");
+
+                let mut cfg = wifi_config_t {
+                    ap: wifi_ap_config_t {
+                        ssid: [0u8; 32usize],
+                        password: [0u8; 64usize],
+                        ssid_len: 0,
+                        channel: config.channel,
+                        authmode: match config.auth_method {
+                            AuthMethod::None => wifi_auth_mode_t_WIFI_AUTH_OPEN,
+                            AuthMethod::WEP => wifi_auth_mode_t_WIFI_AUTH_WEP,
+                            AuthMethod::WPA => wifi_auth_mode_t_WIFI_AUTH_WPA_PSK,
+                            AuthMethod::WPA2Personal => wifi_auth_mode_t_WIFI_AUTH_WPA2_PSK,
+                            AuthMethod::WPAWPA2Personal => wifi_auth_mode_t_WIFI_AUTH_WPA_WPA2_PSK,
+                            AuthMethod::WPA2Enterprise => {
+                                wifi_auth_mode_t_WIFI_AUTH_WPA2_ENTERPRISE
+                            }
+                            AuthMethod::WPA3Personal => wifi_auth_mode_t_WIFI_AUTH_WPA3_PSK,
+                            AuthMethod::WPA2WPA3Personal => {
+                                wifi_auth_mode_t_WIFI_AUTH_WPA2_WPA3_PSK
+                            }
+                            AuthMethod::WAPIPersonal => wifi_auth_mode_t_WIFI_AUTH_WAPI_PSK,
+                        },
+                        ssid_hidden: if config.ssid_hidden { 1 } else { 0 },
+                        max_connection: config.max_connections as u8,
+                        beacon_interval: 100,
+                        pairwise_cipher: wifi_cipher_type_t_WIFI_CIPHER_TYPE_TKIP,
+                        ftm_responder: false,
+                        pmf_cfg: wifi_pmf_config_t {
+                            capable: true,
+                            required: false,
+                        },
+                    },
+                };
+
+                unsafe {
+                    cfg.ap.ssid[0..(config.ssid.len())].copy_from_slice(config.ssid.as_bytes());
+                    cfg.ap.ssid_len = config.ssid.len() as u8;
+                    cfg.ap.password[0..(config.password.len())]
+                        .copy_from_slice(config.password.as_bytes());
+                }
+                esp_wifi_result!(unsafe {
+                    esp_wifi_set_config(wifi_interface_t_WIFI_IF_AP, &mut cfg)
+                })?;
+            }
             embedded_svc::wifi::Configuration::Mixed(_, _) => panic!(),
         };
 
@@ -1014,7 +1130,7 @@ impl embedded_svc::wifi::Wifi for WifiController {
     }
 
     fn is_started(&self) -> Result<bool, Self::Error> {
-        self.is_sta_enabled() // TODO handle AP mode when we support that
+        Ok(self.is_sta_enabled()? || self.is_ap_enabled()?)
     }
 
     fn is_connected(&self) -> Result<bool, Self::Error> {
@@ -1186,10 +1302,27 @@ pub(crate) mod embassy {
 
         fn link_state(&mut self, cx: &mut core::task::Context) -> embassy_net_driver::LinkState {
             LINK_STATE.register(cx.waker());
-            if matches!(get_wifi_state(), WifiState::StaConnected) {
-                embassy_net_driver::LinkState::Up
-            } else {
-                embassy_net_driver::LinkState::Down
+
+            match self.mode {
+                WifiMode::Sta => {
+                    if matches!(get_wifi_state(), WifiState::StaConnected) {
+                        embassy_net_driver::LinkState::Up
+                    } else {
+                        embassy_net_driver::LinkState::Down
+                    }
+                }
+                WifiMode::Ap => {
+                    if matches!(
+                        get_wifi_state(),
+                        WifiState::ApStart
+                            | WifiState::ApStaConnected
+                            | WifiState::ApStaDisconnected
+                    ) {
+                        embassy_net_driver::LinkState::Up
+                    } else {
+                        embassy_net_driver::LinkState::Down
+                    }
+                }
             }
         }
 
@@ -1202,7 +1335,10 @@ pub(crate) mod embassy {
 
         fn ethernet_address(&self) -> [u8; 6] {
             let mut mac = [0; 6];
-            get_sta_mac(&mut mac);
+            match self.mode.is_ap() {
+                true => get_ap_mac(&mut mac),
+                false => get_sta_mac(&mut mac),
+            }
             mac
         }
     }
@@ -1233,7 +1369,19 @@ mod asynch {
         pub async fn start(&mut self) -> Result<(), WifiError> {
             critical_section::with(|cs| WIFI_EVENTS.borrow_ref_mut(cs).remove(WifiEvent::StaStart));
             wifi_start()?;
-            WifiEventFuture::new(WifiEvent::StaStart).await;
+
+            let is_ap = match self.config {
+                embedded_svc::wifi::Configuration::None => panic!(),
+                embedded_svc::wifi::Configuration::Client(_) => false,
+                embedded_svc::wifi::Configuration::AccessPoint(_) => true,
+                embedded_svc::wifi::Configuration::Mixed(_, _) => panic!(),
+            };
+
+            if is_ap {
+                WifiEventFuture::new(WifiEvent::ApStart).await;
+            } else {
+                WifiEventFuture::new(WifiEvent::StaStart).await;
+            }
             Ok(())
         }
 
@@ -1241,7 +1389,19 @@ mod asynch {
         pub async fn stop(&mut self) -> Result<(), WifiError> {
             critical_section::with(|cs| WIFI_EVENTS.borrow_ref_mut(cs).remove(WifiEvent::StaStop));
             embedded_svc::wifi::Wifi::stop(self)?;
-            WifiEventFuture::new(WifiEvent::StaStop).await;
+
+            let is_ap = match self.config {
+                embedded_svc::wifi::Configuration::None => panic!(),
+                embedded_svc::wifi::Configuration::Client(_) => false,
+                embedded_svc::wifi::Configuration::AccessPoint(_) => true,
+                embedded_svc::wifi::Configuration::Mixed(_, _) => panic!(),
+            };
+
+            if is_ap {
+                WifiEventFuture::new(WifiEvent::ApStop).await;
+            } else {
+                WifiEventFuture::new(WifiEvent::StaStop).await;
+            }
             Ok(())
         }
 

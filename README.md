@@ -127,6 +127,36 @@ To build these ensure you are in the `esp-wifi` directory as othewise the `confi
 | ESP32-S2 | `cargo +esp run --example embassy_dhcp --release --target xtensa-esp32s2-none-elf --features "esp32s2,esp32s2-async,embedded-svc,wifi,embassy-net"`                                         |
 | ESP32-S3 | `cargo +esp run --example embassy_dhcp --release --target xtensa-esp32s3-none-elf --features "esp32s3,esp32s3-async,embedded-svc,wifi,embassy-net"`                                    |
 
+### access_point
+
+- creates an open access-point with SSID `esp-wifi`
+- you can connect to it using a static IP in range 192.168.2.2 .. 192.168.2.255, gateway 192.168.2.1
+- open http://192.168.2.1:8080/ in your browser
+- on Android you might need to choose _Keep Accesspoint_ when it tells you the WiFi has no internet connection, Chrome might not want to load the URL - you can use a shell and try `curl` and `ping`
+
+|   Chip   | Command                                                                                                                        |
+| :------: | ------------------------------------------------------------------------------------------------------------------------------ |
+|  ESP32   | `cargo +esp run --example access_point --release --target xtensa-esp32-none-elf --features "esp32,embedded-svc,wifi"`             |
+| ESP32-C2 | `cargo +nightly run --example access_point --release --target riscv32imc-unknown-none-elf --features "esp32c2,embedded-svc,wifi"` |
+| ESP32-C3 | `cargo +nightly run --example access_point --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc,wifi"` |
+| ESP32-S2 | `cargo +esp run --example access_point --release --target xtensa-esp32s2-none-elf --features "esp32s2,embedded-svc,wifi"`         |
+| ESP32-S3 | `cargo +esp run --example access_point --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi"`         |
+
+### embassy_access_point
+
+- creates an open access-point with SSID `esp-wifi`
+- you can connect to it using a static IP in range 192.168.2.2 .. 192.168.2.255, gateway 192.168.2.1
+- open http://192.168.2.1:8080/ in your browser
+- on Android you might need to choose _Keep Accesspoint_ when it tells you the WiFi has no internet connection, Chrome might not want to load the URL - you can use a shell and try `curl` and `ping`
+
+|   Chip   | Command                                                                                                                                                                  |
+| :------: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+|  ESP32   | `cargo +esp run --example embassy_access_point --release --target xtensa-esp32-none-elf --features "esp32,esp32-async,embedded-svc,wifi,embassy-net"`                                               |
+| ESP32-C2 | `CARGO_PROFILE_RELEASE_LTO=false cargo +nightly run --example embassy_access_point --release --target riscv32imc-unknown-none-elf --features "esp32c2,esp32c2-async,embedded-svc,wifi,embassy-net"` |
+| ESP32-C3 | `cargo +nightly run --example embassy_access_point --release --target riscv32imc-unknown-none-elf --features "esp32c3,esp32c3-async,embedded-svc,wifi,embassy-net"`                                 |
+| ESP32-S2 | `cargo +esp run --example embassy_access_point --release --target xtensa-esp32s2-none-elf --features "esp32s2,esp32s2-async,embedded-svc,wifi,embassy-net"`                                         |
+| ESP32-S3 | `cargo +esp run --example embassy_access_point --release --target xtensa-esp32s3-none-elf --features "esp32s3,esp32s3-async,embedded-svc,wifi,embassy-net"`
+
 ## Features
 
 | Feature      | Meaning                                                                                             |
@@ -167,6 +197,7 @@ Don't use this feature if your are _not_ using Serial-JTAG since it might reduce
 - scanning for WiFi access points
 - connect to WiFi access point
 - providing an HCI interface
+- create an open access point
 
 ## Notes on ESP32-C3 support
 
@@ -202,7 +233,8 @@ If something doesn't work as expected try a different opt-level.
 
 - lots of refactoring
 - make CoEx work on ESP32 (it kind of works when commenting out setting the country in wifi_start, probably some mis-compilation since it then crashes in a totally different code path)
-- maybe SoftAP
+- combined SoftAP/STA mode
+- support for non-open SoftAP
 
 ## Using in your own binary crate
 
