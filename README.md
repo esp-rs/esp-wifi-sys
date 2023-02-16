@@ -214,7 +214,7 @@ Make sure to include the rom functions for your target like this
 ```toml
 rustflags = [
     "-C", "link-arg=-Tlinkall.x",
-    "-C", "link-arg=-Tesp32_rom_functions.x",
+    "-C", "link-arg=-Trom_functions.x",
 ]
 ```
 
