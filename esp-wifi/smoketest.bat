@@ -34,12 +34,13 @@ cargo "+esp" run --example embassy_esp_now --release --target xtensa-esp32-none-
 cargo "+esp" run --example access_point --release --target xtensa-esp32-none-elf --features "esp32,embedded-svc,wifi"
 cargo "+esp" run --example embassy_access_point --release --target xtensa-esp32-none-elf --features "esp32,esp32-async,embedded-svc,wifi,embassy-net"
 
-set CARGO_PROFILE_RELEASE_OPT_LEVEL=3
+set CARGO_PROFILE_RELEASE_OPT_LEVEL=1
 set CARGO_PROFILE_RELEASE_LTO=off
 echo.
 echo Connect ESP32-S3
 pause
 cargo "+esp" run --example ble --release --target xtensa-esp32s3-none-elf --features "esp32s3,ble"
+set CARGO_PROFILE_RELEASE_OPT_LEVEL=3
 cargo "+esp" run --example dhcp --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi"
 cargo "+esp" run --example static_ip --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi"
 cargo "+esp" run --example embassy_dhcp --release --target xtensa-esp32s3-none-elf --features "esp32s3,esp32s3-async,embedded-svc,wifi,embassy-net"

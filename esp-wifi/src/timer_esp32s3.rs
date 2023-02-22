@@ -54,7 +54,7 @@ pub fn setup_timer_isr(timg1_timer0: Timer<Timer0<TIMG1>>) {
 
     #[cfg(feature = "wifi")]
     interrupt::enable(
-        peripherals::Interrupt::WIFI_BB,
+        peripherals::Interrupt::WIFI_PWR,
         interrupt::Priority::Priority1,
     )
     .unwrap();
@@ -62,12 +62,12 @@ pub fn setup_timer_isr(timg1_timer0: Timer<Timer0<TIMG1>>) {
     #[cfg(feature = "ble")]
     {
         interrupt::enable(
-            peripherals::Interrupt::BT_BB_NMI,
+            peripherals::Interrupt::BT_BB,
             interrupt::Priority::Priority1,
         )
         .unwrap();
         interrupt::enable(
-            peripherals::Interrupt::RWBT_NMI,
+            peripherals::Interrupt::RWBLE,
             interrupt::Priority::Priority1,
         )
         .unwrap();
@@ -118,10 +118,10 @@ fn WIFI_MAC() {
 
 #[cfg(feature = "wifi")]
 #[interrupt]
-fn WIFI_BB() {
+fn WIFI_PWR() {
     unsafe {
         let (fnc, arg) = crate::wifi::os_adapter::ISR_INTERRUPT_1;
-        trace!("interrupt WIFI_BB {:p} {:p}", fnc, arg);
+        trace!("interrupt WIFI_PWR {:p} {:p}", fnc, arg);
 
         if !fnc.is_null() {
             let fnc: fn(*mut crate::binary::c_types::c_void) = core::mem::transmute(fnc);
@@ -134,10 +134,10 @@ fn WIFI_BB() {
 
 #[cfg(feature = "ble")]
 #[interrupt]
-fn RWBT_NMI() {
+fn RWBLE() {
     critical_section::with(|_| unsafe {
         let (fnc, arg) = crate::ble::btdm::ble_os_adapter_chip_specific::ISR_INTERRUPT_5;
-        trace!("interrupt RWBT_NMI {:p} {:p}", fnc, arg);
+        trace!("interrupt RWBLE {:p} {:p}", fnc, arg);
         if !fnc.is_null() {
             let fnc: fn(*mut crate::binary::c_types::c_void) = core::mem::transmute(fnc);
             fnc(arg);
@@ -147,7 +147,7 @@ fn RWBT_NMI() {
 
 #[cfg(feature = "ble")]
 #[interrupt]
-fn BT_BB_NMI() {
+fn BT_BB() {
     critical_section::with(|_| unsafe {
         let (fnc, arg) = crate::ble::btdm::ble_os_adapter_chip_specific::ISR_INTERRUPT_8;
         trace!("interrupt RWBT {:p} {:p}", fnc, arg);
