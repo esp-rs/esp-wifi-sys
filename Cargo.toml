@@ -14,6 +14,3 @@ opt-level = 3
 [profile.dev]
 # Explicitly disable LTO which the Xtensa codegen backend has issues
 lto = "off"
-
-[patch.crates-io]
-esp32c2-hal = { git = "https://github.com/esp-rs/esp-hal", package = "esp32c2-hal", rev = "f4c7bf809fcf0e57a852d7b2be175cc0c4c2895a" }
