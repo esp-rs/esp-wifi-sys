@@ -44,11 +44,13 @@ fn main() -> ! {
 
     let mut debounce_cnt = 500;
 
+    let mut radio = peripherals.RADIO.split();
+    
     loop {
-        let connector = BleConnector {};
+        let connector = BleConnector::new(&mut radio.1);
         let hci = HciConnector::new(connector, esp_wifi::current_millis);
         let mut ble = Ble::new(&hci);
-
+        
         println!("{:?}", ble.init());
         println!("{:?}", ble.cmd_set_le_advertising_parameters());
         println!(
