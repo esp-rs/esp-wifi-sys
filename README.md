@@ -1,7 +1,5 @@
 # esp-wifi
 
-This is experimental and a work-in-progress! You are welcome to experiment with it and contribute but probably shouldn't use this for something real yet.
-
 Wi-Fi/BTLE coexistence is implemented but currently only works (to some extent) on ESP32-C3 and ESP32-S3. In general COEX shouldn't be used currently.
 
 Minimum supported Rust compiler version: 1.65.0.0
@@ -25,6 +23,7 @@ If a cell contains am em dash (&mdash;) this means that the particular feature i
 | ESP32-S3 |                          ✓                           |                          ✓                          |                          ✓                           |    ✓    |
 | ESP32-C3 |                          ✓                           |                          ✓                          |                          ✓                           |    ✓    |
 | ESP32-C2 |                          ✓                           |                          ✓                          |                                                      |    ✓    |
+| ESP32-C6 |                          ✓                           |                                                     |                                                      |    ✓    |
 
 ## Examples
 
@@ -41,6 +40,7 @@ To build these ensure you are in the `esp-wifi` directory as othewise the `confi
 |  ESP32   | `cargo +esp run --example dhcp --release --target xtensa-esp32-none-elf --features "esp32,embedded-svc,wifi"`             |
 | ESP32-C2 | `cargo +nightly run --example dhcp --release --target riscv32imc-unknown-none-elf --features "esp32c2,embedded-svc,wifi"` |
 | ESP32-C3 | `cargo +nightly run --example dhcp --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc,wifi"` |
+| ESP32-C6 | `cargo +nightly run --example dhcp --release --target riscv32imac-unknown-none-elf --features "esp32c6,embedded-svc,wifi"`|
 | ESP32-S2 | `cargo +esp run --example dhcp --release --target xtensa-esp32s2-none-elf --features "esp32s2,embedded-svc,wifi"`         |
 | ESP32-S3 | `cargo +esp run --example dhcp --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi"`         |
 
@@ -57,6 +57,7 @@ To build these ensure you are in the `esp-wifi` directory as othewise the `confi
 |  ESP32   | `cargo +esp run --example static_ip --release --target xtensa-esp32-none-elf --features "esp32,embedded-svc,wifi"`             |
 | ESP32-C2 | `cargo +nightly run --example static_ip --release --target riscv32imc-unknown-none-elf --features "esp32c2,embedded-svc,wifi"` |
 | ESP32-C3 | `cargo +nightly run --example static_ip --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc,wifi"` |
+| ESP32-C6 | `cargo +nightly run --example static_ip --release --target riscv32imac-unknown-none-elf --features "esp32c6,embedded-svc,wifi"`|
 | ESP32-S2 | `cargo +esp run --example static_ip --release --target xtensa-esp32s2-none-elf --features "esp32s2,embedded-svc,wifi"`         |
 | ESP32-S3 | `cargo +esp run --example static_ip --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi"`         |
 
@@ -89,7 +90,7 @@ To build these ensure you are in the `esp-wifi` directory as othewise the `confi
 | ESP32-C3 | `cargo +nightly run --example coex --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc,wifi,ble"` |
 | ESP32-S3 | `cargo +esp run --example coex --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi,ble"`         |
 
-**NOTE:** Not currently available for the ESP32, ESP32-C2, or ESP32-S2
+**NOTE:** Not currently available for the ESP32, ESP32-C2, ESP32-C6 or ESP32-S2
 
 ### esp_now
 
@@ -100,6 +101,7 @@ To build these ensure you are in the `esp-wifi` directory as othewise the `confi
 |  ESP32   | `cargo +esp run --example esp_now --release --target xtensa-esp32-none-elf --features "esp32,esp-now"`                                             |
 | ESP32-C2 | `CARGO_PROFILE_RELEASE_LTO=false cargo +nightly run --example esp_now --release --target riscv32imc-unknown-none-elf --features "esp32c2,esp-now"` |
 | ESP32-C3 | `cargo +nightly run --example esp_now --release --target riscv32imc-unknown-none-elf --features "esp32c3,esp-now"`                                 |
+| ESP32-C6 | `cargo +nightly run --example esp_now --release --target riscv32imac-unknown-none-elf --features "esp32c6,esp-now"`                                |
 | ESP32-S2 | `cargo +esp run --example esp_now --release --target xtensa-esp32s2-none-elf --features "esp32s2,esp-now"`                                         |
 | ESP32-S3 | `cargo +esp run --example esp_now --release --target xtensa-esp32s3-none-elf --features "esp32s3,esp-now"`                                         |
 
@@ -112,6 +114,7 @@ To build these ensure you are in the `esp-wifi` directory as othewise the `confi
 |  ESP32   | `cargo +esp run --example embassy_esp_now --release --target xtensa-esp32-none-elf --features "esp32,esp32-async,esp-now"`                                               |
 | ESP32-C2 | `CARGO_PROFILE_RELEASE_LTO=false cargo +nightly run --example embassy_esp_now --release --target riscv32imc-unknown-none-elf --features "esp32c2,esp32c2-async,esp-now"` |
 | ESP32-C3 | `cargo +nightly run --example embassy_esp_now --release --target riscv32imc-unknown-none-elf --features "esp32c3,esp32c3-async,esp-now"`                                 |
+| ESP32-C6 | `cargo +nightly run --example embassy_esp_now --release --target riscv32imac-unknown-none-elf --features "esp32c6,esp32c6-async,esp-now"`                                |
 | ESP32-S2 | `cargo +esp run --example embassy_esp_now --release --target xtensa-esp32s2-none-elf --features "esp32s2,esp32s2-async,esp-now"`                                         |
 | ESP32-S3 | `cargo +esp run --example embassy_esp_now --release --target xtensa-esp32s3-none-elf --features "esp32s3,esp32s3-async,esp-now"`        
 
@@ -124,6 +127,7 @@ To build these ensure you are in the `esp-wifi` directory as othewise the `confi
 |  ESP32   | `cargo +esp run --example embassy_dhcp --release --target xtensa-esp32-none-elf --features "esp32,esp32-async,embedded-svc,wifi,embassy-net"`                                               |
 | ESP32-C2 | `CARGO_PROFILE_RELEASE_LTO=false cargo +nightly run --example embassy_dhcp --release --target riscv32imc-unknown-none-elf --features "esp32c2,esp32c2-async,embedded-svc,wifi,embassy-net"` |
 | ESP32-C3 | `cargo +nightly run --example embassy_dhcp --release --target riscv32imc-unknown-none-elf --features "esp32c3,esp32c3-async,embedded-svc,wifi,embassy-net"`                                 |
+| ESP32-C6 | `cargo +nightly run --example embassy_dhcp --release --target riscv32imac-unknown-none-elf --features "esp32c6,esp32c6-async,embedded-svc,wifi,embassy-net"`                                 |
 | ESP32-S2 | `cargo +esp run --example embassy_dhcp --release --target xtensa-esp32s2-none-elf --features "esp32s2,esp32s2-async,embedded-svc,wifi,embassy-net"`                                         |
 | ESP32-S3 | `cargo +esp run --example embassy_dhcp --release --target xtensa-esp32s3-none-elf --features "esp32s3,esp32s3-async,embedded-svc,wifi,embassy-net"`                                    |
 
@@ -139,6 +143,7 @@ To build these ensure you are in the `esp-wifi` directory as othewise the `confi
 |  ESP32   | `cargo +esp run --example access_point --release --target xtensa-esp32-none-elf --features "esp32,embedded-svc,wifi"`             |
 | ESP32-C2 | `cargo +nightly run --example access_point --release --target riscv32imc-unknown-none-elf --features "esp32c2,embedded-svc,wifi"` |
 | ESP32-C3 | `cargo +nightly run --example access_point --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc,wifi"` |
+| ESP32-C6 | `cargo +nightly run --example access_point --release --target riscv32imac-unknown-none-elf --features "esp32c6,embedded-svc,wifi"`|
 | ESP32-S2 | `cargo +esp run --example access_point --release --target xtensa-esp32s2-none-elf --features "esp32s2,embedded-svc,wifi"`         |
 | ESP32-S3 | `cargo +esp run --example access_point --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi"`         |
 
@@ -154,6 +159,7 @@ To build these ensure you are in the `esp-wifi` directory as othewise the `confi
 |  ESP32   | `cargo +esp run --example embassy_access_point --release --target xtensa-esp32-none-elf --features "esp32,esp32-async,embedded-svc,wifi,embassy-net"`                                               |
 | ESP32-C2 | `CARGO_PROFILE_RELEASE_LTO=false cargo +nightly run --example embassy_access_point --release --target riscv32imc-unknown-none-elf --features "esp32c2,esp32c2-async,embedded-svc,wifi,embassy-net"` |
 | ESP32-C3 | `cargo +nightly run --example embassy_access_point --release --target riscv32imc-unknown-none-elf --features "esp32c3,esp32c3-async,embedded-svc,wifi,embassy-net"`                                 |
+| ESP32-C6 | `cargo +nightly run --example embassy_access_point --release --target riscv32imac-unknown-none-elf --features "esp32c6,esp32c6-async,embedded-svc,wifi,embassy-net"`                                 |
 | ESP32-S2 | `cargo +esp run --example embassy_access_point --release --target xtensa-esp32s2-none-elf --features "esp32s2,esp32s2-async,embedded-svc,wifi,embassy-net"`                                         |
 | ESP32-S3 | `cargo +esp run --example embassy_access_point --release --target xtensa-esp32s3-none-elf --features "esp32s3,esp32s3-async,embedded-svc,wifi,embassy-net"`
 
@@ -199,12 +205,12 @@ Don't use this feature if your are _not_ using Serial-JTAG since it might reduce
 - providing an HCI interface
 - create an open access point
 
-## Notes on ESP32-C3 support
+## Notes on ESP32-C2 / ESP32-C3 / ESP32-C6 support
 
 - uses SYSTIMER as the main timer
 - doesn't work in direct-boot mode
 
-## Notes on ESP32 / ESP32-S3 support
+## Notes on ESP32 / ESP32-S2 / ESP32-S3 support
 
 This is even more experimental than support for ESP32-C3.
 

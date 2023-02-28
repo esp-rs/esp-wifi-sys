@@ -119,9 +119,9 @@ impl<T> ::core::fmt::Debug for __IncompleteArrayField<T> {
 }
 pub const SOC_COEX_HW_PTI: u32 = 1;
 pub const _NEWLIB_VERSION_H__: u32 = 1;
-pub const _NEWLIB_VERSION: &[u8; 6usize] = b"4.1.0\0";
-pub const __NEWLIB__: u32 = 4;
-pub const __NEWLIB_MINOR__: u32 = 1;
+pub const _NEWLIB_VERSION: &[u8; 6usize] = b"3.3.0\0";
+pub const __NEWLIB__: u32 = 3;
+pub const __NEWLIB_MINOR__: u32 = 3;
 pub const __NEWLIB_PATCHLEVEL__: u32 = 0;
 pub const _DEFAULT_SOURCE: u32 = 1;
 pub const _POSIX_SOURCE: u32 = 1;
@@ -215,6 +215,7 @@ pub const _FVWRITE_IN_STREAMIO: u32 = 1;
 pub const _FSEEK_OPTIMIZATION: u32 = 1;
 pub const _UNBUF_STREAM_OPT: u32 = 1;
 pub const _RETARGETABLE_LOCKING: u32 = 1;
+pub const _WANT_USE_LONG_TIME_T: u32 = 1;
 pub const __OBSOLETE_MATH_DEFAULT: u32 = 1;
 pub const __OBSOLETE_MATH: u32 = 1;
 pub const __BUFSIZ__: u32 = 128;
@@ -1380,7 +1381,7 @@ pub union _mbstate_t__bindgen_ty_1 {
 }
 pub type _iconv_t = *mut crate::c_types::c_void;
 pub type __clock_t = crate::c_types::c_ulong;
-pub type __time_t = __int_least64_t;
+pub type __time_t = crate::c_types::c_long;
 pub type __clockid_t = crate::c_types::c_ulong;
 pub type __timer_t = crate::c_types::c_ulong;
 pub type __sa_family_t = __uint8_t;
@@ -1654,7 +1655,7 @@ pub type u_int64_t = __uint64_t;
 pub type register_t = __intptr_t;
 pub type __sigset_t = crate::c_types::c_ulong;
 pub type suseconds_t = __suseconds_t;
-pub type time_t = __int_least64_t;
+pub type time_t = crate::c_types::c_long;
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct timeval {
@@ -1674,28 +1675,27 @@ pub struct itimerspec {
     pub it_value: timespec,
 }
 pub type sigset_t = __sigset_t;
-pub type __fd_mask = crate::c_types::c_ulong;
-pub type fd_mask = __fd_mask;
+pub type fd_mask = crate::c_types::c_ulong;
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct fd_set {
-    pub __fds_bits: [__fd_mask; 2usize],
+pub struct _types_fd_set {
+    pub fds_bits: [fd_mask; 2usize],
 }
 extern "C" {
     pub fn select(
         __n: crate::c_types::c_int,
-        __readfds: *mut fd_set,
-        __writefds: *mut fd_set,
-        __exceptfds: *mut fd_set,
+        __readfds: *mut _types_fd_set,
+        __writefds: *mut _types_fd_set,
+        __exceptfds: *mut _types_fd_set,
         __timeout: *mut timeval,
     ) -> crate::c_types::c_int;
 }
 extern "C" {
     pub fn pselect(
         __n: crate::c_types::c_int,
-        __readfds: *mut fd_set,
-        __writefds: *mut fd_set,
-        __exceptfds: *mut fd_set,
+        __readfds: *mut _types_fd_set,
+        __writefds: *mut _types_fd_set,
+        __exceptfds: *mut _types_fd_set,
         __timeout: *const timespec,
         __set: *const sigset_t,
     ) -> crate::c_types::c_int;
