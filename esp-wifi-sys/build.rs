@@ -26,6 +26,11 @@ fn main() -> Result<()> {
         configure_linker_for_chip(&out, "esp32c3")?;
         copy_libraries(&out)?;
     }
+    #[cfg(feature = "esp32c6")]
+    {
+        configure_linker_for_chip(&out, "esp32c6")?;
+        copy_libraries(&out)?;
+    }
     #[cfg(feature = "esp32s2")]
     {
         configure_linker_for_chip(&out, "esp32s2")?;
@@ -143,6 +148,39 @@ fn copy_libraries(out: &PathBuf) -> Result<()> {
 
     println!("cargo:rustc-link-lib={}", "btbb");
     println!("cargo:rustc-link-lib={}", "btdm_app");
+    println!("cargo:rustc-link-lib={}", "coexist");
+    println!("cargo:rustc-link-lib={}", "core");
+    println!("cargo:rustc-link-lib={}", "espnow");
+    println!("cargo:rustc-link-lib={}", "mesh");
+    println!("cargo:rustc-link-lib={}", "net80211");
+    println!("cargo:rustc-link-lib={}", "phy");
+    println!("cargo:rustc-link-lib={}", "pp");
+    println!("cargo:rustc-link-lib={}", "smartconfig");
+    println!("cargo:rustc-link-lib={}", "wapi");
+    println!("cargo:rustc-link-lib={}", "wpa_supplicant");
+
+    Ok(())
+}
+
+#[cfg(feature = "esp32c6")]
+fn copy_libraries(out: &PathBuf) -> Result<()> {
+    copy_file(out, "libs/esp32c6/libbtbb.a", "libbtbb.a")?;
+    copy_file(out, "libs/esp32c6/libcoexist.a", "libcoexist.a")?;
+    copy_file(out, "libs/esp32c6/libcore.a", "libcore.a")?;
+    copy_file(out, "libs/esp32c6/libespnow.a", "libespnow.a")?;
+    copy_file(out, "libs/esp32c6/libmesh.a", "libmesh.a")?;
+    copy_file(out, "libs/esp32c6/libnet80211.a", "libnet80211.a")?;
+    copy_file(out, "libs/esp32c6/libphy.a", "libphy.a")?;
+    copy_file(out, "libs/esp32c6/libpp.a", "libpp.a")?;
+    copy_file(out, "libs/esp32c6/libsmartconfig.a", "libsmartconfig.a")?;
+    copy_file(out, "libs/esp32c6/libwapi.a", "libwapi.a")?;
+    copy_file(
+        out,
+        "libs/esp32c6/libwpa_supplicant.a",
+        "libwpa_supplicant.a",
+    )?;
+
+    println!("cargo:rustc-link-lib={}", "btbb");
     println!("cargo:rustc-link-lib={}", "coexist");
     println!("cargo:rustc-link-lib={}", "core");
     println!("cargo:rustc-link-lib={}", "espnow");
