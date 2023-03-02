@@ -222,6 +222,10 @@ pub(crate) fn setup() {
     }
 }
 
+/// This is needed since apparently `esp_wifi_init` enables the WIFI_BB interrupt
+/// but it doesn't register a callback to handle it.
+///
+/// This is to disable the WIFI_BB interrupt after initialization.
 pub(crate) fn run_after_initialze_hack() {
     unsafe {
         // try to disable the WIFI_BB interrupt
