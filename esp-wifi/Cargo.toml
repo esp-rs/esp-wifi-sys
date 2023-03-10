@@ -47,23 +47,28 @@ embassy-futures = "0.1.0"
 futures-util = { version = "0.3.17", default-features = false }
 
 [target.xtensa-esp32-none-elf.dev-dependencies]
+examples-util = { path = "../examples-util", features = ["esp32"] }
 esp-println = { version = "0.4.0", features = [ "esp32", "log" ] }
 esp-backtrace = { version = "0.6.0", features = ["esp32", "panic-handler", "exception-handler", "print-uart"] }
 
 # change this for ESP32C3 / ESP32C2
 [target.riscv32imc-unknown-none-elf.dev-dependencies]
+examples-util = { path = "../examples-util", features = ["esp32c3"] }
 esp-println = { version = "0.4.0", features = [ "esp32c3", "log" ] }
 esp-backtrace = { version = "0.6.0", features = ["esp32c3", "panic-handler", "exception-handler", "print-uart"] }
 
 [target.riscv32imac-unknown-none-elf.dev-dependencies]
+examples-util = { path = "../examples-util", features = ["esp32c6"] }
 esp-println = { version = "0.4.0", features = [ "esp32c6", "log" ] }
 esp-backtrace = { version = "0.6.0", features = ["esp32c6", "panic-handler", "exception-handler", "print-uart"] }
 
 [target.xtensa-esp32s3-none-elf.dev-dependencies]
+examples-util = { path = "../examples-util", features = ["esp32s3"] }
 esp-println = { version = "0.4.0", features = [ "esp32s3", "log" ] }
 esp-backtrace = { version = "0.6.0", features = ["esp32s3", "panic-handler", "exception-handler", "print-uart"] }
 
 [target.xtensa-esp32s2-none-elf.dev-dependencies]
+examples-util = { path = "../examples-util", features = ["esp32s2"] }
 esp-println = { version = "0.4.0", features = [ "esp32s2", "log", "critical-section" ] }
 esp-backtrace = { version = "0.6.0", features = ["esp32s2", "panic-handler", "exception-handler", "print-uart"] }
 
