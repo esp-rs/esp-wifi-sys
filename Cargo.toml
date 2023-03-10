@@ -4,6 +4,12 @@ members = [
     "esp-wifi-sys",
     "xtask",
     "examples-util",
+    "examples-esp32c2",
+    "examples-esp32c3",
+    "examples-esp32c6",
+    "examples-esp32",
+    "examples-esp32s2",
+    "examples-esp32s3",
 ]
 resolver = "2"
 
