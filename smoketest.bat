@@ -21,7 +21,7 @@ cargo run --example embassy_esp_now --release --features "async,esp-now"
 cargo run --example access_point --release --features "embedded-svc,wifi"
 cargo run --example embassy_access_point --release --features "async,embedded-svc,wifi,embassy-net"
 
-cd examples-esp32
+cd ..\examples-esp32
 set CARGO_PROFILE_RELEASE_OPT_LEVEL=3
 set CARGO_PROFILE_RELEASE_LTO=off
 echo.
@@ -36,7 +36,7 @@ cargo run --example embassy_esp_now --release --features "async,esp-now"
 cargo run --example access_point --release --features "embedded-svc,wifi"
 cargo run --example embassy_access_point --release --features "async,embedded-svc,wifi,embassy-net"
 
-cd examples-esp32s3
+cd ..\examples-esp32s3
 set CARGO_PROFILE_RELEASE_OPT_LEVEL=1
 set CARGO_PROFILE_RELEASE_LTO=off
 echo.
@@ -53,7 +53,7 @@ cargo run --example embassy_esp_now --release --features "async,esp-now"
 cargo run --example access_point --release --features "embedded-svc,wifi"
 cargo run --example embassy_access_point --release --features "async,embedded-svc,wifi,embassy-net"
 
-cd examples-esp32s2
+cd ..\examples-esp32s2
 set CARGO_PROFILE_RELEASE_OPT_LEVEL=3
 set CARGO_PROFILE_RELEASE_LTO=off
 echo.
@@ -67,7 +67,7 @@ cargo run --example embassy_esp_now --release --features "async,esp-now"
 cargo run --example access_point --release --features "embedded-svc,wifi"
 cargo run --example embassy_access_point --release --features "async,embedded-svc,wifi,embassy-net"
 
-cd examples-esp32c2
+cd ..\examples-esp32c2
 set CARGO_PROFILE_RELEASE_OPT_LEVEL=2
 set CARGO_PROFILE_RELEASE_LTO=false
 echo.
@@ -83,7 +83,7 @@ cargo run --example embassy_esp_now --release --features "async,esp-now"
 cargo run --example access_point --release --features "embedded-svc,wifi"
 cargo run --example embassy_access_point --release --features "async,embedded-svc,wifi,embassy-net"
 
-cd examples-esp32c6
+cd ..\examples-esp32c6
 set CARGO_PROFILE_RELEASE_OPT_LEVEL=3
 set CARGO_PROFILE_RELEASE_LTO=off
 echo.
