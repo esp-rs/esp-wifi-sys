@@ -114,9 +114,9 @@ jobs:
       - name: build (esp_now)
         run: cd examples-esp32c6 && cargo build --release --example=esp_now --features=esp-now
       - name: build (embassy_esp_now)
-        run: cd examples-esp32c6 && cargo build --release --example=embassy_esp_now --features=esp32c3-async,esp-now
+        run: cd examples-esp32c6 && cargo build --release --example=embassy_esp_now --features=async,esp-now
       - name: build (embassy_dhcp)
-        run: cd examples-esp32c6 && cargo build --release --example=embassy_dhcp --features=esp32c3-async,embedded-svc,wifi,embassy-net
+        run: cd examples-esp32c6 && cargo build --release --example=embassy_dhcp --features=async,embedded-svc,wifi,embassy-net
 
   esp32s2:
     runs-on: ubuntu-latest
