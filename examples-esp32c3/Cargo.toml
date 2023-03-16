@@ -1,0 +1,42 @@
+[package]
+name = "examples-esp32c3"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+embedded-svc.workspace = true
+bleps.workspace = true
+bleps-macros.workspace = true
+embassy-executor .workspace = true
+embassy-time.workspace = true
+embassy-futures.workspace = true
+futures-util.workspace = true
+embedded-io.workspace = true
+smoltcp.workspace = true
+log.workspace = true
+heapless.workspace = true
+embassy-net = { workspace = true, optional = true }
+
+esp32c3-hal.workspace = true
+examples-util = { path = "../examples-util", features = ["esp32c3"] }
+esp-println = { workspace = true, features = [ "esp32c3" ] }
+esp-backtrace = { workspace = true, features = ["esp32c3"] }
+esp-wifi = { path = "../esp-wifi", features = ["esp32c3"] }
+
+[features]
+default = ["esp32c3"]
+esp32c3 = []
+async = ["esp-wifi/esp32c3-async"]
+embassy-net = ["esp-wifi/embassy-net","dep:embassy-net"]
+wifi-logs = ["esp-wifi/wifi-logs"]
+dump-packets = ["esp-wifi/dump-packets"]
+utils = ["esp-wifi/utils"]
+enumset = ["esp-wifi/enumset"]
+embedded-svc = [ "esp-wifi/embedded-svc" ]
+wifi = ["esp-wifi/wifi"]
+ble = ["esp-wifi/ble"]
+phy-enable-usb = ["esp-wifi/phy-enable-usb"]
+ps-min-modem = ["esp-wifi/ps-min-modem"]
+esp-now = ["esp-wifi/esp-now"]

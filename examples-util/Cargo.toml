@@ -1,0 +1,20 @@
+[package]
+name = "examples-util"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+esp32c3-hal = { version = "0.7.0", optional = true }
+esp32c2-hal = { version = "0.5.1", optional = true }
+esp32c6-hal = { git = "https://github.com/esp-rs/esp-hal", package = "esp32c6-hal", rev = "7cf7d8eeac9172b24f0fba7ae659ec39925ce04f",  optional = true }
+esp32-hal = { version = "0.10.0", optional = true, features = [ "rt" ] }
+esp32s3-hal = { version = "0.7.0", optional = true, features = [ "rt" ] }
+esp32s2-hal = { version = "0.7.0", optional = true, features = [ "rt" ] }
+
+[features]
+esp32c3 = [ "esp32c3-hal" ]
+esp32c2 = [ "esp32c2-hal" ]
+esp32c6 = [ "esp32c6-hal" ]
+esp32   = [ "esp32-hal" ]
+esp32s3 = [ "esp32s3-hal" ]
+esp32s2 = [ "esp32s2-hal" ]

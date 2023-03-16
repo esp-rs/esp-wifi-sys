@@ -27,7 +27,7 @@ If a cell contains am em dash (&mdash;) this means that the particular feature i
 
 ## Examples
 
-To build these ensure you are in the `esp-wifi` directory as othewise the `config.toml` will not apply
+To build these ensure you are in the `examples-esp32XXX` directory matching your target as othewise the `config.toml` will not apply
 
 ### dhcp
 
@@ -35,14 +35,7 @@ To build these ensure you are in the `esp-wifi` directory as othewise the `confi
 - gets an ip address via DHCP
 - performs an HTTP get request to some "random" server
 
-|   Chip   | Command                                                                                                                   |
-| :------: | ------------------------------------------------------------------------------------------------------------------------- |
-|  ESP32   | `cargo +esp run --example dhcp --release --target xtensa-esp32-none-elf --features "esp32,embedded-svc,wifi"`             |
-| ESP32-C2 | `cargo +nightly run --example dhcp --release --target riscv32imc-unknown-none-elf --features "esp32c2,embedded-svc,wifi"` |
-| ESP32-C3 | `cargo +nightly run --example dhcp --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc,wifi"` |
-| ESP32-C6 | `cargo +nightly run --example dhcp --release --target riscv32imac-unknown-none-elf --features "esp32c6,embedded-svc,wifi"`|
-| ESP32-S2 | `cargo +esp run --example dhcp --release --target xtensa-esp32s2-none-elf --features "esp32s2,embedded-svc,wifi"`         |
-| ESP32-S3 | `cargo +esp run --example dhcp --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi"`         |
+`cargo run --example dhcp --release --features "embedded-svc,wifi"`
 
 ### static_ip
 
@@ -52,14 +45,7 @@ To build these ensure you are in the `esp-wifi` directory as othewise the `confi
 - uses the given static IP
 - responds with some HTML content when connecting to port 8080
 
-|   Chip   | Command                                                                                                                        |
-| :------: | ------------------------------------------------------------------------------------------------------------------------------ |
-|  ESP32   | `cargo +esp run --example static_ip --release --target xtensa-esp32-none-elf --features "esp32,embedded-svc,wifi"`             |
-| ESP32-C2 | `cargo +nightly run --example static_ip --release --target riscv32imc-unknown-none-elf --features "esp32c2,embedded-svc,wifi"` |
-| ESP32-C3 | `cargo +nightly run --example static_ip --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc,wifi"` |
-| ESP32-C6 | `cargo +nightly run --example static_ip --release --target riscv32imac-unknown-none-elf --features "esp32c6,embedded-svc,wifi"`|
-| ESP32-S2 | `cargo +esp run --example static_ip --release --target xtensa-esp32s2-none-elf --features "esp32s2,embedded-svc,wifi"`         |
-| ESP32-S3 | `cargo +esp run --example static_ip --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi"`         |
+`cargo run --example static_ip --release --features "embedded-svc,wifi"`
 
 ### ble
 
@@ -68,14 +54,9 @@ To build these ensure you are in the `esp-wifi` directory as othewise the `confi
 - pressing the boot-button on a dev-board will send a notification if it is subscribed
 - this uses a toy level BLE stack - might not work with every BLE central device (tested with Android and Windows Bluetooth LE Explorer)
 
-|   Chip   | Command                                                                                                                                    |
-| :------: | ------------------------------------------------------------------------------------------------------------------------------------------ |
-|  ESP32   | `cargo +esp run --example ble --release --target xtensa-esp32-none-elf --features "esp32,ble"`                                             |
-| ESP32-C2 | `CARGO_PROFILE_RELEASE_LTO=false cargo +nightly run --example ble --release --target riscv32imc-unknown-none-elf --features "esp32c2,ble"` |
-| ESP32-C3 | `cargo +nightly run --example ble --release --target riscv32imc-unknown-none-elf --features "esp32c3,ble"`                                 |
-| ESP32-S3 | `cargo +esp run --example ble --release --target xtensa-esp32s3-none-elf --features "esp32s3,ble"`                                         |
+`cargo run --example ble --release --features "esp32,ble"` 
 
-**NOTE:** ESP32-S2 doesn't support bluetooth
+**NOTE:** ESP32-S2 doesn't support bluetooth, for ESP32-C6 bluetooth support isn't implemented yet 
 
 ### coex
 
@@ -85,10 +66,7 @@ To build these ensure you are in the `esp-wifi` directory as othewise the `confi
 - does BLE advertising
 - coex support is still somewhat flaky
 
-|   Chip   | Command                                                                                                                       |
-| :------: | ----------------------------------------------------------------------------------------------------------------------------- |
-| ESP32-C3 | `cargo +nightly run --example coex --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc,wifi,ble"` |
-| ESP32-S3 | `cargo +esp run --example coex --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi,ble"`         |
+`cargo run --example coex --release --features "embedded-svc,wifi,ble"`
 
 **NOTE:** Not currently available for the ESP32, ESP32-C2, ESP32-C6 or ESP32-S2
 
@@ -96,40 +74,19 @@ To build these ensure you are in the `esp-wifi` directory as othewise the `confi
 
 - broadcasts, receives and sends messages via esp-now
 
-|   Chip   | Command                                                                                                                                            |
-| :------: | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-|  ESP32   | `cargo +esp run --example esp_now --release --target xtensa-esp32-none-elf --features "esp32,esp-now"`                                             |
-| ESP32-C2 | `CARGO_PROFILE_RELEASE_LTO=false cargo +nightly run --example esp_now --release --target riscv32imc-unknown-none-elf --features "esp32c2,esp-now"` |
-| ESP32-C3 | `cargo +nightly run --example esp_now --release --target riscv32imc-unknown-none-elf --features "esp32c3,esp-now"`                                 |
-| ESP32-C6 | `cargo +nightly run --example esp_now --release --target riscv32imac-unknown-none-elf --features "esp32c6,esp-now"`                                |
-| ESP32-S2 | `cargo +esp run --example esp_now --release --target xtensa-esp32s2-none-elf --features "esp32s2,esp-now"`                                         |
-| ESP32-S3 | `cargo +esp run --example esp_now --release --target xtensa-esp32s3-none-elf --features "esp32s3,esp-now"`                                         |
+`cargo run --example esp_now --release --features "esp-now"`
 
 ### embassy_esp_now
 
 - broadcasts, receives and sends messages via esp-now in an async way
 
-|   Chip   | Command                                                                                                                                                                  |
-| :------: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-|  ESP32   | `cargo +esp run --example embassy_esp_now --release --target xtensa-esp32-none-elf --features "esp32,esp32-async,esp-now"`                                               |
-| ESP32-C2 | `CARGO_PROFILE_RELEASE_LTO=false cargo +nightly run --example embassy_esp_now --release --target riscv32imc-unknown-none-elf --features "esp32c2,esp32c2-async,esp-now"` |
-| ESP32-C3 | `cargo +nightly run --example embassy_esp_now --release --target riscv32imc-unknown-none-elf --features "esp32c3,esp32c3-async,esp-now"`                                 |
-| ESP32-C6 | `cargo +nightly run --example embassy_esp_now --release --target riscv32imac-unknown-none-elf --features "esp32c6,esp32c6-async,esp-now"`                                |
-| ESP32-S2 | `cargo +esp run --example embassy_esp_now --release --target xtensa-esp32s2-none-elf --features "esp32s2,esp32s2-async,esp-now"`                                         |
-| ESP32-S3 | `cargo +esp run --example embassy_esp_now --release --target xtensa-esp32s3-none-elf --features "esp32s3,esp32s3-async,esp-now"`        
+`cargo run --example embassy_esp_now --release --features "async,esp-now"`        
 
 ### embassy_dhcp
 
 - Read and Write to sockets over WiFi asyncronously using embassy-executor.
 
-|   Chip   | Command                                                                                                                                                                  |
-| :------: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-|  ESP32   | `cargo +esp run --example embassy_dhcp --release --target xtensa-esp32-none-elf --features "esp32,esp32-async,embedded-svc,wifi,embassy-net"`                                               |
-| ESP32-C2 | `CARGO_PROFILE_RELEASE_LTO=false cargo +nightly run --example embassy_dhcp --release --target riscv32imc-unknown-none-elf --features "esp32c2,esp32c2-async,embedded-svc,wifi,embassy-net"` |
-| ESP32-C3 | `cargo +nightly run --example embassy_dhcp --release --target riscv32imc-unknown-none-elf --features "esp32c3,esp32c3-async,embedded-svc,wifi,embassy-net"`                                 |
-| ESP32-C6 | `cargo +nightly run --example embassy_dhcp --release --target riscv32imac-unknown-none-elf --features "esp32c6,esp32c6-async,embedded-svc,wifi,embassy-net"`                                 |
-| ESP32-S2 | `cargo +esp run --example embassy_dhcp --release --target xtensa-esp32s2-none-elf --features "esp32s2,esp32s2-async,embedded-svc,wifi,embassy-net"`                                         |
-| ESP32-S3 | `cargo +esp run --example embassy_dhcp --release --target xtensa-esp32s3-none-elf --features "esp32s3,esp32s3-async,embedded-svc,wifi,embassy-net"`                                    |
+`cargo run --example embassy_dhcp --release --features "async,embedded-svc,wifi,embassy-net"`
 
 ### access_point
 
@@ -138,14 +95,7 @@ To build these ensure you are in the `esp-wifi` directory as othewise the `confi
 - open http://192.168.2.1:8080/ in your browser
 - on Android you might need to choose _Keep Accesspoint_ when it tells you the WiFi has no internet connection, Chrome might not want to load the URL - you can use a shell and try `curl` and `ping`
 
-|   Chip   | Command                                                                                                                        |
-| :------: | ------------------------------------------------------------------------------------------------------------------------------ |
-|  ESP32   | `cargo +esp run --example access_point --release --target xtensa-esp32-none-elf --features "esp32,embedded-svc,wifi"`             |
-| ESP32-C2 | `cargo +nightly run --example access_point --release --target riscv32imc-unknown-none-elf --features "esp32c2,embedded-svc,wifi"` |
-| ESP32-C3 | `cargo +nightly run --example access_point --release --target riscv32imc-unknown-none-elf --features "esp32c3,embedded-svc,wifi"` |
-| ESP32-C6 | `cargo +nightly run --example access_point --release --target riscv32imac-unknown-none-elf --features "esp32c6,embedded-svc,wifi"`|
-| ESP32-S2 | `cargo +esp run --example access_point --release --target xtensa-esp32s2-none-elf --features "esp32s2,embedded-svc,wifi"`         |
-| ESP32-S3 | `cargo +esp run --example access_point --release --target xtensa-esp32s3-none-elf --features "esp32s3,embedded-svc,wifi"`         |
+`cargo run --example access_point --release --features "embedded-svc,wifi"`
 
 ### embassy_access_point
 
@@ -154,14 +104,7 @@ To build these ensure you are in the `esp-wifi` directory as othewise the `confi
 - open http://192.168.2.1:8080/ in your browser
 - on Android you might need to choose _Keep Accesspoint_ when it tells you the WiFi has no internet connection, Chrome might not want to load the URL - you can use a shell and try `curl` and `ping`
 
-|   Chip   | Command                                                                                                                                                                  |
-| :------: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-|  ESP32   | `cargo +esp run --example embassy_access_point --release --target xtensa-esp32-none-elf --features "esp32,esp32-async,embedded-svc,wifi,embassy-net"`                                               |
-| ESP32-C2 | `CARGO_PROFILE_RELEASE_LTO=false cargo +nightly run --example embassy_access_point --release --target riscv32imc-unknown-none-elf --features "esp32c2,esp32c2-async,embedded-svc,wifi,embassy-net"` |
-| ESP32-C3 | `cargo +nightly run --example embassy_access_point --release --target riscv32imc-unknown-none-elf --features "esp32c3,esp32c3-async,embedded-svc,wifi,embassy-net"`                                 |
-| ESP32-C6 | `cargo +nightly run --example embassy_access_point --release --target riscv32imac-unknown-none-elf --features "esp32c6,esp32c6-async,embedded-svc,wifi,embassy-net"`                                 |
-| ESP32-S2 | `cargo +esp run --example embassy_access_point --release --target xtensa-esp32s2-none-elf --features "esp32s2,esp32s2-async,embedded-svc,wifi,embassy-net"`                                         |
-| ESP32-S3 | `cargo +esp run --example embassy_access_point --release --target xtensa-esp32s3-none-elf --features "esp32s3,esp32s3-async,embedded-svc,wifi,embassy-net"`
+`cargorun --example embassy_access_point --release --features "async,embedded-svc,wifi,embassy-net"`
 
 ## Features
 
@@ -212,13 +155,10 @@ Don't use this feature if your are _not_ using Serial-JTAG since it might reduce
 
 ## Notes on ESP32 / ESP32-S2 / ESP32-S3 support
 
-This is even more experimental than support for ESP32-C3.
-
 - The WiFi logs only print the format string - not the actual values.
-- Also there might be some packet loss and a bit worse performance than on ESP32-C3 currently.
 - The code runs on a single core and might currently not be multi-core safe!
 
-On ESP32 / ESP32-S3 currently TIMG1/TIMER0 is used as the main timer so you can't use it for anything else.
+On ESP32 / ESP32-S2 / ESP32-S3 currently TIMG1/TIMER0 is used as the main timer so you can't use it for anything else.
 Additionally it uses CCOMPARE0 - so don't touch that, too.
 
 ## opt-level for Xtensa targets
