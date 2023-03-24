@@ -89,3 +89,12 @@ macro_rules! boot_button {
         button
     }};
 }
+
+#[cfg(feature = "esp32c3")]
+pub const SOC_NAME: &str = "ESP32-C3";
+#[cfg(feature = "esp32c2")]
+pub const SOC_NAME: &str = "ESP32-C2";
+#[cfg(feature = "esp32")]
+pub const SOC_NAME: &str = "ESP32";
+#[cfg(feature = "esp32s3")]
+pub const SOC_NAME: &str = "ESP32-S3";

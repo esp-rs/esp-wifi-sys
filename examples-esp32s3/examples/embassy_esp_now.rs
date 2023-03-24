@@ -68,7 +68,13 @@ fn main() -> ! {
     examples_util::rtc!(peripherals);
 
     let timer = examples_util::timer!(peripherals, clocks);
-    initialize(timer, Rng::new(peripherals.RNG), &clocks).unwrap();
+    initialize(
+        timer,
+        Rng::new(peripherals.RNG),
+        system.radio_clock_control,
+        &clocks,
+    )
+    .unwrap();
 
     let esp_now = esp_wifi::esp_now::esp_now().initialize().unwrap();
     println!("esp-now version {}", esp_now.get_version().unwrap());
