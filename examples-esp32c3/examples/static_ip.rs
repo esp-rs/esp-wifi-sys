@@ -43,7 +43,13 @@ fn main() -> ! {
     let mut wifi_stack = WifiStack::new(iface, device, sockets, current_millis);
 
     let timer = examples_util::timer!(peripherals, clocks);
-    initialize(timer, Rng::new(peripherals.RNG), &clocks).unwrap();
+    initialize(
+        timer,
+        Rng::new(peripherals.RNG),
+        system.radio_clock_control,
+        &clocks,
+    )
+    .unwrap();
 
     let client_config = Configuration::Client(ClientConfiguration {
         ssid: SSID.into(),

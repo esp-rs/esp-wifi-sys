@@ -32,13 +32,14 @@ fn main() -> ! {
     examples_util::rtc!(peripherals);
 
     let timer = examples_util::timer!(peripherals, clocks);
-    initialize(timer, Rng::new(peripherals.RNG), &clocks).unwrap();
+    initialize(
+        timer,
+        Rng::new(peripherals.RNG),
+        system.radio_clock_control,
+        &clocks,
+    )
+    .unwrap();
 
-    // let io = IO::new(peripherals.GPIO, peripherals.IO_MUX);
-    // #[cfg(any(feature = "esp32", feature = "esp32s2", feature = "esp32s3"))]
-    // let button = io.pins.gpio0.into_pull_down_input();
-    // #[cfg(any(feature = "esp32c2", feature = "esp32c3"))]
-    // let button = io.pins.gpio9.into_pull_down_input();
     let button = examples_util::boot_button!(peripherals);
 
     let mut debounce_cnt = 500;
@@ -55,14 +56,7 @@ fn main() -> ! {
             ble.cmd_set_le_advertising_data(create_advertising_data(&[
                 AdStructure::Flags(LE_GENERAL_DISCOVERABLE | BR_EDR_NOT_SUPPORTED),
                 AdStructure::ServiceUuids16(&[Uuid::Uuid16(0x1809)]),
-                #[cfg(feature = "esp32c3")]
-                AdStructure::CompleteLocalName("ESP32-C3 BLE"),
-                #[cfg(feature = "esp32c2")]
-                AdStructure::CompleteLocalName("ESP32-C2 BLE"),
-                #[cfg(feature = "esp32")]
-                AdStructure::CompleteLocalName("ESP32 BLE"),
-                #[cfg(feature = "esp32s3")]
-                AdStructure::CompleteLocalName("ESP32-S3 BLE"),
+                AdStructure::CompleteLocalName(examples_util::SOC_NAME),
             ]))
         );
         println!("{:?}", ble.cmd_set_le_advertise_enable(true));

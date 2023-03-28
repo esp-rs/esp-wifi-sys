@@ -46,7 +46,13 @@ fn main() -> ! {
     examples_util::rtc!(peripherals);
 
     let timer = examples_util::timer!(peripherals, clocks);
-    initialize(timer, Rng::new(peripherals.RNG), &clocks).unwrap();
+    initialize(
+        timer,
+        Rng::new(peripherals.RNG),
+        system.radio_clock_control,
+        &clocks,
+    )
+    .unwrap();
 
     let (wifi_interface, controller) = esp_wifi::wifi::new(WifiMode::Ap);
 
