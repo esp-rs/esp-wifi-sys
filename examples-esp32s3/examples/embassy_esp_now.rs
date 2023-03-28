@@ -76,9 +76,8 @@ fn main() -> ! {
     )
     .unwrap();
 
-    let radio = peripherals.RADIO.split();
-
-    let esp_now = EspNow::new(radio.0).unwrap();
+    let (wifi, _) = peripherals.RADIO.split();
+    let esp_now = EspNow::new(wifi).unwrap();
     println!("esp-now version {}", esp_now.get_version().unwrap());
 
     let timer_group0 = TimerGroup::new(peripherals.TIMG0, &clocks);

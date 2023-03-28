@@ -40,6 +40,8 @@ fn main() -> ! {
     )
     .unwrap();
 
+    let (_, mut bluetooth) = peripherals.RADIO.split();
+
     let button = examples_util::boot_button!(peripherals);
 
     let mut debounce_cnt = 500;
@@ -47,7 +49,7 @@ fn main() -> ! {
     let mut radio = peripherals.RADIO.split();
     
     loop {
-        let connector = BleConnector::new(&mut radio.1);
+        let connector = BleConnector::new(&mut bluetooth);
         let hci = HciConnector::new(connector, esp_wifi::current_millis);
         let mut ble = Ble::new(&hci);
         

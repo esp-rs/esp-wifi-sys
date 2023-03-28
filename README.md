@@ -54,7 +54,7 @@ To build these ensure you are in the `examples-esp32XXX` directory matching your
 - pressing the boot-button on a dev-board will send a notification if it is subscribed
 - this uses a toy level BLE stack - might not work with every BLE central device (tested with Android and Windows Bluetooth LE Explorer)
 
-`cargo run --example ble --release --features "esp32,ble"` 
+`cargo run --example ble --release --features "ble"` 
 
 **NOTE:** ESP32-S2 doesn't support bluetooth, for ESP32-C6 bluetooth support isn't implemented yet 
 

@@ -56,9 +56,8 @@ fn main() -> ! {
     )
     .unwrap();
 
-    let radio = peripherals.RADIO.split();
-
-    let (wifi_interface, controller) = esp_wifi::wifi::new_with_mode(radio.0, WifiMode::Sta);
+    let (wifi, _) = peripherals.RADIO.split();
+    let (wifi_interface, controller) = esp_wifi::wifi::new_with_mode(wifi, WifiMode::Sta);
 
     let timer_group0 = TimerGroup::new(peripherals.TIMG0, &clocks);
     embassy::init(&clocks, timer_group0.timer0);
