@@ -54,7 +54,8 @@ fn main() -> ! {
     )
     .unwrap();
 
-    let (wifi_interface, controller) = esp_wifi::wifi::new(WifiMode::Ap);
+    let (wifi, _, _) = peripherals.RADIO.split();
+    let (wifi_interface, controller) = esp_wifi::wifi::new_with_mode(wifi, WifiMode::Ap);
 
     let timer_group0 = TimerGroup::new(peripherals.TIMG0, &clocks);
     embassy::init(&clocks, timer_group0.timer0);
@@ -84,7 +85,7 @@ fn main() -> ! {
 }
 
 #[embassy_executor::task]
-async fn connection(mut controller: WifiController) {
+async fn connection(mut controller: WifiController<'static>) {
     println!("start connection task");
     println!("Device capabilities: {:?}", controller.get_capabilities());
     loop {
@@ -110,12 +111,12 @@ async fn connection(mut controller: WifiController) {
 }
 
 #[embassy_executor::task]
-async fn net_task(stack: &'static Stack<WifiDevice>) {
+async fn net_task(stack: &'static Stack<WifiDevice<'static>>) {
     stack.run().await
 }
 
 #[embassy_executor::task]
-async fn task(stack: &'static Stack<WifiDevice>) {
+async fn task(stack: &'static Stack<WifiDevice<'static>>) {
     let mut rx_buffer = [0; 4096];
     let mut tx_buffer = [0; 4096];
 

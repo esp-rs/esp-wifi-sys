@@ -22,7 +22,7 @@ use hal::{embassy, peripherals::Peripherals, prelude::*, timer::TimerGroup, Rtc}
 use hal::system::SystemExt;
 
 #[embassy_executor::task]
-async fn run(mut esp_now: EspNow) {
+async fn run(mut esp_now: EspNow<'static>) {
     let mut ticker = Ticker::every(Duration::from_secs(5));
     loop {
         let res = select(ticker.next(), async {
@@ -76,7 +76,8 @@ fn main() -> ! {
     )
     .unwrap();
 
-    let esp_now = esp_wifi::esp_now::esp_now().initialize().unwrap();
+    let (wifi, _, _) = peripherals.RADIO.split();
+    let esp_now = esp_wifi::esp_now::EspNow::new(wifi).unwrap();
     println!("esp-now version {}", esp_now.get_version().unwrap());
 
     let timer_group0 = TimerGroup::new(peripherals.TIMG0, &clocks);

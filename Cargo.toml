@@ -24,6 +24,7 @@ lto = "off"
 
 [workspace.dependencies]
 embedded-hal = "0.2.3"
+esp-hal-common = { version = "0.8.0" }
 esp32c3-hal = { version = "0.8.0" }
 esp32c2-hal = { version = "0.6.0" }
 esp32c6-hal = { version = "0.1.0" }
