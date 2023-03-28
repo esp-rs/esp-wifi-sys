@@ -15,7 +15,7 @@ use esp32s3_hal as hal;
 use esp_backtrace as _;
 use esp_println::logger::init_logger;
 use esp_println::println;
-use esp_wifi::esp_now::{PeerInfo, BROADCAST_ADDRESS, EspNow};
+use esp_wifi::esp_now::{EspNow, PeerInfo, BROADCAST_ADDRESS};
 use esp_wifi::{current_millis, initialize};
 use hal::clock::{ClockControl, CpuClock};
 use hal::Rng;

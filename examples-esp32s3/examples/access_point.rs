@@ -49,7 +49,6 @@ fn main() -> ! {
         create_network_interface(wifi, radio.0, WifiMode::Ap, &mut socket_set_entries);
     let mut wifi_stack = WifiStack::new(iface, device, sockets, current_millis);
 
-
     let client_config = Configuration::AccessPoint(AccessPointConfiguration {
         ssid: "esp-wifi".into(),
         ..Default::default()

@@ -2,16 +2,18 @@ use embedded_io::{
     blocking::{Read, Write},
     Error, Io,
 };
-use esp_hal_common::peripheral::{PeripheralRef, Peripheral};
+use esp_hal_common::peripheral::{Peripheral, PeripheralRef};
 
 use super::{read_hci, send_hci};
 
 pub struct BleConnector<'d> {
-    _device: PeripheralRef<'d, esp_hal_common::radio::Bluetooth>
+    _device: PeripheralRef<'d, esp_hal_common::radio::Bluetooth>,
 }
 
 impl<'d> BleConnector<'d> {
-    pub fn new(device: impl Peripheral<P = esp_hal_common::radio::Bluetooth> + 'd) -> BleConnector<'d> {
+    pub fn new(
+        device: impl Peripheral<P = esp_hal_common::radio::Bluetooth> + 'd,
+    ) -> BleConnector<'d> {
         Self {
             _device: device.into_ref(),
         }

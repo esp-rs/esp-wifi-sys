@@ -33,7 +33,7 @@ fn main() -> ! {
     let system = examples_util::system!(peripherals);
     let clocks = examples_util::clocks!(system);
     examples_util::rtc!(peripherals);
-    
+
     let timer = examples_util::timer!(peripherals, clocks);
     initialize(
         timer,
@@ -48,7 +48,6 @@ fn main() -> ! {
     let (iface, device, mut controller, sockets) =
         create_network_interface(wifi, WifiMode::Sta, &mut socket_set_entries);
     let wifi_stack = WifiStack::new(iface, device, sockets, current_millis);
-
 
     let client_config = Configuration::Client(ClientConfiguration {
         ssid: SSID.into(),

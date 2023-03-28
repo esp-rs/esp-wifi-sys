@@ -52,7 +52,6 @@ fn main() -> ! {
         create_network_interface(wifi, WifiMode::Sta, &mut socket_set_entries);
     let mut wifi_stack = WifiStack::new(iface, device, sockets, current_millis);
 
-
     let client_config = Configuration::Client(ClientConfiguration {
         ssid: SSID.into(),
         password: PASSWORD.into(),
