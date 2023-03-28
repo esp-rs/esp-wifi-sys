@@ -83,7 +83,7 @@ fn main() -> ! {
 }
 
 #[embassy_executor::task]
-async fn connection(mut controller: WifiController) {
+async fn connection(mut controller: WifiController<'static>) {
     println!("start connection task");
     println!("Device capabilities: {:?}", controller.get_capabilities());
     loop {
@@ -119,12 +119,12 @@ async fn connection(mut controller: WifiController) {
 }
 
 #[embassy_executor::task]
-async fn net_task(stack: &'static Stack<WifiDevice>) {
+async fn net_task(stack: &'static Stack<WifiDevice<'static>>) {
     stack.run().await
 }
 
 #[embassy_executor::task]
-async fn task(stack: &'static Stack<WifiDevice>) {
+async fn task(stack: &'static Stack<WifiDevice<'static>>) {
     let mut rx_buffer = [0; 4096];
     let mut tx_buffer = [0; 4096];
 

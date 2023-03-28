@@ -32,7 +32,7 @@ fn main() -> ! {
     .unwrap();
 
     let (wifi, _) = peripherals.RADIO.split();
-    let esp_now = esp_wifi::esp_now::EspNow::new(wifi).unwrap();
+    let mut esp_now = esp_wifi::esp_now::EspNow::new(wifi).unwrap();
 
     println!("esp-now version {}", esp_now.get_version().unwrap());
 
