@@ -272,7 +272,7 @@ pub fn esp_now() -> EspNowCreator {
 }
 
 pub struct EspNow {
-    pub _private: (),
+    _private: (),
 }
 
 impl EspNow {

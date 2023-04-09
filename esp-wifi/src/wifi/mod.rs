@@ -27,7 +27,6 @@ use esp_wifi_sys::include::wifi_interface_t_WIFI_IF_AP;
 use esp_wifi_sys::include::wifi_mode_t_WIFI_MODE_AP;
 use esp_wifi_sys::include::wifi_mode_t_WIFI_MODE_APSTA;
 use esp_wifi_sys::include::wifi_mode_t_WIFI_MODE_NULL;
-use esp_wifi_sys::include::WIFI_PROTOCOL_LR;
 use esp_wifi_sys::include::esp_wifi_set_protocol;
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
