@@ -24,7 +24,8 @@ examples-util = { path = "../examples-util", features = ["esp32c6"] }
 esp-println = { workspace = true, features = [ "esp32c6" ] }
 esp-backtrace = { workspace = true, features = ["esp32c6"] }
 esp-wifi = { path = "../esp-wifi", features = ["esp32c6"] }
-
+[profile.dev.package."esp-wifi"]
+opt-level = 3
 [features]
 default = ["esp32c6"]
 esp32c6 = []

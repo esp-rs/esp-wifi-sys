@@ -25,6 +25,9 @@ esp-println = { workspace = true, features = [ "esp32c3" ] }
 esp-backtrace = { workspace = true, features = ["esp32c3"] }
 esp-wifi = { path = "../esp-wifi", features = ["esp32c3"] }
 
+[profile.dev]
+opt-level = 3
+
 [features]
 default = ["esp32c3"]
 esp32c3 = []

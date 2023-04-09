@@ -27,6 +27,8 @@ use esp_wifi_sys::include::wifi_interface_t_WIFI_IF_AP;
 use esp_wifi_sys::include::wifi_mode_t_WIFI_MODE_AP;
 use esp_wifi_sys::include::wifi_mode_t_WIFI_MODE_APSTA;
 use esp_wifi_sys::include::wifi_mode_t_WIFI_MODE_NULL;
+use esp_wifi_sys::include::WIFI_PROTOCOL_LR;
+use esp_wifi_sys::include::esp_wifi_set_protocol;
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
 
@@ -722,6 +724,14 @@ pub struct WifiController {
 impl WifiController {
     pub(crate) fn new_with_config(config: embedded_svc::wifi::Configuration) -> Self {
         Self { config }
+    }
+
+    /// Set the wifi mode.
+    fn set_mode(&mut self, protocol_bitmap: u32) -> Result<(), WifiError> {
+        let mode = wifi_mode_t_WIFI_MODE_NULL;
+        esp_wifi_result!(unsafe { esp_wifi_get_mode(&mut mode) })?;
+        esp_wifi_result!(unsafe { esp_wifi_set_protocol(mode, protocol_bitmap.try_into().unwrap()) })?;
+        Ok(())
     }
 
     pub(crate) fn new() -> Self {
