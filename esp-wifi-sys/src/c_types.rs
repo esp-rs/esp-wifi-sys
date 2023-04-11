@@ -5,17 +5,17 @@
     dead_code
 )]
 
-pub type c_uint = u32;
-pub type c_int = i32;
-pub type c_ulonglong = u32;
-pub type c_longlong = i32;
-pub type c_uchar = u8;
+pub type c_uint = core::ffi::c_uint;
+pub type c_int = core::ffi::c_int;
+pub type c_ulonglong = core::ffi::c_ulonglong;
+pub type c_longlong = core::ffi::c_longlong;
+pub type c_uchar = core::ffi::c_uchar;
 
-pub type c_short = i16;
-pub type c_ushort = u16;
-pub type c_schar = i8;
-pub type c_char = u8;
-pub type c_long = i32;
-pub type c_ulong = u32;
+pub type c_short = core::ffi::c_short;
+pub type c_ushort = core::ffi::c_ushort;
+pub type c_schar = core::ffi::c_schar;
+pub type c_char = core::ffi::c_char;
+pub type c_long = core::ffi::c_long;
+pub type c_ulong = core::ffi::c_ulong;
 
-pub enum c_void {}
+pub type c_void = core::ffi::c_void;
