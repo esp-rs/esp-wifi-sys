@@ -7,7 +7,7 @@ use crate::common_adapter::*;
 
 use crate::esp_wifi_result;
 use critical_section::Mutex;
-use embedded_svc::wifi::{AccessPointInfo, AuthMethod, SecondaryChannel};
+use embedded_svc::wifi::{AccessPointInfo, AuthMethod, Protocol, SecondaryChannel};
 use enumset::EnumSet;
 use enumset::EnumSetType;
 use esp_wifi_sys::include::esp_interface_t_ESP_IF_WIFI_AP;
@@ -726,7 +726,16 @@ impl WifiController {
     }
 
     /// Set the wifi mode.
-    fn set_mode(&mut self, protocol_bitmap: u32) -> Result<(), WifiError> {
+    /// This will set the wifi protocol to the desired protocol, the default for this is:
+    /// `WIFI_PROTOCOL_11B|WIFI_PROTOCOL_11G|WIFI_PROTOCOL_11N`
+    /// # Example:
+    /// ```
+    /// use embedded_svc::wifi::Protocol;
+    /// use esp_wifi::wifi::WifiController;
+    /// let mut wifi = WifiController::new();
+    /// wifi.set_mode(Protocol::P802D11BGNLR);
+    /// ```
+    pub(crate) fn set_mode(&mut self, protocol: Protocol) -> Result<(), WifiError> {
         let mode = wifi_mode_t_WIFI_MODE_NULL;
         esp_wifi_result!(unsafe { esp_wifi_get_mode(&mut mode) })?;
         esp_wifi_result!(unsafe { esp_wifi_set_protocol(mode, protocol_bitmap.try_into().unwrap()) })?;
