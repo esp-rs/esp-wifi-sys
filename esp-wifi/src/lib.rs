@@ -93,7 +93,7 @@ const HEAP_SIZE: usize = 64 * 1024;
 const HEAP_SIZE: usize = 64 * 1024;
 
 #[cfg(all(not(coex), not(feature = "esp32s2"), feature = "big-heap"))]
-const HEAP_SIZE: usize = 100 * 1024;
+const HEAP_SIZE: usize = 92 * 1024;
 
 #[cfg(all(not(coex), feature = "esp32s2", feature = "big-heap"))]
 const HEAP_SIZE: usize = 72 * 1024;
