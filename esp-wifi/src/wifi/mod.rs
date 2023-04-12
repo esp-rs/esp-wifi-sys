@@ -756,6 +756,8 @@ impl<'d> WifiController<'d> {
     /// Set the wifi mode.
     /// This will set the wifi protocol to the desired protocol, the default for this is:
     /// `WIFI_PROTOCOL_11B|WIFI_PROTOCOL_11G|WIFI_PROTOCOL_11N`
+    /// # Arguments:
+    /// * `protocol` - The desired protocol
     /// # Example:
     /// ```
     /// use embedded_svc::wifi::Protocol;
@@ -763,10 +765,10 @@ impl<'d> WifiController<'d> {
     /// let mut wifi = WifiController::new();
     /// wifi.set_mode(Protocol::P802D11BGNLR);
     /// ```
-    pub(crate) fn set_mode(&mut self, protocol: Protocol) -> Result<(), WifiError> {
-        let mode = wifi_mode_t_WIFI_MODE_NULL;
+    pub fn set_mode(&mut self, protocol: Protocol) -> Result<(), WifiError> {
+        let mut mode = wifi_mode_t_WIFI_MODE_NULL;
         esp_wifi_result!(unsafe { esp_wifi_get_mode(&mut mode) })?;
-        esp_wifi_result!(unsafe { esp_wifi_set_protocol(mode, protocol_bitmap.try_into().unwrap()) })?;
+        esp_wifi_result!(unsafe { esp_wifi_set_protocol(mode, protocol as u8) })?;
         Ok(())
     }
 
