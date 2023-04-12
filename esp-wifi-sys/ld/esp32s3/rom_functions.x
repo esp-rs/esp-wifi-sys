@@ -2281,3 +2281,8 @@ PROVIDE ( esp_rom_delay_us = ets_delay_us );
 /* from esp32s3.rom.libgcc.ld*/
 __popcountsi2 = 0x400024d8;
 __bswapsi2 = 0x400021d8;
+
+/* from esp32s3.rom.newlib.ld */
+strcmp = 0x40001230;
+strstr = 0x40001254;
+strchr = 0x4000138c;
