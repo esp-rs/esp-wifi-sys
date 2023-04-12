@@ -36,7 +36,6 @@ const PASSWORD: &str = env!("PASSWORD");
 #[entry]
 fn main() -> ! {
     init_logger(log::LevelFilter::Info);
-    esp_wifi::init_heap();
 
     let peripherals = Peripherals::take();
 
@@ -44,13 +43,20 @@ fn main() -> ! {
     let clocks = examples_util::clocks!(system);
     examples_util::rtc!(peripherals);
 
+    let timer = examples_util::timer!(peripherals, clocks);
+    initialize(
+        timer,
+        Rng::new(peripherals.RNG),
+        system.radio_clock_control,
+        &clocks,
+    )
+    .unwrap();
+
+    let (wifi, bluetooth) = peripherals.RADIO.split();
     let mut socket_set_entries: [SocketStorage; 3] = Default::default();
     let (iface, device, mut controller, sockets) =
-        create_network_interface(WifiMode::Sta, &mut socket_set_entries);
+        create_network_interface(wifi, WifiMode::Sta, &mut socket_set_entries);
     let wifi_stack = WifiStack::new(iface, device, sockets, current_millis);
-
-    let timer = examples_util::timer!(peripherals, clocks);
-    initialize(timer, Rng::new(peripherals.RNG), &clocks).unwrap();
 
     let client_config = Configuration::Client(ClientConfiguration {
         ssid: SSID.into(),
@@ -103,7 +109,7 @@ fn main() -> ! {
         }
     }
 
-    let connector = BleConnector {};
+    let connector = BleConnector::new(bluetooth);
     let hci = HciConnector::new(connector, esp_wifi::current_millis);
     let mut ble = Ble::new(&hci);
 
@@ -114,12 +120,7 @@ fn main() -> ! {
         ble.cmd_set_le_advertising_data(create_advertising_data(&[
             AdStructure::Flags(LE_GENERAL_DISCOVERABLE | BR_EDR_NOT_SUPPORTED),
             AdStructure::ServiceUuids16(&[Uuid::Uuid16(0x1809)]),
-            #[cfg(feature = "esp32c3")]
-            AdStructure::CompleteLocalName("ESP32-C3 BLE"),
-            #[cfg(feature = "esp32")]
-            AdStructure::CompleteLocalName("ESP32 BLE"),
-            #[cfg(feature = "esp32s3")]
-            AdStructure::CompleteLocalName("ESP32-S3 BLE"),
+            AdStructure::CompleteLocalName(examples_util::SOC_NAME),
         ]))
     );
     println!("{:?}", ble.cmd_set_le_advertise_enable(true));

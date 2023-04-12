@@ -20,6 +20,7 @@ use esp32s2_hal as hal;
 #[cfg(feature = "esp32s3")]
 use esp32s3_hal as hal;
 
+use hal::system::RadioClockControl;
 use hal::Rng;
 
 use hal::macros::ram;
@@ -42,9 +43,17 @@ pub(crate) mod phy_init_data;
 
 pub(crate) static mut RANDOM_GENERATOR: Option<Rng> = None;
 
-pub fn init_rng(rng: hal::Rng) {
+pub(crate) static mut RADIO_CLOCKS: Option<RadioClockControl> = None;
+
+pub fn init_rng(rng: Rng) {
     unsafe {
         crate::common_adapter::RANDOM_GENERATOR = Some(core::mem::transmute(rng));
+    }
+}
+
+pub fn init_radio_clock_control(rcc: RadioClockControl) {
+    unsafe {
+        crate::common_adapter::RADIO_CLOCKS = Some(core::mem::transmute(rcc));
     }
 }
 
@@ -132,6 +141,7 @@ pub unsafe extern "C" fn semphr_give(semphr: *mut crate::binary::c_types::c_void
  ****************************************************************************/
 #[allow(unused)]
 #[ram]
+#[no_mangle]
 pub unsafe extern "C" fn random() -> crate::binary::c_types::c_ulong {
     trace!("random");
 
@@ -372,7 +382,7 @@ pub unsafe extern "C" fn pp_printf(s: *const u8, args: ...) {
 }
 
 // #define ESP_EVENT_DEFINE_BASE(id) esp_event_base_t id = #id
-static mut EVT: u8 = 0;
+static mut EVT: i8 = 0;
 #[no_mangle]
 static mut WIFI_EVENT: esp_event_base_t = unsafe { &EVT };
 

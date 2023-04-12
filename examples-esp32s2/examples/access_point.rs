@@ -26,7 +26,6 @@ use smoltcp::iface::SocketStorage;
 #[entry]
 fn main() -> ! {
     init_logger(log::LevelFilter::Info);
-    esp_wifi::init_heap();
 
     let peripherals = Peripherals::take();
 
@@ -34,13 +33,20 @@ fn main() -> ! {
     let clocks = examples_util::clocks!(system);
     examples_util::rtc!(peripherals);
 
+    let timer = examples_util::timer!(peripherals, clocks);
+    initialize(
+        timer,
+        Rng::new(peripherals.RNG),
+        system.radio_clock_control,
+        &clocks,
+    )
+    .unwrap();
+
+    let wifi = peripherals.RADIO.split();
     let mut socket_set_entries: [SocketStorage; 3] = Default::default();
     let (iface, device, mut controller, sockets) =
-        create_network_interface(WifiMode::Ap, &mut socket_set_entries);
+        create_network_interface(wifi, WifiMode::Ap, &mut socket_set_entries);
     let mut wifi_stack = WifiStack::new(iface, device, sockets, current_millis);
-
-    let timer = examples_util::timer!(peripherals, clocks);
-    initialize(timer, Rng::new(peripherals.RNG), &clocks).unwrap();
 
     let client_config = Configuration::AccessPoint(AccessPointConfiguration {
         ssid: "esp-wifi".into(),
