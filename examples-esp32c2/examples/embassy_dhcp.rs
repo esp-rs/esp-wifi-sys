@@ -78,7 +78,7 @@ fn main() -> ! {
         spawner.spawn(connection(controller)).ok();
         spawner.spawn(net_task(&stack)).ok();
         spawner.spawn(task(&stack)).ok();
-    });
+    })
 }
 
 #[embassy_executor::task]
