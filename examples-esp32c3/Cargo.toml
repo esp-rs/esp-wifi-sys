@@ -24,11 +24,12 @@ examples-util = { path = "../examples-util", features = ["esp32c3"] }
 esp-println = { workspace = true, features = [ "esp32c3" ] }
 esp-backtrace = { workspace = true, features = ["esp32c3"] }
 esp-wifi = { path = "../esp-wifi", features = ["esp32c3"] }
+embedded-hal-async = {workspace = true, optional = true }
 
 [features]
 default = ["esp32c3"]
 esp32c3 = []
-async = ["esp-wifi/esp32c3-async"]
+async = ["esp-wifi/esp32c3-async", "bleps/async", "dep:embedded-hal-async", "esp32c3-hal/async"]
 embassy-net = ["esp-wifi/embassy-net","dep:embassy-net"]
 wifi-logs = ["esp-wifi/wifi-logs"]
 dump-packets = ["esp-wifi/dump-packets"]

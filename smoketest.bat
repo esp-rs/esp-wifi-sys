@@ -12,6 +12,7 @@ echo.
 echo Connect ESP32-C3
 pause
 cargo run --example ble --release --features "ble"
+cargo run --example async_ble --release --features "async,ble"
 cargo run --example dhcp --release --features "embedded-svc,wifi"
 cargo run --example static_ip --release --features "embedded-svc,wifi"
 cargo run --example embassy_dhcp --release --features "async,embedded-svc,wifi,embassy-net"
@@ -28,6 +29,7 @@ echo.
 echo Connect ESP32
 pause
 cargo run --example ble --release --features "ble"
+cargo run --example async_ble --release --features "async,ble"
 cargo run --example dhcp --release --features "embedded-svc,wifi"
 cargo run --example static_ip --release --features "embedded-svc,wifi"
 cargo run --example embassy_dhcp --release --features "async,embedded-svc,wifi,embassy-net"
@@ -43,6 +45,7 @@ echo.
 echo Connect ESP32-S3
 pause
 cargo run --example ble --release --features "ble"
+cargo run --example async_ble --release --features "async,ble"
 cargo run --example dhcp --release --features "embedded-svc,wifi"
 cargo run --example static_ip --release --features "embedded-svc,wifi"
 cargo run --example embassy_dhcp --release --features "async,embedded-svc,wifi,embassy-net"
@@ -73,6 +76,7 @@ echo.
 echo Connect ESP32-C2
 pause
 cargo run --example ble --release --features "ble"
+cargo run --example async_ble --release --features "async,ble"
 set CARGO_PROFILE_RELEASE_OPT_LEVEL=3
 cargo run --example dhcp --release --features "embedded-svc,wifi"
 cargo run --example static_ip --release --features "embedded-svc,wifi"

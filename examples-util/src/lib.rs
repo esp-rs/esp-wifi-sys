@@ -90,6 +90,11 @@ macro_rules! boot_button {
     }};
 }
 
+#[cfg(any(feature = "esp32c2", feature = "esp32c3"))]
+pub type BootButton = crate::hal::soc::gpio::Gpio9<crate::hal::gpio::Input<crate::hal::gpio::PullDown>>;
+#[cfg(any(feature = "esp32", feature = "esp32s2", feature = "esp32s3"))]
+pub type BootButton = crate::hal::soc::gpio::Gpio0<crate::hal::gpio::Input<crate::hal::gpio::PullDown>>;
+
 #[cfg(feature = "esp32c3")]
 pub const SOC_NAME: &str = "ESP32-C3";
 #[cfg(feature = "esp32c2")]
