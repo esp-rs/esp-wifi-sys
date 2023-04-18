@@ -27,7 +27,7 @@ esp-wifi = { path = "../esp-wifi", features = ["esp32c6"] }
 
 [features]
 default = ["esp32c6"]
-esp32c6 = ["embassy-executor/arch-riscv"]
+esp32c6 = ["embassy-executor/arch-riscv32"]
 async = ["esp-wifi/esp32c6-async"]
 embassy-net = ["esp-wifi/embassy-net","dep:embassy-net"]
 wifi-logs = ["esp-wifi/wifi-logs"]

@@ -9,7 +9,7 @@ edition = "2021"
 embedded-svc.workspace = true
 bleps.workspace = true
 bleps-macros.workspace = true
-embassy-executor = { workspace = true, features = ["arch-riscv"] }
+embassy-executor = { workspace = true, features = ["arch-riscv32"] }
 embassy-time.workspace = true
 embassy-futures.workspace = true
 futures-util.workspace = true
@@ -28,7 +28,7 @@ embedded-hal-async = {workspace = true, optional = true }
 
 [features]
 default = ["esp32c3"]
-esp32c3 = ["embassy-executor/arch-riscv"]
+esp32c3 = ["embassy-executor/arch-riscv32"]
 async = ["esp-wifi/esp32c3-async", "bleps/async", "dep:embedded-hal-async", "esp32c3-hal/async"]
 embassy-net = ["esp-wifi/embassy-net","dep:embassy-net"]
 wifi-logs = ["esp-wifi/wifi-logs"]
