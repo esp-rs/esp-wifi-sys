@@ -10,6 +10,7 @@ use pcap_file::{
     DataLink,
 };
 use r_extcap::{
+    config::StringConfig,
     controls::{synchronous::ExtcapControlSender, ControlCommand, ControlPacket},
     interface::{Dlt, Interface, Metadata},
     ExtcapStep,
@@ -19,6 +20,9 @@ use r_extcap::{
 pub struct AppArgs {
     #[command(flatten)]
     extcap: r_extcap::ExtcapArgs,
+
+    #[arg(long, default_value = "")]
+    serialport: String,
 }
 
 lazy_static! {
@@ -45,6 +49,14 @@ lazy_static! {
             display: "HCI".into(),
         },
     };
+    static ref CONFIG_SERIALPORT: StringConfig = StringConfig::builder()
+        .config_number(1)
+        .call("serialport")
+        .display("Serialport")
+        .tooltip("Serialport to connect to")
+        .required(false)
+        .placeholder("")
+        .build();
 }
 
 fn main() {
@@ -69,9 +81,9 @@ fn main() {
                 .print_from_interfaces(&[&*WIFI_CAPTURE_INTERFACE, &*BT_CAPTURE_INTERFACE])
                 .unwrap();
         }
-        ExtcapStep::Config(config_step) => config_step.list_configs(&[]),
+        ExtcapStep::Config(config_step) => config_step.list_configs(&[&*CONFIG_SERIALPORT]),
         ExtcapStep::ReloadConfig(_reload_config_step) => {
-            todo!()
+            panic!("Unsupported operation");
         }
         ExtcapStep::Capture(capture_step) => {
             let (data_link, prefix) = if capture_step.interface == WIFI_CAPTURE_INTERFACE.value {
@@ -96,8 +108,16 @@ fn main() {
                 ..Default::default()
             };
             let mut pcap_writer = PcapWriter::with_header(capture_step.fifo, pcap_header).unwrap();
-            let ports = serialport::available_ports().unwrap();
-            let serialport = ports[0].port_name.clone();
+
+            let serialport = if args.serialport.is_empty() {
+                let ports = serialport::available_ports().unwrap();
+                if ports.len() != 1 {
+                    panic!("There are more or less than one serial ports. Don't know which one to use.");
+                }
+                ports[0].port_name.clone()
+            } else {
+                args.serialport.clone()
+            };
 
             let port = serialport::new(serialport, 115_200)
                 .timeout(Duration::from_millis(100))

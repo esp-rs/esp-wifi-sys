@@ -58,6 +58,14 @@ To build these ensure you are in the `examples-esp32XXX` directory matching your
 
 **NOTE:** ESP32-S2 doesn't support bluetooth, for ESP32-C6 bluetooth support isn't implemented yet 
 
+### async_ble
+
+- same as `ble` but async
+
+`cargo run --example async_ble --release --features "async,ble"` 
+
+**NOTE:** ESP32-S2 doesn't support bluetooth, for ESP32-C6 bluetooth support isn't implemented yet 
+
 ### coex
 
 - set SSID and PASSWORD env variable
@@ -104,19 +112,22 @@ To build these ensure you are in the `examples-esp32XXX` directory matching your
 - open http://192.168.2.1:8080/ in your browser
 - on Android you might need to choose _Keep Accesspoint_ when it tells you the WiFi has no internet connection, Chrome might not want to load the URL - you can use a shell and try `curl` and `ping`
 
-`cargorun --example embassy_access_point --release --features "async,embedded-svc,wifi,embassy-net"`
+`cargo run --example embassy_access_point --release --features "async,embedded-svc,wifi,embassy-net"`
 
 ## Features
 
 | Feature      | Meaning                                                                                             |
 | ------------ | --------------------------------------------------------------------------------------------------- |
 | wifi-logs    | logs the WiFi logs from the driver at log level info                                                |
-| dump-packets | dumps some packet info at log level info                                                            |
+| dump-packets | dumps packet info at log level info                                                                 |
 | utils        | Provide utilities for smoltcp initialization, this is a default feature                             |
 | embedded-svc | Provides a (very limited) implementation of the `embedded-svc` WiFi trait, includes `utils` feature |
 | ble          | Enable BLE support                                                                                  |
 | wifi         | Enable WiFi support                                                                                 |
 | esp-now      | Enable esp-now support                                                                              |
+
+When using the `dump-packets` feauture you can use the extcap in `extras/esp-wifishark` to analyze the frames in Wireshark.
+For more information see [extras/esp-wifishark/README.md](extras/esp-wifishark/README.md)
 
 ## Important
 
