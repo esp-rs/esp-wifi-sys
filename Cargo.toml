@@ -11,6 +11,9 @@ members = [
     "examples-esp32s2",
     "examples-esp32s3",
 ]
+exclude = [
+    "extras/esp-wifishark",
+]
 resolver = "2"
 
 [profile.release]
