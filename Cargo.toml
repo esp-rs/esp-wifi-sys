@@ -63,3 +63,12 @@ futures-util = { version = "0.3.17", default-features = false }
 esp-println = { version = "0.5.0", features = ["log"] }
 esp-backtrace = { version = "0.7.0", features = ["panic-handler", "exception-handler", "print-uart"] }
 embedded-hal-async = { version = "0.2.0-alpha.0" }
+
+[patch.crates-io]
+esp-hal-common = { git = "https://github.com/esp-rs/esp-hal", rev = "5c5d7f9" }
+esp32c3-hal = { git = "https://github.com/esp-rs/esp-hal", rev = "5c5d7f9" }
+esp32c2-hal = { git = "https://github.com/esp-rs/esp-hal", rev = "5c5d7f9" }
+esp32c6-hal = { git = "https://github.com/esp-rs/esp-hal", rev = "5c5d7f9" }
+esp32-hal = { git = "https://github.com/esp-rs/esp-hal", rev = "5c5d7f9" }
+esp32s3-hal = { git = "https://github.com/esp-rs/esp-hal", rev = "5c5d7f9" }
+esp32s2-hal = { git = "https://github.com/esp-rs/esp-hal", rev = "5c5d7f9" }
