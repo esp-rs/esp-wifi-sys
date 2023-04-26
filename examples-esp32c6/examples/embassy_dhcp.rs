@@ -43,10 +43,11 @@ fn main() -> ! {
     let peripherals = Peripherals::take();
 
     let system = examples_util::system!(peripherals);
+    let mut peripheral_clock_control = system.peripheral_clock_control;
     let clocks = examples_util::clocks!(system);
     examples_util::rtc!(peripherals);
 
-    let timer = examples_util::timer!(peripherals, clocks);
+    let timer = examples_util::timer!(peripherals, clocks, peripheral_clock_control);
     initialize(
         timer,
         Rng::new(peripherals.RNG),
@@ -58,7 +59,7 @@ fn main() -> ! {
     let (wifi, _, _) = peripherals.RADIO.split();
     let (wifi_interface, controller) = esp_wifi::wifi::new_with_mode(wifi, WifiMode::Sta);
 
-    let timer_group0 = TimerGroup::new(peripherals.TIMG0, &clocks);
+    let timer_group0 = TimerGroup::new(peripherals.TIMG0, &clocks, &mut peripheral_clock_control);
     embassy::init(&clocks, timer_group0.timer0);
 
     let config = Config::Dhcp(Default::default());

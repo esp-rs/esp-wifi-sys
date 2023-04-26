@@ -30,16 +30,11 @@ fn main() -> ! {
     let peripherals = Peripherals::take();
 
     let system = examples_util::system!(peripherals);
+    let mut peripheral_clock_control = system.peripheral_clock_control;
     let clocks = examples_util::clocks!(system);
     examples_util::rtc!(peripherals);
 
-    let (wifi, _) = peripherals.RADIO.split();
-    let mut socket_set_entries: [SocketStorage; 3] = Default::default();
-    let (iface, device, mut controller, sockets) =
-        create_network_interface(wifi, WifiMode::Sta, &mut socket_set_entries);
-    let wifi_stack = WifiStack::new(iface, device, sockets, current_millis);
-
-    let timer = examples_util::timer!(peripherals, clocks);
+    let timer = examples_util::timer!(peripherals, clocks, peripheral_clock_control);
     initialize(
         timer,
         Rng::new(peripherals.RNG),
@@ -47,6 +42,12 @@ fn main() -> ! {
         &clocks,
     )
     .unwrap();
+
+    let (wifi, _) = peripherals.RADIO.split();
+    let mut socket_set_entries: [SocketStorage; 3] = Default::default();
+    let (iface, device, mut controller, sockets) =
+        create_network_interface(wifi, WifiMode::Sta, &mut socket_set_entries);
+    let wifi_stack = WifiStack::new(iface, device, sockets, current_millis);
 
     let client_config = Configuration::Client(ClientConfiguration {
         ssid: SSID.into(),

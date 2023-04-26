@@ -50,13 +50,15 @@ cargo run --example dhcp --release --features "embedded-svc,wifi"
 cargo run --example static_ip --release --features "embedded-svc,wifi"
 cargo run --example embassy_dhcp --release --features "async,embedded-svc,wifi,embassy-net"
 cargo run --example coex --release --features "embedded-svc,wifi,ble"
+set CARGO_PROFILE_RELEASE_OPT_LEVEL=1
 cargo run --example esp_now --release --features "esp-now"
 cargo run --example embassy_esp_now --release --features "async,esp-now"
+set CARGO_PROFILE_RELEASE_OPT_LEVEL=3
 cargo run --example access_point --release --features "embedded-svc,wifi"
 cargo run --example embassy_access_point --release --features "async,embedded-svc,wifi,embassy-net"
 
 cd ..\examples-esp32s2
-set CARGO_PROFILE_RELEASE_OPT_LEVEL=3
+set CARGO_PROFILE_RELEASE_OPT_LEVEL=2
 set CARGO_PROFILE_RELEASE_LTO=off
 echo.
 echo Connect ESP32-S2
