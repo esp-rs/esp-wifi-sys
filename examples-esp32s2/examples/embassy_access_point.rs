@@ -54,7 +54,7 @@ fn main() -> ! {
     )
     .unwrap();
 
-    let wifi = peripherals.RADIO.split();
+    let wifi = examples_util::get_wifi!(peripherals);
     let (wifi_interface, controller) = esp_wifi::wifi::new_with_mode(wifi, WifiMode::Ap);
 
     let timer_group0 = TimerGroup::new(peripherals.TIMG0, &clocks, &mut peripheral_clock_control);

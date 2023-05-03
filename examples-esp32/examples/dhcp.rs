@@ -43,7 +43,7 @@ fn main() -> ! {
     )
     .unwrap();
 
-    let (wifi, _) = peripherals.RADIO.split();
+    let wifi = examples_util::get_wifi!(peripherals);
     let mut socket_set_entries: [SocketStorage; 3] = Default::default();
     let (iface, device, mut controller, sockets) =
         create_network_interface(wifi, WifiMode::Sta, &mut socket_set_entries);

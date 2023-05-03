@@ -6,9 +6,8 @@ use bleps::{
         create_advertising_data, AdStructure, BR_EDR_NOT_SUPPORTED, LE_GENERAL_DISCOVERABLE,
     },
     attribute_server::{AttributeServer, NotificationData, WorkResult},
-    Ble, HciConnector,
+    gatt, Ble, HciConnector,
 };
-use bleps_macros::gatt;
 use esp_backtrace as _;
 use esp_println::{logger::init_logger, println};
 use esp_wifi::{ble::controller::BleConnector, initialize};
@@ -44,7 +43,7 @@ fn main() -> ! {
 
     let mut debounce_cnt = 500;
 
-    let (_, mut bluetooth) = peripherals.RADIO.split();
+    let mut bluetooth = examples_util::get_bluetooth!(peripherals);
 
     loop {
         let connector = BleConnector::new(&mut bluetooth);
@@ -65,17 +64,23 @@ fn main() -> ! {
 
         println!("started advertising");
 
-        let mut rf = || &b"Hello Bare-Metal BLE"[..];
-        let mut wf = |offset: u16, data: &[u8]| {
+        let mut rf = |_offset: usize, data: &mut [u8]| {
+            data[..20].copy_from_slice(&b"Hello Bare-Metal BLE"[..]);
+            17
+        };
+        let mut wf = |offset: usize, data: &[u8]| {
             println!("RECEIVED: {} {:x?}", offset, data);
         };
 
-        let mut wf2 = |offset: u16, data: &[u8]| {
+        let mut wf2 = |offset: usize, data: &[u8]| {
             println!("RECEIVED: {} {:x?}", offset, data);
         };
 
-        let mut rf3 = || &b"Hola!"[..];
-        let mut wf3 = |offset: u16, data: &[u8]| {
+        let mut rf3 = |_offset: usize, data: &mut [u8]| {
+            data[..5].copy_from_slice(&b"Hola!"[..]);
+            5
+        };
+        let mut wf3 = |offset: usize, data: &[u8]| {
             println!("RECEIVED: Offset {}, data {:x?}", offset, data);
         };
 
@@ -109,8 +114,9 @@ fn main() -> ! {
             if button.is_low().unwrap() && debounce_cnt > 0 {
                 debounce_cnt -= 1;
                 if debounce_cnt == 0 {
-                    if let Some(cccd) =
-                        srv.get_characteristic_value(my_characteristic_notify_enable_handle)
+                    let mut cccd = [0u8; 1];
+                    if let Some(1) =
+                        srv.get_characteristic_value(my_characteristic_notify_enable_handle, 0, &mut cccd)
                     {
                         // if notifications enabled
                         if cccd[0] == 1 {

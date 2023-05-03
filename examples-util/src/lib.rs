@@ -91,6 +91,41 @@ macro_rules! boot_button {
     }};
 }
 
+#[macro_export]
+macro_rules! get_bluetooth {
+    ($peripherals: ident) => {{
+        #[cfg(any(feature = "esp32", feature = "esp32s3", feature = "esp32c2", feature = "esp32c3"))]
+        let (_, bluetooth) = $peripherals.RADIO.split();
+        #[cfg(any(feature = "esp32c6"))]
+        let (_, bluetooth, _) = $peripherals.RADIO.split();
+        #[cfg(any(feature = "esp32s2"))]
+        compile_error!("Bluetooth is not supported");
+        bluetooth
+    }};
+}
+
+#[macro_export]
+macro_rules! get_wifi {
+    ($peripherals: ident) => {{
+        #[cfg(any(feature = "esp32", feature = "esp32s3", feature = "esp32c2", feature = "esp32c3"))]
+        let (wifi, _) = $peripherals.RADIO.split();
+        #[cfg(any(feature = "esp32c6"))]
+        let (wifi, _, _) = $peripherals.RADIO.split();
+        wifi
+    }};
+}
+
+#[macro_export]
+macro_rules! get_wifi_bluetooth {
+    ($peripherals: ident) => {{
+        #[cfg(any(feature = "esp32", feature = "esp32s3", feature = "esp32c2", feature = "esp32c3"))]
+        let (wifi, bluetooth) = $peripherals.RADIO.split();
+        #[cfg(any(feature = "esp32c6"))]
+        let (wifi, bluetooth, _) = $peripherals.RADIO.split();
+        (wifi, bluetooth)
+    }};
+}
+
 #[cfg(any(feature = "esp32c2", feature = "esp32c3"))]
 pub type BootButton = crate::hal::soc::gpio::Gpio9<crate::hal::gpio::Input<crate::hal::gpio::PullDown>>;
 #[cfg(any(feature = "esp32", feature = "esp32s2", feature = "esp32s3"))]
