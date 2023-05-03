@@ -109,6 +109,8 @@ macro_rules! get_wifi {
     ($peripherals: ident) => {{
         #[cfg(any(feature = "esp32", feature = "esp32s3", feature = "esp32c2", feature = "esp32c3"))]
         let (wifi, _) = $peripherals.RADIO.split();
+        #[cfg(any(feature = "esp32s2"))]
+        let wifi = $peripherals.RADIO.split();
         #[cfg(any(feature = "esp32c6"))]
         let (wifi, _, _) = $peripherals.RADIO.split();
         wifi
