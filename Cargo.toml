@@ -27,13 +27,13 @@ lto = "off"
 
 [workspace.dependencies]
 embedded-hal = "0.2.3"
-esp-hal-common = { version = "0.8.0" }
-esp32c3-hal = { version = "0.8.0" }
-esp32c2-hal = { version = "0.6.0" }
-esp32c6-hal = { version = "0.1.0" }
-esp32-hal = { version = "0.11.0", features = [ "rt" ] }
-esp32s3-hal = { version = "0.8.0", features = [ "rt" ] }
-esp32s2-hal = { version = "0.8.0", features = [ "rt" ] }
+esp-hal-common = { version = "0.9.0" }
+esp32c3-hal = { version = "0.9.0" }
+esp32c2-hal = { version = "0.7.0" }
+esp32c6-hal = { version = "0.2.0" }
+esp32-hal = { version = "0.12.0", features = [ "rt" ] }
+esp32s3-hal = { version = "0.9.0", features = [ "rt" ] }
+esp32s2-hal = { version = "0.9.0", features = [ "rt" ] }
 esp32c3 = { version = "0.14.0",  features = ["critical-section"] }
 esp32c2 = { version = "0.11.0",  features = ["critical-section"] }
 esp32c6 = { version = "0.4.0",  features = ["critical-section"] }
@@ -57,18 +57,9 @@ embassy-net-driver = { git = "https://github.com/embassy-rs/embassy", rev = "fb2
 
 bleps = { git = "https://github.com/bjoernQ/bleps", package = "bleps", rev = "daa341f4e5f40db8348886ab245f51902fccaa17" }
 bleps-macros = { git = "https://github.com/bjoernQ/bleps", package = "bleps-macros", rev = "33fde67257bfbc6c0aebf7649fd302c82ed94c64" }
-embassy-executor = { package = "embassy-executor", git = "https://github.com/embassy-rs/embassy/", rev = "fb27594", features = ["nightly", "executor-thread", "integrated-timers"] }
+embassy-executor = { version = "0.2.0", package = "embassy-executor", features = ["nightly", "executor-thread", "integrated-timers"] }
 embassy-time = { version = "0.1.1", features = ["nightly"] }
 futures-util = { version = "0.3.17", default-features = false }
 esp-println = { version = "0.5.0", features = ["log"] }
 esp-backtrace = { version = "0.7.0", features = ["panic-handler", "exception-handler", "print-uart"] }
 embedded-hal-async = { version = "0.2.0-alpha.0" }
-
-[patch.crates-io]
-esp-hal-common = { git = "https://github.com/esp-rs/esp-hal", rev = "5c5d7f9" }
-esp32c3-hal = { git = "https://github.com/esp-rs/esp-hal", rev = "5c5d7f9" }
-esp32c2-hal = { git = "https://github.com/esp-rs/esp-hal", rev = "5c5d7f9" }
-esp32c6-hal = { git = "https://github.com/esp-rs/esp-hal", rev = "5c5d7f9" }
-esp32-hal = { git = "https://github.com/esp-rs/esp-hal", rev = "5c5d7f9" }
-esp32s3-hal = { git = "https://github.com/esp-rs/esp-hal", rev = "5c5d7f9" }
-esp32s2-hal = { git = "https://github.com/esp-rs/esp-hal", rev = "5c5d7f9" }
