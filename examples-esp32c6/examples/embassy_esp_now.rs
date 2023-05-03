@@ -75,7 +75,7 @@ fn main() -> ! {
     )
     .unwrap();
 
-    let (wifi, _, _) = peripherals.RADIO.split();
+    let wifi = examples_util::get_wifi!(peripherals);
     let esp_now = esp_wifi::esp_now::EspNow::new(wifi).unwrap();
     println!("esp-now version {}", esp_now.get_version().unwrap());
 

@@ -8,7 +8,6 @@ edition = "2021"
 [dependencies]
 embedded-svc.workspace = true
 bleps.workspace = true
-bleps-macros.workspace = true
 embassy-executor.workspace = true
 embassy-time.workspace = true
 embassy-futures.workspace = true

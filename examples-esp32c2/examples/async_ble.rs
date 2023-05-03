@@ -12,8 +12,8 @@ use bleps::{
     async_attribute_server::AttributeServer,
     asynch::Ble,
     attribute_server::NotificationData,
+    gatt
 };
-use bleps_macros::gatt;
 use embassy_executor::Executor;
 use embassy_executor::_export::StaticCell;
 use embedded_hal_async::digital::Wait;
@@ -56,17 +56,23 @@ async fn run(mut bluetooth: Bluetooth, pin: BootButton) {
 
         println!("started advertising");
 
-        let mut rf = || &b"Hello Bare-Metal BLE"[..];
-        let mut wf = |offset: u16, data: &[u8]| {
+        let mut rf = |_offset: usize, data: &mut [u8]| {
+            data[..20].copy_from_slice(&b"Hello Bare-Metal BLE"[..]);
+            17
+        };
+        let mut wf = |offset: usize, data: &[u8]| {
             println!("RECEIVED: {} {:x?}", offset, data);
         };
 
-        let mut wf2 = |offset: u16, data: &[u8]| {
+        let mut wf2 = |offset: usize, data: &[u8]| {
             println!("RECEIVED: {} {:x?}", offset, data);
         };
 
-        let mut rf3 = || &b"Hola!"[..];
-        let mut wf3 = |offset: u16, data: &[u8]| {
+        let mut rf3 = |_offset: usize, data: &mut [u8]| {
+            data[..5].copy_from_slice(&b"Hola!"[..]);
+            5
+        };
+        let mut wf3 = |offset: usize, data: &[u8]| {
             println!("RECEIVED: Offset {}, data {:x?}", offset, data);
         };
 
@@ -145,7 +151,7 @@ fn main() -> ! {
     )
     .unwrap();
 
-    let (_, bluetooth) = peripherals.RADIO.split();
+    let bluetooth = examples_util::get_bluetooth!(peripherals);
 
     let timer_group0 = TimerGroup::new(peripherals.TIMG0, &clocks, &mut peripheral_clock_control);
     embassy::init(&clocks, timer_group0.timer0);
