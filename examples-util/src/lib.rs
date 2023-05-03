@@ -64,16 +64,17 @@ macro_rules! clocks {
 
 #[macro_export]
 macro_rules! timer {
-    ($peripherals: ident, $clocks: ident) => {{
+    ($peripherals: ident, $clocks: ident, $peripheral_clock_control: ident) => {{
         #[cfg(any(feature = "esp32c3", feature = "esp32c2", feature = "esp32c6"))]
         {
+            let _unused = &mut $peripheral_clock_control;
             use hal::systimer::SystemTimer;
             SystemTimer::new($peripherals.SYSTIMER).alarm0
         }
         #[cfg(any(feature = "esp32", feature = "esp32s3", feature = "esp32s2"))]
         {
             use hal::timer::TimerGroup;
-            TimerGroup::new($peripherals.TIMG1, &$clocks).timer0
+            TimerGroup::new($peripherals.TIMG1, &$clocks, &mut $peripheral_clock_control).timer0
         }
     }};
 }

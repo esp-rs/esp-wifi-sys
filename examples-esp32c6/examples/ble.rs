@@ -27,10 +27,11 @@ fn main() -> ! {
     let peripherals = Peripherals::take();
 
     let system = examples_util::system!(peripherals);
+    let mut peripheral_clock_control = system.peripheral_clock_control;
     let clocks = examples_util::clocks!(system);
     examples_util::rtc!(peripherals);
 
-    let timer = examples_util::timer!(peripherals, clocks);
+    let timer = examples_util::timer!(peripherals, clocks, peripheral_clock_control);
     initialize(
         timer,
         Rng::new(peripherals.RNG),
@@ -39,11 +40,11 @@ fn main() -> ! {
     )
     .unwrap();
 
-    let (_, mut bluetooth, _) = peripherals.RADIO.split();
-
     let button = examples_util::boot_button!(peripherals);
 
     let mut debounce_cnt = 500;
+
+    let (_, mut bluetooth, _) = peripherals.RADIO.split();
 
     loop {
         let connector = BleConnector::new(&mut bluetooth);

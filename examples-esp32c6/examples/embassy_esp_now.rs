@@ -13,7 +13,6 @@ use esp_println::logger::init_logger;
 use esp_println::println;
 use esp_wifi::esp_now::{EspNow, PeerInfo, BROADCAST_ADDRESS};
 use esp_wifi::initialize;
-use futures_util::StreamExt;
 use hal::clock::{ClockControl, CpuClock};
 use hal::Rng;
 use hal::{embassy, peripherals::Peripherals, prelude::*, timer::TimerGroup, Rtc};
@@ -63,10 +62,11 @@ fn main() -> ! {
     let peripherals = Peripherals::take();
 
     let system = examples_util::system!(peripherals);
+    let mut peripheral_clock_control = system.peripheral_clock_control;
     let clocks = examples_util::clocks!(system);
     examples_util::rtc!(peripherals);
 
-    let timer = examples_util::timer!(peripherals, clocks);
+    let timer = examples_util::timer!(peripherals, clocks, peripheral_clock_control);
     initialize(
         timer,
         Rng::new(peripherals.RNG),
@@ -79,10 +79,10 @@ fn main() -> ! {
     let esp_now = esp_wifi::esp_now::EspNow::new(wifi).unwrap();
     println!("esp-now version {}", esp_now.get_version().unwrap());
 
-    let timer_group0 = TimerGroup::new(peripherals.TIMG0, &clocks);
+    let timer_group0 = TimerGroup::new(peripherals.TIMG0, &clocks, &mut peripheral_clock_control);
     embassy::init(&clocks, timer_group0.timer0);
     let executor = EXECUTOR.init(Executor::new());
     executor.run(|spawner| {
         spawner.spawn(run(esp_now)).ok();
-    });
+    })
 }

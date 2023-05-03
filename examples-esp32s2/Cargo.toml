@@ -9,7 +9,7 @@ edition = "2021"
 embedded-svc.workspace = true
 bleps.workspace = true
 bleps-macros.workspace = true
-embassy-executor .workspace = true
+embassy-executor.workspace = true
 embassy-time.workspace = true
 embassy-futures.workspace = true
 futures-util.workspace = true
@@ -27,15 +27,16 @@ esp-wifi = { path = "../esp-wifi", features = ["esp32s2"] }
 
 [features]
 default = ["esp32s2"]
-esp32s2 = []
+esp32s2 = ["embassy-executor/arch-xtensa"]
 async = ["esp-wifi/esp32s2-async"]
 embassy-net = ["esp-wifi/embassy-net","dep:embassy-net"]
 wifi-logs = ["esp-wifi/wifi-logs"]
 dump-packets = ["esp-wifi/dump-packets"]
 utils = ["esp-wifi/utils"]
 enumset = ["esp-wifi/enumset"]
+# required for wifi feature
 embedded-svc = [ "esp-wifi/embedded-svc" ]
-wifi = ["esp-wifi/wifi"]
+wifi = ["esp-wifi/wifi", "embedded-svc"]
 ble = ["esp-wifi/ble"]
 phy-enable-usb = ["esp-wifi/phy-enable-usb"]
 ps-min-modem = ["esp-wifi/ps-min-modem"]
