@@ -239,6 +239,18 @@ impl<'a> ipv4::Interface for WifiStack<'a> {
     }
 
     fn set_iface_configuration(&mut self, conf: &ipv4::Configuration) -> Result<(), Self::Error> {
+        if let Some(dhcp_handle) = self.dhcp_socket_handle {
+            let dhcp_socket = self.sockets.get_mut().get_mut::<Dhcpv4Socket>(dhcp_handle);
+            log::info!("Reset DHCP client");
+            dhcp_socket.reset();
+
+            // remove the DHCP client if we use a static IP
+            if matches!(conf, ipv4::Configuration::Client(ipv4::ClientConfiguration::Fixed(_))) {
+                self.sockets.get_mut().remove(dhcp_handle);
+                self.dhcp_socket_handle = None;
+            }
+        }
+
         *self.network_config.borrow_mut() = conf.clone();
         Ok(())
     }
