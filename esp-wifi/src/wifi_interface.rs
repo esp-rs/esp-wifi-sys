@@ -59,6 +59,25 @@ impl<'a> WifiStack<'a> {
         }
     }
 
+    pub fn reset(&self) {
+        log::debug!("Reset TCP stack");
+
+        if let Some(dhcp_handle) = self.dhcp_socket_handle {
+            self.with_mut(|_, _, sockets| {
+                let dhcp_socket = sockets.get_mut::<Dhcpv4Socket>(dhcp_handle);
+                log::debug!("Reset DHCP client");
+                dhcp_socket.reset();
+            });
+        }
+
+        self.with_mut(|interface, _, _| {
+            interface.routes_mut().remove_default_ipv4_route();
+            interface.update_ip_addrs(|addrs| {
+                addrs.clear();
+            });
+        });
+    }
+
     /// Convenience function to poll the DHCP socket.
     pub fn poll_dhcp(
         &self,
@@ -245,7 +264,10 @@ impl<'a> ipv4::Interface for WifiStack<'a> {
             dhcp_socket.reset();
 
             // remove the DHCP client if we use a static IP
-            if matches!(conf, ipv4::Configuration::Client(ipv4::ClientConfiguration::Fixed(_))) {
+            if matches!(
+                conf,
+                ipv4::Configuration::Client(ipv4::ClientConfiguration::Fixed(_))
+            ) {
                 self.sockets.get_mut().remove(dhcp_handle);
                 self.dhcp_socket_handle = None;
             }
