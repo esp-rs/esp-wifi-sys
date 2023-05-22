@@ -12,7 +12,7 @@ use bleps::{
     async_attribute_server::AttributeServer,
     asynch::Ble,
     attribute_server::NotificationData,
-    gatt
+    gatt,
 };
 use embassy_executor::Executor;
 use embassy_executor::_export::StaticCell;

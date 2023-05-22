@@ -28,7 +28,7 @@ use hal::{
     Rng,
 };
 use hal::{peripherals::Peripherals, prelude::*, Rtc};
-use smoltcp::{iface::SocketStorage, wire::Ipv4Address};
+use smoltcp::{iface::SocketStorage, wire::IpAddress, wire::Ipv4Address};
 
 const SSID: &str = env!("SSID");
 const PASSWORD: &str = env!("PASSWORD");
@@ -140,7 +140,7 @@ fn main() -> ! {
         socket.work();
 
         socket
-            .open(Ipv4Address::new(142, 250, 185, 115), 80)
+            .open(IpAddress::Ipv4(Ipv4Address::new(142, 250, 185, 115)), 80)
             .unwrap();
 
         socket

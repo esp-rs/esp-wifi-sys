@@ -18,6 +18,7 @@ use hal::clock::{ClockControl, CpuClock};
 use hal::Rng;
 use hal::{peripherals::Peripherals, prelude::*, Rtc};
 use smoltcp::iface::SocketStorage;
+use smoltcp::wire::IpAddress;
 use smoltcp::wire::Ipv4Address;
 
 const SSID: &str = env!("SSID");
@@ -111,7 +112,7 @@ fn main() -> ! {
         socket.work();
 
         socket
-            .open(Ipv4Address::new(142, 250, 185, 115), 80)
+            .open(IpAddress::Ipv4(Ipv4Address::new(142, 250, 185, 115)), 80)
             .unwrap();
 
         socket
