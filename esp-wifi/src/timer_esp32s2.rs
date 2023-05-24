@@ -70,12 +70,12 @@ pub fn setup_timer_isr(timg1_timer0: Timer<Timer0<TIMG1>>) {
     xtensa_lx::timer::set_ccompare0(0xffffffff);
 
     unsafe {
-        xtensa_lx::interrupt::disable();
+        let enabled = esp32s2_hal::xtensa_lx::interrupt::disable();
         xtensa_lx::interrupt::enable_mask(
             1 << 6 // Timer0
             | 1 << 29 // Software1
                 | xtensa_lx_rt::interrupt::CpuInterruptLevel::Level2.mask()
-                | xtensa_lx_rt::interrupt::CpuInterruptLevel::Level6.mask(),
+                | xtensa_lx_rt::interrupt::CpuInterruptLevel::Level6.mask() | enabled,
         );
     }
 
