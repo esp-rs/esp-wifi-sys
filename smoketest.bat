@@ -13,14 +13,14 @@ echo Connect ESP32-C3
 pause
 cargo run --example ble --release --features "ble"
 cargo run --example async_ble --release --features "async,ble"
-cargo run --example dhcp --release --features "embedded-svc,wifi"
-cargo run --example static_ip --release --features "embedded-svc,wifi"
-cargo run --example embassy_dhcp --release --features "async,embedded-svc,wifi,embassy-net"
-cargo run --example coex --release --features "embedded-svc,wifi,ble"
+cargo run --example dhcp --release --features "wifi"
+cargo run --example static_ip --release --features "wifi"
+cargo run --example embassy_dhcp --release --features "async,wifi,embassy-net"
+cargo run --example coex --release --features "wifi,ble"
 cargo run --example esp_now --release --features "esp-now"
 cargo run --example embassy_esp_now --release --features "async,esp-now"
-cargo run --example access_point --release --features "embedded-svc,wifi"
-cargo run --example embassy_access_point --release --features "async,embedded-svc,wifi,embassy-net"
+cargo run --example access_point --release --features "wifi"
+cargo run --example embassy_access_point --release --features "async,wifi,embassy-net"
 
 cd ..\examples-esp32
 set CARGO_PROFILE_RELEASE_OPT_LEVEL=3
@@ -30,13 +30,13 @@ echo Connect ESP32
 pause
 cargo run --example ble --release --features "ble"
 cargo run --example async_ble --release --features "async,ble"
-cargo run --example dhcp --release --features "embedded-svc,wifi"
-cargo run --example static_ip --release --features "embedded-svc,wifi"
-cargo run --example embassy_dhcp --release --features "async,embedded-svc,wifi,embassy-net"
+cargo run --example dhcp --release --features "wifi"
+cargo run --example static_ip --release --features "wifi"
+cargo run --example embassy_dhcp --release --features "async,wifi,embassy-net"
 cargo run --example esp_now --release --features "esp-now"
 cargo run --example embassy_esp_now --release --features "async,esp-now"
-cargo run --example access_point --release --features "embedded-svc,wifi"
-cargo run --example embassy_access_point --release --features "async,embedded-svc,wifi,embassy-net"
+cargo run --example access_point --release --features "wifi"
+cargo run --example embassy_access_point --release --features "async,wifi,embassy-net"
 
 cd ..\examples-esp32s3
 set CARGO_PROFILE_RELEASE_OPT_LEVEL=3
@@ -46,16 +46,16 @@ echo Connect ESP32-S3
 pause
 cargo run --example ble --release --features "ble"
 cargo run --example async_ble --release --features "async,ble"
-cargo run --example dhcp --release --features "embedded-svc,wifi"
-cargo run --example static_ip --release --features "embedded-svc,wifi"
-cargo run --example embassy_dhcp --release --features "async,embedded-svc,wifi,embassy-net"
-cargo run --example coex --release --features "embedded-svc,wifi,ble"
+cargo run --example dhcp --release --features "wifi"
+cargo run --example static_ip --release --features "wifi"
+cargo run --example embassy_dhcp --release --features "async,wifi,embassy-net"
+cargo run --example coex --release --features "wifi,ble"
 set CARGO_PROFILE_RELEASE_OPT_LEVEL=1
 cargo run --example esp_now --release --features "esp-now"
 cargo run --example embassy_esp_now --release --features "async,esp-now"
 set CARGO_PROFILE_RELEASE_OPT_LEVEL=3
-cargo run --example access_point --release --features "embedded-svc,wifi"
-cargo run --example embassy_access_point --release --features "async,embedded-svc,wifi,embassy-net"
+cargo run --example access_point --release --features "wifi"
+cargo run --example embassy_access_point --release --features "async,wifi,embassy-net"
 
 cd ..\examples-esp32s2
 set CARGO_PROFILE_RELEASE_OPT_LEVEL=2
@@ -63,13 +63,13 @@ set CARGO_PROFILE_RELEASE_LTO=off
 echo.
 echo Connect ESP32-S2
 pause
-cargo run --example dhcp --release --features "embedded-svc,wifi"
-cargo run --example static_ip --release --features "embedded-svc,wifi"
-cargo run --example embassy_dhcp --release --features "async,embedded-svc,wifi,embassy-net"
+cargo run --example dhcp --release --features "wifi"
+cargo run --example static_ip --release --features "wifi"
+cargo run --example embassy_dhcp --release --features "async,wifi,embassy-net"
 cargo run --example esp_now --release --features "esp-now"
 cargo run --example embassy_esp_now --release --features "async,esp-now"
-cargo run --example access_point --release --features "embedded-svc,wifi"
-cargo run --example embassy_access_point --release --features "async,embedded-svc,wifi,embassy-net"
+cargo run --example access_point --release --features "wifi"
+cargo run --example embassy_access_point --release --features "async,wifi,embassy-net"
 
 cd ..\examples-esp32c2
 set CARGO_PROFILE_RELEASE_OPT_LEVEL=2
@@ -80,13 +80,13 @@ pause
 cargo run --example ble --release --features "ble"
 cargo run --example async_ble --release --features "async,ble"
 set CARGO_PROFILE_RELEASE_OPT_LEVEL=3
-cargo run --example dhcp --release --features "embedded-svc,wifi"
-cargo run --example static_ip --release --features "embedded-svc,wifi"
-cargo run --example embassy_dhcp --release --features "async,embedded-svc,wifi,embassy-net"
+cargo run --example dhcp --release --features "wifi"
+cargo run --example static_ip --release --features "wifi"
+cargo run --example embassy_dhcp --release --features "async,wifi,embassy-net"
 cargo run --example esp_now --release --features "esp-now"
 cargo run --example embassy_esp_now --release --features "async,esp-now"
-cargo run --example access_point --release --features "embedded-svc,wifi"
-cargo run --example embassy_access_point --release --features "async,embedded-svc,wifi,embassy-net"
+cargo run --example access_point --release --features "wifi"
+cargo run --example embassy_access_point --release --features "async,wifi,embassy-net"
 
 cd ..\examples-esp32c6
 set CARGO_PROFILE_RELEASE_OPT_LEVEL=3
@@ -94,10 +94,10 @@ set CARGO_PROFILE_RELEASE_LTO=off
 echo.
 echo Connect ESP32-C6
 pause
-cargo run --example dhcp --release --features "embedded-svc,wifi"
-cargo run --example static_ip --release --features "embedded-svc,wifi"
-cargo run --example embassy_dhcp --release --features "async,embedded-svc,wifi,embassy-net"
+cargo run --example dhcp --release --features "wifi"
+cargo run --example static_ip --release --features "wifi"
+cargo run --example embassy_dhcp --release --features "async,wifi,embassy-net"
 cargo run --example esp_now --release --features "esp-now"
 cargo run --example embassy_esp_now --release --features "async,esp-now"
-cargo run --example access_point --release --features "embedded-svc,wifi"
-cargo run --example embassy_access_point --release --features "async,embedded-svc,wifi,embassy-net"
+cargo run --example access_point --release --features "wifi"
+cargo run --example embassy_access_point --release --features "async,wifi,embassy-net"
