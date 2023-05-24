@@ -54,11 +54,14 @@ fn main() -> ! {
         println!("{:?}", ble.cmd_set_le_advertising_parameters());
         println!(
             "{:?}",
-            ble.cmd_set_le_advertising_data(create_advertising_data(&[
-                AdStructure::Flags(LE_GENERAL_DISCOVERABLE | BR_EDR_NOT_SUPPORTED),
-                AdStructure::ServiceUuids16(&[Uuid::Uuid16(0x1809)]),
-                AdStructure::CompleteLocalName(examples_util::SOC_NAME),
-            ]))
+            ble.cmd_set_le_advertising_data(
+                create_advertising_data(&[
+                    AdStructure::Flags(LE_GENERAL_DISCOVERABLE | BR_EDR_NOT_SUPPORTED),
+                    AdStructure::ServiceUuids16(&[Uuid::Uuid16(0x1809)]),
+                    AdStructure::CompleteLocalName(examples_util::SOC_NAME),
+                ])
+                .unwrap()
+            )
         );
         println!("{:?}", ble.cmd_set_le_advertise_enable(true));
 
@@ -115,9 +118,11 @@ fn main() -> ! {
                 debounce_cnt -= 1;
                 if debounce_cnt == 0 {
                     let mut cccd = [0u8; 1];
-                    if let Some(1) =
-                        srv.get_characteristic_value(my_characteristic_notify_enable_handle, 0, &mut cccd)
-                    {
+                    if let Some(1) = srv.get_characteristic_value(
+                        my_characteristic_notify_enable_handle,
+                        0,
+                        &mut cccd,
+                    ) {
                         // if notifications enabled
                         if cccd[0] == 1 {
                             notification = Some(NotificationData::new(
