@@ -49,7 +49,7 @@ async fn run(mut bluetooth: Bluetooth, pin: BootButton) {
                 AdStructure::Flags(LE_GENERAL_DISCOVERABLE | BR_EDR_NOT_SUPPORTED),
                 AdStructure::ServiceUuids16(&[Uuid::Uuid16(0x1809)]),
                 AdStructure::CompleteLocalName(examples_util::SOC_NAME),
-            ]))
+            ]).unwrap())
             .await
         );
         println!("{:?}", ble.cmd_set_le_advertise_enable(true).await);

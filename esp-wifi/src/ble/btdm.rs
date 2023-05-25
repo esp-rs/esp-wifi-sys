@@ -79,10 +79,7 @@ extern "C" fn notify_host_recv(data: *mut u8, len: u16) -> i32 {
 
     unsafe {
         let mut buf = [0u8; 256];
-        for i in 0..len {
-            let b = data.offset(i as isize).read();
-            buf[i as usize] = b;
-        }
+        buf[..len as usize].copy_from_slice(&core::slice::from_raw_parts(data, len as usize));
 
         let packet = ReceivedPacket {
             len: len as u8,
@@ -91,7 +88,9 @@ extern "C" fn notify_host_recv(data: *mut u8, len: u16) -> i32 {
 
         critical_section::with(|cs| {
             let mut queue = BT_RECEIVE_QUEUE.borrow_ref_mut(cs);
-            queue.enqueue(packet).unwrap();
+            if queue.enqueue(packet).is_err() {
+                log::warn!("Dropping BLE packet");
+            }
         });
 
         dump_packet_info(&core::slice::from_raw_parts(
@@ -538,6 +537,20 @@ pub fn have_hci_read_data() -> bool {
             || unsafe {
                 BLE_HCI_READ_DATA_LEN > 0 && (BLE_HCI_READ_DATA_LEN >= BLE_HCI_READ_DATA_INDEX)
             }
+    })
+}
+
+pub(crate) fn read_next(data: &mut [u8]) -> usize {
+    critical_section::with(|cs| {
+        let mut queue = BT_RECEIVE_QUEUE.borrow_ref_mut(cs);
+
+        match queue.dequeue() {
+            Some(packet) => {
+                data[..packet.len as usize].copy_from_slice(&packet.data[..packet.len as usize]);
+                packet.len as usize
+            }
+            None => 0,
+        }
     })
 }
 
