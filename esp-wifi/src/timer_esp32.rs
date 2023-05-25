@@ -54,13 +54,6 @@ pub fn setup_timer_isr(timg1_timer0: Timer<Timer0<TIMG1>>) {
     )
     .unwrap();
 
-    #[cfg(feature = "wifi")]
-    interrupt::enable(
-        peripherals::Interrupt::WIFI_BB,
-        interrupt::Priority::Priority1,
-    )
-    .unwrap();
-
     #[cfg(feature = "ble")]
     {
         interrupt::enable(peripherals::Interrupt::RWBT, interrupt::Priority::Priority1).unwrap();
@@ -127,22 +120,6 @@ fn WIFI_MAC() {
             fnc(arg);
         }
     }
-}
-
-#[cfg(feature = "wifi")]
-#[interrupt]
-fn WIFI_BB() {
-    unsafe {
-        let (fnc, arg) = crate::wifi::os_adapter::ISR_INTERRUPT_1;
-        trace!("interrupt WIFI_BB {:p} {:p}", fnc, arg);
-
-        if !fnc.is_null() {
-            let fnc: fn(*mut crate::binary::c_types::c_void) = core::mem::transmute(fnc);
-            fnc(arg);
-        }
-
-        trace!("interrupt 1 done");
-    };
 }
 
 #[cfg(feature = "ble")]
