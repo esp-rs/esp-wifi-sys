@@ -43,7 +43,7 @@ fn main() -> ! {
             println!("Received {:x?}", r);
 
             if r.info.dst_address == BROADCAST_ADDRESS {
-                if !esp_now.peer_exists(&r.info.src_address).unwrap() {
+                if !esp_now.peer_exists(&r.info.src_address) {
                     esp_now
                         .add_peer(PeerInfo {
                             peer_address: r.info.src_address,
