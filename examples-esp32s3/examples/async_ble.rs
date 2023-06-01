@@ -19,7 +19,9 @@ use embassy_executor::_export::StaticCell;
 use embedded_hal_async::digital::Wait;
 use esp_backtrace as _;
 use esp_println::{logger::init_logger, println};
-use esp_wifi::{ble::controller::asynch::BleConnector, initialize};
+use esp_wifi::{
+    ble::controller::asynch::BleConnector, initialize, EspWifiInitFor, EspWifiInitialization,
+};
 use examples_util::hal;
 use examples_util::BootButton;
 use hal::{
@@ -33,8 +35,8 @@ use hal::{
 };
 
 #[embassy_executor::task]
-async fn run(mut bluetooth: Bluetooth, pin: BootButton) {
-    let connector = BleConnector::new(&mut bluetooth);
+async fn run(init: EspWifiInitialization, mut bluetooth: Bluetooth, pin: BootButton) {
+    let connector = BleConnector::new(&init, &mut bluetooth);
     let mut ble = Ble::new(connector, esp_wifi::current_millis);
     println!("Connector created");
 
@@ -45,11 +47,14 @@ async fn run(mut bluetooth: Bluetooth, pin: BootButton) {
         println!("{:?}", ble.cmd_set_le_advertising_parameters().await);
         println!(
             "{:?}",
-            ble.cmd_set_le_advertising_data(create_advertising_data(&[
-                AdStructure::Flags(LE_GENERAL_DISCOVERABLE | BR_EDR_NOT_SUPPORTED),
-                AdStructure::ServiceUuids16(&[Uuid::Uuid16(0x1809)]),
-                AdStructure::CompleteLocalName(examples_util::SOC_NAME),
-            ]).unwrap())
+            ble.cmd_set_le_advertising_data(
+                create_advertising_data(&[
+                    AdStructure::Flags(LE_GENERAL_DISCOVERABLE | BR_EDR_NOT_SUPPORTED),
+                    AdStructure::ServiceUuids16(&[Uuid::Uuid16(0x1809)]),
+                    AdStructure::CompleteLocalName(examples_util::SOC_NAME),
+                ])
+                .unwrap()
+            )
             .await
         );
         println!("{:?}", ble.cmd_set_le_advertise_enable(true).await);
@@ -134,7 +139,8 @@ fn main() -> ! {
     examples_util::rtc!(peripherals);
 
     let timer = examples_util::timer!(peripherals, clocks, peripheral_clock_control);
-    initialize(
+    let init = initialize(
+        EspWifiInitFor::Ble,
         timer,
         Rng::new(peripherals.RNG),
         system.radio_clock_control,
@@ -157,6 +163,6 @@ fn main() -> ! {
     embassy::init(&clocks, timer_group0.timer0);
     let executor = EXECUTOR.init(Executor::new());
     executor.run(|spawner| {
-        spawner.spawn(run(bluetooth, button)).ok();
+        spawner.spawn(run(init, bluetooth, button)).ok();
     });
 }

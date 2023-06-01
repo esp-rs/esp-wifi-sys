@@ -10,7 +10,7 @@ use bleps::{
 };
 use esp_backtrace as _;
 use esp_println::{logger::init_logger, println};
-use esp_wifi::{ble::controller::BleConnector, initialize};
+use esp_wifi::{ble::controller::BleConnector, initialize, EspWifiInitFor};
 use examples_util::hal;
 use hal::{
     clock::{ClockControl, CpuClock},
@@ -31,7 +31,8 @@ fn main() -> ! {
     examples_util::rtc!(peripherals);
 
     let timer = examples_util::timer!(peripherals, clocks, peripheral_clock_control);
-    initialize(
+    let init = initialize(
+        EspWifiInitFor::Ble,
         timer,
         Rng::new(peripherals.RNG),
         system.radio_clock_control,
@@ -46,7 +47,7 @@ fn main() -> ! {
     let mut bluetooth = examples_util::get_bluetooth!(peripherals);
 
     loop {
-        let connector = BleConnector::new(&mut bluetooth);
+        let connector = BleConnector::new(&init, &mut bluetooth);
         let hci = HciConnector::new(connector, esp_wifi::current_millis);
         let mut ble = Ble::new(&hci);
 
@@ -54,11 +55,14 @@ fn main() -> ! {
         println!("{:?}", ble.cmd_set_le_advertising_parameters());
         println!(
             "{:?}",
-            ble.cmd_set_le_advertising_data(create_advertising_data(&[
-                AdStructure::Flags(LE_GENERAL_DISCOVERABLE | BR_EDR_NOT_SUPPORTED),
-                AdStructure::ServiceUuids16(&[Uuid::Uuid16(0x1809)]),
-                AdStructure::CompleteLocalName(examples_util::SOC_NAME),
-            ]).unwrap())
+            ble.cmd_set_le_advertising_data(
+                create_advertising_data(&[
+                    AdStructure::Flags(LE_GENERAL_DISCOVERABLE | BR_EDR_NOT_SUPPORTED),
+                    AdStructure::ServiceUuids16(&[Uuid::Uuid16(0x1809)]),
+                    AdStructure::CompleteLocalName(examples_util::SOC_NAME),
+                ])
+                .unwrap()
+            )
         );
         println!("{:?}", ble.cmd_set_le_advertise_enable(true));
 
@@ -115,9 +119,11 @@ fn main() -> ! {
                 debounce_cnt -= 1;
                 if debounce_cnt == 0 {
                     let mut cccd = [0u8; 1];
-                    if let Some(1) =
-                        srv.get_characteristic_value(my_characteristic_notify_enable_handle, 0, &mut cccd)
-                    {
+                    if let Some(1) = srv.get_characteristic_value(
+                        my_characteristic_notify_enable_handle,
+                        0,
+                        &mut cccd,
+                    ) {
                         // if notifications enabled
                         if cccd[0] == 1 {
                             notification = Some(NotificationData::new(
