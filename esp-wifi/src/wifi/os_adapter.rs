@@ -1,9 +1,9 @@
-#[cfg_attr(feature = "esp32c3", path = "os_adapter_esp32c3.rs")]
-#[cfg_attr(feature = "esp32c2", path = "os_adapter_esp32c2.rs")]
-#[cfg_attr(feature = "esp32c6", path = "os_adapter_esp32c6.rs")]
-#[cfg_attr(feature = "esp32", path = "os_adapter_esp32.rs")]
-#[cfg_attr(feature = "esp32s3", path = "os_adapter_esp32s3.rs")]
-#[cfg_attr(feature = "esp32s2", path = "os_adapter_esp32s2.rs")]
+#[cfg_attr(esp32c3, path = "os_adapter_esp32c3.rs")]
+#[cfg_attr(esp32c2, path = "os_adapter_esp32c2.rs")]
+#[cfg_attr(esp32c6, path = "os_adapter_esp32c6.rs")]
+#[cfg_attr(esp32, path = "os_adapter_esp32.rs")]
+#[cfg_attr(esp32s3, path = "os_adapter_esp32s3.rs")]
+#[cfg_attr(esp32s2, path = "os_adapter_esp32s2.rs")]
 pub(crate) mod os_adapter_chip_specific;
 
 use core::cell::RefCell;
@@ -1934,12 +1934,7 @@ pub unsafe extern "C" fn coex_event_duration_get(
  *   Don't support
  *
  ****************************************************************************/
-#[cfg(any(
-    feature = "esp32c3",
-    feature = "esp32c2",
-    feature = "esp32c6",
-    feature = "esp32s3"
-))]
+#[cfg(any(esp32c3, esp32c2, esp32c6, esp32s3))]
 #[allow(unused_variables)]
 pub unsafe extern "C" fn coex_pti_get(event: u32, pti: *mut u8) -> crate::binary::c_types::c_int {
     log::debug!("coex_pti_get");
@@ -1951,7 +1946,7 @@ pub unsafe extern "C" fn coex_pti_get(event: u32, pti: *mut u8) -> crate::binary
     0
 }
 
-#[cfg(any(feature = "esp32", feature = "esp32s2"))]
+#[cfg(any(esp32, esp32s2))]
 pub unsafe extern "C" fn coex_pti_get(event: u32, pti: *mut u8) -> crate::binary::c_types::c_int {
     log::debug!("coex_pti_get {} {:p}", event, pti);
     0
@@ -2108,21 +2103,21 @@ pub unsafe extern "C" fn slowclk_cal_get() -> u32 {
 
     // TODO not hardcode this
 
-    #[cfg(feature = "esp32s2")]
+    #[cfg(esp32s2)]
     return 44462;
 
-    #[cfg(feature = "esp32s3")]
+    #[cfg(esp32s3)]
     return 44462;
 
-    #[cfg(feature = "esp32c3")]
+    #[cfg(esp32c3)]
     return 28639;
 
-    #[cfg(feature = "esp32c2")]
+    #[cfg(esp32c2)]
     return 28639;
 
-    #[cfg(feature = "esp32c6")]
+    #[cfg(esp32c6)]
     return 0;
 
-    #[cfg(feature = "esp32")]
+    #[cfg(esp32)]
     return 28639;
 }

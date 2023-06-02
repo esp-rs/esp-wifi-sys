@@ -13,8 +13,8 @@ use embedded_svc::wifi::{ClientConfiguration, Configuration, Wifi};
 use esp_backtrace as _;
 use esp_println::logger::init_logger;
 use esp_println::println;
-use esp_wifi::initialize;
 use esp_wifi::wifi::{WifiController, WifiDevice, WifiEvent, WifiMode, WifiState};
+use esp_wifi::{initialize, EspWifiInitFor};
 use hal::clock::{ClockControl, CpuClock};
 use hal::Rng;
 use hal::{embassy, peripherals::Peripherals, prelude::*, timer::TimerGroup, Rtc};
@@ -48,7 +48,8 @@ fn main() -> ! {
     examples_util::rtc!(peripherals);
 
     let timer = examples_util::timer!(peripherals, clocks, peripheral_clock_control);
-    initialize(
+    let init = initialize(
+        EspWifiInitFor::Wifi,
         timer,
         Rng::new(peripherals.RNG),
         system.radio_clock_control,
@@ -57,7 +58,7 @@ fn main() -> ! {
     .unwrap();
 
     let wifi = examples_util::get_wifi!(peripherals);
-    let (wifi_interface, controller) = esp_wifi::wifi::new_with_mode(wifi, WifiMode::Sta);
+    let (wifi_interface, controller) = esp_wifi::wifi::new_with_mode(&init, wifi, WifiMode::Sta);
 
     let timer_group0 = TimerGroup::new(peripherals.TIMG0, &clocks, &mut peripheral_clock_control);
     embassy::init(&clocks, timer_group0.timer0);

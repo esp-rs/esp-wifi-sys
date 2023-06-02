@@ -4,6 +4,7 @@ pub mod os_adapter;
 use core::{cell::RefCell, marker::PhantomData};
 
 use crate::common_adapter::*;
+use crate::EspWifiInitialization;
 
 use crate::esp_wifi_result;
 use critical_section::Mutex;
@@ -46,17 +47,17 @@ const MTU: usize = 1492;
 #[cfg(feature = "mtu-746")]
 const MTU: usize = 746;
 
-#[cfg(feature = "esp32")]
+#[cfg(esp32)]
 use esp32_hal as hal;
-#[cfg(feature = "esp32c2")]
+#[cfg(esp32c2)]
 use esp32c2_hal as hal;
-#[cfg(feature = "esp32c3")]
+#[cfg(esp32c3)]
 use esp32c3_hal as hal;
-#[cfg(feature = "esp32c6")]
+#[cfg(esp32c6)]
 use esp32c6_hal as hal;
-#[cfg(feature = "esp32s2")]
+#[cfg(esp32s2)]
 use esp32s2_hal as hal;
-#[cfg(feature = "esp32s3")]
+#[cfg(esp32s3)]
 use esp32s3_hal as hal;
 
 use hal::macros::ram;
@@ -216,7 +217,7 @@ pub enum InternalWifiError {
     EspErrWifiTxDisallow = 0x3016,
 }
 
-#[cfg(all(feature = "esp32c3", coex))]
+#[cfg(all(esp32c3, coex))]
 static mut G_COEX_ADAPTER_FUNCS: coex_adapter_funcs_t = coex_adapter_funcs_t {
     _version: crate::binary::include::COEX_ADAPTER_VERSION as i32,
     _task_yield_from_isr: Some(task_yield_from_isr),
@@ -235,7 +236,7 @@ static mut G_COEX_ADAPTER_FUNCS: coex_adapter_funcs_t = coex_adapter_funcs_t {
     _magic: crate::binary::include::COEX_ADAPTER_MAGIC as i32,
 };
 
-#[cfg(all(feature = "esp32s3", coex))]
+#[cfg(all(esp32s3, coex))]
 static mut G_COEX_ADAPTER_FUNCS: coex_adapter_funcs_t = coex_adapter_funcs_t {
     _version: crate::binary::include::COEX_ADAPTER_VERSION as i32,
     _task_yield_from_isr: Some(task_yield_from_isr),
@@ -254,7 +255,7 @@ static mut G_COEX_ADAPTER_FUNCS: coex_adapter_funcs_t = coex_adapter_funcs_t {
     _magic: crate::binary::include::COEX_ADAPTER_MAGIC as i32,
 };
 
-#[cfg(all(feature = "esp32", coex))]
+#[cfg(all(esp32, coex))]
 static mut G_COEX_ADAPTER_FUNCS: coex_adapter_funcs_t = coex_adapter_funcs_t {
     _version: crate::binary::include::COEX_ADAPTER_VERSION as i32,
     _task_yield_from_isr: Some(task_yield_from_isr),
@@ -448,37 +449,31 @@ static g_wifi_osi_funcs: wifi_osi_funcs_t = wifi_osi_funcs_t {
     _coex_schm_curr_phase_get: Some(coex_schm_curr_phase_get),
     _coex_schm_curr_phase_idx_set: Some(coex_schm_curr_phase_idx_set),
     _coex_schm_curr_phase_idx_get: Some(coex_schm_curr_phase_idx_get),
-    #[cfg(any(
-        feature = "esp32c3",
-        feature = "esp32c2",
-        feature = "esp32c6",
-        feature = "esp32s3",
-        feature = "esp32s2",
-    ))]
+    #[cfg(any(esp32c3, esp32c2, esp32c6, esp32s3, esp32s2,))]
     _slowclk_cal_get: Some(slowclk_cal_get),
-    #[cfg(any(feature = "esp32", feature = "esp32s2"))]
+    #[cfg(any(esp32, esp32s2))]
     _phy_common_clock_disable: Some(
         crate::wifi::os_adapter::os_adapter_chip_specific::phy_common_clock_disable,
     ),
-    #[cfg(any(feature = "esp32", feature = "esp32s2"))]
+    #[cfg(any(esp32, esp32s2))]
     _phy_common_clock_enable: Some(
         crate::wifi::os_adapter::os_adapter_chip_specific::phy_common_clock_enable,
     ),
     _coex_register_start_cb: Some(coex_register_start_cb),
 
-    #[cfg(any(feature = "esp32c6"))]
+    #[cfg(any(esp32c6))]
     _regdma_link_set_write_wait_content: Some(
         os_adapter_chip_specific::regdma_link_set_write_wait_content_dummy,
     ),
-    #[cfg(any(feature = "esp32c6"))]
+    #[cfg(any(esp32c6))]
     _sleep_retention_find_link_by_id: Some(
         os_adapter_chip_specific::sleep_retention_find_link_by_id_dummy,
     ),
-    #[cfg(any(feature = "esp32c6"))]
+    #[cfg(any(esp32c6))]
     _sleep_retention_entries_create: Some(
         os_adapter_chip_specific::sleep_retention_entries_create_dummy,
     ),
-    #[cfg(any(feature = "esp32c6"))]
+    #[cfg(any(esp32c6))]
     _sleep_retention_entries_destroy: Some(
         os_adapter_chip_specific::sleep_retention_entries_destroy_dummy,
     ),
@@ -589,7 +584,7 @@ pub fn wifi_init() -> Result<(), WifiError> {
             Some(recv_cb)
         ))?;
 
-        #[cfg(any(feature = "esp32", feature = "esp32s3"))]
+        #[cfg(any(esp32, esp32s3))]
         {
             static mut NVS_STRUCT: [u32; 12] = [0; 12];
             crate::common_adapter::chip_specific::g_misc_nvs =
@@ -691,9 +686,14 @@ pub fn wifi_start_scan(block: bool) -> i32 {
 }
 
 pub fn new_with_config<'d>(
+    inited: &EspWifiInitialization,
     device: impl Peripheral<P = esp_hal_common::radio::Wifi> + 'd,
     config: embedded_svc::wifi::Configuration,
 ) -> (WifiDevice<'d>, WifiController<'d>) {
+    if !inited.is_wifi() {
+        panic!("Not initialized for Wifi use");
+    }
+
     esp_hal_common::into_ref!(device);
     match config {
         embedded_svc::wifi::Configuration::None => panic!(),
@@ -708,10 +708,12 @@ pub fn new_with_config<'d>(
 }
 
 pub fn new_with_mode<'d>(
+    inited: &EspWifiInitialization,
     device: impl Peripheral<P = esp_hal_common::radio::Wifi> + 'd,
     mode: WifiMode,
 ) -> (WifiDevice<'d>, WifiController<'d>) {
     new_with_config(
+        inited,
         device,
         match mode {
             WifiMode::Sta => embedded_svc::wifi::Configuration::Client(Default::default()),
@@ -721,9 +723,10 @@ pub fn new_with_mode<'d>(
 }
 
 pub fn new<'d>(
+    inited: &EspWifiInitialization,
     device: impl Peripheral<P = esp_hal_common::radio::Wifi> + 'd,
 ) -> (WifiDevice<'d>, WifiController<'d>) {
-    new_with_config(device, Default::default())
+    new_with_config(&inited, device, Default::default())
 }
 
 /// A wifi device implementing smoltcp's Device trait.

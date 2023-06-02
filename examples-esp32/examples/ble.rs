@@ -10,7 +10,7 @@ use bleps::{
 };
 use esp_backtrace as _;
 use esp_println::{logger::init_logger, println};
-use esp_wifi::{ble::controller::BleConnector, initialize};
+use esp_wifi::{ble::controller::BleConnector, initialize, EspWifiInitFor};
 use examples_util::hal;
 use hal::{
     clock::{ClockControl, CpuClock},
@@ -31,7 +31,8 @@ fn main() -> ! {
     examples_util::rtc!(peripherals);
 
     let timer = examples_util::timer!(peripherals, clocks, peripheral_clock_control);
-    initialize(
+    let init = initialize(
+        EspWifiInitFor::Ble,
         timer,
         Rng::new(peripherals.RNG),
         system.radio_clock_control,
@@ -46,7 +47,7 @@ fn main() -> ! {
     let mut bluetooth = examples_util::get_bluetooth!(peripherals);
 
     loop {
-        let connector = BleConnector::new(&mut bluetooth);
+        let connector = BleConnector::new(&init, &mut bluetooth);
         let hci = HciConnector::new(connector, esp_wifi::current_millis);
         let mut ble = Ble::new(&hci);
 

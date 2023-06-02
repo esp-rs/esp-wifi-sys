@@ -13,6 +13,7 @@ use bleps::{
 
 use esp_wifi::{
     ble::controller::BleConnector, current_millis, wifi::WifiMode, wifi_interface::WifiStack,
+    EspWifiInitFor,
 };
 
 use embedded_io::blocking::*;
@@ -45,7 +46,8 @@ fn main() -> ! {
     examples_util::rtc!(peripherals);
 
     let timer = examples_util::timer!(peripherals, clocks, peripheral_clock_control);
-    initialize(
+    let init = initialize(
+        EspWifiInitFor::WifiBle,
         timer,
         Rng::new(peripherals.RNG),
         system.radio_clock_control,
@@ -57,7 +59,7 @@ fn main() -> ! {
 
     let mut socket_set_entries: [SocketStorage; 3] = Default::default();
     let (iface, device, mut controller, sockets) =
-        create_network_interface(wifi, WifiMode::Sta, &mut socket_set_entries);
+        create_network_interface(&init, wifi, WifiMode::Sta, &mut socket_set_entries);
     let wifi_stack = WifiStack::new(iface, device, sockets, current_millis);
 
     let client_config = Configuration::Client(ClientConfiguration {
@@ -111,7 +113,7 @@ fn main() -> ! {
         }
     }
 
-    let connector = BleConnector::new(bluetooth);
+    let connector = BleConnector::new(&init, bluetooth);
     let hci = HciConnector::new(connector, esp_wifi::current_millis);
     let mut ble = Ble::new(&hci);
 
