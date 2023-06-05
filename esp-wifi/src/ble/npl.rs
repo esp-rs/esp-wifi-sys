@@ -22,6 +22,8 @@ const OS_MSYS_2_BLOCK_COUNT: i32 = 24;
 const SYSINIT_MSYS_2_MEMPOOL_SIZE: u32 = 1920;
 const SYSINIT_MSYS_2_MEMBLOCK_SIZE: i32 = 320;
 
+const BLE_HCI_TRANS_BUF_CMD: i32 = 3;
+
 /* ACL_DATA_MBUF_LEADINGSPCAE: The leadingspace in user info header for ACL data */
 const ACL_DATA_MBUF_LEADINGSPACE: usize = 4;
 
@@ -176,7 +178,7 @@ pub struct OsMbuf {
     /**
      * Pointer to the beginning of the data, after this buffer
      */
-    om_databuf: [u8; 0],
+    om_databuf: u32,
 }
 
 #[repr(C)]
@@ -261,6 +263,10 @@ extern "C" {
     pub(crate) fn r_os_mbuf_append(om: *mut OsMbuf, src: *const u8, len: u16) -> i32;
 
     pub(crate) fn r_os_mbuf_free_chain(om: *mut OsMbuf) -> i32;
+
+    pub(crate) fn r_ble_hci_trans_buf_alloc(typ: i32) -> *const u8;
+
+    pub(crate) fn r_ble_hci_trans_buf_free(buf: *const u8);
 
     pub(crate) fn ets_delay_us(us: u32);
 }
@@ -997,13 +1003,15 @@ unsafe extern "C" fn callout_timer_callback_wrapper(arg: *mut c_void) {
 unsafe extern "C" fn ble_npl_eventq_init(queue: *const ble_npl_eventq) {
     log::trace!("ble_npl_eventq_init {:p}", queue);
 
-    let queue = queue as *mut ble_npl_eventq;
+    critical_section::with(|_cs| {
+        let queue = queue as *mut ble_npl_eventq;
 
-    if (*queue).dummy == 0 {
-        (*queue).dummy = 1;
-    } else {
-        panic!("Only one emulated queue supported");
-    }
+        if (*queue).dummy == 0 {
+            (*queue).dummy = 1;
+        } else {
+            panic!("Only one emulated queue supported");
+        }
+    });
 }
 
 unsafe extern "C" fn ble_npl_mutex_init(_mutex: *const ble_npl_mutex) -> u32 {
@@ -1133,7 +1141,9 @@ pub(crate) fn ble_init() {
         // probably long term we should rather initialize syscall_table_ptr
         *(r_ble_stub_funcs_ptr.offset(0x7dc / 4)) = ble_ll_random_override as *const u32 as u32;
 
-        ets_delay_us(100);
+        // this is a workaround for an unclear problem
+        // (ASSERT r_ble_hci_ram_hs_cmd_tx:34 0 0)
+        ets_delay_us(10_000);
 
         log::debug!("The ble_controller_init was initialized");
     }
@@ -1238,6 +1248,8 @@ unsafe extern "C" fn ble_hs_hci_rx_evt(cmd: *const u8, arg: *const c_void) {
         dump_packet_info(&data[..(len + 3) as usize]);
     });
 
+    r_ble_hci_trans_buf_free(cmd);
+
     #[cfg(feature = "async")]
     crate::ble::controller::asynch::hci_read_data_available();
 }
@@ -1268,6 +1280,8 @@ unsafe extern "C" fn ble_hs_rx_data(om: *const OsMbuf, arg: *const c_void) {
 
         dump_packet_info(&data[..(len + 1) as usize]);
     });
+
+    r_os_mbuf_free_chain(om as *mut _);
 
     #[cfg(feature = "async")]
     crate::ble::controller::asynch::hci_read_data_available();
@@ -1346,87 +1360,50 @@ pub fn send_hci(data: &[u8]) {
 
                 dump_packet_info(&packet);
 
-                if packet[0] == DATA_TYPE_COMMAND {
-                    let res = (ble_hci_trans_funcs_ptr.ble_hci_trans_hs_cmd_tx.unwrap())(
-                        &packet[1] as *const _ as *mut u8, // don't send the TYPE
-                    );
+                critical_section::with(|_cs| {
+                    if packet[0] == DATA_TYPE_COMMAND {
+                        let cmd = r_ble_hci_trans_buf_alloc(BLE_HCI_TRANS_BUF_CMD);
+                        core::ptr::copy_nonoverlapping(
+                            &packet[1] as *const _ as *mut u8, // don't send the TYPE
+                            cmd as *mut u8,
+                            packet.len() - 1,
+                        );
 
-                    if res != 0 {
-                        log::warn!("ble_hci_trans_hs_cmd_tx res == {}", res);
+                        let res = (ble_hci_trans_funcs_ptr.ble_hci_trans_hs_cmd_tx.unwrap())(cmd);
+
+                        if res != 0 {
+                            log::warn!("ble_hci_trans_hs_cmd_tx res == {}", res);
+                        }
+                    } else if packet[0] == DATA_TYPE_ACL {
+                        let om = r_os_msys_get_pkthdr(
+                            packet.len() as u16,
+                            ACL_DATA_MBUF_LEADINGSPACE as u16,
+                        );
+
+                        let res = r_os_mbuf_append(
+                            om,
+                            packet.as_ptr().offset(1),
+                            (packet.len() - 1) as u16,
+                        );
+                        if res != 0 {
+                            panic!("r_os_mbuf_append returned {}", res);
+                        }
+
+                        // this modification of the ACL data packet makes it getting sent and received by the other side
+                        *((*om).om_data as *mut u8).offset(1) = 0;
+
+                        let res = (ble_hci_trans_funcs_ptr.ble_hci_trans_hs_acl_tx.unwrap())(om);
+                        if res != 0 {
+                            panic!("ble_hci_trans_hs_acl_tx returned {}", res);
+                        }
+                        log::trace!("ACL tx done");
                     }
-                } else if packet[0] == DATA_TYPE_ACL {
-                    let om = get_pkthdr(packet.len());
-
-                    let res =
-                        r_os_mbuf_append(om, packet.as_ptr().offset(1), (packet.len() - 1) as u16);
-                    if res != 0 {
-                        panic!("r_os_mbuf_append returned {}", res);
-                    }
-
-                    // this modification of the ACL data packet makes it getting sent and received by the other side
-                    *((*om).om_data as *mut u8).offset(1) = 0;
-
-                    let res = (ble_hci_trans_funcs_ptr.ble_hci_trans_hs_acl_tx.unwrap())(om);
-                    if res != 0 {
-                        panic!("ble_hci_trans_hs_acl_tx returned {}", res);
-                    }
-                    log::trace!("ACL tx done");
-                }
-
+                });
                 break;
             }
         }
 
         hci_out.reset();
-    }
-}
-
-fn get_pkthdr(len: usize) -> *mut OsMbuf {
-    static mut MBUF_IDX: usize = 0;
-    static mut MBUF_POOL: [Option<*mut OsMbuf>; 10] = [None; 10];
-
-    critical_section::with(|_| unsafe {
-        let om = if let Some(mbuf) = MBUF_POOL[MBUF_IDX] {
-            if !is_mbuf_free(mbuf) {
-                let res = r_os_mbuf_free_chain(mbuf);
-                if res != 0 {
-                    panic!("r_os_mbuf_free_chain returned {}", res);
-                }
-            }
-
-            let om = r_os_msys_get_pkthdr(len as u16, ACL_DATA_MBUF_LEADINGSPACE as u16);
-            if om.is_null() {
-                panic!("r_os_msys_get_pkthdr returned null");
-            }
-
-            MBUF_POOL[MBUF_IDX] = Some(om);
-            om
-        } else {
-            let om = r_os_msys_get_pkthdr(len as u16, ACL_DATA_MBUF_LEADINGSPACE as u16);
-            MBUF_POOL[MBUF_IDX] = Some(om);
-            om
-        };
-        MBUF_IDX = (MBUF_IDX + 1) % MBUF_POOL.len();
-        om
-    })
-}
-
-fn is_mbuf_free(mbuf: *const OsMbuf) -> bool {
-    unsafe { is_free(&OS_MSYS_INIT_1_MEMPOOL, mbuf) || is_free(&OS_MSYS_INIT_2_MEMPOOL, mbuf) }
-}
-
-fn is_free(mempool: &OsMempool, mbuf: *const OsMbuf) -> bool {
-    let mut next = mempool.first as *const OsMbuf;
-    loop {
-        if next.is_null() {
-            break false;
-        }
-
-        if next == mbuf {
-            break true;
-        }
-
-        next = unsafe { (*next).next };
     }
 }
 
