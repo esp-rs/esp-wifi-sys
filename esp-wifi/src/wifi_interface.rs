@@ -450,6 +450,23 @@ impl<'s, 'n: 's> Socket<'s, 'n> {
         Ok(())
     }
 
+    pub fn listen_unblocking<'i>(&'i mut self, port: u16) -> Result<(), IoError>
+    where
+        's: 'i,
+    {
+        {
+            let res = self.network.with_mut(|_interface, _device, sockets| {
+                let sock = sockets.get_mut::<TcpSocket>(self.socket_handle);
+                sock.listen(port)
+            });
+
+            res.map_err(|e| IoError::ListenError(e))?;
+        }
+
+        self.work();
+        Ok(())
+    }
+
     pub fn close(&mut self) {
         self.network.with_mut(|_interface, _device, sockets| {
             sockets.get_mut::<TcpSocket>(self.socket_handle).close();
