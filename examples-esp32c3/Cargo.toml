@@ -28,7 +28,7 @@ embedded-hal-async = {workspace = true, optional = true }
 [features]
 default = ["esp32c3"]
 esp32c3 = ["embassy-executor/arch-riscv32"]
-async = ["esp-wifi/async", "bleps/async", "dep:embedded-hal-async", "esp32c3-hal/async"]
+async = ["esp-wifi/async", "bleps/async", "dep:embedded-hal-async", "esp32c3-hal/async", "esp32c3-hal/embassy-time-timg0"]
 embassy-net = ["esp-wifi/embassy-net","dep:embassy-net"]
 wifi-logs = ["esp-wifi/wifi-logs"]
 dump-packets = ["esp-wifi/dump-packets"]
