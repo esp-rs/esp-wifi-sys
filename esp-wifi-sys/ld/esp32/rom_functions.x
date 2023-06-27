@@ -1965,3 +1965,5 @@ PROVIDE ( TASK_DESC_LLD = 0x3ff98b58 );
 
 PROVIDE ( __bswapsi2 = 0x4006499c );
 PROVIDE ( __popcountsi2 = 0x40002ed0 );
+
+PROVIDE ( esp_rom_crc32_le = crc32_le );

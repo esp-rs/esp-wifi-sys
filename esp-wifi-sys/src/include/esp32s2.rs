@@ -707,10 +707,13 @@ pub const EXIT_SUCCESS: u32 = 0;
 pub const RAND_MAX: u32 = 2147483647;
 pub const CONFIG_SOC_ADC_SUPPORTED: u32 = 1;
 pub const CONFIG_SOC_DAC_SUPPORTED: u32 = 1;
+pub const CONFIG_SOC_UART_SUPPORTED: u32 = 1;
 pub const CONFIG_SOC_TWAI_SUPPORTED: u32 = 1;
 pub const CONFIG_SOC_CP_DMA_SUPPORTED: u32 = 1;
 pub const CONFIG_SOC_DEDICATED_GPIO_SUPPORTED: u32 = 1;
+pub const CONFIG_SOC_GPTIMER_SUPPORTED: u32 = 1;
 pub const CONFIG_SOC_SUPPORTS_SECURE_DL_MODE: u32 = 1;
+pub const CONFIG_SOC_ULP_FSM_SUPPORTED: u32 = 1;
 pub const CONFIG_SOC_RISCV_COPROC_SUPPORTED: u32 = 1;
 pub const CONFIG_SOC_USB_OTG_SUPPORTED: u32 = 1;
 pub const CONFIG_SOC_PCNT_SUPPORTED: u32 = 1;
@@ -742,11 +745,13 @@ pub const CONFIG_SOC_FLASH_ENC_SUPPORTED: u32 = 1;
 pub const CONFIG_SOC_SECURE_BOOT_SUPPORTED: u32 = 1;
 pub const CONFIG_SOC_MEMPROT_SUPPORTED: u32 = 1;
 pub const CONFIG_SOC_TOUCH_SENSOR_SUPPORTED: u32 = 1;
+pub const CONFIG_SOC_BOD_SUPPORTED: u32 = 1;
 pub const CONFIG_SOC_XTAL_SUPPORT_40M: u32 = 1;
 pub const CONFIG_SOC_ADC_RTC_CTRL_SUPPORTED: u32 = 1;
 pub const CONFIG_SOC_ADC_DIG_CTRL_SUPPORTED: u32 = 1;
 pub const CONFIG_SOC_ADC_ARBITER_SUPPORTED: u32 = 1;
-pub const CONFIG_SOC_ADC_FILTER_SUPPORTED: u32 = 1;
+pub const CONFIG_SOC_ADC_DIG_IIR_FILTER_SUPPORTED: u32 = 1;
+pub const CONFIG_SOC_ADC_DIG_IIR_FILTER_UNIT_BINDED: u32 = 1;
 pub const CONFIG_SOC_ADC_MONITOR_SUPPORTED: u32 = 1;
 pub const CONFIG_SOC_ADC_DMA_SUPPORTED: u32 = 1;
 pub const CONFIG_SOC_ADC_PERIPH_NUM: u32 = 2;
@@ -756,6 +761,7 @@ pub const CONFIG_SOC_ADC_DIGI_CONTROLLER_NUM: u32 = 2;
 pub const CONFIG_SOC_ADC_PATT_LEN_MAX: u32 = 32;
 pub const CONFIG_SOC_ADC_DIGI_MIN_BITWIDTH: u32 = 12;
 pub const CONFIG_SOC_ADC_DIGI_MAX_BITWIDTH: u32 = 12;
+pub const CONFIG_SOC_ADC_DIGI_IIR_FILTER_NUM: u32 = 2;
 pub const CONFIG_SOC_ADC_DIGI_RESULT_BYTES: u32 = 2;
 pub const CONFIG_SOC_ADC_DIGI_DATA_BYTES_PER_CONV: u32 = 2;
 pub const CONFIG_SOC_ADC_SAMPLE_FREQ_THRES_HIGH: u32 = 83333;
@@ -763,8 +769,9 @@ pub const CONFIG_SOC_ADC_SAMPLE_FREQ_THRES_LOW: u32 = 611;
 pub const CONFIG_SOC_ADC_RTC_MIN_BITWIDTH: u32 = 13;
 pub const CONFIG_SOC_ADC_RTC_MAX_BITWIDTH: u32 = 13;
 pub const CONFIG_SOC_ADC_CALIBRATION_V1_SUPPORTED: u32 = 1;
+pub const CONFIG_SOC_ADC_SELF_HW_CALI_SUPPORTED: u32 = 1;
 pub const CONFIG_SOC_BROWNOUT_RESET_SUPPORTED: u32 = 1;
-pub const CONFIG_SOC_MMU_LINEAR_ADDRESS_REGION_NUM: u32 = 6;
+pub const CONFIG_SOC_CACHE_WRITEBACK_SUPPORTED: u32 = 1;
 pub const CONFIG_SOC_CP_DMA_MAX_BUFFER_SIZE: u32 = 4095;
 pub const CONFIG_SOC_CPU_CORES_NUM: u32 = 1;
 pub const CONFIG_SOC_CPU_INTR_NUM: u32 = 32;
@@ -781,7 +788,6 @@ pub const CONFIG_SOC_GPIO_SUPPORT_RTC_INDEPENDENT: u32 = 1;
 pub const CONFIG_SOC_GPIO_SUPPORT_FORCE_HOLD: u32 = 1;
 pub const CONFIG_SOC_GPIO_VALID_GPIO_MASK: u64 = 140737488355327;
 pub const CONFIG_SOC_GPIO_VALID_DIGITAL_IO_PAD_MASK: u64 = 140737421246464;
-pub const CONFIG_SOC_GPIO_SUPPORT_SLP_SWITCH: u32 = 1;
 pub const CONFIG_SOC_DEDIC_GPIO_OUT_CHANNELS_NUM: u32 = 8;
 pub const CONFIG_SOC_DEDIC_GPIO_IN_CHANNELS_NUM: u32 = 8;
 pub const CONFIG_SOC_DEDIC_GPIO_ALLOW_REG_ACCESS: u32 = 1;
@@ -813,7 +819,8 @@ pub const CONFIG_SOC_LEDC_SUPPORT_XTAL_CLOCK: u32 = 1;
 pub const CONFIG_SOC_LEDC_CHANNEL_NUM: u32 = 8;
 pub const CONFIG_SOC_LEDC_TIMER_BIT_WIDTH: u32 = 14;
 pub const CONFIG_SOC_LEDC_SUPPORT_FADE_STOP: u32 = 1;
-pub const CONFIG_SOC_LEDC_GAMMA_FADE_RANGE_MAX: u32 = 1;
+pub const CONFIG_SOC_MMU_LINEAR_ADDRESS_REGION_NUM: u32 = 5;
+pub const CONFIG_SOC_MMU_PERIPH_NUM: u32 = 1;
 pub const CONFIG_SOC_MPU_MIN_REGION_SIZE: u32 = 536870912;
 pub const CONFIG_SOC_MPU_REGIONS_MAX_NUM: u32 = 8;
 pub const CONFIG_SOC_PCNT_GROUPS: u32 = 1;
@@ -850,6 +857,7 @@ pub const CONFIG_SOC_SPI_SUPPORT_DDRCLK: u32 = 1;
 pub const CONFIG_SOC_SPI_SLAVE_SUPPORT_SEG_TRANS: u32 = 1;
 pub const CONFIG_SOC_SPI_SUPPORT_CD_SIG: u32 = 1;
 pub const CONFIG_SOC_SPI_SUPPORT_CONTINUOUS_TRANS: u32 = 1;
+pub const CONFIG_SOC_SPI_SUPPORT_CLK_APB: u32 = 1;
 pub const CONFIG_SOC_SPI_SUPPORT_SLAVE_HD_VER2: u32 = 1;
 pub const CONFIG_SOC_SPI_PERIPH_SUPPORT_CONTROL_DUMMY_OUT: u32 = 1;
 pub const CONFIG_SOC_MEMSPI_IS_INDEPENDENT: u32 = 1;
@@ -902,6 +910,13 @@ pub const CONFIG_SOC_SHA_SUPPORT_SHA512_T: u32 = 1;
 pub const CONFIG_SOC_RSA_MAX_BIT_LEN: u32 = 4096;
 pub const CONFIG_SOC_AES_SUPPORT_DMA: u32 = 1;
 pub const CONFIG_SOC_AES_SUPPORT_GCM: u32 = 1;
+pub const CONFIG_SOC_EFUSE_DIS_DOWNLOAD_ICACHE: u32 = 1;
+pub const CONFIG_SOC_EFUSE_DIS_DOWNLOAD_DCACHE: u32 = 1;
+pub const CONFIG_SOC_EFUSE_HARD_DIS_JTAG: u32 = 1;
+pub const CONFIG_SOC_EFUSE_SOFT_DIS_JTAG: u32 = 1;
+pub const CONFIG_SOC_EFUSE_DIS_BOOT_REMAP: u32 = 1;
+pub const CONFIG_SOC_EFUSE_DIS_LEGACY_SPI_BOOT: u32 = 1;
+pub const CONFIG_SOC_EFUSE_DIS_ICACHE: u32 = 1;
 pub const CONFIG_SOC_SECURE_BOOT_V2_RSA: u32 = 1;
 pub const CONFIG_SOC_EFUSE_SECURE_BOOT_KEY_DIGESTS: u32 = 3;
 pub const CONFIG_SOC_EFUSE_REVOKE_BOOT_KEY_DIGESTS: u32 = 1;
@@ -923,14 +938,19 @@ pub const CONFIG_SOC_SPI_MEM_SUPPORT_AUTO_WAIT_IDLE: u32 = 1;
 pub const CONFIG_SOC_SPI_MEM_SUPPORT_AUTO_SUSPEND: u32 = 1;
 pub const CONFIG_SOC_SPI_MEM_SUPPORT_SW_SUSPEND: u32 = 1;
 pub const CONFIG_SOC_SPI_MEM_SUPPORT_CONFIG_GPIO_BY_EFUSE: u32 = 1;
+pub const CONFIG_SOC_SPI_MEM_SUPPORT_WRAP: u32 = 1;
+pub const CONFIG_SOC_PM_SUPPORT_EXT0_WAKEUP: u32 = 1;
+pub const CONFIG_SOC_PM_SUPPORT_EXT1_WAKEUP: u32 = 1;
 pub const CONFIG_SOC_PM_SUPPORT_EXT_WAKEUP: u32 = 1;
 pub const CONFIG_SOC_PM_SUPPORT_WIFI_WAKEUP: u32 = 1;
+pub const CONFIG_SOC_PM_SUPPORT_TOUCH_SENSOR_WAKEUP: u32 = 1;
 pub const CONFIG_SOC_PM_SUPPORT_WIFI_PD: u32 = 1;
 pub const CONFIG_SOC_PM_SUPPORT_RTC_PERIPH_PD: u32 = 1;
-pub const CONFIG_SOC_PM_SUPPORT_TOUCH_SENSOR_WAKEUP: u32 = 1;
 pub const CONFIG_SOC_PM_SUPPORT_RTC_FAST_MEM_PD: u32 = 1;
 pub const CONFIG_SOC_PM_SUPPORT_RTC_SLOW_MEM_PD: u32 = 1;
 pub const CONFIG_SOC_PM_SUPPORT_RC_FAST_PD: u32 = 1;
+pub const CONFIG_SOC_PM_SUPPORT_VDDSDIO_PD: u32 = 1;
+pub const CONFIG_SOC_CONFIGURABLE_VDDSDIO_SUPPORTED: u32 = 1;
 pub const CONFIG_SOC_CLK_APLL_SUPPORTED: u32 = 1;
 pub const CONFIG_SOC_APLL_MULTIPLIER_OUT_MIN_HZ: u32 = 350000000;
 pub const CONFIG_SOC_APLL_MULTIPLIER_OUT_MAX_HZ: u32 = 500000000;
@@ -939,6 +959,7 @@ pub const CONFIG_SOC_APLL_MAX_HZ: u32 = 125000000;
 pub const CONFIG_SOC_CLK_RC_FAST_D256_SUPPORTED: u32 = 1;
 pub const CONFIG_SOC_RTC_SLOW_CLK_SUPPORT_RC_FAST_D256: u32 = 1;
 pub const CONFIG_SOC_CLK_RC_FAST_SUPPORT_CALIBRATION: u32 = 1;
+pub const CONFIG_SOC_CLK_XTAL32K_SUPPORTED: u32 = 1;
 pub const CONFIG_SOC_COEX_HW_PTI: u32 = 1;
 pub const CONFIG_SOC_TEMPERATURE_SENSOR_SUPPORT_FAST_RC: u32 = 1;
 pub const CONFIG_SOC_WIFI_HW_TSF: u32 = 1;
@@ -946,6 +967,9 @@ pub const CONFIG_SOC_WIFI_FTM_SUPPORT: u32 = 1;
 pub const CONFIG_SOC_WIFI_WAPI_SUPPORT: u32 = 1;
 pub const CONFIG_SOC_WIFI_CSI_SUPPORT: u32 = 1;
 pub const CONFIG_SOC_WIFI_MESH_SUPPORT: u32 = 1;
+pub const CONFIG_SOC_WIFI_SUPPORT_VARIABLE_BEACON_WINDOW: u32 = 1;
+pub const CONFIG_SOC_WIFI_NAN_SUPPORT: u32 = 1;
+pub const CONFIG_SOC_ULP_HAS_ADC: u32 = 1;
 pub const CONFIG_IDF_CMAKE: u32 = 1;
 pub const CONFIG_IDF_TARGET_ARCH_XTENSA: u32 = 1;
 pub const CONFIG_IDF_TARGET_ARCH: &[u8; 7usize] = b"xtensa\0";
@@ -973,8 +997,10 @@ pub const CONFIG_APP_COMPILE_TIME_DATE: u32 = 1;
 pub const CONFIG_APP_RETRIEVE_LEN_ELF_SHA: u32 = 16;
 pub const CONFIG_ESP_ROM_HAS_CRC_LE: u32 = 1;
 pub const CONFIG_ESP_ROM_HAS_MZ_CRC32: u32 = 1;
+pub const CONFIG_ESP_ROM_HAS_UART_BUF_SWITCH: u32 = 1;
 pub const CONFIG_ESP_ROM_NEEDS_SWSETUP_WORKAROUND: u32 = 1;
 pub const CONFIG_ESP_ROM_HAS_REGI2C_BUG: u32 = 1;
+pub const CONFIG_ESP_ROM_HAS_NEWLIB_NANO_FORMAT: u32 = 1;
 pub const CONFIG_BOOT_ROM_LOG_ALWAYS_ON: u32 = 1;
 pub const CONFIG_ESPTOOLPY_FLASHMODE_DIO: u32 = 1;
 pub const CONFIG_ESPTOOLPY_FLASH_SAMPLE_MODE_STR: u32 = 1;
@@ -1007,6 +1033,7 @@ pub const CONFIG_APPTRACE_LOCK_ENABLE: u32 = 1;
 pub const CONFIG_ADC_DISABLE_DAC: u32 = 1;
 pub const CONFIG_SPI_MASTER_ISR_IN_IRAM: u32 = 1;
 pub const CONFIG_SPI_SLAVE_ISR_IN_IRAM: u32 = 1;
+pub const CONFIG_TWAI_ERRATA_FIX_LISTEN_ONLY_DOM: u32 = 1;
 pub const CONFIG_EFUSE_MAX_BLK_LEN: u32 = 256;
 pub const CONFIG_ESP_TLS_USING_MBEDTLS: u32 = 1;
 pub const CONFIG_ESP_TLS_USE_DS_PERIPHERAL: u32 = 1;
@@ -1035,9 +1062,7 @@ pub const CONFIG_ESP_SLEEP_RTC_BUS_ISO_WORKAROUND: u32 = 1;
 pub const CONFIG_ESP_SLEEP_FLASH_LEAKAGE_WORKAROUND: u32 = 1;
 pub const CONFIG_RTC_CLK_SRC_INT_RC: u32 = 1;
 pub const CONFIG_RTC_CLK_CAL_CYCLES: u32 = 576;
-pub const CONFIG_MMU_PAGE_SIZE_64KB: u32 = 1;
-pub const CONFIG_MMU_PAGE_MODE: &[u8; 5usize] = b"64KB\0";
-pub const CONFIG_MMU_PAGE_SIZE: u32 = 65536;
+pub const CONFIG_PERIPH_CTRL_FUNC_IN_IRAM: u32 = 1;
 pub const CONFIG_XTAL_FREQ_40: u32 = 1;
 pub const CONFIG_XTAL_FREQ: u32 = 40;
 pub const CONFIG_LCD_PANEL_IO_FORMAT_BUF_SIZE: u32 = 32;
@@ -1047,12 +1072,13 @@ pub const CONFIG_ESP_NETIF_USES_TCPIP_WITH_BSD_API: u32 = 1;
 pub const CONFIG_ESP_PHY_CALIBRATION_AND_DATA_STORAGE: u32 = 1;
 pub const CONFIG_ESP_PHY_MAX_WIFI_TX_POWER: u32 = 20;
 pub const CONFIG_ESP_PHY_MAX_TX_POWER: u32 = 20;
-pub const CONFIG_ESP_PHY_REDUCE_TX_POWER: u32 = 1;
+pub const CONFIG_ESP_PHY_RF_CAL_PARTIAL: u32 = 1;
+pub const CONFIG_ESP_PHY_CALIBRATION_MODE: u32 = 0;
 pub const CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ_160: u32 = 1;
 pub const CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ: u32 = 160;
 pub const CONFIG_ESP32S2_INSTRUCTION_CACHE_8KB: u32 = 1;
 pub const CONFIG_ESP32S2_INSTRUCTION_CACHE_LINE_32B: u32 = 1;
-pub const CONFIG_ESP32S2_DATA_CACHE_0KB: u32 = 1;
+pub const CONFIG_ESP32S2_DATA_CACHE_8KB: u32 = 1;
 pub const CONFIG_ESP32S2_DATA_CACHE_LINE_32B: u32 = 1;
 pub const CONFIG_ESP32S2_TRACEMEM_RESERVE_DRAM: u32 = 0;
 pub const CONFIG_ESP_SYSTEM_PANIC_PRINT_REBOOT: u32 = 1;
@@ -1090,22 +1116,26 @@ pub const CONFIG_ESP_TIME_FUNCS_USE_RTC_TIMER: u32 = 1;
 pub const CONFIG_ESP_TIME_FUNCS_USE_ESP_TIMER: u32 = 1;
 pub const CONFIG_ESP_TIMER_TASK_STACK_SIZE: u32 = 3584;
 pub const CONFIG_ESP_TIMER_INTERRUPT_LEVEL: u32 = 1;
+pub const CONFIG_ESP_TIMER_TASK_AFFINITY: u32 = 0;
+pub const CONFIG_ESP_TIMER_TASK_AFFINITY_CPU0: u32 = 1;
+pub const CONFIG_ESP_TIMER_ISR_AFFINITY: u32 = 1;
+pub const CONFIG_ESP_TIMER_ISR_AFFINITY_CPU0: u32 = 1;
 pub const CONFIG_ESP_TIMER_IMPL_SYSTIMER: u32 = 1;
-pub const CONFIG_ESP32_WIFI_ENABLED: u32 = 1;
-pub const CONFIG_ESP32_WIFI_STATIC_RX_BUFFER_NUM: u32 = 10;
-pub const CONFIG_ESP32_WIFI_DYNAMIC_RX_BUFFER_NUM: u32 = 32;
-pub const CONFIG_ESP32_WIFI_DYNAMIC_TX_BUFFER: u32 = 1;
-pub const CONFIG_ESP32_WIFI_TX_BUFFER_TYPE: u32 = 1;
-pub const CONFIG_ESP32_WIFI_DYNAMIC_TX_BUFFER_NUM: u32 = 32;
-pub const CONFIG_ESP32_WIFI_AMPDU_TX_ENABLED: u32 = 1;
-pub const CONFIG_ESP32_WIFI_TX_BA_WIN: u32 = 6;
-pub const CONFIG_ESP32_WIFI_AMPDU_RX_ENABLED: u32 = 1;
-pub const CONFIG_ESP32_WIFI_RX_BA_WIN: u32 = 6;
-pub const CONFIG_ESP32_WIFI_NVS_ENABLED: u32 = 1;
-pub const CONFIG_ESP32_WIFI_SOFTAP_BEACON_MAX_LEN: u32 = 752;
-pub const CONFIG_ESP32_WIFI_MGMT_SBUF_NUM: u32 = 32;
-pub const CONFIG_ESP32_WIFI_IRAM_OPT: u32 = 1;
-pub const CONFIG_ESP32_WIFI_RX_IRAM_OPT: u32 = 1;
+pub const CONFIG_ESP_WIFI_ENABLED: u32 = 1;
+pub const CONFIG_ESP_WIFI_STATIC_RX_BUFFER_NUM: u32 = 10;
+pub const CONFIG_ESP_WIFI_DYNAMIC_RX_BUFFER_NUM: u32 = 32;
+pub const CONFIG_ESP_WIFI_DYNAMIC_TX_BUFFER: u32 = 1;
+pub const CONFIG_ESP_WIFI_TX_BUFFER_TYPE: u32 = 1;
+pub const CONFIG_ESP_WIFI_DYNAMIC_TX_BUFFER_NUM: u32 = 32;
+pub const CONFIG_ESP_WIFI_AMPDU_TX_ENABLED: u32 = 1;
+pub const CONFIG_ESP_WIFI_TX_BA_WIN: u32 = 6;
+pub const CONFIG_ESP_WIFI_AMPDU_RX_ENABLED: u32 = 1;
+pub const CONFIG_ESP_WIFI_RX_BA_WIN: u32 = 6;
+pub const CONFIG_ESP_WIFI_NVS_ENABLED: u32 = 1;
+pub const CONFIG_ESP_WIFI_SOFTAP_BEACON_MAX_LEN: u32 = 752;
+pub const CONFIG_ESP_WIFI_MGMT_SBUF_NUM: u32 = 32;
+pub const CONFIG_ESP_WIFI_IRAM_OPT: u32 = 1;
+pub const CONFIG_ESP_WIFI_RX_IRAM_OPT: u32 = 1;
 pub const CONFIG_ESP_WIFI_STA_DISCONNECTED_PM_ENABLE: u32 = 1;
 pub const CONFIG_ESP_WIFI_SOFTAP_SUPPORT: u32 = 1;
 pub const CONFIG_ESP_WIFI_ESPNOW_MAX_ENCRYPT_NUM: u32 = 7;
@@ -1118,6 +1148,7 @@ pub const CONFIG_FATFS_CODEPAGE: u32 = 437;
 pub const CONFIG_FATFS_FS_LOCK: u32 = 0;
 pub const CONFIG_FATFS_TIMEOUT_MS: u32 = 10000;
 pub const CONFIG_FATFS_PER_FILE_CACHE: u32 = 1;
+pub const CONFIG_FATFS_VFS_FSTAT_BLKSIZE: u32 = 0;
 pub const CONFIG_FREERTOS_UNICORE: u32 = 1;
 pub const CONFIG_FREERTOS_HZ: u32 = 100;
 pub const CONFIG_FREERTOS_OPTIMIZED_SCHEDULER: u32 = 1;
@@ -1143,8 +1174,12 @@ pub const CONFIG_FREERTOS_SUPPORT_STATIC_ALLOCATION: u32 = 1;
 pub const CONFIG_FREERTOS_DEBUG_OCDAWARE: u32 = 1;
 pub const CONFIG_HAL_ASSERTION_EQUALS_SYSTEM: u32 = 1;
 pub const CONFIG_HAL_DEFAULT_ASSERTION_LEVEL: u32 = 2;
+pub const CONFIG_HAL_SPI_MASTER_FUNC_IN_IRAM: u32 = 1;
+pub const CONFIG_HAL_SPI_SLAVE_FUNC_IN_IRAM: u32 = 1;
 pub const CONFIG_HEAP_POISONING_DISABLED: u32 = 1;
 pub const CONFIG_HEAP_TRACING_OFF: u32 = 1;
+pub const CONFIG_IEEE802154_CCA_THRESHOLD: i32 = -60;
+pub const CONFIG_IEEE802154_PENDING_TABLE_SIZE: u32 = 20;
 pub const CONFIG_LOG_DEFAULT_LEVEL_INFO: u32 = 1;
 pub const CONFIG_LOG_DEFAULT_LEVEL: u32 = 3;
 pub const CONFIG_LOG_MAXIMUM_EQUALS_DEFAULT: u32 = 1;
@@ -1162,14 +1197,18 @@ pub const CONFIG_LWIP_IP6_FRAG: u32 = 1;
 pub const CONFIG_LWIP_IP_REASS_MAX_PBUFS: u32 = 10;
 pub const CONFIG_LWIP_ESP_GRATUITOUS_ARP: u32 = 1;
 pub const CONFIG_LWIP_GARP_TMR_INTERVAL: u32 = 60;
+pub const CONFIG_LWIP_ESP_MLDV6_REPORT: u32 = 1;
+pub const CONFIG_LWIP_MLDV6_TMR_INTERVAL: u32 = 40;
 pub const CONFIG_LWIP_TCPIP_RECVMBOX_SIZE: u32 = 32;
 pub const CONFIG_LWIP_DHCP_DOES_ARP_CHECK: u32 = 1;
 pub const CONFIG_LWIP_DHCP_DISABLE_VENDOR_CLASS_ID: u32 = 1;
 pub const CONFIG_LWIP_DHCP_OPTIONS_LEN: u32 = 68;
 pub const CONFIG_LWIP_NUM_NETIF_CLIENT_DATA: u32 = 0;
+pub const CONFIG_LWIP_DHCP_COARSE_TIMER_SECS: u32 = 1;
 pub const CONFIG_LWIP_DHCPS: u32 = 1;
 pub const CONFIG_LWIP_DHCPS_LEASE_UNIT: u32 = 60;
 pub const CONFIG_LWIP_DHCPS_MAX_STATION_NUM: u32 = 8;
+pub const CONFIG_LWIP_IPV4: u32 = 1;
 pub const CONFIG_LWIP_IPV6: u32 = 1;
 pub const CONFIG_LWIP_IPV6_NUM_ADDRESSES: u32 = 3;
 pub const CONFIG_LWIP_NETIF_LOOPBACK: u32 = 1;
@@ -1213,6 +1252,7 @@ pub const CONFIG_MBEDTLS_ASYMMETRIC_CONTENT_LEN: u32 = 1;
 pub const CONFIG_MBEDTLS_SSL_IN_CONTENT_LEN: u32 = 16384;
 pub const CONFIG_MBEDTLS_SSL_OUT_CONTENT_LEN: u32 = 4096;
 pub const CONFIG_MBEDTLS_SSL_KEEP_PEER_CERTIFICATE: u32 = 1;
+pub const CONFIG_MBEDTLS_PKCS7_C: u32 = 1;
 pub const CONFIG_MBEDTLS_CERTIFICATE_BUNDLE: u32 = 1;
 pub const CONFIG_MBEDTLS_CERTIFICATE_BUNDLE_DEFAULT_FULL: u32 = 1;
 pub const CONFIG_MBEDTLS_CERTIFICATE_BUNDLE_MAX_CERTS: u32 = 200;
@@ -1278,6 +1318,9 @@ pub const CONFIG_PTHREAD_TASK_PRIO_DEFAULT: u32 = 5;
 pub const CONFIG_PTHREAD_TASK_STACK_SIZE_DEFAULT: u32 = 3072;
 pub const CONFIG_PTHREAD_TASK_CORE_DEFAULT: i32 = -1;
 pub const CONFIG_PTHREAD_TASK_NAME_DEFAULT: &[u8; 8usize] = b"pthread\0";
+pub const CONFIG_MMU_PAGE_SIZE_64KB: u32 = 1;
+pub const CONFIG_MMU_PAGE_MODE: &[u8; 5usize] = b"64KB\0";
+pub const CONFIG_MMU_PAGE_SIZE: u32 = 65536;
 pub const CONFIG_SPI_FLASH_ROM_DRIVER_PATCH: u32 = 1;
 pub const CONFIG_SPI_FLASH_DANGEROUS_WRITE_ABORTS: u32 = 1;
 pub const CONFIG_SPI_FLASH_YIELD_DURING_ERASE: u32 = 1;
@@ -1286,6 +1329,13 @@ pub const CONFIG_SPI_FLASH_ERASE_YIELD_TICKS: u32 = 1;
 pub const CONFIG_SPI_FLASH_WRITE_CHUNK_SIZE: u32 = 8192;
 pub const CONFIG_SPI_FLASH_BROWNOUT_RESET_XMC: u32 = 1;
 pub const CONFIG_SPI_FLASH_BROWNOUT_RESET: u32 = 1;
+pub const CONFIG_SPI_FLASH_VENDOR_XMC_SUPPORTED: u32 = 1;
+pub const CONFIG_SPI_FLASH_VENDOR_GD_SUPPORTED: u32 = 1;
+pub const CONFIG_SPI_FLASH_VENDOR_ISSI_SUPPORTED: u32 = 1;
+pub const CONFIG_SPI_FLASH_VENDOR_MXIC_SUPPORTED: u32 = 1;
+pub const CONFIG_SPI_FLASH_VENDOR_WINBOND_SUPPORTED: u32 = 1;
+pub const CONFIG_SPI_FLASH_VENDOR_BOYA_SUPPORTED: u32 = 1;
+pub const CONFIG_SPI_FLASH_VENDOR_TH_SUPPORTED: u32 = 1;
 pub const CONFIG_SPI_FLASH_SUPPORT_ISSI_CHIP: u32 = 1;
 pub const CONFIG_SPI_FLASH_SUPPORT_MXIC_CHIP: u32 = 1;
 pub const CONFIG_SPI_FLASH_SUPPORT_GD_CHIP: u32 = 1;
@@ -1312,6 +1362,10 @@ pub const CONFIG_UNITY_ENABLE_IDF_TEST_RUNNER: u32 = 1;
 pub const CONFIG_USB_OTG_SUPPORTED: u32 = 1;
 pub const CONFIG_USB_HOST_CONTROL_TRANSFER_MAX_SIZE: u32 = 256;
 pub const CONFIG_USB_HOST_HW_BUFFER_BIAS_BALANCED: u32 = 1;
+pub const CONFIG_USB_HOST_DEBOUNCE_DELAY_MS: u32 = 250;
+pub const CONFIG_USB_HOST_RESET_HOLD_MS: u32 = 30;
+pub const CONFIG_USB_HOST_RESET_RECOVERY_MS: u32 = 30;
+pub const CONFIG_USB_HOST_SET_ADDR_RECOVERY_MS: u32 = 10;
 pub const CONFIG_VFS_SUPPORT_IO: u32 = 1;
 pub const CONFIG_VFS_SUPPORT_DIR: u32 = 1;
 pub const CONFIG_VFS_SUPPORT_SELECT: u32 = 1;
@@ -1355,7 +1409,21 @@ pub const CONFIG_ESP32_PTHREAD_TASK_CORE_DEFAULT: i32 = -1;
 pub const CONFIG_ESP32_PTHREAD_TASK_NAME_DEFAULT: &[u8; 8usize] = b"pthread\0";
 pub const CONFIG_ESP32_PTHREAD_TASK_PRIO_DEFAULT: u32 = 5;
 pub const CONFIG_ESP32_PTHREAD_TASK_STACK_SIZE_DEFAULT: u32 = 3072;
-pub const CONFIG_ESP32_REDUCE_PHY_TX_POWER: u32 = 1;
+pub const CONFIG_ESP32_WIFI_AMPDU_RX_ENABLED: u32 = 1;
+pub const CONFIG_ESP32_WIFI_AMPDU_TX_ENABLED: u32 = 1;
+pub const CONFIG_ESP32_WIFI_DYNAMIC_RX_BUFFER_NUM: u32 = 32;
+pub const CONFIG_ESP32_WIFI_DYNAMIC_TX_BUFFER: u32 = 1;
+pub const CONFIG_ESP32_WIFI_DYNAMIC_TX_BUFFER_NUM: u32 = 32;
+pub const CONFIG_ESP32_WIFI_ENABLED: u32 = 1;
+pub const CONFIG_ESP32_WIFI_IRAM_OPT: u32 = 1;
+pub const CONFIG_ESP32_WIFI_MGMT_SBUF_NUM: u32 = 32;
+pub const CONFIG_ESP32_WIFI_NVS_ENABLED: u32 = 1;
+pub const CONFIG_ESP32_WIFI_RX_BA_WIN: u32 = 6;
+pub const CONFIG_ESP32_WIFI_RX_IRAM_OPT: u32 = 1;
+pub const CONFIG_ESP32_WIFI_SOFTAP_BEACON_MAX_LEN: u32 = 752;
+pub const CONFIG_ESP32_WIFI_STATIC_RX_BUFFER_NUM: u32 = 10;
+pub const CONFIG_ESP32_WIFI_TX_BA_WIN: u32 = 6;
+pub const CONFIG_ESP32_WIFI_TX_BUFFER_TYPE: u32 = 1;
 pub const CONFIG_ESP_GRATUITOUS_ARP: u32 = 1;
 pub const CONFIG_ESP_TASK_WDT: u32 = 1;
 pub const CONFIG_FLASHMODE_DIO: u32 = 1;
@@ -1372,7 +1440,6 @@ pub const CONFIG_OPTIMIZATION_ASSERTION_LEVEL: u32 = 2;
 pub const CONFIG_OPTIMIZATION_LEVEL_RELEASE: u32 = 1;
 pub const CONFIG_POST_EVENTS_FROM_IRAM_ISR: u32 = 1;
 pub const CONFIG_POST_EVENTS_FROM_ISR: u32 = 1;
-pub const CONFIG_REDUCE_PHY_TX_POWER: u32 = 1;
 pub const CONFIG_SEMIHOSTFS_MAX_MOUNT_POINTS: u32 = 1;
 pub const CONFIG_SPI_FLASH_WRITING_DANGEROUS_REGIONS_ABORTS: u32 = 1;
 pub const CONFIG_STACK_CHECK_NONE: u32 = 1;
@@ -1380,6 +1447,7 @@ pub const CONFIG_SUPPORT_TERMIOS: u32 = 1;
 pub const CONFIG_SUPPRESS_SELECT_DEBUG_OUTPUT: u32 = 1;
 pub const CONFIG_SYSTEM_EVENT_QUEUE_SIZE: u32 = 32;
 pub const CONFIG_SYSTEM_EVENT_TASK_STACK_SIZE: u32 = 2304;
+pub const CONFIG_TASK_WDT: u32 = 1;
 pub const CONFIG_TASK_WDT_CHECK_IDLE_TASK_CPU0: u32 = 1;
 pub const CONFIG_TASK_WDT_TIMEOUT_S: u32 = 5;
 pub const CONFIG_TCPIP_RECVMBOX_SIZE: u32 = 32;
@@ -1429,6 +1497,7 @@ pub const WIFI_PROTOCOL_11G: u32 = 2;
 pub const WIFI_PROTOCOL_11N: u32 = 4;
 pub const WIFI_PROTOCOL_LR: u32 = 8;
 pub const WIFI_PROTOCOL_11AX: u32 = 16;
+pub const SAE_H2E_IDENTIFIER_LEN: u32 = 32;
 pub const ESP_WIFI_MAX_CONN_NUM: u32 = 15;
 pub const WIFI_VENDOR_IE_ELEMENT_ID: u32 = 221;
 pub const WIFI_PROMIS_FILTER_MASK_ALL: u32 = 4294967295;
@@ -1451,6 +1520,13 @@ pub const WIFI_PROMIS_CTRL_FILTER_MASK_CFEND: u32 = 1073741824;
 pub const WIFI_PROMIS_CTRL_FILTER_MASK_CFENDACK: u32 = 2147483648;
 pub const WIFI_EVENT_MASK_ALL: u32 = 4294967295;
 pub const WIFI_EVENT_MASK_NONE: u32 = 0;
+pub const ESP_WIFI_NAN_MAX_SVC_SUPPORTED: u32 = 2;
+pub const ESP_WIFI_NAN_DATAPATH_MAX_PEERS: u32 = 2;
+pub const ESP_WIFI_NDP_ROLE_INITIATOR: u32 = 1;
+pub const ESP_WIFI_NDP_ROLE_RESPONDER: u32 = 2;
+pub const ESP_WIFI_MAX_SVC_NAME_LEN: u32 = 256;
+pub const ESP_WIFI_MAX_FILTER_LEN: u32 = 256;
+pub const ESP_WIFI_MAX_SVC_INFO_LEN: u32 = 64;
 pub const MAX_SSID_LEN: u32 = 32;
 pub const MAX_PASSPHRASE_LEN: u32 = 64;
 pub const MAX_WPS_AP_CRED: u32 = 3;
@@ -1488,6 +1564,7 @@ pub const ESP_ERR_WIFI_STOP_STATE: u32 = 12308;
 pub const ESP_ERR_WIFI_NOT_ASSOC: u32 = 12309;
 pub const ESP_ERR_WIFI_TX_DISALLOW: u32 = 12310;
 pub const ESP_ERR_WIFI_TWT_FULL: u32 = 12311;
+pub const ESP_ERR_WIFI_TWT_SETUP_TIMEOUT: u32 = 12312;
 pub const WIFI_STATIC_TX_BUFFER_NUM: u32 = 0;
 pub const WIFI_CACHE_TX_BUFFER_NUM: u32 = 0;
 pub const WIFI_DYNAMIC_TX_BUFFER_NUM: u32 = 32;
@@ -3925,13 +4002,15 @@ extern "C" {
         expression: *const crate::c_types::c_char,
     );
 }
-#[doc = "< ESP32 station interface"]
+#[doc = "< Station interface"]
 pub const esp_interface_t_ESP_IF_WIFI_STA: esp_interface_t = 0;
-#[doc = "< ESP32 soft-AP interface"]
+#[doc = "< Soft-AP interface"]
 pub const esp_interface_t_ESP_IF_WIFI_AP: esp_interface_t = 1;
-#[doc = "< ESP32 ethernet interface"]
-pub const esp_interface_t_ESP_IF_ETH: esp_interface_t = 2;
-pub const esp_interface_t_ESP_IF_MAX: esp_interface_t = 3;
+#[doc = "< NAN interface"]
+pub const esp_interface_t_ESP_IF_WIFI_NAN: esp_interface_t = 2;
+#[doc = "< Ethernet interface"]
+pub const esp_interface_t_ESP_IF_ETH: esp_interface_t = 3;
+pub const esp_interface_t_ESP_IF_MAX: esp_interface_t = 4;
 pub type esp_interface_t = crate::c_types::c_uint;
 pub type esp_event_base_t = *const crate::c_types::c_char;
 pub type esp_event_loop_handle_t = *mut crate::c_types::c_void;
@@ -3952,10 +4031,14 @@ pub const wifi_mode_t_WIFI_MODE_STA: wifi_mode_t = 1;
 pub const wifi_mode_t_WIFI_MODE_AP: wifi_mode_t = 2;
 #[doc = "< WiFi station + soft-AP mode"]
 pub const wifi_mode_t_WIFI_MODE_APSTA: wifi_mode_t = 3;
-pub const wifi_mode_t_WIFI_MODE_MAX: wifi_mode_t = 4;
+#[doc = "< WiFi NAN mode"]
+pub const wifi_mode_t_WIFI_MODE_NAN: wifi_mode_t = 4;
+pub const wifi_mode_t_WIFI_MODE_MAX: wifi_mode_t = 5;
 pub type wifi_mode_t = crate::c_types::c_uint;
 pub const wifi_interface_t_WIFI_IF_STA: wifi_interface_t = 0;
 pub const wifi_interface_t_WIFI_IF_AP: wifi_interface_t = 1;
+pub const wifi_interface_t_WIFI_IF_NAN: wifi_interface_t = 2;
+pub const wifi_interface_t_WIFI_IF_MAX: wifi_interface_t = 3;
 pub type wifi_interface_t = crate::c_types::c_uint;
 #[doc = "< Country policy is auto, use the country info of AP to which the station is connected"]
 pub const wifi_country_policy_t_WIFI_COUNTRY_POLICY_AUTO: wifi_country_policy_t = 0;
@@ -4055,6 +4138,7 @@ pub const wifi_err_reason_t_WIFI_REASON_CONNECTION_FAIL: wifi_err_reason_t = 205
 pub const wifi_err_reason_t_WIFI_REASON_AP_TSF_RESET: wifi_err_reason_t = 206;
 pub const wifi_err_reason_t_WIFI_REASON_ROAMING: wifi_err_reason_t = 207;
 pub const wifi_err_reason_t_WIFI_REASON_ASSOC_COMEBACK_TIME_TOO_LONG: wifi_err_reason_t = 208;
+pub const wifi_err_reason_t_WIFI_REASON_SA_QUERY_TIMEOUT: wifi_err_reason_t = 209;
 pub type wifi_err_reason_t = crate::c_types::c_uint;
 #[doc = "< the channel width is HT20"]
 pub const wifi_second_chan_t_WIFI_SECOND_CHAN_NONE: wifi_second_chan_t = 0;
@@ -4432,19 +4516,24 @@ pub const wifi_sae_pwe_method_t_WPA3_SAE_PWE_HASH_TO_ELEMENT: wifi_sae_pwe_metho
 pub const wifi_sae_pwe_method_t_WPA3_SAE_PWE_BOTH: wifi_sae_pwe_method_t = 3;
 #[doc = " Configuration for SAE PWE derivation"]
 pub type wifi_sae_pwe_method_t = crate::c_types::c_uint;
-#[doc = " @brief Soft-AP configuration settings for the ESP32"]
+pub const wifi_sae_pk_mode_t_WPA3_SAE_PK_MODE_AUTOMATIC: wifi_sae_pk_mode_t = 0;
+pub const wifi_sae_pk_mode_t_WPA3_SAE_PK_MODE_ONLY: wifi_sae_pk_mode_t = 1;
+pub const wifi_sae_pk_mode_t_WPA3_SAE_PK_MODE_DISABLED: wifi_sae_pk_mode_t = 2;
+#[doc = " Configuration for SAE-PK"]
+pub type wifi_sae_pk_mode_t = crate::c_types::c_uint;
+#[doc = " @brief Soft-AP configuration settings for the device"]
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct wifi_ap_config_t {
-    #[doc = "< SSID of ESP32 soft-AP. If ssid_len field is 0, this must be a Null terminated string. Otherwise, length is set according to ssid_len."]
+    #[doc = "< SSID of soft-AP. If ssid_len field is 0, this must be a Null terminated string. Otherwise, length is set according to ssid_len."]
     pub ssid: [u8; 32usize],
-    #[doc = "< Password of ESP32 soft-AP."]
+    #[doc = "< Password of soft-AP."]
     pub password: [u8; 64usize],
     #[doc = "< Optional length of SSID field."]
     pub ssid_len: u8,
-    #[doc = "< Channel of ESP32 soft-AP"]
+    #[doc = "< Channel of soft-AP"]
     pub channel: u8,
-    #[doc = "< Auth mode of ESP32 soft-AP. Do not support AUTH_WEP in soft-AP mode"]
+    #[doc = "< Auth mode of soft-AP. Do not support AUTH_WEP, AUTH_WAPI_PSK and AUTH_OWE in soft-AP mode. When the auth mode is set to WPA2_PSK, WPA2_WPA3_PSK or WPA3_PSK, the pairwise cipher will be overwritten with WIFI_CIPHER_TYPE_CCMP."]
     pub authmode: wifi_auth_mode_t,
     #[doc = "< Broadcast SSID or not, default 0, broadcast the SSID"]
     pub ssid_hidden: u8,
@@ -4452,14 +4541,16 @@ pub struct wifi_ap_config_t {
     pub max_connection: u8,
     #[doc = "< Beacon interval which should be multiples of 100. Unit: TU(time unit, 1 TU = 1024 us). Range: 100 ~ 60000. Default value: 100"]
     pub beacon_interval: u16,
-    #[doc = "< pairwise cipher of SoftAP, group cipher will be derived using this. cipher values are valid starting from WIFI_CIPHER_TYPE_TKIP, enum values before that will be considered as invalid and default cipher suites(TKIP+CCMP) will be used. Valid cipher suites in softAP mode are WIFI_CIPHER_TYPE_TKIP, WIFI_CIPHER_TYPE_CCMP and WIFI_CIPHER_TYPE_TKIP_CCMP."]
+    #[doc = "< Pairwise cipher of SoftAP, group cipher will be derived using this. Cipher values are valid starting from WIFI_CIPHER_TYPE_TKIP, enum values before that will be considered as invalid and default cipher suites(TKIP+CCMP) will be used. Valid cipher suites in softAP mode are WIFI_CIPHER_TYPE_TKIP, WIFI_CIPHER_TYPE_CCMP and WIFI_CIPHER_TYPE_TKIP_CCMP."]
     pub pairwise_cipher: wifi_cipher_type_t,
     #[doc = "< Enable FTM Responder mode"]
     pub ftm_responder: bool,
     #[doc = "< Configuration for Protected Management Frame"]
     pub pmf_cfg: wifi_pmf_config_t,
+    #[doc = "< Configuration for SAE PWE derivation method"]
+    pub sae_pwe_h2e: wifi_sae_pwe_method_t,
 }
-#[doc = " @brief STA configuration settings for the ESP32"]
+#[doc = " @brief STA configuration settings for the device"]
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct wifi_sta_config_t {
@@ -4483,16 +4574,19 @@ pub struct wifi_sta_config_t {
     pub threshold: wifi_scan_threshold_t,
     #[doc = "< Configuration for Protected Management Frame. Will be advertised in RSN Capabilities in RSN IE."]
     pub pmf_cfg: wifi_pmf_config_t,
-    pub _bitfield_align_1: [u16; 0],
+    pub _bitfield_align_1: [u32; 0],
     pub _bitfield_1: __BindgenBitfieldUnit<[u8; 4usize]>,
-    #[doc = "< Whether SAE hash to element is enabled"]
+    #[doc = "< Configuration for SAE PWE derivation method"]
     pub sae_pwe_h2e: wifi_sae_pwe_method_t,
+    #[doc = "< Configuration for SAE-PK (Public Key) Authentication method"]
+    pub sae_pk_mode: wifi_sae_pk_mode_t,
     #[doc = "< Number of connection retries station will do before moving to next AP. scan_method should be set as WIFI_ALL_CHANNEL_SCAN to use this config."]
     #[doc = "Note: Enabling this may cause connection time to increase incase best AP doesn't behave properly."]
     pub failure_retry_cnt: u8,
-    pub _bitfield_align_2: [u8; 0],
-    pub _bitfield_2: __BindgenBitfieldUnit<[u8; 1usize]>,
-    pub __bindgen_padding_0: u16,
+    pub _bitfield_align_2: [u32; 0],
+    pub _bitfield_2: __BindgenBitfieldUnit<[u8; 4usize]>,
+    #[doc = "< Password identifier for H2E. this needs to be null terminated string"]
+    pub sae_h2e_identifier: [u8; 32usize],
 }
 impl wifi_sta_config_t {
     #[inline]
@@ -4562,36 +4656,14 @@ impl wifi_sta_config_t {
         }
     }
     #[inline]
-    pub fn aid(&self) -> u32 {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(6usize, 12u8) as u32) }
-    }
-    #[inline]
-    pub fn set_aid(&mut self, val: u32) {
-        unsafe {
-            let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_1.set(6usize, 12u8, val as u64)
-        }
-    }
-    #[inline]
-    pub fn phymode(&self) -> u32 {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(18usize, 6u8) as u32) }
-    }
-    #[inline]
-    pub fn set_phymode(&mut self, val: u32) {
-        unsafe {
-            let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_1.set(18usize, 6u8, val as u64)
-        }
-    }
-    #[inline]
     pub fn reserved(&self) -> u32 {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(24usize, 8u8) as u32) }
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(6usize, 26u8) as u32) }
     }
     #[inline]
     pub fn set_reserved(&mut self, val: u32) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_1.set(24usize, 8u8, val as u64)
+            self._bitfield_1.set(6usize, 26u8, val as u64)
         }
     }
     #[inline]
@@ -4602,8 +4674,6 @@ impl wifi_sta_config_t {
         ft_enabled: u32,
         owe_enabled: u32,
         transition_disable: u32,
-        aid: u32,
-        phymode: u32,
         reserved: u32,
     ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
@@ -4631,96 +4701,186 @@ impl wifi_sta_config_t {
             let transition_disable: u32 = unsafe { ::core::mem::transmute(transition_disable) };
             transition_disable as u64
         });
-        __bindgen_bitfield_unit.set(6usize, 12u8, {
-            let aid: u32 = unsafe { ::core::mem::transmute(aid) };
-            aid as u64
-        });
-        __bindgen_bitfield_unit.set(18usize, 6u8, {
-            let phymode: u32 = unsafe { ::core::mem::transmute(phymode) };
-            phymode as u64
-        });
-        __bindgen_bitfield_unit.set(24usize, 8u8, {
+        __bindgen_bitfield_unit.set(6usize, 26u8, {
             let reserved: u32 = unsafe { ::core::mem::transmute(reserved) };
             reserved as u64
         });
         __bindgen_bitfield_unit
     }
     #[inline]
-    pub fn he_dcm_set(&self) -> u8 {
-        unsafe { ::core::mem::transmute(self._bitfield_2.get(0usize, 1u8) as u8) }
+    pub fn he_dcm_set(&self) -> u32 {
+        unsafe { ::core::mem::transmute(self._bitfield_2.get(0usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_he_dcm_set(&mut self, val: u8) {
+    pub fn set_he_dcm_set(&mut self, val: u32) {
         unsafe {
-            let val: u8 = ::core::mem::transmute(val);
+            let val: u32 = ::core::mem::transmute(val);
             self._bitfield_2.set(0usize, 1u8, val as u64)
         }
     }
     #[inline]
-    pub fn he_dcm_max_constellation_tx(&self) -> u8 {
-        unsafe { ::core::mem::transmute(self._bitfield_2.get(1usize, 2u8) as u8) }
+    pub fn he_dcm_max_constellation_tx(&self) -> u32 {
+        unsafe { ::core::mem::transmute(self._bitfield_2.get(1usize, 2u8) as u32) }
     }
     #[inline]
-    pub fn set_he_dcm_max_constellation_tx(&mut self, val: u8) {
+    pub fn set_he_dcm_max_constellation_tx(&mut self, val: u32) {
         unsafe {
-            let val: u8 = ::core::mem::transmute(val);
+            let val: u32 = ::core::mem::transmute(val);
             self._bitfield_2.set(1usize, 2u8, val as u64)
         }
     }
     #[inline]
-    pub fn he_dcm_max_constellation_rx(&self) -> u8 {
-        unsafe { ::core::mem::transmute(self._bitfield_2.get(3usize, 2u8) as u8) }
+    pub fn he_dcm_max_constellation_rx(&self) -> u32 {
+        unsafe { ::core::mem::transmute(self._bitfield_2.get(3usize, 2u8) as u32) }
     }
     #[inline]
-    pub fn set_he_dcm_max_constellation_rx(&mut self, val: u8) {
+    pub fn set_he_dcm_max_constellation_rx(&mut self, val: u32) {
         unsafe {
-            let val: u8 = ::core::mem::transmute(val);
+            let val: u32 = ::core::mem::transmute(val);
             self._bitfield_2.set(3usize, 2u8, val as u64)
         }
     }
     #[inline]
-    pub fn he_mcs9_enabled(&self) -> u8 {
-        unsafe { ::core::mem::transmute(self._bitfield_2.get(5usize, 1u8) as u8) }
+    pub fn he_mcs9_enabled(&self) -> u32 {
+        unsafe { ::core::mem::transmute(self._bitfield_2.get(5usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_he_mcs9_enabled(&mut self, val: u8) {
+    pub fn set_he_mcs9_enabled(&mut self, val: u32) {
         unsafe {
-            let val: u8 = ::core::mem::transmute(val);
+            let val: u32 = ::core::mem::transmute(val);
             self._bitfield_2.set(5usize, 1u8, val as u64)
         }
     }
     #[inline]
+    pub fn he_su_beamformee_disabled(&self) -> u32 {
+        unsafe { ::core::mem::transmute(self._bitfield_2.get(6usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set_he_su_beamformee_disabled(&mut self, val: u32) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_2.set(6usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn he_trig_su_bmforming_feedback_disabled(&self) -> u32 {
+        unsafe { ::core::mem::transmute(self._bitfield_2.get(7usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set_he_trig_su_bmforming_feedback_disabled(&mut self, val: u32) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_2.set(7usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn he_trig_mu_bmforming_partial_feedback_disabled(&self) -> u32 {
+        unsafe { ::core::mem::transmute(self._bitfield_2.get(8usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set_he_trig_mu_bmforming_partial_feedback_disabled(&mut self, val: u32) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_2.set(8usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn he_trig_cqi_feedback_disabled(&self) -> u32 {
+        unsafe { ::core::mem::transmute(self._bitfield_2.get(9usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set_he_trig_cqi_feedback_disabled(&mut self, val: u32) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_2.set(9usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn he_reserved(&self) -> u32 {
+        unsafe { ::core::mem::transmute(self._bitfield_2.get(10usize, 22u8) as u32) }
+    }
+    #[inline]
+    pub fn set_he_reserved(&mut self, val: u32) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_2.set(10usize, 22u8, val as u64)
+        }
+    }
+    #[inline]
     pub fn new_bitfield_2(
-        he_dcm_set: u8,
-        he_dcm_max_constellation_tx: u8,
-        he_dcm_max_constellation_rx: u8,
-        he_mcs9_enabled: u8,
-    ) -> __BindgenBitfieldUnit<[u8; 1usize]> {
-        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize]> = Default::default();
+        he_dcm_set: u32,
+        he_dcm_max_constellation_tx: u32,
+        he_dcm_max_constellation_rx: u32,
+        he_mcs9_enabled: u32,
+        he_su_beamformee_disabled: u32,
+        he_trig_su_bmforming_feedback_disabled: u32,
+        he_trig_mu_bmforming_partial_feedback_disabled: u32,
+        he_trig_cqi_feedback_disabled: u32,
+        he_reserved: u32,
+    ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
         __bindgen_bitfield_unit.set(0usize, 1u8, {
-            let he_dcm_set: u8 = unsafe { ::core::mem::transmute(he_dcm_set) };
+            let he_dcm_set: u32 = unsafe { ::core::mem::transmute(he_dcm_set) };
             he_dcm_set as u64
         });
         __bindgen_bitfield_unit.set(1usize, 2u8, {
-            let he_dcm_max_constellation_tx: u8 =
+            let he_dcm_max_constellation_tx: u32 =
                 unsafe { ::core::mem::transmute(he_dcm_max_constellation_tx) };
             he_dcm_max_constellation_tx as u64
         });
         __bindgen_bitfield_unit.set(3usize, 2u8, {
-            let he_dcm_max_constellation_rx: u8 =
+            let he_dcm_max_constellation_rx: u32 =
                 unsafe { ::core::mem::transmute(he_dcm_max_constellation_rx) };
             he_dcm_max_constellation_rx as u64
         });
         __bindgen_bitfield_unit.set(5usize, 1u8, {
-            let he_mcs9_enabled: u8 = unsafe { ::core::mem::transmute(he_mcs9_enabled) };
+            let he_mcs9_enabled: u32 = unsafe { ::core::mem::transmute(he_mcs9_enabled) };
             he_mcs9_enabled as u64
+        });
+        __bindgen_bitfield_unit.set(6usize, 1u8, {
+            let he_su_beamformee_disabled: u32 =
+                unsafe { ::core::mem::transmute(he_su_beamformee_disabled) };
+            he_su_beamformee_disabled as u64
+        });
+        __bindgen_bitfield_unit.set(7usize, 1u8, {
+            let he_trig_su_bmforming_feedback_disabled: u32 =
+                unsafe { ::core::mem::transmute(he_trig_su_bmforming_feedback_disabled) };
+            he_trig_su_bmforming_feedback_disabled as u64
+        });
+        __bindgen_bitfield_unit.set(8usize, 1u8, {
+            let he_trig_mu_bmforming_partial_feedback_disabled: u32 =
+                unsafe { ::core::mem::transmute(he_trig_mu_bmforming_partial_feedback_disabled) };
+            he_trig_mu_bmforming_partial_feedback_disabled as u64
+        });
+        __bindgen_bitfield_unit.set(9usize, 1u8, {
+            let he_trig_cqi_feedback_disabled: u32 =
+                unsafe { ::core::mem::transmute(he_trig_cqi_feedback_disabled) };
+            he_trig_cqi_feedback_disabled as u64
+        });
+        __bindgen_bitfield_unit.set(10usize, 22u8, {
+            let he_reserved: u32 = unsafe { ::core::mem::transmute(he_reserved) };
+            he_reserved as u64
         });
         __bindgen_bitfield_unit
     }
 }
-#[doc = " @brief Configuration data for ESP32 AP or STA."]
+#[doc = " @brief NAN Discovery start configuration"]
 #[doc = ""]
-#[doc = " The usage of this union (for ap or sta configuration) is determined by the accompanying"]
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct wifi_nan_config_t {
+    #[doc = "< NAN Discovery operating channel"]
+    pub op_channel: u8,
+    #[doc = "< Device's preference value to serve as NAN Master"]
+    pub master_pref: u8,
+    #[doc = "< Scan time in seconds while searching for a NAN cluster"]
+    pub scan_time: u8,
+    #[doc = "< Warm up time before assuming NAN Anchor Master role"]
+    pub warm_up_sec: u16,
+}
+#[doc = " @brief Configuration data for device's AP or STA or NAN."]
+#[doc = ""]
+#[doc = " The usage of this union (for ap, sta or nan configuration) is determined by the accompanying"]
 #[doc = " interface argument passed to esp_wifi_set_config() or esp_wifi_get_config()"]
 #[doc = ""]
 #[repr(C)]
@@ -4730,6 +4890,8 @@ pub union wifi_config_t {
     pub ap: wifi_ap_config_t,
     #[doc = "< configuration of STA"]
     pub sta: wifi_sta_config_t,
+    #[doc = "< configuration of NAN"]
+    pub nan: wifi_nan_config_t,
 }
 #[doc = " @brief Description of STA associated with AP"]
 #[repr(C)]
@@ -4863,7 +5025,7 @@ impl wifi_sta_info_t {
         __bindgen_bitfield_unit
     }
 }
-#[doc = " @brief List of stations associated with the ESP32 Soft-AP"]
+#[doc = " @brief List of stations associated with the Soft-AP"]
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct wifi_sta_list_t {
@@ -5371,6 +5533,211 @@ pub struct wifi_ftm_initiator_cfg_t {
     #[doc = "< Requested time period between consecutive FTM bursts in 100's of milliseconds (0 - No pref)"]
     pub burst_period: u16,
 }
+#[doc = " @brief WiFi beacon monitor parameter configuration"]
+#[doc = ""]
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct wifi_beacon_monitor_config_t {
+    #[doc = "< Enable or disable beacon monitor"]
+    pub enable: bool,
+    #[doc = "< Beacon lost timeout"]
+    pub loss_timeout: u8,
+    #[doc = "< Maximum number of consecutive lost beacons allowed"]
+    pub loss_threshold: u8,
+    #[doc = "< Delta early time for RF PHY on"]
+    pub delta_intr_early: u8,
+    #[doc = "< Delta timeout time for RF PHY off"]
+    pub delta_loss_timeout: u8,
+}
+#[doc = "< Send unicast Publish frame to Subscribers that match the requirement"]
+pub const wifi_nan_service_type_t_NAN_PUBLISH_SOLICITED: wifi_nan_service_type_t = 0;
+#[doc = "< Send broadcast Publish frames in every Discovery Window(DW)"]
+pub const wifi_nan_service_type_t_NAN_PUBLISH_UNSOLICITED: wifi_nan_service_type_t = 1;
+#[doc = "< Send broadcast Subscribe frames in every DW"]
+pub const wifi_nan_service_type_t_NAN_SUBSCRIBE_ACTIVE: wifi_nan_service_type_t = 2;
+#[doc = "< Passively listens to Publish frames"]
+pub const wifi_nan_service_type_t_NAN_SUBSCRIBE_PASSIVE: wifi_nan_service_type_t = 3;
+#[doc = " @brief NAN Services types"]
+#[doc = ""]
+pub type wifi_nan_service_type_t = crate::c_types::c_uint;
+#[doc = " @brief NAN Publish service configuration parameters"]
+#[doc = ""]
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct wifi_nan_publish_cfg_t {
+    #[doc = "< Service name identifier"]
+    pub service_name: [crate::c_types::c_char; 256usize],
+    #[doc = "< Service type"]
+    pub type_: wifi_nan_service_type_t,
+    #[doc = "< Comma separated filters for filtering services"]
+    pub matching_filter: [crate::c_types::c_char; 256usize],
+    #[doc = "< Service info shared in Publish frame"]
+    pub svc_info: [crate::c_types::c_char; 64usize],
+    pub _bitfield_align_1: [u8; 0],
+    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 1usize]>,
+    pub __bindgen_padding_0: [u8; 3usize],
+}
+impl wifi_nan_publish_cfg_t {
+    #[inline]
+    pub fn single_replied_event(&self) -> u8 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(0usize, 1u8) as u8) }
+    }
+    #[inline]
+    pub fn set_single_replied_event(&mut self, val: u8) {
+        unsafe {
+            let val: u8 = ::core::mem::transmute(val);
+            self._bitfield_1.set(0usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn datapath_reqd(&self) -> u8 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(1usize, 1u8) as u8) }
+    }
+    #[inline]
+    pub fn set_datapath_reqd(&mut self, val: u8) {
+        unsafe {
+            let val: u8 = ::core::mem::transmute(val);
+            self._bitfield_1.set(1usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn reserved(&self) -> u8 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(2usize, 6u8) as u8) }
+    }
+    #[inline]
+    pub fn set_reserved(&mut self, val: u8) {
+        unsafe {
+            let val: u8 = ::core::mem::transmute(val);
+            self._bitfield_1.set(2usize, 6u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn new_bitfield_1(
+        single_replied_event: u8,
+        datapath_reqd: u8,
+        reserved: u8,
+    ) -> __BindgenBitfieldUnit<[u8; 1usize]> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize]> = Default::default();
+        __bindgen_bitfield_unit.set(0usize, 1u8, {
+            let single_replied_event: u8 = unsafe { ::core::mem::transmute(single_replied_event) };
+            single_replied_event as u64
+        });
+        __bindgen_bitfield_unit.set(1usize, 1u8, {
+            let datapath_reqd: u8 = unsafe { ::core::mem::transmute(datapath_reqd) };
+            datapath_reqd as u64
+        });
+        __bindgen_bitfield_unit.set(2usize, 6u8, {
+            let reserved: u8 = unsafe { ::core::mem::transmute(reserved) };
+            reserved as u64
+        });
+        __bindgen_bitfield_unit
+    }
+}
+#[doc = " @brief NAN Subscribe service configuration parameters"]
+#[doc = ""]
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct wifi_nan_subscribe_cfg_t {
+    #[doc = "< Service name identifier"]
+    pub service_name: [crate::c_types::c_char; 256usize],
+    #[doc = "< Service type"]
+    pub type_: wifi_nan_service_type_t,
+    #[doc = "< Comma separated filters for filtering services"]
+    pub matching_filter: [crate::c_types::c_char; 256usize],
+    #[doc = "< Service info shared in Subscribe frame"]
+    pub svc_info: [crate::c_types::c_char; 64usize],
+    pub _bitfield_align_1: [u8; 0],
+    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 1usize]>,
+    pub __bindgen_padding_0: [u8; 3usize],
+}
+impl wifi_nan_subscribe_cfg_t {
+    #[inline]
+    pub fn single_match_event(&self) -> u8 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(0usize, 1u8) as u8) }
+    }
+    #[inline]
+    pub fn set_single_match_event(&mut self, val: u8) {
+        unsafe {
+            let val: u8 = ::core::mem::transmute(val);
+            self._bitfield_1.set(0usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn reserved(&self) -> u8 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(1usize, 7u8) as u8) }
+    }
+    #[inline]
+    pub fn set_reserved(&mut self, val: u8) {
+        unsafe {
+            let val: u8 = ::core::mem::transmute(val);
+            self._bitfield_1.set(1usize, 7u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn new_bitfield_1(
+        single_match_event: u8,
+        reserved: u8,
+    ) -> __BindgenBitfieldUnit<[u8; 1usize]> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize]> = Default::default();
+        __bindgen_bitfield_unit.set(0usize, 1u8, {
+            let single_match_event: u8 = unsafe { ::core::mem::transmute(single_match_event) };
+            single_match_event as u64
+        });
+        __bindgen_bitfield_unit.set(1usize, 7u8, {
+            let reserved: u8 = unsafe { ::core::mem::transmute(reserved) };
+            reserved as u64
+        });
+        __bindgen_bitfield_unit
+    }
+}
+#[doc = " @brief NAN Follow-up parameters"]
+#[doc = ""]
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct wifi_nan_followup_params_t {
+    #[doc = "< Own service instance id"]
+    pub inst_id: u8,
+    #[doc = "< Peer's service instance id"]
+    pub peer_inst_id: u8,
+    #[doc = "< Peer's MAC address"]
+    pub peer_mac: [u8; 6usize],
+    #[doc = "< Service info(or message) to be shared"]
+    pub svc_info: [crate::c_types::c_char; 64usize],
+}
+#[doc = " @brief NAN Datapath Request parameters"]
+#[doc = ""]
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct wifi_nan_datapath_req_t {
+    #[doc = "< Publisher's service instance id"]
+    pub pub_id: u8,
+    #[doc = "< Peer's MAC address"]
+    pub peer_mac: [u8; 6usize],
+    #[doc = "< NDP Confirm frame required"]
+    pub confirm_required: bool,
+}
+#[doc = " @brief NAN Datapath Response parameters"]
+#[doc = ""]
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct wifi_nan_datapath_resp_t {
+    #[doc = "< True - Accept incoming NDP, False - Reject it"]
+    pub accept: bool,
+    #[doc = "< NAN Datapath Identifier"]
+    pub ndp_id: u8,
+    #[doc = "< Peer's MAC address"]
+    pub peer_mac: [u8; 6usize],
+}
+#[doc = " @brief NAN Datapath End parameters"]
+#[doc = ""]
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct wifi_nan_datapath_end_req_t {
+    #[doc = "< NAN Datapath Identifier"]
+    pub ndp_id: u8,
+    #[doc = "< Peer's MAC address"]
+    pub peer_mac: [u8; 6usize],
+}
 #[doc = "< 1 Mbps with long preamble"]
 pub const wifi_phy_rate_t_WIFI_PHY_RATE_1M_L: wifi_phy_rate_t = 0;
 #[doc = "< 2 Mbps with long preamble"]
@@ -5399,39 +5766,39 @@ pub const wifi_phy_rate_t_WIFI_PHY_RATE_54M: wifi_phy_rate_t = 12;
 pub const wifi_phy_rate_t_WIFI_PHY_RATE_36M: wifi_phy_rate_t = 13;
 #[doc = "< 18 Mbps"]
 pub const wifi_phy_rate_t_WIFI_PHY_RATE_18M: wifi_phy_rate_t = 14;
-#[doc = "< 9 Mbps"]
+#[doc = "< 9 Mbps */"]
 pub const wifi_phy_rate_t_WIFI_PHY_RATE_9M: wifi_phy_rate_t = 15;
-#[doc = "< MCS0 with long GI, 6.5 Mbps for 20MHz, 13.5 Mbps for 40MHz"]
+#[doc = "< MCS0 with long GI"]
 pub const wifi_phy_rate_t_WIFI_PHY_RATE_MCS0_LGI: wifi_phy_rate_t = 16;
-#[doc = "< MCS1 with long GI, 13 Mbps for 20MHz, 27 Mbps for 40MHz"]
+#[doc = "< MCS1 with long GI"]
 pub const wifi_phy_rate_t_WIFI_PHY_RATE_MCS1_LGI: wifi_phy_rate_t = 17;
-#[doc = "< MCS2 with long GI, 19.5 Mbps for 20MHz, 40.5 Mbps for 40MHz"]
+#[doc = "< MCS2 with long GI"]
 pub const wifi_phy_rate_t_WIFI_PHY_RATE_MCS2_LGI: wifi_phy_rate_t = 18;
-#[doc = "< MCS3 with long GI, 26 Mbps for 20MHz, 54 Mbps for 40MHz"]
+#[doc = "< MCS3 with long GI"]
 pub const wifi_phy_rate_t_WIFI_PHY_RATE_MCS3_LGI: wifi_phy_rate_t = 19;
-#[doc = "< MCS4 with long GI, 39 Mbps for 20MHz, 81 Mbps for 40MHz"]
+#[doc = "< MCS4 with long GI"]
 pub const wifi_phy_rate_t_WIFI_PHY_RATE_MCS4_LGI: wifi_phy_rate_t = 20;
-#[doc = "< MCS5 with long GI, 52 Mbps for 20MHz, 108 Mbps for 40MHz"]
+#[doc = "< MCS5 with long GI"]
 pub const wifi_phy_rate_t_WIFI_PHY_RATE_MCS5_LGI: wifi_phy_rate_t = 21;
-#[doc = "< MCS6 with long GI, 58.5 Mbps for 20MHz, 121.5 Mbps for 40MHz"]
+#[doc = "< MCS6 with long GI"]
 pub const wifi_phy_rate_t_WIFI_PHY_RATE_MCS6_LGI: wifi_phy_rate_t = 22;
-#[doc = "< MCS7 with long GI, 65 Mbps for 20MHz, 135 Mbps for 40MHz"]
+#[doc = "< MCS7 with long GI"]
 pub const wifi_phy_rate_t_WIFI_PHY_RATE_MCS7_LGI: wifi_phy_rate_t = 23;
-#[doc = "< MCS0 with short GI, 7.2 Mbps for 20MHz, 15 Mbps for 40MHz"]
+#[doc = "< MCS0 with short GI"]
 pub const wifi_phy_rate_t_WIFI_PHY_RATE_MCS0_SGI: wifi_phy_rate_t = 24;
-#[doc = "< MCS1 with short GI, 14.4 Mbps for 20MHz, 30 Mbps for 40MHz"]
+#[doc = "< MCS1 with short GI"]
 pub const wifi_phy_rate_t_WIFI_PHY_RATE_MCS1_SGI: wifi_phy_rate_t = 25;
-#[doc = "< MCS2 with short GI, 21.7 Mbps for 20MHz, 45 Mbps for 40MHz"]
+#[doc = "< MCS2 with short GI"]
 pub const wifi_phy_rate_t_WIFI_PHY_RATE_MCS2_SGI: wifi_phy_rate_t = 26;
-#[doc = "< MCS3 with short GI, 28.9 Mbps for 20MHz, 60 Mbps for 40MHz"]
+#[doc = "< MCS3 with short GI"]
 pub const wifi_phy_rate_t_WIFI_PHY_RATE_MCS3_SGI: wifi_phy_rate_t = 27;
-#[doc = "< MCS4 with short GI, 43.3 Mbps for 20MHz, 90 Mbps for 40MHz"]
+#[doc = "< MCS4 with short GI"]
 pub const wifi_phy_rate_t_WIFI_PHY_RATE_MCS4_SGI: wifi_phy_rate_t = 28;
-#[doc = "< MCS5 with short GI, 57.8 Mbps for 20MHz, 120 Mbps for 40MHz"]
+#[doc = "< MCS5 with short GI"]
 pub const wifi_phy_rate_t_WIFI_PHY_RATE_MCS5_SGI: wifi_phy_rate_t = 29;
-#[doc = "< MCS6 with short GI, 65 Mbps for 20MHz, 135 Mbps for 40MHz"]
+#[doc = "< MCS6 with short GI"]
 pub const wifi_phy_rate_t_WIFI_PHY_RATE_MCS6_SGI: wifi_phy_rate_t = 30;
-#[doc = "< MCS7 with short GI, 72.2 Mbps for 20MHz, 150 Mbps for 40MHz"]
+#[doc = "< MCS7 with short GI"]
 pub const wifi_phy_rate_t_WIFI_PHY_RATE_MCS7_SGI: wifi_phy_rate_t = 31;
 #[doc = "< 250 Kbps"]
 pub const wifi_phy_rate_t_WIFI_PHY_RATE_LORA_250K: wifi_phy_rate_t = 41;
@@ -5441,37 +5808,37 @@ pub const wifi_phy_rate_t_WIFI_PHY_RATE_MAX: wifi_phy_rate_t = 43;
 #[doc = " @brief WiFi PHY rate encodings"]
 #[doc = ""]
 pub type wifi_phy_rate_t = crate::c_types::c_uint;
-#[doc = "< ESP32 WiFi ready"]
+#[doc = "< WiFi ready"]
 pub const wifi_event_t_WIFI_EVENT_WIFI_READY: wifi_event_t = 0;
-#[doc = "< ESP32 finish scanning AP"]
+#[doc = "< Finished scanning AP"]
 pub const wifi_event_t_WIFI_EVENT_SCAN_DONE: wifi_event_t = 1;
-#[doc = "< ESP32 station start"]
+#[doc = "< Station start"]
 pub const wifi_event_t_WIFI_EVENT_STA_START: wifi_event_t = 2;
-#[doc = "< ESP32 station stop"]
+#[doc = "< Station stop"]
 pub const wifi_event_t_WIFI_EVENT_STA_STOP: wifi_event_t = 3;
-#[doc = "< ESP32 station connected to AP"]
+#[doc = "< Station connected to AP"]
 pub const wifi_event_t_WIFI_EVENT_STA_CONNECTED: wifi_event_t = 4;
-#[doc = "< ESP32 station disconnected from AP"]
+#[doc = "< Station disconnected from AP"]
 pub const wifi_event_t_WIFI_EVENT_STA_DISCONNECTED: wifi_event_t = 5;
-#[doc = "< the auth mode of AP connected by ESP32 station changed"]
+#[doc = "< the auth mode of AP connected by device's station changed"]
 pub const wifi_event_t_WIFI_EVENT_STA_AUTHMODE_CHANGE: wifi_event_t = 6;
-#[doc = "< ESP32 station wps succeeds in enrollee mode"]
+#[doc = "< Station wps succeeds in enrollee mode"]
 pub const wifi_event_t_WIFI_EVENT_STA_WPS_ER_SUCCESS: wifi_event_t = 7;
-#[doc = "< ESP32 station wps fails in enrollee mode"]
+#[doc = "< Station wps fails in enrollee mode"]
 pub const wifi_event_t_WIFI_EVENT_STA_WPS_ER_FAILED: wifi_event_t = 8;
-#[doc = "< ESP32 station wps timeout in enrollee mode"]
+#[doc = "< Station wps timeout in enrollee mode"]
 pub const wifi_event_t_WIFI_EVENT_STA_WPS_ER_TIMEOUT: wifi_event_t = 9;
-#[doc = "< ESP32 station wps pin code in enrollee mode"]
+#[doc = "< Station wps pin code in enrollee mode"]
 pub const wifi_event_t_WIFI_EVENT_STA_WPS_ER_PIN: wifi_event_t = 10;
-#[doc = "< ESP32 station wps overlap in enrollee mode"]
+#[doc = "< Station wps overlap in enrollee mode"]
 pub const wifi_event_t_WIFI_EVENT_STA_WPS_ER_PBC_OVERLAP: wifi_event_t = 11;
-#[doc = "< ESP32 soft-AP start"]
+#[doc = "< Soft-AP start"]
 pub const wifi_event_t_WIFI_EVENT_AP_START: wifi_event_t = 12;
-#[doc = "< ESP32 soft-AP stop"]
+#[doc = "< Soft-AP stop"]
 pub const wifi_event_t_WIFI_EVENT_AP_STOP: wifi_event_t = 13;
-#[doc = "< a station connected to ESP32 soft-AP"]
+#[doc = "< a station connected to Soft-AP"]
 pub const wifi_event_t_WIFI_EVENT_AP_STACONNECTED: wifi_event_t = 14;
-#[doc = "< a station disconnected from ESP32 soft-AP"]
+#[doc = "< a station disconnected from Soft-AP"]
 pub const wifi_event_t_WIFI_EVENT_AP_STADISCONNECTED: wifi_event_t = 15;
 #[doc = "< Receive probe request packet in soft-AP interface"]
 pub const wifi_event_t_WIFI_EVENT_AP_PROBEREQRECVED: wifi_event_t = 16;
@@ -5483,9 +5850,9 @@ pub const wifi_event_t_WIFI_EVENT_STA_BSS_RSSI_LOW: wifi_event_t = 18;
 pub const wifi_event_t_WIFI_EVENT_ACTION_TX_STATUS: wifi_event_t = 19;
 #[doc = "< Remain-on-Channel operation complete"]
 pub const wifi_event_t_WIFI_EVENT_ROC_DONE: wifi_event_t = 20;
-#[doc = "< ESP32 station beacon timeout"]
+#[doc = "< Station beacon timeout"]
 pub const wifi_event_t_WIFI_EVENT_STA_BEACON_TIMEOUT: wifi_event_t = 21;
-#[doc = "< ESP32 connectionless module wake interval start"]
+#[doc = "< Connectionless module wake interval start"]
 pub const wifi_event_t_WIFI_EVENT_CONNECTIONLESS_MODULE_WAKE_INTERVAL_START: wifi_event_t = 22;
 #[doc = "< Soft-AP wps succeeds in registrar mode"]
 pub const wifi_event_t_WIFI_EVENT_AP_WPS_RG_SUCCESS: wifi_event_t = 23;
@@ -5505,12 +5872,28 @@ pub const wifi_event_t_WIFI_EVENT_ITWT_TEARDOWN: wifi_event_t = 29;
 pub const wifi_event_t_WIFI_EVENT_ITWT_PROBE: wifi_event_t = 30;
 #[doc = "< iTWT suspend"]
 pub const wifi_event_t_WIFI_EVENT_ITWT_SUSPEND: wifi_event_t = 31;
+#[doc = "< NAN Discovery has started"]
+pub const wifi_event_t_WIFI_EVENT_NAN_STARTED: wifi_event_t = 32;
+#[doc = "< NAN Discovery has stopped"]
+pub const wifi_event_t_WIFI_EVENT_NAN_STOPPED: wifi_event_t = 33;
+#[doc = "< NAN Service Discovery match found"]
+pub const wifi_event_t_WIFI_EVENT_NAN_SVC_MATCH: wifi_event_t = 34;
+#[doc = "< Replied to a NAN peer with Service Discovery match"]
+pub const wifi_event_t_WIFI_EVENT_NAN_REPLIED: wifi_event_t = 35;
+#[doc = "< Received a Follow-up message"]
+pub const wifi_event_t_WIFI_EVENT_NAN_RECEIVE: wifi_event_t = 36;
+#[doc = "< Received NDP Request from a NAN Peer"]
+pub const wifi_event_t_WIFI_EVENT_NDP_INDICATION: wifi_event_t = 37;
+#[doc = "< NDP Confirm Indication"]
+pub const wifi_event_t_WIFI_EVENT_NDP_CONFIRM: wifi_event_t = 38;
+#[doc = "< NAN Datapath terminated indication"]
+pub const wifi_event_t_WIFI_EVENT_NDP_TERMINATED: wifi_event_t = 39;
 #[doc = "< Invalid WiFi event ID"]
-pub const wifi_event_t_WIFI_EVENT_MAX: wifi_event_t = 32;
+pub const wifi_event_t_WIFI_EVENT_MAX: wifi_event_t = 40;
 #[doc = " WiFi event declarations"]
 pub type wifi_event_t = crate::c_types::c_uint;
 extern "C" {
-    pub static mut WIFI_EVENT: esp_event_base_t;
+    pub static WIFI_EVENT: esp_event_base_t;
 }
 #[doc = " Argument structure for WIFI_EVENT_SCAN_DONE event"]
 #[repr(C)]
@@ -5571,10 +5954,10 @@ pub struct wifi_event_sta_wps_er_pin_t {
     #[doc = "< PIN code of station in enrollee mode"]
     pub pin_code: [u8; 8usize],
 }
-#[doc = "< ESP32 WPS normal fail reason"]
+#[doc = "< WPS normal fail reason"]
 pub const wifi_event_sta_wps_fail_reason_t_WPS_FAIL_REASON_NORMAL:
     wifi_event_sta_wps_fail_reason_t = 0;
-#[doc = "< ESP32 WPS receive M2D frame"]
+#[doc = "< WPS receive M2D frame"]
 pub const wifi_event_sta_wps_fail_reason_t_WPS_FAIL_REASON_RECV_M2D:
     wifi_event_sta_wps_fail_reason_t = 1;
 pub const wifi_event_sta_wps_fail_reason_t_WPS_FAIL_REASON_MAX: wifi_event_sta_wps_fail_reason_t =
@@ -5602,9 +5985,9 @@ pub struct wifi_event_sta_wps_er_success_t__bindgen_ty_1 {
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct wifi_event_ap_staconnected_t {
-    #[doc = "< MAC address of the station connected to ESP32 soft-AP"]
+    #[doc = "< MAC address of the station connected to Soft-AP"]
     pub mac: [u8; 6usize],
-    #[doc = "< the aid that ESP32 soft-AP gives to the station connected to"]
+    #[doc = "< the aid that soft-AP gives to the station connected to"]
     pub aid: u8,
     #[doc = "< flag to identify mesh child"]
     pub is_mesh_child: bool,
@@ -5613,9 +5996,9 @@ pub struct wifi_event_ap_staconnected_t {
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct wifi_event_ap_stadisconnected_t {
-    #[doc = "< MAC address of the station disconnects to ESP32 soft-AP"]
+    #[doc = "< MAC address of the station disconnects to soft-AP"]
     pub mac: [u8; 6usize],
-    #[doc = "< the aid that ESP32 soft-AP gave to the station disconnects to"]
+    #[doc = "< the aid that soft-AP gave to the station disconnects to"]
     pub aid: u8,
     #[doc = "< flag to identify mesh child"]
     pub is_mesh_child: bool,
@@ -5737,6 +6120,84 @@ pub struct wifi_event_ap_wps_rg_fail_reason_t {
 pub struct wifi_event_ap_wps_rg_success_t {
     #[doc = "< Enrollee mac address"]
     pub peer_macaddr: [u8; 6usize],
+}
+#[doc = " Argument structure for WIFI_EVENT_NAN_SVC_MATCH event"]
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct wifi_event_nan_svc_match_t {
+    #[doc = "< Subscribe Service Identifier"]
+    pub subscribe_id: u8,
+    #[doc = "< Publish Service Identifier"]
+    pub publish_id: u8,
+    #[doc = "< NAN Interface MAC of the Publisher"]
+    pub pub_if_mac: [u8; 6usize],
+}
+#[doc = " Argument structure for WIFI_EVENT_NAN_REPLIED event"]
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct wifi_event_nan_replied_t {
+    #[doc = "< Publish Service Identifier"]
+    pub publish_id: u8,
+    #[doc = "< Subscribe Service Identifier"]
+    pub subscribe_id: u8,
+    #[doc = "< NAN Interface MAC of the Subscriber"]
+    pub sub_if_mac: [u8; 6usize],
+}
+#[doc = " Argument structure for WIFI_EVENT_NAN_RECEIVE event"]
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct wifi_event_nan_receive_t {
+    #[doc = "< Our Service Identifier"]
+    pub inst_id: u8,
+    #[doc = "< Peer's Service Identifier"]
+    pub peer_inst_id: u8,
+    #[doc = "< Peer's NAN Interface MAC"]
+    pub peer_if_mac: [u8; 6usize],
+    #[doc = "< Peer Service Info"]
+    pub peer_svc_info: [u8; 64usize],
+}
+#[doc = " Argument structure for WIFI_EVENT_NDP_INDICATION event"]
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct wifi_event_ndp_indication_t {
+    #[doc = "< Publish Id for NAN Service"]
+    pub publish_id: u8,
+    #[doc = "< NDP instance id"]
+    pub ndp_id: u8,
+    #[doc = "< Peer's NAN Management Interface MAC"]
+    pub peer_nmi: [u8; 6usize],
+    #[doc = "< Peer's NAN Data Interface MAC"]
+    pub peer_ndi: [u8; 6usize],
+    #[doc = "< Service Specific Info"]
+    pub svc_info: [u8; 64usize],
+}
+#[doc = " Argument structure for WIFI_EVENT_NDP_CONFIRM event"]
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct wifi_event_ndp_confirm_t {
+    #[doc = "< NDP status code"]
+    pub status: u8,
+    #[doc = "< NDP instance id"]
+    pub ndp_id: u8,
+    #[doc = "< Peer's NAN Management Interface MAC"]
+    pub peer_nmi: [u8; 6usize],
+    #[doc = "< Peer's NAN Data Interface MAC"]
+    pub peer_ndi: [u8; 6usize],
+    #[doc = "< Own NAN Data Interface MAC"]
+    pub own_ndi: [u8; 6usize],
+    #[doc = "< Service Specific Info"]
+    pub svc_info: [u8; 64usize],
+}
+#[doc = " Argument structure for WIFI_EVENT_NDP_TERMINATED event"]
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct wifi_event_ndp_terminated_t {
+    #[doc = "< Termination reason code"]
+    pub reason: u8,
+    #[doc = "< NDP instance id"]
+    pub ndp_id: u8,
+    #[doc = "< Initiator's NAN Data Interface MAC"]
+    pub init_ndi: [u8; 6usize],
 }
 #[doc = " Configuration for creating event loops"]
 #[repr(C)]
@@ -6658,8 +7119,30 @@ pub type esp_aes_gmac_t = ::core::option::Option<
         mic: *mut u8,
     ) -> crate::c_types::c_int,
 >;
+#[doc = " @brief SHA256 hash for data vector"]
+#[doc = " @num_elem: Number of elements in the data vector"]
+#[doc = " @addr: Pointers to the data areas"]
+#[doc = " @len: Lengths of the data blocks"]
+#[doc = " @mac: Buffer for the hash"]
+#[doc = " Returns: 0 on success, -1 on failure"]
+pub type esp_sha256_vector_t = ::core::option::Option<
+    unsafe extern "C" fn(
+        num_elem: size_t,
+        addr: *mut *const u8,
+        len: *const size_t,
+        buf: *mut u8,
+    ) -> crate::c_types::c_int,
+>;
+#[doc = " @brief CRC32 value in little endian."]
+#[doc = ""]
+#[doc = " @param crc: Initial CRC value (result of last calculation or 0 for the first time)"]
+#[doc = " @param buf: Data buffer that used to calculate the CRC value"]
+#[doc = " @param len: Length of the data buffer"]
+#[doc = " @return CRC32 value"]
+pub type esp_crc32_le_t =
+    ::core::option::Option<unsafe extern "C" fn(crc: u32, buf: *const u8, len: u32) -> u32>;
 #[doc = " @brief The crypto callback function structure used when do station security connect."]
-#[doc = "        The structure can be set as software crypto or the crypto optimized by ESP32"]
+#[doc = "        The structure can be set as software crypto or the crypto optimized by device's"]
 #[doc = "        hardware."]
 #[repr(C)]
 #[derive(Copy, Clone)]
@@ -6695,9 +7178,11 @@ pub struct wpa_crypto_funcs_t {
     pub ccmp_decrypt: esp_ccmp_decrypt_t,
     pub ccmp_encrypt: esp_ccmp_encrypt_t,
     pub aes_gmac: esp_aes_gmac_t,
+    pub sha256_vector: esp_sha256_vector_t,
+    pub crc32: esp_crc32_le_t,
 }
 #[doc = " @brief The crypto callback function structure used in mesh vendor IE encryption. The"]
-#[doc = "        structure can be set as software crypto or the crypto optimized by ESP32"]
+#[doc = "        structure can be set as software crypto or the crypto optimized by device's"]
 #[doc = "        hardware."]
 #[repr(C)]
 #[derive(Copy, Clone)]
@@ -7063,11 +7548,16 @@ pub struct wifi_osi_funcs_t {
     pub _coex_schm_curr_period_get: ::core::option::Option<unsafe extern "C" fn() -> u8>,
     pub _coex_schm_curr_phase_get:
         ::core::option::Option<unsafe extern "C" fn() -> *mut crate::c_types::c_void>,
-    pub _coex_schm_curr_phase_idx_set: ::core::option::Option<
-        unsafe extern "C" fn(idx: crate::c_types::c_int) -> crate::c_types::c_int,
-    >,
-    pub _coex_schm_curr_phase_idx_get:
+    pub _coex_schm_process_restart:
         ::core::option::Option<unsafe extern "C" fn() -> crate::c_types::c_int>,
+    pub _coex_schm_register_cb: ::core::option::Option<
+        unsafe extern "C" fn(
+            arg1: crate::c_types::c_int,
+            cb: ::core::option::Option<
+                unsafe extern "C" fn(arg1: crate::c_types::c_int) -> crate::c_types::c_int,
+            >,
+        ) -> crate::c_types::c_int,
+    >,
     pub _coex_register_start_cb: ::core::option::Option<
         unsafe extern "C" fn(
             cb: ::core::option::Option<unsafe extern "C" fn() -> crate::c_types::c_int>,
@@ -7113,6 +7603,13 @@ extern "C" {
     pub fn esp_wifi_set_default_wifi_ap_handlers() -> esp_err_t;
 }
 extern "C" {
+    #[doc = " @brief Sets default wifi event handlers for NAN interface"]
+    #[doc = ""]
+    #[doc = " @return"]
+    #[doc = "  - ESP_OK on success, error returned from esp_event_handler_register if failed"]
+    pub fn esp_wifi_set_default_wifi_nan_handlers() -> esp_err_t;
+}
+extern "C" {
     #[doc = " @brief Clears default wifi event handlers for supplied network interface"]
     #[doc = ""]
     #[doc = " @param esp_netif instance of corresponding if object"]
@@ -7140,6 +7637,15 @@ extern "C" {
     #[doc = ""]
     #[doc = " @return pointer to esp-netif instance"]
     pub fn esp_netif_create_default_wifi_sta() -> *mut esp_netif_t;
+}
+extern "C" {
+    #[doc = " @brief Creates default WIFI NAN. In case of any init error this API aborts."]
+    #[doc = ""]
+    #[doc = " @note The API creates esp_netif object with default WiFi station config,"]
+    #[doc = " attaches the netif to wifi and registers default wifi handlers."]
+    #[doc = ""]
+    #[doc = " @return pointer to esp-netif instance"]
+    pub fn esp_netif_create_default_wifi_nan() -> *mut esp_netif_t;
 }
 extern "C" {
     #[doc = " @brief Destroys default WIFI netif created with esp_netif_create_default_wifi_...() API."]
@@ -7275,7 +7781,7 @@ extern "C" {
 extern "C" {
     #[doc = " @brief     Set the WiFi operating mode"]
     #[doc = ""]
-    #[doc = "            Set the WiFi operating mode as station, soft-AP or station+soft-AP,"]
+    #[doc = "            Set the WiFi operating mode as station, soft-AP, station+soft-AP or NAN."]
     #[doc = "            The default mode is station mode."]
     #[doc = ""]
     #[doc = " @param     mode  WiFi operating mode"]
@@ -7300,9 +7806,10 @@ extern "C" {
 }
 extern "C" {
     #[doc = " @brief  Start WiFi according to current configuration"]
-    #[doc = "         If mode is WIFI_MODE_STA, it create station control block and start station"]
-    #[doc = "         If mode is WIFI_MODE_AP, it create soft-AP control block and start soft-AP"]
-    #[doc = "         If mode is WIFI_MODE_APSTA, it create soft-AP and station control block and start soft-AP and station"]
+    #[doc = "         If mode is WIFI_MODE_STA, it creates station control block and starts station"]
+    #[doc = "         If mode is WIFI_MODE_AP, it creates soft-AP control block and starts soft-AP"]
+    #[doc = "         If mode is WIFI_MODE_APSTA, it creates soft-AP and station control block and starts soft-AP and station"]
+    #[doc = "         If mode is WIFI_MODE_NAN, it creates NAN control block and starts NAN"]
     #[doc = ""]
     #[doc = " @return"]
     #[doc = "    - ESP_OK: succeed"]
@@ -7315,9 +7822,10 @@ extern "C" {
 }
 extern "C" {
     #[doc = " @brief  Stop WiFi"]
-    #[doc = "         If mode is WIFI_MODE_STA, it stop station and free station control block"]
-    #[doc = "         If mode is WIFI_MODE_AP, it stop soft-AP and free soft-AP control block"]
-    #[doc = "         If mode is WIFI_MODE_APSTA, it stop station/soft-AP and free station/soft-AP control block"]
+    #[doc = "         If mode is WIFI_MODE_STA, it stops station and frees station control block"]
+    #[doc = "         If mode is WIFI_MODE_AP, it stops soft-AP and frees soft-AP control block"]
+    #[doc = "         If mode is WIFI_MODE_APSTA, it stops station/soft-AP and frees station/soft-AP control block"]
+    #[doc = "         If mode is WIFI_MODE_NAN, it stops NAN and frees NAN control block"]
     #[doc = ""]
     #[doc = " @return"]
     #[doc = "    - ESP_OK: succeed"]
@@ -7339,15 +7847,15 @@ extern "C" {
     pub fn esp_wifi_restore() -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief     Connect the ESP32 WiFi station to the AP."]
+    #[doc = " @brief     Connect WiFi station to the AP."]
     #[doc = ""]
     #[doc = " @attention 1. This API only impact WIFI_MODE_STA or WIFI_MODE_APSTA mode"]
-    #[doc = " @attention 2. If the ESP32 is connected to an AP, call esp_wifi_disconnect to disconnect."]
-    #[doc = " @attention 3. The scanning triggered by esp_wifi_scan_start() will not be effective until connection between ESP32 and the AP is established."]
-    #[doc = "               If ESP32 is scanning and connecting at the same time, ESP32 will abort scanning and return a warning message and error"]
+    #[doc = " @attention 2. If station interface is connected to an AP, call esp_wifi_disconnect to disconnect."]
+    #[doc = " @attention 3. The scanning triggered by esp_wifi_scan_start() will not be effective until connection between device and the AP is established."]
+    #[doc = "               If device is scanning and connecting at the same time, it will abort scanning and return a warning message and error"]
     #[doc = "               number ESP_ERR_WIFI_STATE."]
-    #[doc = "               If you want to do reconnection after ESP32 received disconnect event, remember to add the maximum retry time, otherwise the called"]
-    #[doc = "               scan will not work. This is especially true when the AP doesn't exist, and you still try reconnection after ESP32 received disconnect"]
+    #[doc = "               If you want to do reconnection after device received disconnect event, remember to add the maximum retry time, otherwise the called"]
+    #[doc = "               scan will not work. This is especially true when the AP doesn't exist, and you still try reconnection after device received disconnect"]
     #[doc = "               event with the reason code WIFI_REASON_NO_AP_FOUND."]
     #[doc = ""]
     #[doc = " @return"]
@@ -7359,7 +7867,7 @@ extern "C" {
     pub fn esp_wifi_connect() -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief     Disconnect the ESP32 WiFi station from the AP."]
+    #[doc = " @brief     Disconnect WiFi station from the AP."]
     #[doc = ""]
     #[doc = " @return"]
     #[doc = "    - ESP_OK: succeed"]
@@ -7467,7 +7975,7 @@ extern "C" {
     pub fn esp_wifi_clear_ap_list() -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief     Get information of AP which the ESP32 station is associated with"]
+    #[doc = " @brief     Get information of AP to which the device is associated with"]
     #[doc = ""]
     #[doc = " @attention When the obtained country information is empty, it means that the AP does not carry country information"]
     #[doc = ""]
@@ -7534,7 +8042,7 @@ extern "C" {
     pub fn esp_wifi_get_protocol(ifx: wifi_interface_t, protocol_bitmap: *mut u8) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief     Set the bandwidth of ESP32 specified interface"]
+    #[doc = " @brief     Set the bandwidth of specified interface"]
     #[doc = ""]
     #[doc = " @attention 1. API return false if try to configure an interface that is not enabled"]
     #[doc = " @attention 2. WIFI_BW_HT40 is supported only when the interface support 11N"]
@@ -7551,7 +8059,7 @@ extern "C" {
     pub fn esp_wifi_set_bandwidth(ifx: wifi_interface_t, bw: wifi_bandwidth_t) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief     Get the bandwidth of ESP32 specified interface"]
+    #[doc = " @brief     Get the bandwidth of specified interface"]
     #[doc = ""]
     #[doc = " @attention 1. API return false if try to get a interface that is not enable"]
     #[doc = ""]
@@ -7566,12 +8074,12 @@ extern "C" {
     pub fn esp_wifi_get_bandwidth(ifx: wifi_interface_t, bw: *mut wifi_bandwidth_t) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief     Set primary/secondary channel of ESP32"]
+    #[doc = " @brief     Set primary/secondary channel of device"]
     #[doc = ""]
     #[doc = " @attention 1. This API should be called after esp_wifi_start()"]
-    #[doc = " @attention 2. When ESP32 is in STA mode, this API should not be called when STA is scanning or connecting to an external AP"]
-    #[doc = " @attention 3. When ESP32 is in softAP mode, this API should not be called when softAP has connected to external STAs"]
-    #[doc = " @attention 4. When ESP32 is in STA+softAP mode, this API should not be called when in the scenarios described above"]
+    #[doc = " @attention 2. When device is in STA mode, this API should not be called when STA is scanning or connecting to an external AP"]
+    #[doc = " @attention 3. When device is in softAP mode, this API should not be called when softAP has connected to external STAs"]
+    #[doc = " @attention 4. When device is in STA+softAP mode, this API should not be called when in the scenarios described above"]
     #[doc = " @attention 5. The channel info set by this API will not be stored in NVS. So If you want to remeber the channel used before wifi stop,"]
     #[doc = "               you need to call this API again after wifi start, or you can call `esp_wifi_set_config()` to store the channel info in NVS."]
     #[doc = ""]
@@ -7586,7 +8094,7 @@ extern "C" {
     pub fn esp_wifi_set_channel(primary: u8, second: wifi_second_chan_t) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief     Get the primary/secondary channel of ESP32"]
+    #[doc = " @brief     Get the primary/secondary channel of device"]
     #[doc = ""]
     #[doc = " @attention 1. API return false if try to get a interface that is not enable"]
     #[doc = ""]
@@ -7640,11 +8148,11 @@ extern "C" {
     pub fn esp_wifi_get_country(country: *mut wifi_country_t) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief     Set MAC address of the ESP32 WiFi station or the soft-AP interface."]
+    #[doc = " @brief     Set MAC address of WiFi station, soft-AP or NAN interface."]
     #[doc = ""]
     #[doc = " @attention 1. This API can only be called when the interface is disabled"]
-    #[doc = " @attention 2. ESP32 soft-AP and station have different MAC addresses, do not set them to be the same."]
-    #[doc = " @attention 3. The bit 0 of the first byte of ESP32 MAC address can not be 1. For example, the MAC address"]
+    #[doc = " @attention 2. Above mentioned interfaces have different MAC addresses, do not set them to be the same."]
+    #[doc = " @attention 3. The bit 0 of the first byte of MAC address can not be 1. For example, the MAC address"]
     #[doc = "      can set to be \"1a:XX:XX:XX:XX:XX\", but can not be \"15:XX:XX:XX:XX:XX\"."]
     #[doc = ""]
     #[doc = " @param     ifx  interface"]
@@ -7766,16 +8274,16 @@ extern "C" {
     ) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief     Set the configuration of the ESP32 STA or AP"]
+    #[doc = " @brief     Set the configuration of the STA, AP or NAN"]
     #[doc = ""]
     #[doc = " @attention 1. This API can be called only when specified interface is enabled, otherwise, API fail"]
     #[doc = " @attention 2. For station configuration, bssid_set needs to be 0; and it needs to be 1 only when users need to check the MAC address of the AP."]
-    #[doc = " @attention 3. ESP32 is limited to only one channel, so when in the soft-AP+station mode, the soft-AP will adjust its channel automatically to be the same as"]
-    #[doc = "               the channel of the ESP32 station."]
-    #[doc = " @attention 4. The configuration will be stored in NVS"]
+    #[doc = " @attention 3. ESP devices are limited to only one channel, so when in the soft-AP+station mode, the soft-AP will adjust its channel automatically to be the same as"]
+    #[doc = "               the channel of the station."]
+    #[doc = " @attention 4. The configuration will be stored in NVS for station and soft-AP"]
     #[doc = ""]
     #[doc = " @param     interface  interface"]
-    #[doc = " @param     conf  station or soft-AP configuration"]
+    #[doc = " @param     conf  station, soft-AP or NAN configuration"]
     #[doc = ""]
     #[doc = " @return"]
     #[doc = "    - ESP_OK: succeed"]
@@ -8091,7 +8599,7 @@ extern "C" {
     pub fn esp_wifi_get_tsf_time(interface: wifi_interface_t) -> i64;
 }
 extern "C" {
-    #[doc = " @brief     Set the inactive time of the ESP32 STA or AP"]
+    #[doc = " @brief     Set the inactive time of the STA or AP"]
     #[doc = ""]
     #[doc = " @attention 1. For Station, If the station does not receive a beacon frame from the connected SoftAP during the inactive time,"]
     #[doc = "               disconnect from SoftAP. Default 6s."]
@@ -8118,6 +8626,7 @@ extern "C" {
     #[doc = " @return"]
     #[doc = "    - ESP_OK: succeed"]
     #[doc = "    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init"]
+    #[doc = "    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start"]
     #[doc = "    - ESP_ERR_WIFI_ARG: invalid argument"]
     pub fn esp_wifi_get_inactive_time(ifx: wifi_interface_t, sec: *mut u16) -> esp_err_t;
 }
@@ -8282,6 +8791,40 @@ extern "C" {
     #[doc = "    - others: failed"]
     pub fn esp_wifi_disable_pmf_config(ifx: wifi_interface_t) -> esp_err_t;
 }
+extern "C" {
+    #[doc = " @brief     Get the Association id assigned to STA by AP"]
+    #[doc = ""]
+    #[doc = " @param[out] aid  store the aid"]
+    #[doc = ""]
+    #[doc = " @attention aid = 0 if station is not connected to AP."]
+    #[doc = ""]
+    #[doc = " @return"]
+    #[doc = "    - ESP_OK: succeed"]
+    pub fn esp_wifi_sta_get_aid(aid: *mut u16) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief     Get the negotiated phymode after connection."]
+    #[doc = ""]
+    #[doc = " @param[out] phymode  store the negotiated phymode."]
+    #[doc = ""]
+    #[doc = " @attention Operation phy mode, BIT[5]: indicate whether LR enabled, BIT[0-4]: wifi_phy_mode_t"]
+    #[doc = ""]
+    #[doc = " @return"]
+    #[doc = "    - ESP_OK: succeed"]
+    pub fn esp_wifi_sta_get_negotiated_phymode(phymode: *mut wifi_phy_mode_t) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief      Config dynamic carrier sense"]
+    #[doc = ""]
+    #[doc = " @attention  This API should be called after esp_wifi_start()."]
+    #[doc = ""]
+    #[doc = " @param      enabled Dynamic carrier sense is enabled or not."]
+    #[doc = ""]
+    #[doc = " @return"]
+    #[doc = "    - ESP_OK: succeed"]
+    #[doc = "    - others: failed"]
+    pub fn esp_wifi_set_dynamic_cs(enabled: bool) -> esp_err_t;
+}
 #[doc = "< protocol: ESPTouch"]
 pub const smartconfig_type_t_SC_TYPE_ESPTOUCH: smartconfig_type_t = 0;
 #[doc = "< protocol: AirKiss"]
@@ -8291,18 +8834,18 @@ pub const smartconfig_type_t_SC_TYPE_ESPTOUCH_AIRKISS: smartconfig_type_t = 2;
 #[doc = "< protocol: ESPTouch v2"]
 pub const smartconfig_type_t_SC_TYPE_ESPTOUCH_V2: smartconfig_type_t = 3;
 pub type smartconfig_type_t = crate::c_types::c_uint;
-#[doc = "< ESP32 station smartconfig has finished to scan for APs"]
+#[doc = "< Station smartconfig has finished to scan for APs"]
 pub const smartconfig_event_t_SC_EVENT_SCAN_DONE: smartconfig_event_t = 0;
-#[doc = "< ESP32 station smartconfig has found the channel of the target AP"]
+#[doc = "< Station smartconfig has found the channel of the target AP"]
 pub const smartconfig_event_t_SC_EVENT_FOUND_CHANNEL: smartconfig_event_t = 1;
-#[doc = "< ESP32 station smartconfig got the SSID and password"]
+#[doc = "< Station smartconfig got the SSID and password"]
 pub const smartconfig_event_t_SC_EVENT_GOT_SSID_PSWD: smartconfig_event_t = 2;
-#[doc = "< ESP32 station smartconfig has sent ACK to cellphone"]
+#[doc = "< Station smartconfig has sent ACK to cellphone"]
 pub const smartconfig_event_t_SC_EVENT_SEND_ACK_DONE: smartconfig_event_t = 3;
 #[doc = " Smartconfig event declarations"]
 pub type smartconfig_event_t = crate::c_types::c_uint;
 extern "C" {
-    pub static mut SC_EVENT: esp_event_base_t;
+    pub static SC_EVENT: esp_event_base_t;
 }
 #[doc = " Argument structure for SC_EVENT_GOT_SSID_PSWD event"]
 #[repr(C)]
@@ -8725,6 +9268,18 @@ extern "C" {
     pub fn esp_wifi_internal_wifi_type_md5_check(md5: *const crate::c_types::c_char) -> esp_err_t;
 }
 extern "C" {
+    #[doc = " @brief     Check the MD5 values of the esp_wifi_he_types.h in IDF and WiFi library"]
+    #[doc = ""]
+    #[doc = " @attention 1. It is used for internal CI version check"]
+    #[doc = ""]
+    #[doc = " @return"]
+    #[doc = "     - ESP_OK : succeed"]
+    #[doc = "     - ESP_WIFI_INVALID_ARG : MD5 check fail"]
+    pub fn esp_wifi_internal_wifi_he_type_md5_check(
+        md5: *const crate::c_types::c_char,
+    ) -> esp_err_t;
+}
+extern "C" {
     #[doc = " @brief     Check the MD5 values of the esp_wifi.h in IDF and WiFi library"]
     #[doc = ""]
     #[doc = " @attention 1. It is used for internal CI version check"]
@@ -8733,6 +9288,17 @@ extern "C" {
     #[doc = "     - ESP_OK : succeed"]
     #[doc = "     - ESP_WIFI_INVALID_ARG : MD5 check fail"]
     pub fn esp_wifi_internal_esp_wifi_md5_check(md5: *const crate::c_types::c_char) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief     Check the MD5 values of the esp_wifi_he.h in IDF and WiFi library"]
+    #[doc = ""]
+    #[doc = " @attention 1. It is used for internal CI version check"]
+    #[doc = ""]
+    #[doc = " @return"]
+    #[doc = "     - ESP_OK : succeed"]
+    #[doc = "     - ESP_WIFI_INVALID_ARG : MD5 check fail"]
+    pub fn esp_wifi_internal_esp_wifi_he_md5_check(md5: *const crate::c_types::c_char)
+        -> esp_err_t;
 }
 extern "C" {
     #[doc = " @brief     Allocate a chunk of memory for WiFi driver"]
@@ -8864,7 +9430,7 @@ extern "C" {
     #[doc = " @param     aid : the connection number when a STA connects to the softAP"]
     #[doc = " @param     primary : store the negotiated primary channel"]
     #[doc = " @param     second : store the negotiated second channel"]
-    #[doc = " @attention the aid param is only works when the ESP32 in softAP/softAP+STA mode"]
+    #[doc = " @attention the aid param is only works when the device in softAP/softAP+STA mode"]
     #[doc = ""]
     #[doc = " @return"]
     #[doc = "    - ESP_OK: succeed"]
@@ -8961,16 +9527,110 @@ extern "C" {
 extern "C" {
     #[doc = " @brief   Configure wifi beacon montior default parameters"]
     #[doc = ""]
-    #[doc = " @param   enable: enable or disable beacon monitor"]
-    #[doc = " @param   timeout: timeout time for close rf phy when beacon loss occurs, Unit: 1024 microsecond"]
-    #[doc = " @param   threshold: maximum number of consecutive lost beacons allowed"]
-    pub fn esp_wifi_beacon_monitor_configure(
-        enable: bool,
-        timeout: crate::c_types::c_int,
-        threshold: crate::c_types::c_int,
-        delta_intr_early: crate::c_types::c_int,
-        delta_timeout: crate::c_types::c_int,
+    #[doc = " @param   config: the configuration parameters for wifi beacon monitor"]
+    pub fn esp_wifi_beacon_monitor_configure(config: *mut wifi_beacon_monitor_config_t);
+}
+extern "C" {
+    #[doc = " @brief   Require WiFi to enable or disable Advanced DTIM sleep function"]
+    #[doc = ""]
+    #[doc = " @param   light_sleep_enable: true for light sleep mode is enabled, false for light sleep mode is disabled."]
+    #[doc = " @param   modem_state_enable: true for require WiFi to enable Advanced DTIM sleep function,"]
+    #[doc = "                              false for require WiFi to disable Advanced DTIM sleep function."]
+    #[doc = " @return"]
+    #[doc = "    - ESP_OK: succeed"]
+    pub fn esp_wifi_internal_mac_sleep_configure(
+        light_sleep_enable: bool,
+        modem_state_enable: bool,
     );
+}
+extern "C" {
+    #[doc = " @brief      Start Publishing a service in the NAN cluster"]
+    #[doc = ""]
+    #[doc = " @attention  This API should be called after esp_wifi_start() in NAN Mode."]
+    #[doc = ""]
+    #[doc = " @param      publish_cfg  Configuration parameters for publishing a service."]
+    #[doc = " @param      id  Identifier for the Publish service."]
+    #[doc = " @param      cancel  Cancel the service identified by the id."]
+    #[doc = ""]
+    #[doc = " @return"]
+    #[doc = "    - ESP_OK: succeed"]
+    #[doc = "    - others: failed"]
+    pub fn esp_nan_internal_publish_service(
+        publish_cfg: *const wifi_nan_publish_cfg_t,
+        id: *mut u8,
+        cancel: bool,
+    ) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief      Subscribe for a service within the NAN cluster"]
+    #[doc = ""]
+    #[doc = " @attention  This API should be called after esp_wifi_start() in NAN Mode."]
+    #[doc = ""]
+    #[doc = " @param      subscribe_cfg  Configuration parameters for subscribing for a service."]
+    #[doc = " @param      id  Identifier for the Subscribe service."]
+    #[doc = " @param      cancel  Cancel the service identified by the id."]
+    #[doc = ""]
+    #[doc = " @return"]
+    #[doc = "    - ESP_OK: succeed"]
+    #[doc = "    - others: failed"]
+    pub fn esp_nan_internal_subscribe_service(
+        subscribe_cfg: *const wifi_nan_subscribe_cfg_t,
+        id: *mut u8,
+        cancel: bool,
+    ) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief      Send Follow-up to the Publisher with matching service"]
+    #[doc = ""]
+    #[doc = " @attention  This API should be called after WIFI_EVENT_NAN_SVC_MATCH event is received."]
+    #[doc = ""]
+    #[doc = " @param      fup_params  Configuration parameters for sending a Follow-up to the Peer."]
+    #[doc = ""]
+    #[doc = " @return"]
+    #[doc = "    - ESP_OK: succeed"]
+    #[doc = "    - others: failed"]
+    pub fn esp_nan_internal_send_followup(
+        fup_params: *const wifi_nan_followup_params_t,
+    ) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief      Send Datapath Request to the Publisher with matching service"]
+    #[doc = ""]
+    #[doc = " @attention  This API should be called after WIFI_EVENT_NAN_SVC_MATCH event is received."]
+    #[doc = ""]
+    #[doc = " @param      req  NAN Datapath Request parameters."]
+    #[doc = ""]
+    #[doc = " @return"]
+    #[doc = "    - ESP_OK: succeed"]
+    #[doc = "    - others: failed"]
+    pub fn esp_nan_internal_datapath_req(
+        req: *mut wifi_nan_datapath_req_t,
+        ndp_id: *mut u8,
+    ) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief      Send Datapath Response to accept or reject the received request"]
+    #[doc = ""]
+    #[doc = " @attention  This API should be called on the Publisher after receiving WIFI_EVENT_NDP_INDICATION event."]
+    #[doc = ""]
+    #[doc = " @param      resp  NAN Datapath Response parameters."]
+    #[doc = ""]
+    #[doc = " @return"]
+    #[doc = "    - ESP_OK: succeed"]
+    #[doc = "    - others: failed"]
+    pub fn esp_nan_internal_datapath_resp(resp: *mut wifi_nan_datapath_resp_t) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief      End NAN Datapath that is active"]
+    #[doc = ""]
+    #[doc = " @attention  This API should be called after receiving WIFI_EVENT_NDP_CONFIRM event."]
+    #[doc = ""]
+    #[doc = " @param      req  NAN Datapath end request parameters."]
+    #[doc = ""]
+    #[doc = " @return"]
+    #[doc = "    - ESP_OK: succeed"]
+    #[doc = "    - others: failed"]
+    pub fn esp_nan_internal_datapath_end(req: *mut wifi_nan_datapath_end_req_t) -> esp_err_t;
 }
 extern "C" {
     pub static g_wifi_default_mesh_crypto_funcs: mesh_crypto_funcs_t;
@@ -9124,6 +9784,14 @@ extern "C" {
     pub fn esp_btbb_enable();
 }
 extern "C" {
+    #[doc = " @brief Disable BTBB module"]
+    #[doc = ""]
+    #[doc = " Dsiable BTBB module, used by IEEE802154 or Bluetooth."]
+    #[doc = " Users should not call this API in their application."]
+    #[doc = ""]
+    pub fn esp_btbb_disable();
+}
+extern "C" {
     #[doc = " @brief Load calibration data from NVS and initialize PHY and RF module"]
     pub fn esp_phy_load_cal_and_init();
 }
@@ -9164,6 +9832,22 @@ extern "C" {
     #[doc = " @brief Get PHY lib version"]
     #[doc = " @return PHY lib version."]
     pub fn get_phy_version_str() -> *mut crate::c_types::c_char;
+}
+pub const phy_i2c_master_command_type_t_PHY_I2C_MST_CMD_TYPE_OFF: phy_i2c_master_command_type_t = 0;
+pub const phy_i2c_master_command_type_t_PHY_I2C_MST_CMD_TYPE_ON: phy_i2c_master_command_type_t = 1;
+pub const phy_i2c_master_command_type_t_PHY_I2C_MST_CMD_TYPE_MAX: phy_i2c_master_command_type_t = 2;
+pub type phy_i2c_master_command_type_t = crate::c_types::c_uint;
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct phy_i2c_master_command_attribute_t {
+    pub config: [phy_i2c_master_command_attribute_t__bindgen_ty_1; 2usize],
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct phy_i2c_master_command_attribute_t__bindgen_ty_1 {
+    pub start: u8,
+    pub end: u8,
+    pub host_id: u8,
 }
 extern "C" {
     #[doc = " @brief Return ROM function pointer table from PHY library."]
@@ -9405,6 +10089,11 @@ extern "C" {
     #[doc = " to call this function before using other esp_timer APIs."]
     #[doc = " Before calling this function, esp_timer_early_init must be called by the"]
     #[doc = " startup code."]
+    #[doc = ""]
+    #[doc = " This function will be called from startup code on every core"]
+    #[doc = " if CONFIG_ESP_TIMER_ISR_AFFINITY_NO_AFFINITY is enabled,"]
+    #[doc = " It allocates the timer ISR on MULTIPLE cores and"]
+    #[doc = " creates the timer task which can be run on any core."]
     #[doc = ""]
     #[doc = " @return"]
     #[doc = "      - ESP_OK on success"]
