@@ -2286,3 +2286,5 @@ __bswapsi2 = 0x400021d8;
 strcmp = 0x40001230;
 strstr = 0x40001254;
 strchr = 0x4000138c;
+
+PROVIDE ( esp_rom_crc32_le = crc32_le );
