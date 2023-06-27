@@ -82,6 +82,16 @@ fn main() -> Result<()> {
         tools.join("riscv32-esp-elf/esp-2021r2-patch5-8_4_0/riscv32-esp-elf/"),
     )?;
 
+    generate_bindings_for_chip(
+        "esp32h2",
+        Arch::RiscV,
+        &workspace,
+        tools.join(
+            "riscv32-esp-elf/esp-2021r2-patch5-8_4_0/riscv32-esp-elf/riscv32-esp-elf/include/",
+        ),
+        tools.join("riscv32-esp-elf/esp-2021r2-patch5-8_4_0/riscv32-esp-elf/"),
+    )?;
+
     Ok(())
 }
 
