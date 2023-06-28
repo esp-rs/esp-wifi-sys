@@ -8,9 +8,9 @@ This uses the WiFi drivers from https://github.com/esp-rs/esp-wireless-drivers-3
 
 ## Version used
 
-v5.1-dev-2658-g0025915dc4 commit 0025915dc489a9d45f99aed74920346f8ac4ec09
+v5.1-rc2-4-gc570f67461 commit c570f674610479fc5e070c8db6d181b73ddf60a8
 
-https://github.com/esp-rs/esp-wireless-drivers-3rdparty/ (commit f4caebff200e8f6f51b0a11d2b69ca56c76bb1c9)
+https://github.com/esp-rs/esp-wireless-drivers-3rdparty/ (commit 976e9cc6c0725e8325a7e3a362d113559238c45c)
 
 ## Current support
 
