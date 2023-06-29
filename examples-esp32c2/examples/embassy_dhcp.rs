@@ -63,7 +63,7 @@ fn main() -> ! {
     let timer_group0 = TimerGroup::new(peripherals.TIMG0, &clocks, &mut peripheral_clock_control);
     embassy::init(&clocks, timer_group0.timer0);
 
-    let config = Config::Dhcp(Default::default());
+    let config = Config::dhcpv4(Default::default());
 
     let seed = 1234; // very random, very secure seed
 
@@ -138,7 +138,7 @@ async fn task(stack: &'static Stack<WifiDevice<'static>>) {
 
     println!("Waiting to get IP address...");
     loop {
-        if let Some(config) = stack.config() {
+        if let Some(config) = stack.config_v4() {
             println!("Got IP: {}", config.address);
             break;
         }
@@ -150,7 +150,7 @@ async fn task(stack: &'static Stack<WifiDevice<'static>>) {
 
         let mut socket = TcpSocket::new(&stack, &mut rx_buffer, &mut tx_buffer);
 
-        socket.set_timeout(Some(embassy_net::SmolDuration::from_secs(10)));
+        socket.set_timeout(Some(embassy_time::Duration::from_secs(10)));
 
         let remote_endpoint = (Ipv4Address::new(142, 250, 185, 115), 80);
         println!("connecting...");
