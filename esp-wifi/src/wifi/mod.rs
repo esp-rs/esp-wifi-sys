@@ -232,8 +232,11 @@ static mut G_COEX_ADAPTER_FUNCS: coex_adapter_funcs_t = coex_adapter_funcs_t {
     _free: Some(free),
     _esp_timer_get_time: Some(esp_timer_get_time),
     _env_is_chip: Some(env_is_chip),
-    _slowclk_cal_get: Some(slowclk_cal_get),
     _magic: crate::binary::include::COEX_ADAPTER_MAGIC as i32,
+    _timer_disarm: Some(timer_disarm),
+    _timer_done: Some(timer_done),
+    _timer_setfn: Some(timer_setfn),
+    _timer_arm_us: Some(timer_arm_us),
 };
 
 #[cfg(all(esp32s3, coex))]
@@ -251,8 +254,11 @@ static mut G_COEX_ADAPTER_FUNCS: coex_adapter_funcs_t = coex_adapter_funcs_t {
     _free: Some(free),
     _esp_timer_get_time: Some(esp_timer_get_time),
     _env_is_chip: Some(env_is_chip),
-    _slowclk_cal_get: Some(slowclk_cal_get),
     _magic: crate::binary::include::COEX_ADAPTER_MAGIC as i32,
+    _timer_disarm: Some(timer_disarm),
+    _timer_done: Some(timer_done),
+    _timer_setfn: Some(timer_setfn),
+    _timer_arm_us: Some(timer_arm_us),
 };
 
 #[cfg(all(esp32, coex))]
@@ -278,7 +284,6 @@ static mut G_COEX_ADAPTER_FUNCS: coex_adapter_funcs_t = coex_adapter_funcs_t {
     _timer_setfn: Some(timer_setfn),
     _timer_arm_us: Some(timer_arm_us),
     _env_is_chip: Some(env_is_chip),
-    _slowclk_cal_get: Some(slowclk_cal_get),
     _magic: crate::binary::include::COEX_ADAPTER_MAGIC as i32,
 };
 
@@ -447,8 +452,6 @@ static g_wifi_osi_funcs: wifi_osi_funcs_t = wifi_osi_funcs_t {
     _coex_schm_interval_get: Some(coex_schm_interval_get),
     _coex_schm_curr_period_get: Some(coex_schm_curr_period_get),
     _coex_schm_curr_phase_get: Some(coex_schm_curr_phase_get),
-    _coex_schm_curr_phase_idx_set: Some(coex_schm_curr_phase_idx_set),
-    _coex_schm_curr_phase_idx_get: Some(coex_schm_curr_phase_idx_get),
     #[cfg(any(esp32c3, esp32c2, esp32c6, esp32s3, esp32s2,))]
     _slowclk_cal_get: Some(slowclk_cal_get),
     #[cfg(any(esp32, esp32s2))]
@@ -477,6 +480,9 @@ static g_wifi_osi_funcs: wifi_osi_funcs_t = wifi_osi_funcs_t {
     _sleep_retention_entries_destroy: Some(
         os_adapter_chip_specific::sleep_retention_entries_destroy_dummy,
     ),
+
+    _coex_schm_process_restart: Some(coex_schm_process_restart_wrapper),
+    _coex_schm_register_cb: Some(coex_schm_register_cb_wrapper),
 
     _magic: ESP_WIFI_OS_ADAPTER_MAGIC as i32,
 };
@@ -518,6 +524,8 @@ static mut G_CONFIG: wifi_init_config_t = wifi_init_config_t {
         ccmp_decrypt: None,
         ccmp_encrypt: None,
         aes_gmac: None,
+        sha256_vector: None,
+        crc32: None,
     },
     static_rx_buf_num: 10,
     dynamic_rx_buf_num: 32,
@@ -557,7 +565,6 @@ pub fn wifi_init() -> Result<(), WifiError> {
     unsafe {
         G_CONFIG.wpa_crypto_funcs = g_wifi_default_wpa_crypto_funcs;
         G_CONFIG.feature_caps = g_wifi_feature_caps;
-
         crate::wifi_set_log_verbose();
 
         #[cfg(coex)]
@@ -1125,12 +1132,13 @@ impl embedded_svc::wifi::Wifi for WifiController<'_> {
                             required: false,
                         },
                         sae_pwe_h2e: 3,
-                        _bitfield_align_1: [0u16; 0],
+                        _bitfield_align_1: [0u32; 0],
                         _bitfield_1: __BindgenBitfieldUnit::new([0u8; 4usize]),
                         failure_retry_cnt: 1,
-                        _bitfield_align_2: [0u8; 0],
-                        _bitfield_2: __BindgenBitfieldUnit::new([0u8; 1usize]),
-                        __bindgen_padding_0: 0u16,
+                        _bitfield_align_2: [0u32; 0],
+                        _bitfield_2: __BindgenBitfieldUnit::new([0u8; 4usize]),
+                        sae_pk_mode: 0, // ??
+                        sae_h2e_identifier: [0u8; 32usize],
                     },
                 };
 
@@ -1178,6 +1186,7 @@ impl embedded_svc::wifi::Wifi for WifiController<'_> {
                             capable: true,
                             required: false,
                         },
+                        sae_pwe_h2e: 0,
                     },
                 };
 

@@ -686,7 +686,12 @@ r_ble_util_data_rx_buf_reset = 0x40000b8c;
 r_bt_bb_get_intr_mask = 0x40000b90;
 r_bt_bb_intr_clear = 0x40000b94;
 r_bt_bb_intr_mask_set = 0x40000b98;
+/*
+
+IT IS IMPORTANT TO NOT USE THE ROM FUNCTION BUT THE FUNCTION PROVIDED BY libbtdm_app.a
+
 r_bt_bb_isr = 0x40000b9c;
+*/
 r_bt_rf_coex_cfg_set = 0x40000ba0;
 r_bt_rf_coex_conn_dynamic_pti_en_get = 0x40000ba4;
 r_bt_rf_coex_conn_phy_coded_data_time_limit_en_get = 0x40000ba8;
@@ -716,9 +721,14 @@ r_bt_rtp_init = 0x40000c04;
 r_bt_rtp_register_rule_cs_fmt = 0x40000c08;
 r_bt_rtp_register_rule_cs_idx = 0x40000c0c;
 r_btdm_isr = 0x40000c10;
+/*
+
+IT IS IMPORTANT TO NOT USE THE ROM FUNCTIONS BUT THE FUNCTIONS PROVIDED BY libbtdm_app.a
+
 r_btdm_task_post = 0x40000c14;
 r_btdm_task_post_from_isr = 0x40000c18;
 r_btdm_task_recycle = 0x40000c1c;
+*/
 r_cali_phase_match_p = 0x40000c20;
 r_cmp_abs_time = 0x40000c24;
 r_cmp_dest_id = 0x40000c28;
@@ -2036,3 +2046,60 @@ __unordsf2 = 0x400008c8;
  ***************************************/
 
 PROVIDE ( esp_rom_delay_us = ets_delay_us );
+
+PROVIDE ( esp_rom_crc32_le = crc32_le );
+
+r_lld_legacy_adv_dynamic_pti_get = 0x40001b38;
+r_lld_legacy_adv_dynamic_pti_process = 0x40001b3c;
+r_lld_ext_adv_dynamic_pti_get = 0x40001b40;
+r_lld_adv_ext_pkt_prepare_set = 0x40001b4c;
+r_lld_adv_ext_chain_connectable_construct = 0x40001b54;
+r_lld_adv_pkt_rx_connect_post = 0x40001b5c;
+r_lld_adv_start_init_evt_param = 0x40001b60;
+r_lld_adv_start_set_cs = 0x40001b64;
+r_lld_adv_start_update_filter_policy = 0x40001b68;
+r_lld_adv_start_schedule_asap = 0x40001b6c;
+r_lld_ext_adv_dynamic_pti_process = 0x40005124;
+r_lld_con_tx_prog_new_packet_coex = 0x40001b70;
+r_lld_per_adv_dynamic_pti_get = 0x40001b78;
+r_lld_per_adv_evt_start_chm_upd = 0x40001b7c;
+r_lld_ext_scan_dynamic_pti_get = 0x400051cc;
+r_sch_prog_ble_push = 0x40001b8c;
+r_sch_prog_bt_push = 0x40001b90;
+r_lld_con_tx_hook = 0x40001c9c;
+r_lld_con_frm_isr_hook = 0x40001c98;
+r_lld_con_evt_canceled_cbk_hook = 0x40001c94;
+r_lld_adv_start_init_evt_param_hook = 0x40001c90;
+r_lld_adv_frm_isr_hook = 0x40001c8c;
+r_lld_adv_aux_evt_start_cbk_hook = 0x40001c88;
+r_lld_init_sched_hook = 0x40001cbc;
+r_lld_init_evt_start_cbk_hook = 0x40001cb4;
+r_lld_init_frm_eof_isr_hook = 0x40001cb0;
+r_lld_con_tx_prog_new_packet_hook = 0x40001cac;
+r_lld_con_evt_start_cbk_hook = 0x40001ca4;
+r_lld_con_rx_hook = 0x40001ca0;
+r_lld_sync_evt_start_cbk_hook = 0x40001cd4;
+r_lld_sync_frm_eof_isr_hook = 0x40001cd0;
+r_lld_per_adv_start_hook = 0x40001ccc;
+r_lld_per_adv_frm_isr_hook = 0x40001cc8;
+r_lld_per_adv_evt_start_cbk_hook = 0x40001cc4;
+r_lld_init_process_pkt_tx_hook = 0x40001cc0;
+r_lld_scan_try_sched = 0x40001b84;
+r_sch_plan_offset_req_hook = 0x40001ce4;
+r_sch_arb_insert_hook = 0x40001ce0;
+r_lld_sync_process_pkt_rx_pkt_check_hook = 0x40001cdc;
+r_lld_sync_start_hook = 0x40001cd8;
+r_lld_adv_evt_start_cbk_hook = 0x40001c84;
+r_lld_scan_sched_hook = 0x40001c7c;
+r_lld_scan_process_pkt_rx_ext_adv_hook = 0x40001c78;
+r_lld_scan_evt_start_cbk_hook = 0x40001c70;
+r_lld_scan_frm_eof_isr_hook = 0x40001c6c;
+r_llc_rem_phy_upd_proc_continue_hook = 0x40001c68;
+r_llc_loc_encrypt_proc_continue_hook = 0x40001c60;
+r_lld_init_evt_end_type_check_state_get = 0x40005244;
+r_llc_loc_phy_upd_proc_continue_hook = 0x40001c64;
+r_lld_init_evt_end_type_check_state_set = 0x40001ba4;
+r_lld_adv_direct_adv_use_rpa_addr_state_get = 0x40001ba0;
+r_lld_init_evt_end_type_get = 0x40001b98;
+r_lld_init_evt_end_type_set = 0x40001b94;
+r_lld_adv_direct_adv_use_rpa_addr_state_set = 0x40001b9c;

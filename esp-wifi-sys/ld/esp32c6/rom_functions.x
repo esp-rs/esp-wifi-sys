@@ -1467,3 +1467,4 @@ wifi_get_target_power = 0x4000148c;
 phy_param_rom = 0x4087fce8;
 
 PROVIDE ( esp_rom_delay_us = ets_delay_us );
+PROVIDE ( esp_rom_crc32_le = crc32_le );

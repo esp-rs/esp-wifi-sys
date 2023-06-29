@@ -976,7 +976,12 @@ r_ble_util_data_rx_buf_reset = 0x40003288;
 r_bt_bb_get_intr_mask = 0x40003294;
 r_bt_bb_intr_clear = 0x400032a0;
 r_bt_bb_intr_mask_set = 0x400032ac;
+/*
+
+IT IS IMPORTANT TO NOT USE THE ROM FUNCTION BUT THE FUNCTION PROVIDED BY libbtdm_app.a
+
 r_bt_bb_isr = 0x400032b8;
+*/
 r_bt_rf_coex_cfg_set = 0x400032c4;
 r_bt_rf_coex_conn_dynamic_pti_en_get = 0x400032d0;
 r_bt_rf_coex_conn_phy_coded_data_time_limit_en_get = 0x400032dc;
@@ -1006,9 +1011,14 @@ r_bt_rtp_init = 0x400033f0;
 r_bt_rtp_register_rule_cs_fmt = 0x400033fc;
 r_bt_rtp_register_rule_cs_idx = 0x40003408;
 r_btdm_isr = 0x40003414;
+/*
+
+IT IS IMPORTANT TO NOT USE THE ROM FUNCTIONS BUT THE FUNCTIONS PROVIDED BY libbtdm_app.a
+
 r_btdm_task_post = 0x40003420;
 r_btdm_task_post_from_isr = 0x4000342c;
 r_btdm_task_recycle = 0x40003438;
+*/
 r_cali_phase_match_p = 0x40003444;
 r_cmp_abs_time = 0x40003450;
 r_cmp_dest_id = 0x4000345c;
@@ -2286,3 +2296,49 @@ __bswapsi2 = 0x400021d8;
 strcmp = 0x40001230;
 strstr = 0x40001254;
 strchr = 0x4000138c;
+
+/* bluetooth hook funcs */
+r_llc_loc_encrypt_proc_continue_hook = 0x40001c60;
+r_llc_loc_phy_upd_proc_continue_hook = 0x40001c64;
+r_llc_rem_phy_upd_proc_continue_hook = 0x40001c68;
+r_lld_scan_frm_eof_isr_hook = 0x40001c6c;
+r_lld_scan_evt_start_cbk_hook = 0x40001c70;
+/*
+r_lld_scan_start_hook = 0x40001c74;
+*/
+r_lld_scan_process_pkt_rx_ext_adv_hook = 0x40001c78;
+r_lld_scan_sched_hook = 0x40001c7c;
+/*
+r_lld_adv_start_hook = 0x40001c80;
+*/
+r_lld_adv_evt_start_cbk_hook = 0x40001c84;
+r_lld_adv_aux_evt_start_cbk_hook = 0x40001c88;
+r_lld_adv_frm_isr_hook = 0x40001c8c;
+r_lld_adv_start_init_evt_param_hook = 0x40001c90;
+r_lld_con_evt_canceled_cbk_hook = 0x40001c94;
+r_lld_con_frm_isr_hook = 0x40001c98;
+r_lld_con_tx_hook = 0x40001c9c;
+r_lld_con_rx_hook = 0x40001ca0;
+r_lld_con_evt_start_cbk_hook = 0x40001ca4;
+/*
+r_lld_con_start_hook = 0x40001ca8;
+*/
+r_lld_con_tx_prog_new_packet_hook = 0x40001cac;
+r_lld_init_frm_eof_isr_hook = 0x40001cb0;
+r_lld_init_evt_start_cbk_hook = 0x40001cb4;
+/*
+r_lld_init_start_hook = 0x40001cb8;
+*/
+r_lld_init_sched_hook = 0x40001cbc;
+r_lld_init_process_pkt_tx_hook = 0x40001cc0;
+r_lld_per_adv_evt_start_cbk_hook = 0x40001cc4;
+r_lld_per_adv_frm_isr_hook = 0x40001cc8;
+r_lld_per_adv_start_hook = 0x40001ccc;
+r_lld_sync_frm_eof_isr_hook = 0x40001cd0;
+r_lld_sync_evt_start_cbk_hook = 0x40001cd4;
+r_lld_sync_start_hook = 0x40001cd8;
+r_lld_sync_process_pkt_rx_pkt_check_hook = 0x40001cdc;
+r_sch_arb_insert_hook = 0x40001ce0;
+r_sch_plan_offset_req_hook = 0x40001ce4;
+
+PROVIDE ( esp_rom_crc32_le = crc32_le );
