@@ -81,9 +81,9 @@ jobs:
       - name: build (embassy_dhcp)
         run: cd examples-esp32c2 && cargo +nightly-2023-05-16 build --release --example=embassy_dhcp --features=async,wifi,embassy-net
       - name: build (embassy_access_point)
-        run: cd examples-esp32c2 && cargo build --release --example=embassy_access_point --features=async,wifi,embassy-net
+        run: cd examples-esp32c2 && cargo +nightly-2023-05-16 build --release --example=embassy_access_point --features=async,wifi,embassy-net
       - name: build (static_ip)
-        run: cd examples-esp32c2 && cargo build --release --example=static_ip --features=wifi
+        run: cd examples-esp32c2 && cargo +nightly-2023-05-16 build --release --example=static_ip --features=wifi
 
   esp32c3:
     runs-on: ubuntu-latest
@@ -113,9 +113,9 @@ jobs:
       - name: build (embassy_dhcp)
         run: cd examples-esp32c3 && cargo +nightly-2023-05-16 build --release --example=embassy_dhcp --features=async,wifi,embassy-net
       - name: build (embassy_access_point)
-        run: cd examples-esp32c3 && cargo build --release --example=embassy_access_point --features=async,wifi,embassy-net
+        run: cd examples-esp32c3 && cargo +nightly-2023-05-16 build --release --example=embassy_access_point --features=async,wifi,embassy-net
       - name: build (static_ip)
-        run: cd examples-esp32c3 && cargo build --release --example=static_ip --features=wifi
+        run: cd examples-esp32c3 && cargo +nightly-2023-05-16 build --release --example=static_ip --features=wifi
 
   esp32c6:
     runs-on: ubuntu-latest
@@ -139,9 +139,9 @@ jobs:
       - name: build (embassy_dhcp)
         run: cd examples-esp32c6 && cargo +nightly-2023-05-16 build --release --example=embassy_dhcp --features=async,wifi,embassy-net
       - name: build (embassy_access_point)
-        run: cd examples-esp32c6 && cargo build --release --example=embassy_access_point --features=async,wifi,embassy-net
+        run: cd examples-esp32c6 && cargo +nightly-2023-05-16 build --release --example=embassy_access_point --features=async,wifi,embassy-net
       - name: build (static_ip)
-        run: cd examples-esp32c6 && cargo build --release --example=static_ip --features=wifi
+        run: cd examples-esp32c6 && cargo +nightly-2023-05-16 build --release --example=static_ip --features=wifi
 
   esp32s2:
     runs-on: ubuntu-latest
