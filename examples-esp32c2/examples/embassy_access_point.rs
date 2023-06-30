@@ -6,8 +6,9 @@
 
 use embassy_executor::_export::StaticCell;
 use embassy_net::tcp::TcpSocket;
+use embassy_net::ConfigV4;
 use embassy_net::{
-    Config, IpListenEndpoint, Ipv4Address, Ipv4Cidr, Stack, StackResources, StaticConfig,
+    Config, IpListenEndpoint, Ipv4Address, Ipv4Cidr, Stack, StackResources, StaticConfigV4,
 };
 use examples_util::hal;
 
@@ -61,11 +62,13 @@ fn main() -> ! {
     let timer_group0 = TimerGroup::new(peripherals.TIMG0, &clocks, &mut peripheral_clock_control);
     embassy::init(&clocks, timer_group0.timer0);
 
-    let config = Config::Static(StaticConfig {
-        address: Ipv4Cidr::new(Ipv4Address::new(192, 168, 2, 1), 24),
-        gateway: Some(Ipv4Address::from_bytes(&[192, 168, 2, 1])),
-        dns_servers: Default::default(),
-    });
+    let config = Config {
+        ipv4: ConfigV4::Static(StaticConfigV4 {
+            address: Ipv4Cidr::new(Ipv4Address::new(192, 168, 2, 1), 24),
+            gateway: Some(Ipv4Address::from_bytes(&[192, 168, 2, 1])),
+            dns_servers: Default::default(),
+        }),
+    };
 
     let seed = 1234; // very random, very secure seed
 
@@ -131,7 +134,7 @@ async fn task(stack: &'static Stack<WifiDevice<'static>>) {
     println!("Use a static IP in the range 192.168.2.2 .. 192.168.2.255, use gateway 192.168.2.1");
 
     let mut socket = TcpSocket::new(&stack, &mut rx_buffer, &mut tx_buffer);
-    socket.set_timeout(Some(embassy_net::SmolDuration::from_secs(10)));
+    socket.set_timeout(Some(embassy_time::Duration::from_secs(10)));
     loop {
         println!("Wait for connection...");
         let r = socket
