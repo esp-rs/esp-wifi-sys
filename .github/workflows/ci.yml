@@ -41,15 +41,19 @@ jobs:
       - name: build (async-ble)
         run: cd examples-esp32 && cargo build --release --example=async_ble --features=async,ble
       - name: build (dhcp)
-        run: cd examples-esp32 && cargo build --release --example=dhcp --features=embedded-svc,wifi
+        run: cd examples-esp32 && cargo build --release --example=dhcp --features=wifi
       - name: build (static_ip)
-        run: cd examples-esp32 && cargo build --release --example=static_ip --features=embedded-svc,wifi
+        run: cd examples-esp32 && cargo build --release --example=static_ip --features=wifi
       - name: build (esp_now)
         run: cd examples-esp32 && cargo build --release --example=esp_now --features=esp-now
       - name: build (embassy_esp_now)
         run: cd examples-esp32 && cargo build --release --example=embassy_esp_now --features=async,esp-now
       - name: build (embassy_dhcp)
-        run: cd examples-esp32 && cargo build --release --example=embassy_dhcp --features=async,embedded-svc,wifi,embassy-net
+        run: cd examples-esp32 && cargo build --release --example=embassy_dhcp --features=async,wifi,embassy-net
+      - name: build (embassy_access_point)
+        run: cd examples-esp32 && cargo build --release --example=embassy_access_point --features=async,wifi,embassy-net
+      - name: build (static_ip)
+        run: cd examples-esp32 && cargo build --release --example=static_ip --features=wifi
 
   esp32c2:
     runs-on: ubuntu-latest
@@ -58,24 +62,28 @@ jobs:
       - uses: dtolnay/rust-toolchain@v1
         with:
           target: riscv32imc-unknown-none-elf
-          toolchain: nightly-2023-03-09
+          toolchain: nightly-2023-05-16
           components: rust-src
       - uses: Swatinem/rust-cache@v1
 
       - name: build (ble)
-        run: cd examples-esp32c2 && cargo +nightly-2023-03-09 build --release --example=ble --features=ble
+        run: cd examples-esp32c2 && cargo +nightly-2023-05-16 build --release --example=ble --features=ble
       - name: build (async-ble)
-        run: cd examples-esp32c2 && cargo +nightly-2023-03-09 build --release --example=async_ble --features=async,ble
+        run: cd examples-esp32c2 && cargo +nightly-2023-05-16 build --release --example=async_ble --features=async,ble
       - name: build (dhcp)
-        run: cd examples-esp32c2 && cargo +nightly-2023-03-09 build --release --example=dhcp --features=embedded-svc,wifi
+        run: cd examples-esp32c2 && cargo +nightly-2023-05-16 build --release --example=dhcp --features=wifi
       - name: build (static_ip)
-        run: cd examples-esp32c2 && cargo +nightly-2023-03-09 build --release --example=static_ip --features=embedded-svc,wifi
+        run: cd examples-esp32c2 && cargo +nightly-2023-05-16 build --release --example=static_ip --features=wifi
       - name: build (esp_now)
-        run: cd examples-esp32c2 && cargo +nightly-2023-03-09 build --release --example=esp_now --features=esp-now
+        run: cd examples-esp32c2 && cargo +nightly-2023-05-16 build --release --example=esp_now --features=esp-now
       - name: build (embassy_esp_now)
-        run: cd examples-esp32c2 && cargo +nightly-2023-03-09 build --release --example=embassy_esp_now --features=async,esp-now
+        run: cd examples-esp32c2 && cargo +nightly-2023-05-16 build --release --example=embassy_esp_now --features=async,esp-now
       - name: build (embassy_dhcp)
-        run: cd examples-esp32c2 && cargo +nightly-2023-03-09 build --release --example=embassy_dhcp --features=async,embedded-svc,wifi,embassy-net
+        run: cd examples-esp32c2 && cargo +nightly-2023-05-16 build --release --example=embassy_dhcp --features=async,wifi,embassy-net
+      - name: build (embassy_access_point)
+        run: cd examples-esp32c2 && cargo build --release --example=embassy_access_point --features=async,wifi,embassy-net
+      - name: build (static_ip)
+        run: cd examples-esp32c2 && cargo build --release --example=static_ip --features=wifi
 
   esp32c3:
     runs-on: ubuntu-latest
@@ -84,26 +92,30 @@ jobs:
       - uses: dtolnay/rust-toolchain@v1
         with:
           target: riscv32imc-unknown-none-elf
-          toolchain: nightly-2023-03-09
+          toolchain: nightly-2023-05-16
           components: rust-src
       - uses: Swatinem/rust-cache@v1
 
       - name: build (ble)
-        run: cd examples-esp32c3 && cargo +nightly-2023-03-09 build --release --example=ble --features=ble
+        run: cd examples-esp32c3 && cargo +nightly-2023-05-16 build --release --example=ble --features=ble
       - name: build (async-ble)
-        run: cd examples-esp32c3 && cargo +nightly-2023-03-09 build --release --example=async_ble --features=async,ble
+        run: cd examples-esp32c3 && cargo +nightly-2023-05-16 build --release --example=async_ble --features=async,ble
       - name: build (coex)
-        run: cd examples-esp32c3 && cargo +nightly-2023-03-09 build --release --example=coex --features=embedded-svc,wifi,ble
+        run: cd examples-esp32c3 && cargo +nightly-2023-05-16 build --release --example=coex --features=wifi,ble
       - name: build (dhcp)
-        run: cd examples-esp32c3 && cargo +nightly-2023-03-09 build --release --example=dhcp --features=embedded-svc,wifi
+        run: cd examples-esp32c3 && cargo +nightly-2023-05-16 build --release --example=dhcp --features=wifi
       - name: build (static_ip)
-        run: cd examples-esp32c3 && cargo +nightly-2023-03-09 build --release --example=static_ip --features=embedded-svc,wifi
+        run: cd examples-esp32c3 && cargo +nightly-2023-05-16 build --release --example=static_ip --features=wifi
       - name: build (esp_now)
-        run: cd examples-esp32c3 && cargo +nightly-2023-03-09 build --release --example=esp_now --features=esp-now
+        run: cd examples-esp32c3 && cargo +nightly-2023-05-16 build --release --example=esp_now --features=esp-now
       - name: build (embassy_esp_now)
-        run: cd examples-esp32c3 && cargo +nightly-2023-03-09 build --release --example=embassy_esp_now --features=async,esp-now
+        run: cd examples-esp32c3 && cargo +nightly-2023-05-16 build --release --example=embassy_esp_now --features=async,esp-now
       - name: build (embassy_dhcp)
-        run: cd examples-esp32c3 && cargo +nightly-2023-03-09 build --release --example=embassy_dhcp --features=async,embedded-svc,wifi,embassy-net
+        run: cd examples-esp32c3 && cargo +nightly-2023-05-16 build --release --example=embassy_dhcp --features=async,wifi,embassy-net
+      - name: build (embassy_access_point)
+        run: cd examples-esp32c3 && cargo build --release --example=embassy_access_point --features=async,wifi,embassy-net
+      - name: build (static_ip)
+        run: cd examples-esp32c3 && cargo build --release --example=static_ip --features=wifi
 
   esp32c6:
     runs-on: ubuntu-latest
@@ -112,20 +124,24 @@ jobs:
       - uses: dtolnay/rust-toolchain@v1
         with:
           target: riscv32imac-unknown-none-elf
-          toolchain: nightly-2023-03-09
+          toolchain: nightly-2023-05-16
           components: rust-src
       - uses: Swatinem/rust-cache@v1
 
       - name: build (dhcp)
-        run: cd examples-esp32c6 && cargo +nightly-2023-03-09 build --release --example=dhcp --features=embedded-svc,wifi
+        run: cd examples-esp32c6 && cargo +nightly-2023-05-16 build --release --example=dhcp --features=wifi
       - name: build (static_ip)
-        run: cd examples-esp32c6 && cargo +nightly-2023-03-09 build --release --example=static_ip --features=embedded-svc,wifi
+        run: cd examples-esp32c6 && cargo +nightly-2023-05-16 build --release --example=static_ip --features=wifi
       - name: build (esp_now)
-        run: cd examples-esp32c6 && cargo +nightly-2023-03-09 build --release --example=esp_now --features=esp-now
+        run: cd examples-esp32c6 && cargo +nightly-2023-05-16 build --release --example=esp_now --features=esp-now
       - name: build (embassy_esp_now)
-        run: cd examples-esp32c6 && cargo +nightly-2023-03-09 build --release --example=embassy_esp_now --features=async,esp-now
+        run: cd examples-esp32c6 && cargo +nightly-2023-05-16 build --release --example=embassy_esp_now --features=async,esp-now
       - name: build (embassy_dhcp)
-        run: cd examples-esp32c6 && cargo +nightly-2023-03-09 build --release --example=embassy_dhcp --features=async,embedded-svc,wifi,embassy-net
+        run: cd examples-esp32c6 && cargo +nightly-2023-05-16 build --release --example=embassy_dhcp --features=async,wifi,embassy-net
+      - name: build (embassy_access_point)
+        run: cd examples-esp32c6 && cargo build --release --example=embassy_access_point --features=async,wifi,embassy-net
+      - name: build (static_ip)
+        run: cd examples-esp32c6 && cargo build --release --example=static_ip --features=wifi
 
   esp32s2:
     runs-on: ubuntu-latest
@@ -139,15 +155,19 @@ jobs:
       - uses: Swatinem/rust-cache@v1
 
       - name: build (dhcp)
-        run: cd examples-esp32s2 && cargo build --release --example=dhcp --features=embedded-svc,wifi
+        run: cd examples-esp32s2 && cargo build --release --example=dhcp --features=wifi
       - name: build (static_ip)
-        run: cd examples-esp32s2 && cargo build --release --example=static_ip --features=embedded-svc,wifi
+        run: cd examples-esp32s2 && cargo build --release --example=static_ip --features=wifi
       - name: build (esp_now)
         run: cd examples-esp32s2 && cargo build --release --example=esp_now --features=esp-now
       - name: build (embassy_esp_now)
         run: cd examples-esp32s2 && cargo build --release --example=embassy_esp_now --features=async,esp-now
       - name: build (embassy_dhcp)
-        run: cd examples-esp32s2 && cargo build --release --example=embassy_dhcp --features=async,embedded-svc,wifi,embassy-net
+        run: cd examples-esp32s2 && cargo build --release --example=embassy_dhcp --features=async,wifi,embassy-net
+      - name: build (embassy_access_point)
+        run: cd examples-esp32s2 && cargo build --release --example=embassy_access_point --features=async,wifi,embassy-net
+      - name: build (static_ip)
+        run: cd examples-esp32s2 && cargo build --release --example=static_ip --features=wifi
 
   esp32s3:
     runs-on: ubuntu-latest
@@ -165,14 +185,18 @@ jobs:
       - name: build (async-ble)
         run: cd examples-esp32s3 && cargo build --release --example=async_ble --features=async,ble
       - name: build (coex)
-        run: cd examples-esp32s3 && cargo build --release --example=coex --features=embedded-svc,wifi,ble
+        run: cd examples-esp32s3 && cargo build --release --example=coex --features=wifi,ble
       - name: build (dhcp)
-        run: cd examples-esp32s3 && cargo build --release --example=dhcp --features=embedded-svc,wifi
+        run: cd examples-esp32s3 && cargo build --release --example=dhcp --features=wifi
       - name: build (static_ip)
-        run: cd examples-esp32s3 && cargo build --release --example=static_ip --features=embedded-svc,wifi
+        run: cd examples-esp32s3 && cargo build --release --example=static_ip --features=wifi
       - name: build (esp_now)
         run: cd examples-esp32s3 && cargo build --release --example=esp_now --features=esp-now
       - name: build (embassy_esp_now)
         run: cd examples-esp32s3 && cargo build --release --example=embassy_esp_now --features=async,esp-now
       - name: build (embassy_dhcp)
-        run: cd examples-esp32s3 && cargo build --release --example=embassy_dhcp --features=async,embedded-svc,wifi,embassy-net
+        run: cd examples-esp32s3 && cargo build --release --example=embassy_dhcp --features=async,wifi,embassy-net
+      - name: build (embassy_access_point)
+        run: cd examples-esp32s3 && cargo build --release --example=embassy_access_point --features=async,wifi,embassy-net
+      - name: build (static_ip)
+        run: cd examples-esp32s3 && cargo build --release --example=static_ip --features=wifi
