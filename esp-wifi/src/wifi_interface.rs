@@ -276,7 +276,7 @@ impl<'a> WifiStack<'a> {
         }
     }
 
-    pub fn is_dns_configured() -> bool {
+    pub fn is_dns_configured(&self) -> bool {
         self.dns_socket_handle.borrow().is_some()
     }
 
