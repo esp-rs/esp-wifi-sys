@@ -285,11 +285,12 @@ impl<'a> WifiStack<'a> {
         servers: &[IpAddress],
         query_storage: &'a mut [Option<smoltcp::socket::dns::DnsQuery>]
     ) {
-        let dns = smoltcp::socket::dns::Socket::new(servers, query_storage);
         if let Some(old_handle) = self.dns_socket_handle.take() {
             self.with_mut(|_interface, _device, sockets| sockets.remove(old_handle));
             // the returned socket get dropped and frees a slot for the new one
         }
+
+        let dns = smoltcp::socket::dns::Socket::new(servers, query_storage);
         let handle = self.with_mut(|_interface, _device, sockets| sockets.add(dns));
         self.dns_socket_handle.replace(Some(handle));
     }
@@ -302,13 +303,13 @@ impl<'a> WifiStack<'a> {
         use smoltcp::socket::dns;
 
         let Some(dns_handle) = *self.dns_socket_handle.borrow() else {
-            return Err(WifiStackError::DnsQueryFailed);
+            return Err(WifiStackError::DnsNotConfigured);
         };
 
         let query = self.with_mut(|interface, _device, sockets| {
             sockets.get_mut::<dns::Socket>(dns_handle)
                 .start_query(interface.context(), name, query_type)
-                .map_err(|_| WifiStackError::DnsQueryFailed)
+                .map_err(|e| WifiStackError::DnsQueryError(e))
         })?;
 
         loop {
@@ -396,6 +397,8 @@ pub enum WifiStackError {
     InitializationError(crate::InitializationError),
     DeviceError(crate::wifi::WifiError),
     MissingIp,
+    DnsNotConfigured,
+    DnsQueryError(smoltcp::socket::dns::StartQueryError),
     DnsQueryFailed
 }
 
