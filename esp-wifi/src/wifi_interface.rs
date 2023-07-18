@@ -7,7 +7,7 @@ use embedded_svc::ipv4;
 use smoltcp::iface::{Interface, SocketHandle, SocketSet};
 use smoltcp::socket::{dhcpv4::Socket as Dhcpv4Socket, tcp::Socket as TcpSocket};
 use smoltcp::time::Instant;
-use smoltcp::wire::{IpAddress, IpCidr, IpEndpoint, Ipv4Address};
+use smoltcp::wire::{IpAddress, IpCidr, IpEndpoint, Ipv4Address, DnsQueryType};
 
 use crate::current_millis;
 use crate::wifi::{get_ap_mac, get_sta_mac, WifiDevice, WifiMode};
@@ -272,6 +272,46 @@ impl<'a> WifiStack<'a> {
         }
     }
 
+    pub fn dns_query(
+        &'a self,
+        name: &str,
+        query_type: DnsQueryType,
+        query_storage: &'a mut [Option<smoltcp::socket::dns::DnsQuery>]
+    ) -> Result<heapless::Vec<IpAddress, 1>, WifiStackError> {
+        use smoltcp::socket::dns;
+
+        let servers = [Ipv4Address::new(8, 8, 8, 8).into()]; // TODO: Customize dns server
+
+        // Maybe we should not create a socket every time we do a DNS query.
+        // We could add it to the socket storage upon creation of the WifiStack,
+        // then reuse it here. This way, it could for example enable the
+        // customization of the dns server.
+        let dns = dns::Socket::new(&servers, query_storage);
+
+        let dns_handle =
+            self.with_mut(|_interface, _device, sockets| sockets.borrow_mut().add(dns));
+
+        let query = self.with_mut(|interface, _device, sockets| {
+            sockets.get_mut::<dns::Socket>(dns_handle)
+                .start_query(interface.context(), name, query_type)
+                .map_err(|_| WifiStackError::DnsQueryFailed)
+        })?;
+
+        loop {
+            self.work();
+
+            let result = self.with_mut(|_interface, _device, sockets| {
+                sockets.get_mut::<dns::Socket>(dns_handle).get_query_result(query)
+            });
+
+            match result {
+                Ok(addrs) => return Ok(addrs), // query finished
+                Err(dns::GetQueryResultError::Pending) => {}, // query not finished
+                Err(_) => return Err(WifiStackError::DnsQueryFailed)
+            }
+        }
+    }
+
     pub fn work(&self) {
         loop {
             if let false = self.with_mut(|interface, device, sockets| {
@@ -342,6 +382,7 @@ pub enum WifiStackError {
     InitializationError(crate::InitializationError),
     DeviceError(crate::wifi::WifiError),
     MissingIp,
+    DnsQueryFailed
 }
 
 impl Display for WifiStackError {
