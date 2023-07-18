@@ -23,6 +23,7 @@ pub struct WifiStack<'a> {
     pub(crate) network_config: RefCell<ipv4::Configuration>,
     pub(crate) ip_info: RefCell<Option<ipv4::IpInfo>>,
     pub(crate) dhcp_socket_handle: RefCell<Option<SocketHandle>>,
+    dns_socket_handle: RefCell<Option<SocketHandle>>,
 }
 
 impl<'a> WifiStack<'a> {
@@ -33,10 +34,12 @@ impl<'a> WifiStack<'a> {
         current_millis_fn: fn() -> u64,
     ) -> WifiStack<'a> {
         let mut dhcp_socket_handle: Option<SocketHandle> = None;
+        let mut dns_socket_handle: Option<SocketHandle> = None;
 
         for (handle, socket) in sockets.iter_mut() {
             match socket {
                 smoltcp::socket::Socket::Dhcpv4(_) => dhcp_socket_handle = Some(handle),
+                smoltcp::socket::Socket::Dns(_) => dns_socket_handle = Some(handle),
                 _ => {}
             }
         }
@@ -55,6 +58,7 @@ impl<'a> WifiStack<'a> {
             sockets: RefCell::new(sockets),
             current_millis_fn,
             local_port: RefCell::new(41000),
+            dns_socket_handle: RefCell::new(dns_socket_handle),
         };
 
         this.reset();
@@ -272,24 +276,36 @@ impl<'a> WifiStack<'a> {
         }
     }
 
-    pub fn dns_query(
+    pub fn is_dns_configured() -> bool {
+        self.dns_socket_handle.borrow().is_some()
+    }
+
+    pub fn configure_dns(
         &'a self,
+        servers: &[IpAddress],
+        query_storage: &'a mut [Option<smoltcp::socket::dns::DnsQuery>]
+    ) -> bool {
+        if self.dns_socket_handle.borrow().is_none() {
+            let dns = smoltcp::socket::dns::Socket::new(servers, query_storage);
+            let handle =
+                self.with_mut(|_interface, _device, sockets| sockets.borrow_mut().add(dns));
+            self.dns_socket_handle.replace(Some(handle));
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn dns_query(
+        &self,
         name: &str,
         query_type: DnsQueryType,
-        query_storage: &'a mut [Option<smoltcp::socket::dns::DnsQuery>]
     ) -> Result<heapless::Vec<IpAddress, 1>, WifiStackError> {
         use smoltcp::socket::dns;
 
-        let servers = [Ipv4Address::new(8, 8, 8, 8).into()]; // TODO: Customize dns server
-
-        // Maybe we should not create a socket every time we do a DNS query.
-        // We could add it to the socket storage upon creation of the WifiStack,
-        // then reuse it here. This way, it could for example enable the
-        // customization of the dns server.
-        let dns = dns::Socket::new(&servers, query_storage);
-
-        let dns_handle =
-            self.with_mut(|_interface, _device, sockets| sockets.borrow_mut().add(dns));
+        let Some(dns_handle) = *self.dns_socket_handle.borrow() else {
+            return Err(WifiStackError::DnsQueryFailed);
+        };
 
         let query = self.with_mut(|interface, _device, sockets| {
             sockets.get_mut::<dns::Socket>(dns_handle)
