@@ -302,6 +302,21 @@ impl<'a> WifiStack<'a> {
     ) -> Result<heapless::Vec<IpAddress, 1>, WifiStackError> {
         use smoltcp::socket::dns;
 
+        match query_type { // check if name is already an IP
+            DnsQueryType::A => {
+                if let Ok(ip) = name.parse::<Ipv4Address>() {
+                    return Ok([ip.into()].into_iter().collect());
+                }
+            }
+            #[cfg(feature = "ipv6")]
+            DnsQueryType::Aaaa => {
+                if let Ok(ip) = name.parse::<smoltcp::wire::Ipv6Address>() {
+                    return Ok([ip.into()].into_iter().collect());
+                }
+            }
+            _ => {}
+        }
+
         let Some(dns_handle) = *self.dns_socket_handle.borrow() else {
             return Err(WifiStackError::DnsNotConfigured);
         };
