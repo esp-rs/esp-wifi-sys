@@ -284,16 +284,14 @@ impl<'a> WifiStack<'a> {
         &'a self,
         servers: &[IpAddress],
         query_storage: &'a mut [Option<smoltcp::socket::dns::DnsQuery>]
-    ) -> bool {
-        if self.dns_socket_handle.borrow().is_none() {
-            let dns = smoltcp::socket::dns::Socket::new(servers, query_storage);
-            let handle =
-                self.with_mut(|_interface, _device, sockets| sockets.borrow_mut().add(dns));
-            self.dns_socket_handle.replace(Some(handle));
-            true
-        } else {
-            false
+    ) {
+        let dns = smoltcp::socket::dns::Socket::new(servers, query_storage);
+        if let Some(old_handle) = self.dns_socket_handle.take() {
+            self.with_mut(|_interface, _device, sockets| sockets.remove(old_handle));
+            // the returned socket get dropped and frees a slot for the new one
         }
+        let handle = self.with_mut(|_interface, _device, sockets| sockets.add(dns));
+        self.dns_socket_handle.replace(Some(handle));
     }
 
     pub fn dns_query(
