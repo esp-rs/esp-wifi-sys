@@ -195,6 +195,7 @@ impl<'a> WifiStack<'a> {
         if let Some(dhcp_handle) = *dhcp_socket_handle_ref {
             let dhcp_socket = sockets.get_mut::<Dhcpv4Socket>(dhcp_handle);
             let event = dhcp_socket.poll();
+            let mut dns_server = None;
             if let Some(event) = event {
                 match event {
                     smoltcp::socket::dhcpv4::Event::Deconfigured => {
@@ -202,15 +203,20 @@ impl<'a> WifiStack<'a> {
                         interface.routes_mut().remove_default_ipv4_route();
                     }
                     smoltcp::socket::dhcpv4::Event::Configured(config) => {
+                        let dns = config.dns_servers.get(0);
                         *self.ip_info.borrow_mut() = Some(ipv4::IpInfo {
                             ip: config.address.address().0.into(),
                             subnet: ipv4::Subnet {
                                 gateway: config.router.unwrap().0.into(),
                                 mask: ipv4::Mask(config.address.prefix_len()),
                             },
-                            dns: config.dns_servers.get(0).map(|x| x.0.into()),
+                            dns: dns.map(|x| x.0.into()),
                             secondary_dns: config.dns_servers.get(1).map(|x| x.0.into()),
                         });
+
+                        if let Some(&dns) = dns {
+                            dns_server = Some(dns.into());
+                        }
 
                         let address = config.address;
                         interface.borrow_mut().update_ip_addrs(|addrs| {
@@ -224,6 +230,13 @@ impl<'a> WifiStack<'a> {
                         }
                     }
                 }
+            }
+
+            if let (Some(dns_server), Some(dns_handle)) =
+                (dns_server, *self.dns_socket_handle.borrow()) {
+
+                sockets.get_mut::<smoltcp::socket::dns::Socket>(dns_handle)
+                    .update_servers(&[dns_server]);
             }
         }
 
@@ -293,6 +306,15 @@ impl<'a> WifiStack<'a> {
         let dns = smoltcp::socket::dns::Socket::new(servers, query_storage);
         let handle = self.with_mut(|_interface, _device, sockets| sockets.add(dns));
         self.dns_socket_handle.replace(Some(handle));
+    }
+
+    pub fn update_dns_servers(&self, servers: &[IpAddress]) {
+        if let Some(dns_handle) = *self.dns_socket_handle.borrow_mut() {
+            self.with_mut(|_interface, _device, sockets| {
+                sockets.get_mut::<smoltcp::socket::dns::Socket>(dns_handle)
+                    .update_servers(servers);
+            });
+        }
     }
 
     pub fn dns_query(
