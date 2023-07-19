@@ -195,7 +195,6 @@ impl<'a> WifiStack<'a> {
         if let Some(dhcp_handle) = *dhcp_socket_handle_ref {
             let dhcp_socket = sockets.get_mut::<Dhcpv4Socket>(dhcp_handle);
             let event = dhcp_socket.poll();
-            let mut dns_server = None;
             if let Some(event) = event {
                 match event {
                     smoltcp::socket::dhcpv4::Event::Deconfigured => {
@@ -214,10 +213,6 @@ impl<'a> WifiStack<'a> {
                             secondary_dns: config.dns_servers.get(1).map(|x| x.0.into()),
                         });
 
-                        if let Some(&dns) = dns {
-                            dns_server = Some(dns.into());
-                        }
-
                         let address = config.address;
                         interface.borrow_mut().update_ip_addrs(|addrs| {
                             addrs.push(smoltcp::wire::IpCidr::Ipv4(address)).unwrap();
@@ -228,15 +223,15 @@ impl<'a> WifiStack<'a> {
                                 .add_default_ipv4_route(route)
                                 .unwrap();
                         }
+
+                        if let (Some(&dns), Some(dns_handle)) =
+                            (dns, *self.dns_socket_handle.borrow()) {
+
+                            sockets.get_mut::<smoltcp::socket::dns::Socket>(dns_handle)
+                                .update_servers(&[dns.into()]);
+                        }
                     }
                 }
-            }
-
-            if let (Some(dns_server), Some(dns_handle)) =
-                (dns_server, *self.dns_socket_handle.borrow()) {
-
-                sockets.get_mut::<smoltcp::socket::dns::Socket>(dns_handle)
-                    .update_servers(&[dns_server]);
             }
         }
 
