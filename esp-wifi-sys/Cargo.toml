@@ -6,7 +6,7 @@ edition = "2021"
 [dependencies]
 
 [build-dependencies]
-anyhow = "1.0.68"
+anyhow = "1.0.71"
 
 [features]
 default = []

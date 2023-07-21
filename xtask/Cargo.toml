@@ -1,12 +1,12 @@
 [package]
-name    = "xtask"
+name = "xtask"
 version = "0.0.0"
 edition = "2021"
 publish = false
 
 [dependencies]
-anyhow      = "1.0.68"
-bindgen     = "0.59.2"
-directories = "4.0.1"
-env_logger  = "0.10.0"
-log         = "0.4.17"
+anyhow = "1.0.71"
+bindgen = "0.66.1"
+directories = "5.0.1"
+env_logger = "0.10.0"
+log = "0.4.18"

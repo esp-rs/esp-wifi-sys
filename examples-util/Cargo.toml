@@ -8,7 +8,7 @@ esp32c3-hal = { workspace = true, optional = true }
 esp32c2-hal = { workspace = true, optional = true }
 esp32c6-hal = { workspace = true, optional = true }
 esp32-hal = { workspace = true, optional = true }
-esp32s3-hal = {workspace = true, optional = true }
+esp32s3-hal = { workspace = true, optional = true }
 esp32s2-hal = { workspace = true, optional = true }
 
 [features]
