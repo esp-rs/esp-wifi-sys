@@ -861,7 +861,11 @@ impl<'d> WifiController<'d> {
         unsafe {
             esp_wifi_result!(crate::binary::include::esp_wifi_scan_get_ap_num(
                 &mut bss_total
-            ))?;
+            ))
+            .map_err(|e| {
+                unsafe { crate::binary::include::esp_wifi_clear_ap_list() };
+                e
+            })?;
         }
 
         Ok(bss_total as usize)
@@ -870,35 +874,32 @@ impl<'d> WifiController<'d> {
     fn scan_results<const N: usize>(
         &mut self,
     ) -> Result<heapless::Vec<AccessPointInfo, N>, WifiError> {
-        let scan = || -> Result<heapless::Vec<AccessPointInfo, N>, WifiError> {
-            let mut scanned = heapless::Vec::<AccessPointInfo, N>::new();
-            let mut bss_total: u16 = N as u16;
+        let mut scanned = heapless::Vec::<AccessPointInfo, N>::new();
+        let mut bss_total: u16 = N as u16;
 
-            unsafe {
-                let mut records: [MaybeUninit<crate::binary::include::wifi_ap_record_t>; N] =
-                    [MaybeUninit::uninit(); N];
+        unsafe {
+            let mut records: [MaybeUninit<crate::binary::include::wifi_ap_record_t>; N] =
+                [MaybeUninit::uninit(); N];
 
-                esp_wifi_result!(crate::binary::include::esp_wifi_scan_get_ap_records(
-                    &mut bss_total,
-                    records[0].as_mut_ptr(),
-                ))?;
+            esp_wifi_result!(crate::binary::include::esp_wifi_scan_get_ap_records(
+                &mut bss_total,
+                records[0].as_mut_ptr(),
+            ))
+            .map_err(|e| {
+                // upon scan failure, list should be cleared to avoid memory leakage
+                unsafe { crate::binary::include::esp_wifi_clear_ap_list() };
+                e
+            })?;
 
-                for i in 0..bss_total {
-                    let record = MaybeUninit::assume_init_ref(&records[i as usize]);
-                    let ap_info = convert_ap_info(record);
+            for i in 0..bss_total {
+                let record = MaybeUninit::assume_init_ref(&records[i as usize]);
+                let ap_info = convert_ap_info(record);
 
-                    scanned.push(ap_info).ok();
-                }
+                scanned.push(ap_info).ok();
             }
+        }
 
-            Ok(scanned)
-        };
-
-        scan().map_err(|e| {
-            // upon scan failure, list should be cleared to avoid memory leakage
-            unsafe { crate::binary::include::esp_wifi_clear_ap_list() };
-            e
-        })
+        Ok(scanned)
     }
 }
 
