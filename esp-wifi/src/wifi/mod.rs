@@ -860,16 +860,9 @@ impl<'d> WifiController<'d> {
     ) -> Result<(heapless::Vec<AccessPointInfo, N>, usize), WifiError> {
         let scan = || -> Result<(heapless::Vec<AccessPointInfo, N>, usize), WifiError> {
             let mut scanned = heapless::Vec::<AccessPointInfo, N>::new();
-            let mut bss_total: u16 = N as u16;
+            let mut bss_total: u16 = N;
 
             unsafe {
-                esp_wifi_result!(crate::binary::include::esp_wifi_scan_get_ap_num(
-                    &mut bss_total
-                ))?;
-                if bss_total as usize > N {
-                    bss_total = N as u16;
-                }
-
                 let mut records: [MaybeUninit<crate::binary::include::wifi_ap_record_t>; N] =
                     [MaybeUninit::uninit(); N];
 
