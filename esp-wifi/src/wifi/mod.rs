@@ -855,12 +855,24 @@ impl<'d> WifiController<'d> {
         Ok(mode == wifi_mode_t_WIFI_MODE_AP || mode == wifi_mode_t_WIFI_MODE_APSTA)
     }
 
+    fn scan_result_count(&mut self) -> Result<usize, WifiError> {
+        let mut bss_total: u16 = 0;
+
+        unsafe {
+            esp_wifi_result!(crate::binary::include::esp_wifi_scan_get_ap_num(
+                &mut bss_total
+            ))?;
+        }
+
+        Ok(bss_total as usize)
+    }
+
     fn scan_results<const N: usize>(
         &mut self,
-    ) -> Result<(heapless::Vec<AccessPointInfo, N>, usize), WifiError> {
-        let scan = || -> Result<(heapless::Vec<AccessPointInfo, N>, usize), WifiError> {
+    ) -> Result<heapless::Vec<AccessPointInfo, N>, WifiError> {
+        let scan = || -> Result<heapless::Vec<AccessPointInfo, N>, WifiError> {
             let mut scanned = heapless::Vec::<AccessPointInfo, N>::new();
-            let mut bss_total: u16 = N;
+            let mut bss_total: u16 = N as u16;
 
             unsafe {
                 let mut records: [MaybeUninit<crate::binary::include::wifi_ap_record_t>; N] =
@@ -879,7 +891,7 @@ impl<'d> WifiController<'d> {
                 }
             }
 
-            Ok((scanned, bss_total as usize))
+            Ok(scanned)
         };
 
         scan().map_err(|e| {
@@ -1033,7 +1045,11 @@ impl embedded_svc::wifi::Wifi for WifiController<'_> {
         &mut self,
     ) -> Result<(heapless::Vec<AccessPointInfo, N>, usize), Self::Error> {
         esp_wifi_result!(crate::wifi::wifi_start_scan(true))?;
-        self.scan_results()
+
+        let count = self.scan_result_count()?;
+        let result = self.scan_results()?;
+
+        Ok((result, count))
     }
 
     /// Get the currently used configuration.
@@ -1383,7 +1399,10 @@ mod asynch {
             esp_wifi_result!(wifi_start_scan(false))?;
             WifiEventFuture::new(WifiEvent::ScanDone).await;
 
-            self.scan_results()
+            let count = self.scan_result_count()?;
+            let result = self.scan_results()?;
+
+            Ok((result, count))
         }
 
         /// Async version of [`embedded_svc::wifi::Wifi`]'s `start` method
