@@ -760,7 +760,12 @@ impl<'d> WifiDevice<'d> {
 }
 
 fn convert_ap_info(record: &crate::binary::include::wifi_ap_record_t) -> AccessPointInfo {
-    let ssid_strbuf = unsafe { crate::compat::common::StrBuf::from(&record.ssid as *const u8) };
+    let str_len = record
+        .ssid
+        .iter()
+        .position(|&c| c == 0)
+        .unwrap_or(record.ssid.len());
+    let ssid_ref = unsafe { core::str::from_utf8_unchecked(&record.ssid[..str_len]) };
 
     let auth_method = match record.authmode {
         crate::binary::include::wifi_auth_mode_t_WIFI_AUTH_OPEN => AuthMethod::None,
@@ -782,7 +787,7 @@ fn convert_ap_info(record: &crate::binary::include::wifi_ap_record_t) -> AccessP
     };
 
     let mut ssid = heapless::String::<32>::new();
-    ssid.push_str(unsafe { ssid_strbuf.as_str_ref() }).ok();
+    ssid.push_str(ssid_ref).unwrap();
 
     AccessPointInfo {
         ssid,
@@ -863,7 +868,7 @@ impl<'d> WifiController<'d> {
                 &mut bss_total
             ))
             .map_err(|e| {
-                unsafe { crate::binary::include::esp_wifi_clear_ap_list() };
+                crate::binary::include::esp_wifi_clear_ap_list();
                 e
             })?;
         }
@@ -887,7 +892,7 @@ impl<'d> WifiController<'d> {
             ))
             .map_err(|e| {
                 // upon scan failure, list should be cleared to avoid memory leakage
-                unsafe { crate::binary::include::esp_wifi_clear_ap_list() };
+                crate::binary::include::esp_wifi_clear_ap_list();
                 e
             })?;
 
