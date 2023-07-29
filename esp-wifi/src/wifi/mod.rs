@@ -8,7 +8,7 @@ use crate::EspWifiInitialization;
 
 use crate::esp_wifi_result;
 use critical_section::Mutex;
-use embedded_svc::wifi::{AccessPointInfo, AuthMethod, Protocol, SecondaryChannel};
+use embedded_svc::wifi::{AccessPointInfo, AuthMethod, Protocol, SecondaryChannel, Wifi};
 use enumset::EnumSet;
 use enumset::EnumSetType;
 use esp_hal_common::peripheral::Peripheral;
@@ -770,7 +770,12 @@ impl<'d> WifiController<'d> {
         _device: PeripheralRef<'d, esp_hal_common::radio::Wifi>,
         config: embedded_svc::wifi::Configuration,
     ) -> Self {
-        Self { _device, config }
+        let mut this = Self {
+            _device,
+            config: Default::default(),
+        };
+        this.set_configuration(&config).unwrap();
+        this
     }
 
     /// Set the wifi mode.
@@ -1053,7 +1058,7 @@ pub fn send_data_if_needed() {
     });
 }
 
-impl embedded_svc::wifi::Wifi for WifiController<'_> {
+impl Wifi for WifiController<'_> {
     type Error = WifiError;
 
     /// This currently only supports the `Client` and `AccessPoint` capability.
