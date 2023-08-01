@@ -138,6 +138,7 @@ pub(crate) static DATA_QUEUE_TX: Mutex<RefCell<SimpleQueue<DataFrame, 3>>> =
 
 #[derive(Debug, Clone, Copy)]
 pub enum WifiError {
+    NotInitialized,
     InternalError(InternalWifiError),
     WrongClockConfig,
     Disconnected,
@@ -698,7 +699,7 @@ pub fn new_with_config<'d>(
     config: embedded_svc::wifi::Configuration,
 ) -> Result<(WifiDevice<'d>, WifiController<'d>), WifiError> {
     if !inited.is_wifi() {
-        panic!("Not initialized for Wifi use");
+        return Err(WifiError::NotInitialized);
     }
 
     esp_hal_common::into_ref!(device);
