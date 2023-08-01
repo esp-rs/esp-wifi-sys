@@ -696,7 +696,7 @@ pub fn new_with_config<'d>(
     inited: &EspWifiInitialization,
     device: impl Peripheral<P = esp_hal_common::radio::Wifi> + 'd,
     config: embedded_svc::wifi::Configuration,
-) -> (WifiDevice<'d>, WifiController<'d>) {
+) -> Result<(WifiDevice<'d>, WifiController<'d>), WifiError> {
     if !inited.is_wifi() {
         panic!("Not initialized for Wifi use");
     }
@@ -708,17 +708,18 @@ pub fn new_with_config<'d>(
         embedded_svc::wifi::Configuration::AccessPoint(_) => (),
         embedded_svc::wifi::Configuration::Mixed(_, _) => panic!(),
     };
-    (
+
+    Ok((
         WifiDevice::new(unsafe { device.clone_unchecked() }),
-        WifiController::new_with_config(device, config),
-    )
+        WifiController::new_with_config(device, config)?,
+    ))
 }
 
 pub fn new_with_mode<'d>(
     inited: &EspWifiInitialization,
     device: impl Peripheral<P = esp_hal_common::radio::Wifi> + 'd,
     mode: WifiMode,
-) -> (WifiDevice<'d>, WifiController<'d>) {
+) -> Result<(WifiDevice<'d>, WifiController<'d>), WifiError> {
     new_with_config(
         inited,
         device,
@@ -732,7 +733,7 @@ pub fn new_with_mode<'d>(
 pub fn new<'d>(
     inited: &EspWifiInitialization,
     device: impl Peripheral<P = esp_hal_common::radio::Wifi> + 'd,
-) -> (WifiDevice<'d>, WifiController<'d>) {
+) -> Result<(WifiDevice<'d>, WifiController<'d>), WifiError> {
     new_with_config(&inited, device, Default::default())
 }
 
@@ -769,13 +770,13 @@ impl<'d> WifiController<'d> {
     pub(crate) fn new_with_config(
         _device: PeripheralRef<'d, esp_hal_common::radio::Wifi>,
         config: embedded_svc::wifi::Configuration,
-    ) -> Self {
+    ) -> Result<Self, WifiError> {
         let mut this = Self {
             _device,
             config: Default::default(),
         };
-        this.set_configuration(&config).unwrap();
-        this
+        this.set_configuration(&config)?;
+        Ok(this)
     }
 
     /// Set the wifi mode.
