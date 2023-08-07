@@ -132,7 +132,7 @@ To build these ensure you are in the `examples-esp32XXX` directory matching your
 | phy-enable-usb | See _Using Serial-JTAG_ below                                                                       |
 | ps-min-modem   | Enable modem sleep                                                                                  |
 
-When using the `dump-packets` feauture you can use the extcap in `extras/esp-wifishark` to analyze the frames in Wireshark.
+When using the `dump-packets` feature you can use the extcap in `extras/esp-wifishark` to analyze the frames in Wireshark.
 For more information see [extras/esp-wifishark/README.md](extras/esp-wifishark/README.md)
 
 ## Important
