@@ -633,7 +633,7 @@ impl<'s, 'n: 's> Read for Socket<'s, 'n> {
                 match socket.recv_slice(buf) {
                     Ok(0) => continue, // no data
                     Ok(n) => return Ok(n),
-                    Err(RecvError::Finished) => return Ok(0), // eof
+                    Err(RecvError::Finished) => return Err(IoError::SocketClosed), // eof
                     Err(RecvError::InvalidState) => return Err(IoError::TcpRecvError)
                 }
             }
