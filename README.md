@@ -55,6 +55,8 @@ rustflags = [
     "-C", "link-arg=-Trom_functions.x",
 ]
 ```
+> [!NOTE]
+> At time of writing, you will already have the linkall flag if you used `cargo generate`. Generating from a template does not include the `rom_functions` flag.
 
 
 ### Optimization Level
