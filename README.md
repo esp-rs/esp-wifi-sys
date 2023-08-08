@@ -25,6 +25,114 @@ If a cell contains am em dash (&mdash;) this means that the particular feature i
 | ESP32-C2 |                          ✓                           |                          ✓                          |                                                      |    ✓    |
 | ESP32-C6 |                          ✓                           |                                                     |                                                      |    ✓    |
 
+
+## Usage
+
+### Importing
+
+For now this is not available on _crates.io_. Until then you need to import via git, cloning locally, etc.
+
+```toml
+[dependencies.esp-wifi]
+git = "https://github.com/esp-rs/esp-wifi.git"
+
+# `esp-wifi` is in active development. It is often a good idea to lock it to a specific commit
+rev = "c7ca849274cf3d7a08b49c260bb46693c91c85c0"
+
+# A supported chip needs to be specified, as well as specific use-case features 
+features = ["esp32s3", "wifi", "esp-now"]
+```
+
+### Link configuration
+
+> [!IMPORTANT]
+> Make sure to include the rom functions for your target:
+
+```toml
+# .cargo/config.toml
+rustflags = [
+    "-C", "link-arg=-Tlinkall.x",
+    "-C", "link-arg=-Trom_functions.x",
+]
+```
+> [!NOTE]
+> At time of writing, you will already have the linkall flag if you used `cargo generate`. Generating from a template does not include the `rom_functions` flag.
+
+
+### Optimization Level
+
+> [!IMPORTANT]
+> Link time optimization is not yet recommended for use, please ensure `lto = "off"` is in your `Cargo.toml` for both release and debug profiles.
+
+It is necessary to build with optimization level 2 or 3 since otherwise it might not even be able to connect or advertise.
+
+To make it work also for your debug builds add this to your `Cargo.toml`
+
+```toml
+[profile.dev.package.esp-wifi]
+opt-level = 3
+
+[profile.dev]
+lto = "off"
+[profile.release]
+lto = "off"
+
+```
+
+
+### Features
+
+| Feature        | Meaning                                                                                             |
+| -------------- | --------------------------------------------------------------------------------------------------- |
+| wifi-logs      | logs the WiFi logs from the driver at log level info                                                |
+| dump-packets   | dumps packet info at log level info                                                                 |
+| utils          | Provide utilities for smoltcp initialization, this is a default feature                             |
+| embedded-svc   | Provides a (very limited) implementation of the `embedded-svc` WiFi trait, includes `utils` feature |
+| ble            | Enable BLE support                                                                                  |
+| wifi           | Enable WiFi support                                                                                 |
+| esp-now        | Enable esp-now support                                                                              |
+| coex           | Enable coex support                                                                                 |
+| mtu-XXX        | Set MTU to XXX, XXX can be 746, 1492, 1500, 1514. Defaults to 1492                                  |
+| big-heap       | Reserve more heap memory for the drivers                                                            |
+| ipv6           | IPv6 support                                                                                        |
+| phy-enable-usb | See _Using Serial-JTAG_ below                                                                       |
+| ps-min-modem   | Enable modem sleep                                                                                  |
+
+When using the `dump-packets` feature you can use the extcap in `extras/esp-wifishark` to analyze the frames in Wireshark.
+For more information see [extras/esp-wifishark/README.md](extras/esp-wifishark/README.md)
+
+### Serial-JTAG
+> [!IMPORTANT]
+> On ESP32-C3 / ESP32-S3 when using Serial-JTAG you have to activate the feature `phy-enable-usb`.
+> 
+> Don't use this feature if your are _not_ using Serial-JTAG since it might reduce WiFi performance.
+
+### What works?
+
+- scanning for WiFi access points
+- connect to WiFi access point
+- providing an HCI interface
+- create an open access point
+
+### Notes on ESP32-C2 / ESP32-C3 / ESP32-C6 support
+
+- uses SYSTIMER as the main timer
+- doesn't work in direct-boot mode
+
+### Notes on ESP32 / ESP32-S2 / ESP32-S3 support
+
+- The WiFi logs only print the format string - not the actual values.
+- The code runs on a single core and might currently not be multi-core safe!
+
+On ESP32 / ESP32-S2 / ESP32-S3 currently TIMG1/TIMER0 is used as the main timer so you can't use it for anything else.
+Additionally it uses CCOMPARE0 - so don't touch that, too.
+
+### opt-level for Xtensa targets
+
+Currently your mileage might vary a lot for different opt-levels on Xtensa targets!
+If something doesn't work as expected try a different opt-level.
+
+
 ## Examples
 
 To build these ensure you are in the `examples-esp32XXX` directory matching your target as othewise the `config.toml` will not apply
@@ -114,74 +222,6 @@ To build these ensure you are in the `examples-esp32XXX` directory matching your
 
 `cargo run --example embassy_access_point --release --features "async,embedded-svc,wifi,embassy-net"`
 
-## Features
-
-| Feature        | Meaning                                                                                             |
-| -------------- | --------------------------------------------------------------------------------------------------- |
-| wifi-logs      | logs the WiFi logs from the driver at log level info                                                |
-| dump-packets   | dumps packet info at log level info                                                                 |
-| utils          | Provide utilities for smoltcp initialization, this is a default feature                             |
-| embedded-svc   | Provides a (very limited) implementation of the `embedded-svc` WiFi trait, includes `utils` feature |
-| ble            | Enable BLE support                                                                                  |
-| wifi           | Enable WiFi support                                                                                 |
-| esp-now        | Enable esp-now support                                                                              |
-| coex           | Enable coex support                                                                                 |
-| mtu-XXX        | Set MTU to XXX, XXX can be 746, 1492, 1500, 1514. Defaults to 1492                                  |
-| big-heap       | Reserve more heap memory for the drivers                                                            |
-| ipv6           | IPv6 support                                                                                        |
-| phy-enable-usb | See _Using Serial-JTAG_ below                                                                       |
-| ps-min-modem   | Enable modem sleep                                                                                  |
-
-When using the `dump-packets` feature you can use the extcap in `extras/esp-wifishark` to analyze the frames in Wireshark.
-For more information see [extras/esp-wifishark/README.md](extras/esp-wifishark/README.md)
-
-## Important
-
-## Optimization Level
-
-It is necessary to build with optimization level 2 or 3 since otherwise it might not even be able to connect or advertise.
-
-To make it work also for your debug builds add this to your `Cargo.toml`
-
-```toml
-[profile.dev.package.esp-wifi]
-opt-level = 3
-```
-
-## LTO
-
-Link time optimization is not yet recommended for use, please ensure `lto = "off"` is in your `Cargo.toml` for both release and debug profiles.
-
-## Using Serial-JTAG
-
-On ESP32-C3 / ESP32-S3 when using Serial-JTAG you have to activate the feature `phy-enable-usb`.
-
-Don't use this feature if your are _not_ using Serial-JTAG since it might reduce WiFi performance.
-
-## What works?
-
-- scanning for WiFi access points
-- connect to WiFi access point
-- providing an HCI interface
-- create an open access point
-
-## Notes on ESP32-C2 / ESP32-C3 / ESP32-C6 support
-
-- uses SYSTIMER as the main timer
-- doesn't work in direct-boot mode
-
-## Notes on ESP32 / ESP32-S2 / ESP32-S3 support
-
-- The WiFi logs only print the format string - not the actual values.
-- The code runs on a single core and might currently not be multi-core safe!
-
-On ESP32 / ESP32-S2 / ESP32-S3 currently TIMG1/TIMER0 is used as the main timer so you can't use it for anything else.
-Additionally it uses CCOMPARE0 - so don't touch that, too.
-
-## opt-level for Xtensa targets
-
-Currently your mileage might vary a lot for different opt-levels on Xtensa targets!
-If something doesn't work as expected try a different opt-level.
 
 ## Directory Structure
 
@@ -198,22 +238,6 @@ If something doesn't work as expected try a different opt-level.
 - make CoEx work on ESP32 (it kind of works when commenting out setting the country in wifi_start, probably some mis-compilation since it then crashes in a totally different code path)
 - combined SoftAP/STA mode
 - support for non-open SoftAP
-
-## Using in your own binary crate
-
-For now this is not available on _crates.io_. Until then you need to specify a git dependency.
-You might want to pin the dependency to a specific commit since this things might change a lot during development.
-
-Make sure to include the rom functions for your target like this
-
-```toml
-rustflags = [
-    "-C", "link-arg=-Tlinkall.x",
-    "-C", "link-arg=-Trom_functions.x",
-]
-```
-
-in your `.cargo/config.toml` - otherwise you will get linker errors complaining about missing symbols.
 
 ## License
 
