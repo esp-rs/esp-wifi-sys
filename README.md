@@ -101,7 +101,6 @@ For more information see [extras/esp-wifishark/README.md](extras/esp-wifishark/R
 
 ### Serial-JTAG
 > [!IMPORTANT]
-> 
 > On ESP32-C3 / ESP32-S3 when using Serial-JTAG you have to activate the feature `phy-enable-usb`.
 > 
 > Don't use this feature if your are _not_ using Serial-JTAG since it might reduce WiFi performance.
