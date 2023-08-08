@@ -50,7 +50,6 @@ features = ["esp32s3", "wifi", "esp-now"]
 
 ```toml
 # .cargo/config.toml
-
 rustflags = [
     "-C", "link-arg=-Tlinkall.x",
     "-C", "link-arg=-Trom_functions.x",
@@ -100,8 +99,8 @@ lto = "off"
 When using the `dump-packets` feature you can use the extcap in `extras/esp-wifishark` to analyze the frames in Wireshark.
 For more information see [extras/esp-wifishark/README.md](extras/esp-wifishark/README.md)
 
+### Serial-JTAG
 > [!IMPORTANT]
-> Serial-JTAG
 > 
 > On ESP32-C3 / ESP32-S3 when using Serial-JTAG you have to activate the feature `phy-enable-usb`.
 > 
