@@ -107,6 +107,12 @@ For more information see [extras/esp-wifishark/README.md](extras/esp-wifishark/R
 > 
 > Don't use this feature if your are _not_ using Serial-JTAG since it might reduce WiFi performance.
 
+### Tuning
+
+The defaults used by `esp-wifi` and the examples are rather conservative. It is possible to change a few of the important settings.
+
+See [Tuning](docs/tuning.md) for details
+
 ### What works?
 
 - scanning for WiFi access points
