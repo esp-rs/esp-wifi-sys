@@ -54,8 +54,7 @@ fn main() -> ! {
                         })
                         .unwrap();
                 }
-                let waiter = esp_now.send(&r.info.src_address, b"Hello Peer").unwrap();
-                let status = waiter.wait();
+                let status = esp_now.send(&r.info.src_address, b"Hello Peer").unwrap().wait();
                 println!("Send hello to peer status: {:?}", status);
             }
         }

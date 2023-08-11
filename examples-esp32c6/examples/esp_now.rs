@@ -54,14 +54,16 @@ fn main() -> ! {
                         })
                         .unwrap();
                 }
-                esp_now.send(&r.info.src_address, b"Hello Peer").unwrap();
+                let status = esp_now.send(&r.info.src_address, b"Hello Peer").unwrap().wait();
+                println!("Send hello to peer status: {:?}", status);
             }
         }
 
         if current_millis() >= next_send_time {
             next_send_time = current_millis() + 5 * 1000;
             println!("Send");
-            esp_now.send(&BROADCAST_ADDRESS, b"0123456789").unwrap();
+            let status = esp_now.send(&BROADCAST_ADDRESS, b"0123456789").unwrap().wait();
+            println!("Send broadcast status: {:?}", status)
         }
     }
 }
