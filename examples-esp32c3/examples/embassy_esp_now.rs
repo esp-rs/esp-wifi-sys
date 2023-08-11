@@ -38,7 +38,8 @@ async fn run(mut esp_now: EspNow<'static>) {
                         })
                         .unwrap();
                 }
-                esp_now.send(&r.info.src_address, b"Hello Peer").unwrap();
+                let status = esp_now.send_async(&r.info.src_address, b"Hello Peer").unwrap().await;
+                println!("Send hello to peer status: {:?}", status);
             }
         })
         .await;
@@ -46,7 +47,8 @@ async fn run(mut esp_now: EspNow<'static>) {
         match res {
             Either::First(_) => {
                 println!("Send");
-                esp_now.send(&BROADCAST_ADDRESS, b"0123456789").unwrap();
+                let status = esp_now.send_async(&BROADCAST_ADDRESS, b"0123456789").unwrap().await;
+                println!("Send broadcast status: {:?}", status);
             }
             Either::Second(_) => (),
         }
