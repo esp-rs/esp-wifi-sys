@@ -21,7 +21,7 @@ use hal::{embassy, peripherals::Peripherals, prelude::*, timer::TimerGroup, Rtc}
 use hal::system::SystemExt;
 
 #[embassy_executor::task]
-async fn run(mut esp_now: EspNow<'static>) {
+async fn run(esp_now: EspNow<'static>) {
     let mut ticker = Ticker::every(Duration::from_secs(5));
     loop {
         let res = select(ticker.next(), async {
