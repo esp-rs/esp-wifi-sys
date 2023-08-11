@@ -90,24 +90,16 @@ pub fn current_millis() -> u64 {
 }
 
 #[allow(unused)]
-#[cfg(all(not(coex), not(feature = "big-heap")))]
+#[cfg(all(not(feature = "big-heap")))]
 const DEFAULT_HEAP_SIZE: usize = 64 * 1024;
 
 #[allow(unused)]
-#[cfg(all(coex, not(feature = "big-heap")))]
-const DEFAULT_HEAP_SIZE: usize = 64 * 1024;
-
-#[allow(unused)]
-#[cfg(all(not(coex), not(esp32s2), feature = "big-heap"))]
+#[cfg(all(not(esp32s2), feature = "big-heap"))]
 const DEFAULT_HEAP_SIZE: usize = 110 * 1024;
 
 #[allow(unused)]
-#[cfg(all(not(coex), esp32s2, feature = "big-heap"))]
+#[cfg(all(esp32s2, feature = "big-heap"))]
 const DEFAULT_HEAP_SIZE: usize = 72 * 1024;
-
-#[allow(unused)]
-#[cfg(all(coex, feature = "big-heap"))]
-const DEFAULT_HEAP_SIZE: usize = 110 * 1024;
 
 const HEAP_SIZE: usize = crate::CONFIG.heap_size;
 
