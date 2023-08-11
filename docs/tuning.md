@@ -41,6 +41,11 @@ You can set the following settings
 |ampdu_tx_enable|WiFi AMPDU TX feature enable flag. (0 or 1) See [ESP-IDF Programming Guide](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/network/esp_wifi.html#_CPPv418wifi_init_config_t)|
 |amsdu_tx_enable|WiFi AMSDU TX feature enable flag. (0 or 1) See [ESP-IDF Programming Guide](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/network/esp_wifi.html#_CPPv418wifi_init_config_t)|
 |rx_ba_win|WiFi Block Ack RX window size. See [ESP-IDF Programming Guide](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/network/esp_wifi.html#_CPPv418wifi_init_config_t)|
+|country_code|Country code. See [ESP-IDF Programming Guide](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/wifi.html#wi-fi-country-code)|
+|country_code_operating_class|If not 0: Operating Class table number. See [ESP-IDF Programming Guide](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/wifi.html#wi-fi-country-code)|
+|mtu|MTU, see [documentation](https://docs.rs/smoltcp/0.10.0/smoltcp/phy/struct.DeviceCapabilities.html#structfield.max_transmission_unit)|
+|heap_size|Size of the WiFi/BLE heap in bytes|
+|tick_rate_hz|Tick rate of the internal task scheduler in hertz.|
 
 ## Globally disable logging
 
