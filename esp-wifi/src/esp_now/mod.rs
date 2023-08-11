@@ -27,9 +27,9 @@ static RECEIVE_QUEUE: Mutex<RefCell<SimpleQueue<ReceivedData, 10>>> =
 
 macro_rules! check_error {
     ($block:block) => {
-        let res = unsafe { $block };
-        if res != 0 {
-            return Err(EspNowError::Error(Error::from_code(res as u32)));
+        match unsafe { $block } {
+            0 => Ok(()),
+            res @ _ => Err(EspNowError::Error(Error::from_code(res as u32)))
         }
     };
 }
@@ -282,10 +282,11 @@ impl<'d> EspNow<'d> {
         }
 
         let mut esp_now = EspNow { _device: device };
-        check_error!({ esp_wifi_set_mode(wifi_mode_t_WIFI_MODE_STA) });
-        check_error!({ esp_wifi_start() });
-        check_error!({ esp_now_init() });
-        check_error!({ esp_now_register_recv_cb(Some(rcv_cb)) });
+        check_error!({ esp_wifi_set_mode(wifi_mode_t_WIFI_MODE_STA) })?;
+        check_error!({ esp_wifi_start() })?;
+        check_error!({ esp_now_init() })?;
+        check_error!({ esp_now_register_recv_cb(Some(rcv_cb)) })?;
+        check_error!({ esp_now_register_send_cb(Some(send_cb)) })?;
 
         esp_now.add_peer(PeerInfo {
             peer_address: BROADCAST_ADDRESS,
@@ -300,14 +301,13 @@ impl<'d> EspNow<'d> {
     /// Set primary WiFi channel
     /// Should only be used when using ESP-NOW without AP or STA
     pub fn set_channel(&mut self, channel: u8) -> Result<(), EspNowError> {
-        check_error!({ esp_wifi_set_channel(channel, 0) });
-        Ok(())
+        check_error!({ esp_wifi_set_channel(channel, 0) })
     }
 
     /// Get the version of ESPNOW
     pub fn get_version(&self) -> Result<u32, EspNowError> {
         let mut version = 0u32;
-        check_error!({ esp_now_get_version(&mut version as *mut u32) });
+        check_error!({ esp_now_get_version(&mut version as *mut u32) })?;
         Ok(version)
     }
 
@@ -321,15 +321,12 @@ impl<'d> EspNow<'d> {
             encrypt: peer.encrypt,
             priv_: core::ptr::null_mut(),
         };
-        check_error!({ esp_now_add_peer(&raw_peer as *const _) });
-
-        Ok(())
+        check_error!({ esp_now_add_peer(&raw_peer as *const _) })
     }
 
     /// Remove the given peer
     pub fn remove_peer(&mut self, peer_address: &[u8; 6]) -> Result<(), EspNowError> {
-        check_error!({ esp_now_del_peer(peer_address.as_ptr()) });
-        Ok(())
+        check_error!({ esp_now_del_peer(peer_address.as_ptr()) })
     }
 
     /// Modify a peer information
@@ -342,9 +339,7 @@ impl<'d> EspNow<'d> {
             encrypt: peer.encrypt,
             priv_: core::ptr::null_mut(),
         };
-        check_error!({ esp_now_mod_peer(&raw_peer as *const _) });
-
-        Ok(())
+        check_error!({ esp_now_mod_peer(&raw_peer as *const _) })
     }
 
     /// Get peer by MAC address
@@ -357,7 +352,7 @@ impl<'d> EspNow<'d> {
             encrypt: false,
             priv_: core::ptr::null_mut(),
         };
-        check_error!({ esp_now_get_peer(peer_address.as_ptr(), &mut raw_peer as *mut _) });
+        check_error!({ esp_now_get_peer(peer_address.as_ptr(), &mut raw_peer as *mut _) })?;
 
         Ok(PeerInfo {
             peer_address: raw_peer.peer_addr,
@@ -388,7 +383,7 @@ impl<'d> EspNow<'d> {
             encrypt: false,
             priv_: core::ptr::null_mut(),
         };
-        check_error!({ esp_now_fetch_peer(from_head, &mut raw_peer as *mut _) });
+        check_error!({ esp_now_fetch_peer(from_head, &mut raw_peer as *mut _) })?;
 
         Ok(PeerInfo {
             peer_address: raw_peer.peer_addr,
@@ -417,7 +412,7 @@ impl<'d> EspNow<'d> {
             total_num: 0,
             encrypt_num: 0,
         };
-        check_error!({ esp_now_get_peer_num(&mut peer_num as *mut _) });
+        check_error!({ esp_now_get_peer_num(&mut peer_num as *mut _) })?;
 
         Ok(PeerCount {
             total_count: peer_num.total_num,
@@ -427,25 +422,19 @@ impl<'d> EspNow<'d> {
 
     /// Set the primary master key
     pub fn set_pmk(&mut self, pmk: &[u8; 16]) -> Result<(), EspNowError> {
-        check_error!({ esp_now_set_pmk(pmk.as_ptr()) });
-
-        Ok(())
+        check_error!({ esp_now_set_pmk(pmk.as_ptr()) })
     }
 
     /// Set wake window for esp_now to wake up in interval unit
     ///
     /// Window is milliseconds the chip keep waked each interval, from 0 to 65535.
     pub fn set_wake_window(&mut self, wake_window: u16) -> Result<(), EspNowError> {
-        check_error!({ esp_now_set_wake_window(wake_window) });
-
-        Ok(())
+        check_error!({ esp_now_set_wake_window(wake_window) })
     }
 
     /// Config ESPNOW rate
     pub fn set_rate(&mut self, rate: WifiPhyRate) -> Result<(), EspNowError> {
-        check_error!({ esp_wifi_config_espnow_rate(wifi_interface_t_WIFI_IF_STA, rate as u32,) });
-
-        Ok(())
+        check_error!({ esp_wifi_config_espnow_rate(wifi_interface_t_WIFI_IF_STA, rate as u32,) })
     }
 
     /// Send data to peer
