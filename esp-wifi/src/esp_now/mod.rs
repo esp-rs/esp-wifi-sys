@@ -9,6 +9,7 @@
 use core::{cell::RefCell, fmt::Debug};
 
 use critical_section::Mutex;
+use atomic_polyfill::{Ordering, AtomicBool};
 use esp_hal_common::peripheral::{Peripheral, PeripheralRef};
 
 use crate::compat::queue::SimpleQueue;
@@ -24,6 +25,13 @@ pub const BROADCAST_ADDRESS: [u8; 6] = [0xffu8, 0xffu8, 0xffu8, 0xffu8, 0xffu8, 
 
 static RECEIVE_QUEUE: Mutex<RefCell<SimpleQueue<ReceivedData, 10>>> =
     Mutex::new(RefCell::new(SimpleQueue::new()));
+/// This atomic behaves like a guard, so we need strict memory ordering when
+/// operating it.
+/// 
+/// This flag indicates whether the send callback has been called after a sending.
+static ESP_NOW_SEND_CB_INVOKED: AtomicBool = AtomicBool::new(false);
+/// Status of esp now send, true for success, false for failure
+static ESP_NOW_SEND_STATUS: AtomicBool = AtomicBool::new(true);
 
 macro_rules! check_error {
     ($block:block) => {
@@ -439,13 +447,20 @@ impl<'d> EspNow<'d> {
 
     /// Send data to peer
     ///
-    /// The peer needs to be added to the peer list first
-    pub fn send(&mut self, dst_addr: &[u8; 6], data: &[u8]) -> Result<(), EspNowError> {
+    /// The peer needs to be added to the peer list first.
+    /// 
+    /// This method returns a `SendWaiter` on success. ESP-NOW protocol provides guaranteed 
+    /// delivery on MAC layer. If you need this guatantee, call `wait` method of the returned 
+    /// `SendWaiter` and make sure it returns `SendStatus::Success`. 
+    /// However, this method will block current task for milliseconds. 
+    /// So you can just drop the waiter if you want high frequency sending.
+    pub fn send(&mut self, dst_addr: &[u8; 6], data: &[u8]) -> Result<SendWaiter, EspNowError> {
         let mut addr = [0u8; 6];
         addr.copy_from_slice(dst_addr);
-        check_error!({ esp_now_send(addr.as_ptr(), data.as_ptr(), data.len() as u32) });
 
-        Ok(())
+        ESP_NOW_SEND_CB_INVOKED.store(false, Ordering::Release);
+        check_error!({ esp_now_send(addr.as_ptr(), data.as_ptr(), data.len() as u32) })?;
+        Ok(SendWaiter(()))
     }
 
     /// Receive data
@@ -464,6 +479,51 @@ impl Drop for EspNow<'_> {
             esp_now_deinit();
         }
     }
+}
+
+/// This is essentially [esp_now_send_status_t](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/network/esp_now.html#_CPPv421esp_now_send_status_t)
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum SendStatus {
+    Success,
+    Failed
+}
+
+/// This struct is returned by a sync esp now send. Invoking `wait` method of this
+/// struct will block current task until the callback function of esp now send is called
+/// and return the status of previous sending. 
+pub struct SendWaiter(());
+
+impl SendWaiter {
+    /// Wait for the previous sending to complete, i.e. the send callback is invoked with 
+    /// status of the sending.
+    /// 
+    /// Note: if you firstly dropped waiter of a sending and then wait for a following sending,
+    /// you probably get unreliable status because we cannot determine which sending the waited status
+    /// belongs to.
+    pub fn wait(self) -> SendStatus {
+        while !ESP_NOW_SEND_CB_INVOKED.load(Ordering::Acquire) {}
+
+        if ESP_NOW_SEND_STATUS.load(Ordering::Relaxed) {
+            SendStatus::Success
+        } else {
+            SendStatus::Failed
+        }
+    }
+}
+
+unsafe extern "C" fn send_cb(
+    _mac_addr: *const u8,
+    status: esp_now_send_status_t
+) {
+    critical_section::with(|_| {
+        let is_success = status == esp_now_send_status_t_ESP_NOW_SEND_SUCCESS;
+        ESP_NOW_SEND_STATUS.store(is_success, Ordering::Relaxed);
+    
+        ESP_NOW_SEND_CB_INVOKED.store(true, Ordering::Release);
+
+        #[cfg(feature = "async")]
+        asynch::ESP_NOW_TX_WAKER.wake();
+    })
 }
 
 unsafe extern "C" fn rcv_cb(
@@ -561,9 +621,12 @@ unsafe extern "C" fn rcv_cb(
             .unwrap();
 
         #[cfg(feature = "async")]
-        asynch::ESP_NOW_WAKER.wake();
+        asynch::ESP_NOW_RX_WAKER.wake();
     });
 }
+
+#[cfg(feature = "async")]
+pub use asynch::SendFuture;
 
 #[cfg(feature = "async")]
 mod asynch {
@@ -571,11 +634,40 @@ mod asynch {
     use core::task::{Context, Poll};
     use embassy_sync::waitqueue::AtomicWaker;
 
-    pub(super) static ESP_NOW_WAKER: AtomicWaker = AtomicWaker::new();
+    pub(super) static ESP_NOW_TX_WAKER: AtomicWaker = AtomicWaker::new();
+    pub(super) static ESP_NOW_RX_WAKER: AtomicWaker = AtomicWaker::new();
 
     impl<'d> EspNow<'d> {
         pub async fn receive_async(&mut self) -> ReceivedData {
             ReceiveFuture.await
+        }
+
+        pub fn send_async(&mut self, dst_addr: &[u8; 6], data: &[u8]) -> Result<SendFuture, EspNowError> {
+            let mut addr = [0u8; 6];
+            addr.copy_from_slice(dst_addr);
+            ESP_NOW_SEND_CB_INVOKED.store(false, Ordering::Release);
+            check_error!({ esp_now_send(addr.as_ptr(), data.as_ptr(), data.len() as u32) })?;
+            Ok(SendFuture(()))
+        }
+    }
+
+    pub struct SendFuture(());
+
+    impl core::future::Future for SendFuture {
+        type Output = SendStatus;
+
+        fn poll(self: core::pin::Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
+            ESP_NOW_TX_WAKER.register(cx.waker());
+
+            if ESP_NOW_SEND_CB_INVOKED.load(Ordering::Acquire) {
+                Poll::Ready(if ESP_NOW_SEND_STATUS.load(Ordering::Relaxed) {
+                    SendStatus::Success
+                } else {
+                    SendStatus::Failed
+                })
+            } else {
+                Poll::Pending
+            }
         }
     }
 
@@ -585,7 +677,7 @@ mod asynch {
         type Output = ReceivedData;
 
         fn poll(self: core::pin::Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
-            ESP_NOW_WAKER.register(cx.waker());
+            ESP_NOW_RX_WAKER.register(cx.waker());
 
             if let Some(data) = critical_section::with(|cs| {
                 let mut queue = RECEIVE_QUEUE.borrow_ref_mut(cs);
