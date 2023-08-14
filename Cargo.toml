@@ -58,7 +58,7 @@ toml-cfg = "0.1.3"
 
 embassy-net = { version = "0.1.0", features = ["nightly", "tcp", "udp", "dhcpv4", "medium-ethernet"] }
 bleps = { git = "https://github.com/bjoernQ/bleps", package = "bleps", rev = "b82f1e7009bef7e32f0918be5b186188aa5e7109", features = ["macros"] }
-embassy-executor = { version = "0.2.0", package = "embassy-executor", features = ["nightly", "executor-thread", "integrated-timers"] }
+embassy-executor = { version = "0.2.1", package = "embassy-executor", features = ["nightly", "executor-thread", "integrated-timers"] }
 embassy-time = { version = "0.1.1", features = ["nightly"] }
 futures-util = { version = "0.3.28", default-features = false }
 esp-println = { version = "0.5.0", features = ["log"] }
