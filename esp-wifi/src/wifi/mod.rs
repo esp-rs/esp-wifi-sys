@@ -143,11 +143,9 @@ impl DataFrame {
         });
     }
 
-    pub(crate) fn data_mut(&mut self) -> &'static mut [u8] {
+    pub(crate) fn data_mut(&mut self) -> &mut [u8] {
         let data = unsafe { DATA_FRAME_BACKING_MEMORY.assume_init_mut() };
-        unsafe {
-            core::mem::transmute(&mut data[(self.index * DATA_FRAME_SIZE)..][..DATA_FRAME_SIZE])
-        }
+        &mut data[(self.index * DATA_FRAME_SIZE)..][..DATA_FRAME_SIZE]
     }
 
     pub(crate) fn from_bytes(bytes: &[u8]) -> Option<DataFrame> {
@@ -165,7 +163,7 @@ impl DataFrame {
 
     pub(crate) fn slice(&self) -> &[u8] {
         let data = unsafe { DATA_FRAME_BACKING_MEMORY.assume_init_ref() };
-        unsafe { core::mem::transmute(&data[(self.index * DATA_FRAME_SIZE)..][..self.len]) }
+        &data[(self.index * DATA_FRAME_SIZE)..][..self.len]
     }
 }
 
@@ -1028,7 +1026,8 @@ impl RxToken for WifiRxToken {
             let mut data = queue
                 .dequeue()
                 .expect("unreachable: transmit()/receive() ensures there is a packet to process");
-            let buffer = &mut data.data_mut()[..data.len];
+            let len = data.len;
+            let buffer = &mut data.data_mut()[..len];
             dump_packet_info(&buffer);
             let res = f(buffer);
             data.free();
@@ -1341,7 +1340,8 @@ pub(crate) mod embassy {
                 let mut data = queue.dequeue().expect(
                     "unreachable: transmit()/receive() ensures there is a packet to process",
                 );
-                let buffer = &mut data.data_mut()[..data.len];
+                let len = data.len;
+                let buffer = &mut data.data_mut()[..len];
                 dump_packet_info(&buffer);
                 let res = f(buffer);
                 data.free();
