@@ -123,15 +123,17 @@ impl DataFrame {
         });
     }
 
-    pub(crate) fn new() -> DataFrame {
+    pub(crate) fn new() -> Option<DataFrame> {
         let index = critical_section::with(|cs| {
             DATA_FRAME_BACKING_MEMORY_FREE_SLOTS
                 .borrow_ref_mut(cs)
                 .pop()
-                .expect("Out of DataFrames")
         });
 
-        DataFrame { len: 0, index }
+        match index {
+            Some(index) => Some(DataFrame { len: 0, index }),
+            None => None,
+        }
     }
 
     pub(crate) fn free(self) {
@@ -148,8 +150,8 @@ impl DataFrame {
         }
     }
 
-    pub(crate) fn from_bytes(bytes: &[u8]) -> DataFrame {
-        let mut data = DataFrame::new();
+    pub(crate) fn from_bytes(bytes: &[u8]) -> Option<DataFrame> {
+        let mut data = DataFrame::new()?;
         data.len = bytes.len();
         let mem = unsafe { DATA_FRAME_BACKING_MEMORY.assume_init_mut() };
         let len = usize::min(bytes.len(), DATA_FRAME_SIZE);
@@ -158,7 +160,7 @@ impl DataFrame {
         }
 
         mem[(data.index * DATA_FRAME_SIZE)..][..len].copy_from_slice(bytes);
-        data
+        Some(data)
     }
 
     pub(crate) fn slice(&self) -> &[u8] {
@@ -651,7 +653,11 @@ unsafe extern "C" fn recv_cb(
     eb: *mut crate::binary::c_types::c_void,
 ) -> esp_err_t {
     let src = core::slice::from_raw_parts_mut(buffer as *mut u8, len as usize);
-    let packet = DataFrame::from_bytes(src);
+    let packet = if let Some(packet) = DataFrame::from_bytes(src) {
+        packet
+    } else {
+        return esp_wifi_sys::include::ESP_ERR_NO_MEM as esp_err_t;
+    };
 
     let res = critical_section::with(|cs| {
         let mut queue = DATA_QUEUE_RX.borrow_ref_mut(cs);
@@ -668,6 +674,7 @@ unsafe extern "C" fn recv_cb(
             1
         }
     });
+
     esp_wifi_internal_free_rx_buffer(eb);
 
     res
@@ -1041,7 +1048,7 @@ impl TxToken for WifiTxToken {
         let res = critical_section::with(|cs| {
             let mut queue = DATA_QUEUE_TX.borrow_ref_mut(cs);
 
-            let mut packet = DataFrame::new();
+            let mut packet = DataFrame::new().expect("unreachable: transmit()/receive() ensures there is a buffer free (which means we also have free buffer space)");
             packet.len = len;
             let res = f(&mut packet.data_mut()[..len]);
             queue
@@ -1351,7 +1358,8 @@ pub(crate) mod embassy {
             let res = critical_section::with(|cs| {
                 let mut queue = DATA_QUEUE_TX.borrow_ref_mut(cs);
 
-                let mut packet = DataFrame::new();
+                let mut packet = DataFrame::new().expect("unreachable: transmit()/receive() ensures there is a buffer free and space available");
+
                 packet.len = len;
                 let res = f(&mut packet.data_mut()[..len]);
                 queue
