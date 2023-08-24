@@ -2,7 +2,7 @@
 
 Wi-Fi/BTLE coexistence is implemented but currently only works (to some extent) on ESP32-C3 and ESP32-S3. In general COEX shouldn't be used currently.
 
-Minimum supported Rust compiler version: 1.65.0.0
+Minimum supported Rust compiler version: 1.72.0.0
 
 This uses the WiFi drivers from https://github.com/esp-rs/esp-wireless-drivers-3rdparty
 
