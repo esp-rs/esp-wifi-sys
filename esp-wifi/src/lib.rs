@@ -114,6 +114,7 @@ const DEFAULT_TICK_RATE_HZ: u32 = 50;
 const DEFAULT_TICK_RATE_HZ: u32 = 100;
 
 #[derive(Debug)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[toml_cfg::toml_config]
 struct Config {
     #[default(5)]
