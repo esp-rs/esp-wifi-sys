@@ -36,6 +36,10 @@ jobs:
           ldproxy: false
       - uses: Swatinem/rust-cache@v1
 
+      - name: check
+        run: cd examples-esp32 && cargo check
+      - name: check (all features)
+        run: cd examples-esp32 && cargo check --all-features
       - name: build (ble)
         run: cd examples-esp32 && cargo build --release --example=ble --features=ble
       - name: build (async-ble)
@@ -66,6 +70,10 @@ jobs:
           components: rust-src
       - uses: Swatinem/rust-cache@v1
 
+      - name: check
+        run: cd examples-esp32c2 && cargo +nightly-2023-05-16 check
+      - name: check (all features)
+        run: cd examples-esp32c2 && cargo +nightly-2023-05-16 check --all-features
       - name: build (ble)
         run: cd examples-esp32c2 && cargo +nightly-2023-05-16 build --release --example=ble --features=ble
       - name: build (async-ble)
@@ -96,6 +104,10 @@ jobs:
           components: rust-src
       - uses: Swatinem/rust-cache@v1
 
+      - name: check
+        run: cd examples-esp32c3 && cargo +nightly-2023-05-16 check
+      - name: check (all features)
+        run: cd examples-esp32c3 && cargo +nightly-2023-05-16 check --all-features
       - name: build (ble)
         run: cd examples-esp32c3 && cargo +nightly-2023-05-16 build --release --example=ble --features=ble
       - name: build (async-ble)
@@ -128,6 +140,10 @@ jobs:
           components: rust-src
       - uses: Swatinem/rust-cache@v1
 
+      - name: check
+        run: cd examples-esp32c6 && cargo +nightly-2023-05-16 check
+      - name: check (all features)
+        run: cd examples-esp32c6 && cargo +nightly-2023-05-16 check --all-features
       - name: build (dhcp)
         run: cd examples-esp32c6 && cargo +nightly-2023-05-16 build --release --example=dhcp --features=wifi
       - name: build (static_ip)
@@ -154,6 +170,10 @@ jobs:
           ldproxy: false
       - uses: Swatinem/rust-cache@v1
 
+      - name: check
+        run: cd examples-esp32s2 && cargo check
+      - name: check (all features)
+        run: cd examples-esp32s2 && cargo check --all-features
       - name: build (dhcp)
         run: cd examples-esp32s2 && cargo build --release --example=dhcp --features=wifi
       - name: build (static_ip)
@@ -180,6 +200,10 @@ jobs:
           ldproxy: false
       - uses: Swatinem/rust-cache@v1
 
+      - name: check
+        run: cd examples-esp32s3 && cargo check
+      - name: check (all features)
+        run: cd examples-esp32s3 && cargo check --all-features
       - name: build (ble)
         run: cd examples-esp32s3 && cargo build --release --example=ble --features=ble
       - name: build (async-ble)
