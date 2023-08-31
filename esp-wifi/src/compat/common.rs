@@ -462,7 +462,7 @@ pub fn send_queued(
                 for i in 0..8 as usize {
                     data[i] = *(message.offset(i as isize));
                 }
-                trace!("queue posting {:x?}", data);
+                trace!("queue posting {:?}", data);
 
                 REAL_WIFI_QUEUE.as_mut().unwrap().enqueue(data);
                 memory_fence();
@@ -500,7 +500,7 @@ pub fn receive_queued(
                         for i in 0..8 {
                             item.offset(i).write_volatile(message[i as usize]);
                         }
-                        trace!("received {:x?}", message);
+                        trace!("received {:?}", message);
                         1
                     } else {
                         0

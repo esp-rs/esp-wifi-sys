@@ -1226,7 +1226,7 @@ unsafe extern "C" fn ble_hs_hci_rx_evt(cmd: *const u8, arg: *const c_void) {
     let event = *cmd;
     let len = *(cmd.offset(1)) as usize;
     let payload = core::slice::from_raw_parts(cmd.offset(2), len);
-    debug!("$ pld = {:x?}", payload);
+    debug!("$ pld = {:?}", payload);
 
     critical_section::with(|cs| {
         let mut queue = BT_RECEIVE_QUEUE.borrow_ref_mut(cs);
@@ -1415,6 +1415,6 @@ fn dump_packet_info(buffer: &[u8]) {
     return;
 
     critical_section::with(|cs| {
-        info!("@HCIFRAME {:02x?}", buffer);
+        info!("@HCIFRAME {:?}", buffer);
     });
 }

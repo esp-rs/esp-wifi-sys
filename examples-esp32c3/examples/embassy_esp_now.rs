@@ -26,7 +26,7 @@ async fn run(esp_now: EspNow<'static>) {
     loop {
         let res = select(ticker.next(), async {
             let r = esp_now.receive_async().await;
-            println!("Received {:x?}", r);
+            println!("Received {:?}", r);
             if r.info.dst_address == BROADCAST_ADDRESS {
                 if !esp_now.peer_exists(&r.info.src_address) {
                     esp_now

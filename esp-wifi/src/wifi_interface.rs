@@ -83,7 +83,7 @@ impl<'a> WifiStack<'a> {
         self.network_interface
             .borrow_mut()
             .set_hardware_addr(hw_address);
-        info!("Set hardware address: {:02x?}", hw_address);
+        info!("Set hardware address: {:?}", hw_address);
 
         self.reset(); // reset IP address
 

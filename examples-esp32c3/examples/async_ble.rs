@@ -66,11 +66,11 @@ async fn run(init: EspWifiInitialization, mut bluetooth: Bluetooth, pin: BootBut
             17
         };
         let mut wf = |offset: usize, data: &[u8]| {
-            println!("RECEIVED: {} {:x?}", offset, data);
+            println!("RECEIVED: {} {:?}", offset, data);
         };
 
         let mut wf2 = |offset: usize, data: &[u8]| {
-            println!("RECEIVED: {} {:x?}", offset, data);
+            println!("RECEIVED: {} {:?}", offset, data);
         };
 
         let mut rf3 = |_offset: usize, data: &mut [u8]| {
@@ -78,7 +78,7 @@ async fn run(init: EspWifiInitialization, mut bluetooth: Bluetooth, pin: BootBut
             5
         };
         let mut wf3 = |offset: usize, data: &[u8]| {
-            println!("RECEIVED: Offset {}, data {:x?}", offset, data);
+            println!("RECEIVED: Offset {}, data {:?}", offset, data);
         };
 
         gatt!([service {

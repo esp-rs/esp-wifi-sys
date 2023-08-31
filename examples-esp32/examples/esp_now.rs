@@ -41,7 +41,7 @@ fn main() -> ! {
     loop {
         let r = esp_now.receive();
         if let Some(r) = r {
-            println!("Received {:x?}", r);
+            println!("Received {:?}", r);
 
             if r.info.dst_address == BROADCAST_ADDRESS {
                 if !esp_now.peer_exists(&r.info.src_address) {

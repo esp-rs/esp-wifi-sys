@@ -74,11 +74,11 @@ fn main() -> ! {
             17
         };
         let mut wf = |offset: usize, data: &[u8]| {
-            println!("RECEIVED: {} {:x?}", offset, data);
+            println!("RECEIVED: {} {:?}", offset, data);
         };
 
         let mut wf2 = |offset: usize, data: &[u8]| {
-            println!("RECEIVED: {} {:x?}", offset, data);
+            println!("RECEIVED: {} {:?}", offset, data);
         };
 
         let mut rf3 = |_offset: usize, data: &mut [u8]| {
@@ -86,7 +86,7 @@ fn main() -> ! {
             5
         };
         let mut wf3 = |offset: usize, data: &[u8]| {
-            println!("RECEIVED: Offset {}, data {:x?}", offset, data);
+            println!("RECEIVED: Offset {}, data {:?}", offset, data);
         };
 
         gatt!([service {
@@ -147,7 +147,7 @@ fn main() -> ! {
                     }
                 }
                 Err(err) => {
-                    println!("{:x?}", err);
+                    println!("{:?}", err);
                 }
             }
         }

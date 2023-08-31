@@ -7,7 +7,7 @@ use crate::binary::{
         esp_bt_mode_t_ESP_BT_MODE_IDLE,
     },
 };
-use crate::{debug, error, info, trace, warn};
+use crate::{debug, info, trace, warn};
 
 use core::ptr::addr_of_mut;
 

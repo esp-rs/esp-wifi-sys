@@ -193,7 +193,7 @@ unsafe extern "C" fn queue_send(queue: *const (), item: *const (), _block_time_m
             for i in 0..8 as usize {
                 data[i] = *(message.offset(i as isize));
             }
-            trace!("queue posting {:x?}", data);
+            trace!("queue posting {:?}", data);
 
             critical_section::with(|cs| {
                 let mut queue = BT_INTERNAL_QUEUE.borrow_ref_mut(cs);
@@ -244,7 +244,7 @@ unsafe extern "C" fn queue_recv(queue: *const (), item: *const (), block_time_ms
                         for i in 0..8 {
                             item.offset(i).write_volatile(message[i as usize]);
                         }
-                        trace!("received {:x?}", message);
+                        trace!("received {:?}", message);
                         1
                     } else {
                         0
@@ -620,6 +620,6 @@ fn dump_packet_info(buffer: &[u8]) {
     return;
 
     critical_section::with(|cs| {
-        info!("@HCIFRAME {:02x?}", buffer);
+        info!("@HCIFRAME {:?}", buffer);
     });
 }

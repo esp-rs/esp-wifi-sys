@@ -1307,7 +1307,7 @@ fn dump_packet_info(buffer: &[u8]) {
     #[cfg(not(feature = "dump-packets"))]
     return;
 
-    info!("@WIFIFRAME {:02x?}", buffer);
+    info!("@WIFIFRAME {:?}", buffer);
 }
 
 #[macro_export]
