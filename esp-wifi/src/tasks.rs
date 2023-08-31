@@ -1,4 +1,4 @@
-use log::{debug, trace};
+use crate::{debug, trace};
 
 use crate::{
     compat::{

@@ -18,7 +18,7 @@ use embassy_executor::Executor;
 use embassy_executor::_export::StaticCell;
 use embedded_hal_async::digital::Wait;
 use esp_backtrace as _;
-use esp_println::{logger::init_logger, println};
+use esp_println::println;
 use esp_wifi::{
     ble::controller::asynch::BleConnector, initialize, EspWifiInitFor, EspWifiInitialization,
 };
@@ -129,7 +129,8 @@ static EXECUTOR: StaticCell<Executor> = StaticCell::new();
 
 #[entry]
 fn main() -> ! {
-    init_logger(log::LevelFilter::Info);
+    #[cfg(feature = "log")]
+    esp_println::logger::init_logger(log::LevelFilter::Info);
 
     let peripherals = Peripherals::take();
 

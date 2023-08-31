@@ -1,5 +1,6 @@
 use core::cell::RefCell;
 
+use crate::trace;
 use atomic_polyfill::{AtomicU64, Ordering};
 use critical_section::Mutex;
 use esp32s2_hal::xtensa_lx;
@@ -11,7 +12,6 @@ use esp32s2_hal::{
     prelude::*,
     timer::{Timer, Timer0},
 };
-use log::trace;
 
 use crate::preempt::preempt::task_switch;
 use esp32s2_hal::macros::interrupt;

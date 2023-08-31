@@ -21,7 +21,7 @@ use embedded_svc::ipv4::Interface;
 use embedded_svc::wifi::{AccessPointInfo, ClientConfiguration, Configuration, Wifi};
 
 use esp_backtrace as _;
-use esp_println::{logger::init_logger, print, println};
+use esp_println::{print, println};
 use esp_wifi::initialize;
 use esp_wifi::wifi::{utils::create_network_interface, WifiError};
 use hal::{
@@ -36,7 +36,8 @@ const PASSWORD: &str = env!("PASSWORD");
 
 #[entry]
 fn main() -> ! {
-    init_logger(log::LevelFilter::Info);
+    #[cfg(feature = "log")]
+    esp_println::logger::init_logger(log::LevelFilter::Info);
 
     let peripherals = Peripherals::take();
 

@@ -1,6 +1,7 @@
 use crate::binary::include::esp_bt_controller_config_t;
 use crate::common_adapter::RADIO_CLOCKS;
 use crate::hal::system::RadioClockController;
+use crate::trace;
 
 pub(crate) static mut ISR_INTERRUPT_4: (
     *mut crate::binary::c_types::c_void,
@@ -80,7 +81,7 @@ pub(super) unsafe extern "C" fn esp_intr_alloc(
     arg: *mut crate::binary::c_types::c_void,
     ret_handle: *mut *mut crate::binary::c_types::c_void,
 ) -> i32 {
-    log::trace!(
+    trace!(
         "esp_intr_alloc {} {} {:?} {:?} {:?}",
         source,
         flags,
@@ -105,7 +106,7 @@ pub(super) fn ble_rtc_clk_init() {
 }
 
 pub(super) unsafe extern "C" fn esp_reset_rpa_moudle() {
-    log::trace!("esp_reset_rpa_moudle");
+    trace!("esp_reset_rpa_moudle");
     unsafe {
         RADIO_CLOCKS.as_mut().unwrap().reset_rpa();
     }

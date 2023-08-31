@@ -5,6 +5,7 @@ use core::{cell::RefCell, mem::MaybeUninit};
 
 use crate::common_adapter::*;
 use crate::EspWifiInitialization;
+use crate::{debug, error, info, trace, warn};
 
 use crate::esp_wifi_result;
 use critical_section::Mutex;
@@ -81,7 +82,6 @@ use crate::{
     },
     compat::queue::SimpleQueue,
 };
-use log::debug;
 
 #[derive(Debug, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
@@ -155,7 +155,7 @@ impl DataFrame {
         let mem = unsafe { DATA_FRAME_BACKING_MEMORY.assume_init_mut() };
         let len = usize::min(bytes.len(), DATA_FRAME_SIZE);
         if len != bytes.len() {
-            log::warn!("Trying to store more data than available into DataFrame. Check MTU");
+            warn!("Trying to store more data than available into DataFrame. Check MTU");
         }
 
         mem[(data.index * DATA_FRAME_SIZE)..][..len].copy_from_slice(bytes);
@@ -358,18 +358,18 @@ unsafe extern "C" fn is_in_isr_wrapper() -> i32 {
 
 #[cfg(coex)]
 pub(crate) fn coex_initialize() -> i32 {
-    log::debug!("call coex-initialize");
+    debug!("call coex-initialize");
     unsafe {
         let res = esp_coex_adapter_register(
             &mut G_COEX_ADAPTER_FUNCS as *mut _ as *mut coex_adapter_funcs_t,
         );
         if res != 0 {
-            log::error!("Error: esp_coex_adapter_register {}", res);
+            error!("Error: esp_coex_adapter_register {}", res);
             return res;
         }
         let res = coex_pre_init();
         if res != 0 {
-            log::error!("Error: coex_pre_init {}", res);
+            error!("Error: coex_pre_init {}", res);
             return res;
         }
         0
@@ -377,7 +377,7 @@ pub(crate) fn coex_initialize() -> i32 {
 }
 
 pub unsafe extern "C" fn coex_init() -> i32 {
-    log::debug!("coex-init");
+    debug!("coex-init");
     #[cfg(coex)]
     return crate::binary::include::coex_init();
 
@@ -672,7 +672,7 @@ unsafe extern "C" fn recv_cb(
             0
         } else {
             packet.free();
-            log::error!("RX QUEUE FULL");
+            error!("RX QUEUE FULL");
             1
         }
     });
@@ -1002,7 +1002,7 @@ impl<'d> Device for WifiDevice<'d> {
             if !tx.is_full() {
                 Some(WifiTxToken::default())
             } else {
-                log::warn!("no Tx token available");
+                warn!("no Tx token available");
                 None
             }
         })
@@ -1080,7 +1080,7 @@ pub fn send_data_if_needed() {
         );
 
         while let Some(mut packet) = queue.dequeue() {
-            log::trace!("sending... {} bytes", packet.len);
+            trace!("sending... {} bytes", packet.len);
             dump_packet_info(packet.slice());
 
             let interface = if is_ap {
@@ -1096,9 +1096,9 @@ pub fn send_data_if_needed() {
                     packet.len as u16,
                 );
                 if _res != 0 {
-                    log::warn!("esp_wifi_internal_tx {}", _res);
+                    warn!("esp_wifi_internal_tx {}", _res);
                 }
-                log::trace!("esp_wifi_internal_tx {}", _res);
+                trace!("esp_wifi_internal_tx {}", _res);
             }
             #[cfg(feature = "embassy-net")]
             embassy::TRANSMIT_WAKER.wake();
@@ -1307,7 +1307,7 @@ fn dump_packet_info(buffer: &[u8]) {
     #[cfg(not(feature = "dump-packets"))]
     return;
 
-    log::info!("@WIFIFRAME {:02x?}", buffer);
+    info!("@WIFIFRAME {:02x?}", buffer);
 }
 
 #[macro_export]
@@ -1438,7 +1438,7 @@ pub(crate) mod embassy {
                     }
                 }
                 _ => {
-                    log::warn!("Unknown wifi mode in link_state");
+                    warn!("Unknown wifi mode in link_state");
                     embassy_net_driver::LinkState::Down
                 }
             }

@@ -8,8 +8,8 @@ use esp32c6_hal::trapframe::TrapFrame;
 use hal::peripherals::Interrupt;
 use hal::systimer::{Alarm, Periodic, Target};
 
+use crate::trace;
 use crate::{binary, preempt::preempt::task_switch};
-use log::trace;
 
 pub const TICKS_PER_SECOND: u64 = 16_000_000;
 

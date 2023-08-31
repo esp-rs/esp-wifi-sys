@@ -1,5 +1,5 @@
 use super::queue::SimpleQueue;
-use log::trace;
+use crate::trace;
 
 static mut WORKER_HIGH: Option<
     SimpleQueue<

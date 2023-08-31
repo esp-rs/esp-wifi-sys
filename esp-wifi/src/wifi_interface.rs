@@ -11,6 +11,7 @@ use smoltcp::wire::{DnsQueryType, IpAddress, IpCidr, IpEndpoint, Ipv4Address};
 
 use crate::current_millis;
 use crate::wifi::{get_ap_mac, get_sta_mac, WifiDevice, WifiMode};
+use crate::{debug, info};
 
 use core::borrow::BorrowMut;
 
@@ -82,7 +83,7 @@ impl<'a> WifiStack<'a> {
         self.network_interface
             .borrow_mut()
             .set_hardware_addr(hw_address);
-        log::info!("Set hardware address: {:02x?}", hw_address);
+        info!("Set hardware address: {:02x?}", hw_address);
 
         self.reset(); // reset IP address
 
@@ -113,7 +114,7 @@ impl<'a> WifiStack<'a> {
 
         if let Some(dhcp_handle) = *dhcp_socket_handle_ref {
             let dhcp_socket = sockets_ref.get_mut::<Dhcpv4Socket>(dhcp_handle);
-            log::info!("Reset DHCP client");
+            info!("Reset DHCP client");
             dhcp_socket.reset();
         }
 
@@ -122,13 +123,13 @@ impl<'a> WifiStack<'a> {
     }
 
     pub fn reset(&self) {
-        log::debug!("Reset TCP stack");
+        debug!("Reset TCP stack");
 
         let dhcp_socket_handle_ref = self.dhcp_socket_handle.borrow_mut();
         if let Some(dhcp_handle) = *dhcp_socket_handle_ref {
             self.with_mut(|_, _, sockets| {
                 let dhcp_socket = sockets.get_mut::<Dhcpv4Socket>(dhcp_handle);
-                log::debug!("Reset DHCP client");
+                debug!("Reset DHCP client");
                 dhcp_socket.reset();
             });
         }
@@ -160,12 +161,9 @@ impl<'a> WifiStack<'a> {
                 let a6 = 0xfe << 8 | mac[3] as u16;
                 let a7 = (mac[4] as u16) << 8 | mac[5] as u16;
 
-                log::info!(
+                info!(
                     "IPv6 link-local address fe80::{:x}:{:x}:{:x}:{:x}",
-                    a4,
-                    a5,
-                    a6,
-                    a7
+                    a4, a5, a6, a7
                 );
 
                 interface.update_ip_addrs(|addrs| {

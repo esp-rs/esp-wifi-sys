@@ -3,9 +3,9 @@ use crate::binary::include::*;
 use crate::common_adapter::RADIO_CLOCKS;
 use crate::hal::system::RadioClockController;
 use crate::hal::system::RadioPeripherals;
+use crate::trace;
 use atomic_polyfill::AtomicU32;
 use esp32_hal::prelude::ram;
-use log::trace;
 
 const SOC_PHY_DIG_REGS_MEM_SIZE: usize = 21 * 4;
 
@@ -71,7 +71,7 @@ pub(crate) unsafe fn phy_enable() {
             #[cfg(coex)]
             coex_bt_high_prio();
 
-            log::trace!("PHY ENABLE");
+            trace!("PHY ENABLE");
         });
     }
 }
@@ -92,7 +92,7 @@ pub(crate) unsafe fn phy_disable() {
 
             // Disable WiFi/BT common peripheral clock. Do not disable clock for hardware RNG
             phy_disable_clock();
-            log::trace!("PHY DISABLE");
+            trace!("PHY DISABLE");
         });
     }
 }

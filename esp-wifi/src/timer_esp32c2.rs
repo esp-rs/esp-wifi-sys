@@ -8,8 +8,8 @@ use esp32c2_hal::prelude::*;
 use hal::peripherals::Interrupt;
 use hal::systimer::{Alarm, Periodic, Target};
 
+use crate::trace;
 use crate::{binary, preempt::preempt::task_switch};
-use log::trace;
 
 pub const TICKS_PER_SECOND: u64 = 16_000_000;
 
@@ -100,7 +100,7 @@ fn WIFI_PWR() {
 #[interrupt]
 fn LP_TIMER() {
     unsafe {
-        log::trace!("LP_TIMER interrupt");
+        trace!("LP_TIMER interrupt");
 
         let (fnc, arg) = crate::ble::npl::ble_os_adapter_chip_specific::ISR_INTERRUPT_7;
 
@@ -122,7 +122,7 @@ fn LP_TIMER() {
 #[interrupt]
 fn BT_MAC() {
     unsafe {
-        log::trace!("BT_MAC interrupt");
+        trace!("BT_MAC interrupt");
 
         let (fnc, arg) = crate::ble::npl::ble_os_adapter_chip_specific::ISR_INTERRUPT_4;
 

@@ -77,6 +77,8 @@ pub(crate) mod common_adapter;
 #[doc(hidden)]
 pub mod tasks;
 
+mod log_macros;
+
 pub(crate) mod memory_fence;
 
 pub use critical_section;
@@ -283,7 +285,7 @@ pub fn initialize(
     #[cfg(feature = "wifi")]
     crate::wifi::DataFrame::internal_init();
 
-    log::info!("esp-wifi configuration {:?}", crate::CONFIG);
+    info!("esp-wifi configuration {:?}", crate::CONFIG);
 
     crate::common_adapter::chip_specific::enable_wifi_power_domain();
 
@@ -299,7 +301,7 @@ pub fn initialize(
 
     #[cfg(coex)]
     {
-        log::debug!("coex init");
+        debug!("coex init");
         let res = crate::wifi::coex_initialize();
         if res != 0 {
             return Err(InitializationError::General(res));
@@ -309,7 +311,7 @@ pub fn initialize(
     #[cfg(feature = "wifi")]
     {
         if init_for.is_wifi() {
-            log::debug!("wifi init");
+            debug!("wifi init");
             // wifi init
             crate::wifi::wifi_init()?;
         }
@@ -321,7 +323,7 @@ pub fn initialize(
             // ble init
             // for some reason things don't work when initializing things the other way around
             // while the original implementation in NuttX does it like that
-            log::debug!("ble init");
+            debug!("ble init");
             crate::ble::ble_init();
         }
     }

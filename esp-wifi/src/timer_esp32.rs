@@ -11,9 +11,10 @@ use esp32_hal::{
     prelude::*,
     timer::{Timer, Timer0},
 };
-use log::trace;
 
 use crate::preempt::preempt::task_switch;
+#[cfg(any(feature = "wifi", feature = "ble"))]
+use crate::trace;
 use esp32_hal::macros::interrupt;
 
 pub const TICKS_PER_SECOND: u64 = 40_000_000;

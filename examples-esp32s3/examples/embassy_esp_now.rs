@@ -9,7 +9,7 @@ use examples_util::hal;
 use embassy_executor::Executor;
 use embassy_time::{Duration, Ticker};
 use esp_backtrace as _;
-use esp_println::logger::init_logger;
+
 use esp_println::println;
 use esp_wifi::esp_now::{EspNow, PeerInfo, BROADCAST_ADDRESS};
 use esp_wifi::{initialize, EspWifiInitFor};
@@ -38,7 +38,10 @@ async fn run(esp_now: EspNow<'static>) {
                         })
                         .unwrap();
                 }
-                let status = esp_now.send_async(&r.info.src_address, b"Hello Peer").unwrap().await;
+                let status = esp_now
+                    .send_async(&r.info.src_address, b"Hello Peer")
+                    .unwrap()
+                    .await;
                 println!("Send hello to peer status: {:?}", status);
             }
         })
@@ -47,7 +50,10 @@ async fn run(esp_now: EspNow<'static>) {
         match res {
             Either::First(_) => {
                 println!("Send");
-                let status = esp_now.send_async(&BROADCAST_ADDRESS, b"0123456789").unwrap().await;
+                let status = esp_now
+                    .send_async(&BROADCAST_ADDRESS, b"0123456789")
+                    .unwrap()
+                    .await;
                 println!("Send broadcast status: {:?}", status)
             }
             Either::Second(_) => (),
@@ -59,7 +65,8 @@ static EXECUTOR: StaticCell<Executor> = StaticCell::new();
 
 #[entry]
 fn main() -> ! {
-    init_logger(log::LevelFilter::Info);
+    #[cfg(feature = "log")]
+    esp_println::logger::init_logger(log::LevelFilter::Info);
 
     let peripherals = Peripherals::take();
 

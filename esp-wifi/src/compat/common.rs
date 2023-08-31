@@ -2,8 +2,6 @@
 
 use core::{ffi::VaListImpl, fmt::Write, ptr::addr_of_mut};
 
-use log::{info, trace};
-
 use super::queue::SimpleQueue;
 use crate::{
     binary::{c_types::c_void, include::OSI_FUNCS_TIME_BLOCKING},
@@ -11,6 +9,7 @@ use crate::{
     preempt::preempt::current_task,
     timer::yield_task,
 };
+use crate::{info, trace};
 
 static mut CURR_SEM: [Option<u32>; 20] = [
     None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
@@ -261,7 +260,7 @@ pub fn sem_create(max: u32, init: u32) -> *mut crate::binary::c_types::c_void {
 }
 
 pub fn sem_delete(semphr: *mut crate::binary::c_types::c_void) {
-    log::trace!(">>> sem delete");
+    trace!(">>> sem delete");
     critical_section::with(|_| unsafe {
         CURR_SEM[semphr as usize - 1] = None;
         memory_fence();
