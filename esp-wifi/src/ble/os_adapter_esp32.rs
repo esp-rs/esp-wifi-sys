@@ -7,7 +7,7 @@ use crate::binary::{
         esp_bt_mode_t_ESP_BT_MODE_IDLE,
     },
 };
-use crate::{debug, info, panic, trace, warn};
+use crate::{debug, info, panic, trace, unwrap, warn};
 
 use core::ptr::addr_of_mut;
 
@@ -181,9 +181,8 @@ pub(super) static G_OSI_FUNCS: osi_funcs_s = osi_funcs_s {
 
 extern "C" fn coex_version_get_wrapper(major: *mut u32, minor: *mut u32, patch: *mut u32) -> i32 {
     unsafe {
-        let coex_version = core::ffi::CStr::from_ptr(crate::binary::include::coex_version_get())
-            .to_str()
-            .unwrap();
+        let coex_version =
+            unwrap!(core::ffi::CStr::from_ptr(crate::binary::include::coex_version_get()).to_str());
         info!("COEX Version {}", coex_version);
         // we should parse it ... for now just hardcoded
         major.write_volatile(1);

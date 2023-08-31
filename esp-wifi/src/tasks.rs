@@ -1,4 +1,4 @@
-use crate::{debug, trace};
+use crate::{debug, trace, unwrap};
 
 use crate::{
     compat::{
@@ -54,7 +54,7 @@ pub extern "C" fn worker_task2() {
                             debug!("timer is due.... {:?}", old.ptimer);
                             let fnctn: fn(*mut crate::binary::c_types::c_void) =
                                 core::mem::transmute(old.timer_ptr);
-                            to_run.enqueue((fnctn, old.arg_ptr)).unwrap();
+                            unwrap!(to_run.enqueue((fnctn, old.arg_ptr)));
 
                             TIMERS[i] = Some(Timer {
                                 expire: if old.period != 0 {
@@ -79,7 +79,7 @@ pub extern "C" fn worker_task2() {
                 break;
             }
 
-            let (fnc, arg) = run_now.unwrap();
+            let (fnc, arg) = unwrap!(run_now);
             trace!("trigger timer....");
             fnc(arg);
             trace!("timer callback called");

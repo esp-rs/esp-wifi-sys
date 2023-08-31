@@ -11,7 +11,7 @@ use crate::{
     memory_fence::memory_fence,
     timer::yield_task,
 };
-use crate::{debug, info, panic, trace, warn};
+use crate::{debug, info, panic, trace, unwrap, warn};
 
 #[cfg(esp32)]
 use esp32_hal as hal;
@@ -197,7 +197,7 @@ unsafe extern "C" fn queue_send(queue: *const (), item: *const (), _block_time_m
 
             critical_section::with(|cs| {
                 let mut queue = BT_INTERNAL_QUEUE.borrow_ref_mut(cs);
-                queue.enqueue(data).unwrap();
+                unwrap!(queue.enqueue(data));
             });
             memory_fence();
         });

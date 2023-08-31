@@ -69,3 +69,36 @@ macro_rules! error {
         $crate::log_macros::defmt::error!($($args),*);
     }}
 }
+
+pub(crate) trait ResultExt<T, E> {
+    fn into_result(self) -> Result<T, E>;
+}
+
+impl<T, E> ResultExt<T, E> for Result<T, E> {
+    #[inline(always)]
+    fn into_result(self) -> Result<T, E> {
+        self
+    }
+}
+
+impl<T> ResultExt<T, ()> for Option<T> {
+    #[inline(always)]
+    fn into_result(self) -> Result<T, ()> {
+        self.ok_or(())
+    }
+}
+
+#[macro_export]
+macro_rules! unwrap {
+    ($expr:expr $($(,$msg:tt)+)?) => {{
+        match $crate::log_macros::ResultExt::into_result($expr) {
+            Ok(value) => value,
+            Err(_) => {
+                $(
+                    $crate::error!($($msg),+);
+                )?
+                $crate::panic!();
+            }
+        }
+    }}
+}

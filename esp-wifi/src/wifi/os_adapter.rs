@@ -27,7 +27,7 @@ use crate::{
     memory_fence::memory_fence,
     timer::yield_task,
 };
-use crate::{debug, info, panic, trace, warn};
+use crate::{debug, info, panic, trace, unwrap, warn};
 
 #[cfg(target_arch = "riscv32")]
 use crate::compat::common::syslog;
@@ -920,7 +920,7 @@ pub unsafe extern "C" fn event_post(
     );
     use num_traits::FromPrimitive;
 
-    let event = WifiEvent::from_i32(event_id).unwrap();
+    let event = unwrap!(WifiEvent::from_i32(event_id));
     trace!("EVENT: {:?}", event);
     critical_section::with(|cs| WIFI_EVENTS.borrow_ref_mut(cs).insert(event));
 
@@ -1109,7 +1109,7 @@ pub unsafe extern "C" fn phy_update_country_info(
  ****************************************************************************/
 pub unsafe extern "C" fn wifi_reset_mac() {
     trace!("wifi_reset_mac");
-    RADIO_CLOCKS.as_mut().unwrap().reset_mac();
+    unwrap!(RADIO_CLOCKS.as_mut()).reset_mac();
 }
 
 /****************************************************************************
@@ -1127,10 +1127,7 @@ pub unsafe extern "C" fn wifi_reset_mac() {
  ****************************************************************************/
 pub unsafe extern "C" fn wifi_clock_enable() {
     trace!("wifi_clock_enable");
-    RADIO_CLOCKS
-        .as_mut()
-        .unwrap()
-        .enable(RadioPeripherals::Wifi);
+    unwrap!(RADIO_CLOCKS.as_mut()).enable(RadioPeripherals::Wifi);
 }
 
 /****************************************************************************
@@ -1148,10 +1145,7 @@ pub unsafe extern "C" fn wifi_clock_enable() {
  ****************************************************************************/
 pub unsafe extern "C" fn wifi_clock_disable() {
     trace!("wifi_clock_disable");
-    RADIO_CLOCKS
-        .as_mut()
-        .unwrap()
-        .disable(RadioPeripherals::Wifi);
+    unwrap!(RADIO_CLOCKS.as_mut()).disable(RadioPeripherals::Wifi);
 }
 
 /****************************************************************************
@@ -2084,7 +2078,8 @@ pub unsafe extern "C" fn coex_schm_register_cb_wrapper(
     #[cfg(coex)]
     crate::binary::include::coex_schm_register_callback(
         arg1 as u32,
-        (cb.unwrap()) as *const esp_wifi_sys::c_types::c_void as *mut esp_wifi_sys::c_types::c_void,
+        unwrap!(cb) as *const esp_wifi_sys::c_types::c_void
+            as *mut esp_wifi_sys::c_types::c_void,
     )
 }
 

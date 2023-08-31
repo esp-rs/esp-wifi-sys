@@ -8,8 +8,8 @@ use esp32c6_hal::trapframe::TrapFrame;
 use hal::peripherals::Interrupt;
 use hal::systimer::{Alarm, Periodic, Target};
 
-use crate::trace;
 use crate::{binary, preempt::preempt::task_switch};
+use crate::{trace, unwrap};
 
 pub const TICKS_PER_SECOND: u64 = 16_000_000;
 
@@ -27,19 +27,22 @@ pub fn setup_timer_isr(systimer: Alarm<Target, 0>) {
 
     critical_section::with(|cs| ALARM0.borrow_ref_mut(cs).replace(alarm0));
 
-    esp32c6_hal::interrupt::enable(
+    unwrap!(esp32c6_hal::interrupt::enable(
         Interrupt::SYSTIMER_TARGET0,
         hal::interrupt::Priority::Priority1,
-    )
-    .unwrap();
+    ));
 
     #[cfg(feature = "wifi")]
-    esp32c6_hal::interrupt::enable(Interrupt::WIFI_MAC, hal::interrupt::Priority::Priority1)
-        .unwrap();
+    unwrap!(esp32c6_hal::interrupt::enable(
+        Interrupt::WIFI_MAC,
+        hal::interrupt::Priority::Priority1
+    ));
 
     #[cfg(feature = "wifi")]
-    esp32c6_hal::interrupt::enable(Interrupt::WIFI_PWR, hal::interrupt::Priority::Priority1)
-        .unwrap();
+    unwrap!(esp32c6_hal::interrupt::enable(
+        Interrupt::WIFI_PWR,
+        hal::interrupt::Priority::Priority1
+    ));
 
     // make sure to disable WIFI_BB/MODEM_PERI_TIMEOUT by mapping it to CPU interrupt 31 which is masked by default
     // for some reason for this interrupt, mapping it to 0 doesn't deactivate it
@@ -53,19 +56,24 @@ pub fn setup_timer_isr(systimer: Alarm<Target, 0>) {
 
     #[cfg(feature = "ble")]
     {
-        esp32c6_hal::interrupt::enable(Interrupt::RWBT, hal::interrupt::Priority::Priority1)
-            .unwrap();
-        esp32c6_hal::interrupt::enable(Interrupt::RWBLE, hal::interrupt::Priority::Priority1)
-            .unwrap();
-        esp32c6_hal::interrupt::enable(Interrupt::BT_BB, hal::interrupt::Priority::Priority1)
-            .unwrap();
+        unwrap!(esp32c6_hal::interrupt::enable(
+            Interrupt::RWBT,
+            hal::interrupt::Priority::Priority1
+        ));
+        unwrap!(esp32c6_hal::interrupt::enable(
+            Interrupt::RWBLE,
+            hal::interrupt::Priority::Priority1
+        ));
+        unwrap!(esp32c6_hal::interrupt::enable(
+            Interrupt::BT_BB,
+            hal::interrupt::Priority::Priority1
+        ));
     }
 
-    esp32c6_hal::interrupt::enable(
+    unwrap!(esp32c6_hal::interrupt::enable(
         Interrupt::FROM_CPU_INTR3,
         hal::interrupt::Priority::Priority1,
-    )
-    .unwrap();
+    ));
 
     unsafe {
         esp32c6_hal::riscv::interrupt::enable();
@@ -172,11 +180,7 @@ fn BT_BB(_trap_frame: &mut TrapFrame) {
 fn SYSTIMER_TARGET0(trap_frame: &mut TrapFrame) {
     // clear the systimer intr
     critical_section::with(|cs| {
-        ALARM0
-            .borrow_ref_mut(cs)
-            .as_mut()
-            .unwrap()
-            .clear_interrupt();
+        unwrap!(ALARM0.borrow_ref_mut(cs).as_mut()).clear_interrupt();
     });
 
     task_switch(trap_frame);
@@ -193,7 +197,7 @@ fn FROM_CPU_INTR3(trap_frame: &mut TrapFrame) {
 
     critical_section::with(|cs| {
         let mut alarm0 = ALARM0.borrow_ref_mut(cs);
-        let alarm0 = alarm0.as_mut().unwrap();
+        let alarm0 = unwrap!(alarm0.as_mut());
 
         alarm0.set_period(TIMER_DELAY.into());
         alarm0.clear_interrupt();

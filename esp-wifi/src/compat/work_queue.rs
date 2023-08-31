@@ -1,5 +1,5 @@
 use super::queue::SimpleQueue;
-use crate::trace;
+use crate::{trace, unwrap};
 
 static mut WORKER_HIGH: Option<
     SimpleQueue<
@@ -32,10 +32,7 @@ pub fn queue_work(
             WORKER_HIGH = Some(SimpleQueue::new());
         }
 
-        let _ = &WORKER_HIGH
-            .as_mut()
-            .unwrap()
-            .enqueue((core::mem::transmute(task_func), param));
+        let _ = &unwrap!(WORKER_HIGH.as_mut()).enqueue((core::mem::transmute(task_func), param));
     });
 }
 
@@ -52,7 +49,7 @@ pub fn do_work() {
             }
 
             todo.iter_mut().for_each(|e| {
-                let work = &WORKER_HIGH.as_mut().unwrap().dequeue();
+                let work = &unwrap!(WORKER_HIGH.as_mut()).dequeue();
 
                 match work {
                     Some(worker) => {

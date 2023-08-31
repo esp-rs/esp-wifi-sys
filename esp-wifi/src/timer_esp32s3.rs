@@ -11,7 +11,7 @@ use esp32s3_hal::{
 };
 
 use crate::preempt::preempt::task_switch;
-use crate::trace;
+use crate::{trace, unwrap};
 use esp32s3_hal::macros::interrupt;
 
 pub const TICKS_PER_SECOND: u64 = 40_000_000;
@@ -36,38 +36,33 @@ fn read_timer_value() -> u64 {
 
 pub fn setup_timer_isr(timg1_timer0: Timer<Timer0<TIMG1>>) {
     let mut timer1 = timg1_timer0;
-    interrupt::enable(
+    unwrap!(interrupt::enable(
         peripherals::Interrupt::TG1_T0_LEVEL,
         interrupt::Priority::Priority2,
-    )
-    .unwrap();
+    ));
 
     #[cfg(feature = "wifi")]
-    interrupt::enable(
+    unwrap!(interrupt::enable(
         peripherals::Interrupt::WIFI_MAC,
         interrupt::Priority::Priority1,
-    )
-    .unwrap();
+    ));
 
     #[cfg(feature = "wifi")]
-    interrupt::enable(
+    unwrap!(interrupt::enable(
         peripherals::Interrupt::WIFI_PWR,
         interrupt::Priority::Priority1,
-    )
-    .unwrap();
+    ));
 
     #[cfg(feature = "ble")]
     {
-        interrupt::enable(
+        unwrap!(interrupt::enable(
             peripherals::Interrupt::BT_BB,
             interrupt::Priority::Priority1,
-        )
-        .unwrap();
-        interrupt::enable(
+        ));
+        unwrap!(interrupt::enable(
             peripherals::Interrupt::RWBLE,
             interrupt::Priority::Priority1,
-        )
-        .unwrap();
+        ));
     }
 
     timer1.listen();
@@ -164,7 +159,7 @@ fn TG1_T0_LEVEL(context: &mut TrapFrame) {
         crate::memory_fence::memory_fence();
 
         let mut timer = TIMER1.borrow_ref_mut(cs);
-        let timer = timer.as_mut().unwrap();
+        let timer = unwrap!(timer.as_mut());
         timer.clear_interrupt();
         timer.start(TIMER_DELAY.into_duration());
     });
@@ -184,7 +179,7 @@ fn Software1(_level: u32, context: &mut TrapFrame) {
         crate::memory_fence::memory_fence();
 
         let mut timer = TIMER1.borrow_ref_mut(cs);
-        let timer = timer.as_mut().unwrap();
+        let timer = unwrap!(timer.as_mut());
         timer.clear_interrupt();
         timer.start(TIMER_DELAY.into_duration());
     });

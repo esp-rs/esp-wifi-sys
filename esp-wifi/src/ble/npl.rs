@@ -9,7 +9,7 @@ use crate::compat;
 use crate::compat::common::StrBuf;
 use crate::compat::queue::SimpleQueue;
 use crate::timer::yield_task;
-use crate::{debug, error, info, panic, trace, warn};
+use crate::{debug, info, panic, trace, unwrap, warn};
 
 #[cfg_attr(esp32c2, path = "os_adapter_esp32c2.rs")]
 pub(crate) mod ble_os_adapter_chip_specific;
@@ -702,7 +702,7 @@ unsafe extern "C" fn ble_npl_callout_stop(callout: *const ble_npl_callout) {
         panic!("Trying to stop an uninitialzed callout");
     }
 
-    let co = CALLOUTS[((*callout).dummy - 1) as usize].as_mut().unwrap();
+    let co = unwrap!(CALLOUTS[((*callout).dummy - 1) as usize].as_mut());
 
     // stop timer
     compat::timer_compat::compat_timer_disarm(co.timer_handle as *mut c_void);
@@ -714,7 +714,7 @@ unsafe extern "C" fn ble_npl_callout_reset(
 ) -> ble_npl_error_t {
     trace!("ble_npl_callout_reset {:?} {}", callout, time);
 
-    let co = CALLOUTS[((*callout).dummy - 1) as usize].as_mut().unwrap();
+    let co = unwrap!(CALLOUTS[((*callout).dummy - 1) as usize].as_mut());
 
     // start timer
     compat::timer_compat::compat_timer_arm(co.timer_handle as *mut c_void, time, false);
@@ -766,10 +766,7 @@ unsafe extern "C" fn ble_npl_event_set_arg(event: *const ble_npl_event, arg: *co
         panic!("Call set_arg on uninitialized event");
     }
 
-    EVENTS[((*event).dummy - 1) as usize]
-        .as_mut()
-        .unwrap()
-        .ev_arg_ptr = arg as u32;
+    unwrap!(EVENTS[((*event).dummy - 1) as usize].as_mut()).ev_arg_ptr = arg as u32;
 }
 
 unsafe extern "C" fn ble_npl_event_get_arg(event: *const ble_npl_event) -> *const c_void {
@@ -780,16 +777,10 @@ unsafe extern "C" fn ble_npl_event_get_arg(event: *const ble_npl_event) -> *cons
 
     trace!(
         "returning arg {:x}",
-        EVENTS[((*event).dummy - 1) as usize]
-            .as_mut()
-            .unwrap()
-            .ev_arg_ptr
+        unwrap!(EVENTS[((*event).dummy - 1) as usize].as_mut()).ev_arg_ptr
     );
 
-    EVENTS[((*event).dummy - 1) as usize]
-        .as_mut()
-        .unwrap()
-        .ev_arg_ptr as *const c_void
+    unwrap!(EVENTS[((*event).dummy - 1) as usize].as_mut()).ev_arg_ptr as *const c_void
 }
 
 unsafe extern "C" fn ble_npl_event_is_queued(event: *const ble_npl_event) -> bool {
@@ -798,10 +789,7 @@ unsafe extern "C" fn ble_npl_event_is_queued(event: *const ble_npl_event) -> boo
         panic!("Call is_queued on uninitialized event");
     }
 
-    EVENTS[((*event).dummy - 1) as usize]
-        .as_mut()
-        .unwrap()
-        .queued
+    unwrap!(EVENTS[((*event).dummy - 1) as usize].as_mut()).queued
 }
 
 unsafe extern "C" fn ble_npl_event_reset(event: *const ble_npl_event) {
@@ -811,10 +799,7 @@ unsafe extern "C" fn ble_npl_event_reset(event: *const ble_npl_event) {
     if (*event).dummy == 0 {
         panic!("Trying to reset an uninitialized event");
     } else {
-        EVENTS[((*event).dummy - 1) as usize]
-            .as_mut()
-            .unwrap()
-            .queued = false;
+        unwrap!(EVENTS[((*event).dummy - 1) as usize].as_mut()).queued = false;
     }
 }
 
@@ -832,7 +817,7 @@ unsafe extern "C" fn ble_npl_event_init(
     let event = event as *mut ble_npl_event;
 
     if (*event).dummy == 0 {
-        let idx = EVENTS.iter().position(|item| item.is_none()).unwrap();
+        let idx = unwrap!(EVENTS.iter().position(|item| item.is_none()));
         EVENTS[idx] = Some(Event {
             event_id: event as u32,
             event_fn_ptr: func as u32,
@@ -860,7 +845,7 @@ unsafe extern "C" fn ble_npl_event_run(event: *const ble_npl_event) {
     if (*event).dummy == 0 {
         panic!("Trying to run an uninitialized event");
     } else {
-        let ev = EVENTS[((*event).dummy - 1) as usize].as_mut().unwrap();
+        let ev = unwrap!(EVENTS[((*event).dummy - 1) as usize].as_mut());
         trace!("info {:x} with arg {:x}", ev.event_fn_ptr, event as u32);
         let func: unsafe extern "C" fn(u32) = core::mem::transmute(ev.event_fn_ptr);
         func(event as u32);
@@ -884,10 +869,7 @@ unsafe extern "C" fn ble_npl_eventq_remove(
     }
 
     critical_section::with(|_| {
-        EVENTS[((*event).dummy - 1) as usize]
-            .as_mut()
-            .unwrap()
-            .queued = false;
+        unwrap!(EVENTS[((*event).dummy - 1) as usize].as_mut()).queued = false;
     });
 }
 
@@ -903,11 +885,8 @@ unsafe extern "C" fn ble_npl_eventq_put(queue: *const ble_npl_eventq, event: *co
     }
 
     critical_section::with(|_| {
-        EVENTS[((*event).dummy - 1) as usize]
-            .as_mut()
-            .unwrap()
-            .queued = true;
-        EVENT_QUEUE.enqueue((*event).dummy as usize).unwrap();
+        unwrap!(EVENTS[((*event).dummy - 1) as usize].as_mut()).queued = true;
+        unwrap!(EVENT_QUEUE.enqueue((*event).dummy as usize));
     });
 }
 
@@ -922,7 +901,7 @@ unsafe extern "C" fn ble_npl_eventq_get(
             let dequeued = critical_section::with(|_| EVENT_QUEUE.dequeue());
 
             if let Some(event_idx) = dequeued {
-                let evt = EVENTS[event_idx - 1].as_mut().unwrap();
+                let evt = unwrap!(EVENTS[event_idx - 1].as_mut());
                 if evt.queued == true {
                     trace!("got {:x}", evt.event_id);
                     evt.queued = false;
@@ -958,7 +937,7 @@ unsafe extern "C" fn ble_npl_callout_init(
     let callout = callout as *mut ble_npl_callout;
 
     if (*callout).dummy == 0 {
-        let idx = CALLOUTS.iter().position(|item| item.is_none()).unwrap();
+        let idx = unwrap!(CALLOUTS.iter().position(|item| item.is_none()));
 
         let timer = &CALLOUT_TIMERS[idx];
         crate::compat::timer_compat::compat_timer_setfn(
@@ -983,7 +962,7 @@ unsafe extern "C" fn ble_npl_callout_init(
 
 unsafe extern "C" fn callout_timer_callback_wrapper(arg: *mut c_void) {
     info!("callout_timer_callback_wrapper {:?}", arg);
-    let co = CALLOUTS[arg as usize].as_mut().unwrap();
+    let co = unwrap!(CALLOUTS[arg as usize].as_mut());
 
     if co.eventq_id == 0 {
         ble_npl_eventq_put(
@@ -1364,7 +1343,7 @@ pub fn send_hci(data: &[u8]) {
                             packet.len() - 1,
                         );
 
-                        let res = (ble_hci_trans_funcs_ptr.ble_hci_trans_hs_cmd_tx.unwrap())(cmd);
+                        let res = unwrap!(ble_hci_trans_funcs_ptr.ble_hci_trans_hs_cmd_tx)(cmd);
 
                         if res != 0 {
                             warn!("ble_hci_trans_hs_cmd_tx res == {}", res);
@@ -1387,7 +1366,7 @@ pub fn send_hci(data: &[u8]) {
                         // this modification of the ACL data packet makes it getting sent and received by the other side
                         *((*om).om_data as *mut u8).offset(1) = 0;
 
-                        let res = (ble_hci_trans_funcs_ptr.ble_hci_trans_hs_acl_tx.unwrap())(om);
+                        let res = unwrap!(ble_hci_trans_funcs_ptr.ble_hci_trans_hs_acl_tx)(om);
                         if res != 0 {
                             panic!("ble_hci_trans_hs_acl_tx returned {}", res);
                         }

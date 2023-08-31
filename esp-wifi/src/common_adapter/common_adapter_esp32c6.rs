@@ -4,7 +4,7 @@ use crate::common_adapter::RADIO_CLOCKS;
 use crate::compat::common::StrBuf;
 use crate::hal::system::RadioClockController;
 use crate::hal::system::RadioPeripherals;
-use crate::trace;
+use crate::{trace, unwrap};
 use atomic_polyfill::AtomicU32;
 
 const SOC_PHY_DIG_REGS_MEM_SIZE: usize = 21 * 4;
@@ -121,17 +121,14 @@ fn phy_digital_regs_store() {
 
 pub(crate) unsafe fn phy_enable_clock() {
     trace!("phy_enable_clock");
-    RADIO_CLOCKS.as_mut().unwrap().enable(RadioPeripherals::Phy);
+    unwrap!(RADIO_CLOCKS.as_mut()).enable(RadioPeripherals::Phy);
     trace!("phy_enable_clock done!");
 }
 
 #[allow(unused)]
 pub(crate) unsafe fn phy_disable_clock() {
     trace!("phy_disable_clock");
-    RADIO_CLOCKS
-        .as_mut()
-        .unwrap()
-        .disable(RadioPeripherals::Phy);
+    unwrap!(RADIO_CLOCKS.as_mut()).disable(RadioPeripherals::Phy);
     trace!("phy_disable_clock done!");
 }
 

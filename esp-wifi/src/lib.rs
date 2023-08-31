@@ -375,6 +375,6 @@ pub fn init_buffer() {
 
 pub fn init_clocks() {
     unsafe {
-        RADIO_CLOCKS.as_mut().unwrap().init_clocks();
+        unwrap!(RADIO_CLOCKS.as_mut()).init_clocks();
     }
 }

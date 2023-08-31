@@ -9,7 +9,7 @@ use crate::{
     preempt::preempt::current_task,
     timer::yield_task,
 };
-use crate::{info, panic, trace};
+use crate::{info, panic, trace, unwrap};
 
 static mut CURR_SEM: [Option<u32>; 20] = [
     None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
@@ -339,7 +339,7 @@ pub fn thread_sem_get() -> *mut crate::binary::c_types::c_void {
             PER_THREAD_SEM[tid] = Some(sem);
             sem
         } else {
-            let sem = PER_THREAD_SEM[tid].unwrap();
+            let sem = unwrap!(PER_THREAD_SEM[tid]);
             trace!("wifi_thread_semphr_get - return for {} {:?}", tid, sem);
             sem
         }
@@ -464,7 +464,7 @@ pub fn send_queued(
                 }
                 trace!("queue posting {:?}", data);
 
-                REAL_WIFI_QUEUE.as_mut().unwrap().enqueue(data);
+                unwrap!(REAL_WIFI_QUEUE.as_mut()).enqueue(data);
                 memory_fence();
             });
         }
@@ -493,9 +493,9 @@ pub fn receive_queued(
             loop {
                 let res = critical_section::with(|_| {
                     memory_fence();
-                    let message = REAL_WIFI_QUEUE.as_mut().unwrap().dequeue();
+                    let message = unwrap!(REAL_WIFI_QUEUE.as_mut()).dequeue();
                     if message.is_some() {
-                        let message = message.unwrap();
+                        let message = unwrap!(message);
                         let item = item as *mut u8;
                         for i in 0..8 {
                             item.offset(i).write_volatile(message[i as usize]);

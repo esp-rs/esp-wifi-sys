@@ -2,7 +2,7 @@ use crate::{
     binary::include::{esp_timer_create_args_t, esp_timer_handle_t},
     memory_fence::memory_fence,
 };
-use crate::{debug, panic, trace};
+use crate::{debug, panic, trace, unwrap};
 
 static ESP_FAKE_TIMER: () = ();
 
@@ -184,7 +184,7 @@ pub fn compat_esp_timer_create(
                     expire: 0,
                     period: 0,
                     active: false,
-                    timer_ptr: core::mem::transmute((*args).callback.unwrap()),
+                    timer_ptr: core::mem::transmute(unwrap!((*args).callback)),
                     arg_ptr: (*args).arg,
                 });
                 out_handle = &ESP_FAKE_TIMER as *const _ as *mut esp_timer_handle_t;

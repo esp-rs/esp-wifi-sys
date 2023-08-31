@@ -11,7 +11,7 @@ use smoltcp::wire::{DnsQueryType, IpAddress, IpCidr, IpEndpoint, Ipv4Address};
 
 use crate::current_millis;
 use crate::wifi::{get_ap_mac, get_sta_mac, WifiDevice, WifiMode};
-use crate::{debug, info};
+use crate::{debug, info, unwrap};
 
 use core::borrow::BorrowMut;
 
@@ -142,12 +142,9 @@ impl<'a> WifiStack<'a> {
 
             #[cfg(feature = "ipv6")]
             {
-                interface
-                    .routes_mut()
-                    .add_default_ipv6_route(smoltcp::wire::Ipv6Address::new(
-                        0xfe80, 0, 0, 0, 0, 0, 0, 0,
-                    ))
-                    .unwrap();
+                unwrap!(interface.routes_mut().add_default_ipv6_route(
+                    smoltcp::wire::Ipv6Address::new(0xfe80, 0, 0, 0, 0, 0, 0, 0,)
+                ));
 
                 let mut mac = [0u8; 6];
                 match interface.hardware_addr() {
@@ -167,12 +164,10 @@ impl<'a> WifiStack<'a> {
                 );
 
                 interface.update_ip_addrs(|addrs| {
-                    addrs
-                        .push(IpCidr::new(
-                            smoltcp::wire::IpAddress::v6(0xfe80, 0, 0, 0, a4, a5, a6, a7),
-                            64,
-                        ))
-                        .unwrap();
+                    unwrap!(addrs.push(IpCidr::new(
+                        smoltcp::wire::IpAddress::v6(0xfe80, 0, 0, 0, a4, a5, a6, a7),
+                        64,
+                    )));
                 });
             }
         });
@@ -204,7 +199,7 @@ impl<'a> WifiStack<'a> {
                         *self.ip_info.borrow_mut() = Some(ipv4::IpInfo {
                             ip: config.address.address().0.into(),
                             subnet: ipv4::Subnet {
-                                gateway: config.router.unwrap().0.into(),
+                                gateway: unwrap!(config.router).0.into(),
                                 mask: ipv4::Mask(config.address.prefix_len()),
                             },
                             dns: dns.map(|x| x.0.into()),
@@ -213,13 +208,10 @@ impl<'a> WifiStack<'a> {
 
                         let address = config.address;
                         interface.borrow_mut().update_ip_addrs(|addrs| {
-                            addrs.push(smoltcp::wire::IpCidr::Ipv4(address)).unwrap();
+                            unwrap!(addrs.push(smoltcp::wire::IpCidr::Ipv4(address)));
                         });
                         if let Some(route) = config.router {
-                            interface
-                                .routes_mut()
-                                .add_default_ipv4_route(route)
-                                .unwrap();
+                            unwrap!(interface.routes_mut().add_default_ipv4_route(route));
                         }
 
                         if let (Some(&dns), Some(dns_handle)) =
@@ -380,9 +372,7 @@ impl<'a> WifiStack<'a> {
                         let gateway = Ipv4Address::from_bytes(&settings.subnet.gateway.octets());
                         interface.routes_mut().add_default_ipv4_route(gateway).ok();
                         interface.update_ip_addrs(|addrs| {
-                            addrs
-                                .push(IpCidr::new(addr.into(), settings.subnet.mask.0))
-                                .unwrap();
+                            unwrap!(addrs.push(IpCidr::new(addr.into(), settings.subnet.mask.0)));
                         });
                     }
                 }
