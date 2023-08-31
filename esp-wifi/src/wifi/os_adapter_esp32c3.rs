@@ -27,7 +27,7 @@ pub(crate) unsafe extern "C" fn wifi_int_disable(
     riscv::interrupt::disable();
 
     trace!(
-        "wifi_int_disable wifi_int_mux {:p} - return {}",
+        "wifi_int_disable wifi_int_mux {:?} - return {}",
         wifi_int_mux,
         res,
     );
@@ -40,7 +40,7 @@ pub(crate) unsafe extern "C" fn wifi_int_restore(
     tmp: u32,
 ) {
     trace!(
-        "wifi_int_restore wifi_int_mux {:p} tmp {}",
+        "wifi_int_restore wifi_int_mux {:?} tmp {}",
         wifi_int_mux,
         tmp
     );

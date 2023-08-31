@@ -158,7 +158,7 @@ pub unsafe extern "C" fn set_isr(
     f: *mut crate::binary::c_types::c_void,
     arg: *mut crate::binary::c_types::c_void,
 ) {
-    trace!("set_isr - interrupt {} function {:p} arg {:p}", n, f, arg);
+    trace!("set_isr - interrupt {} function {:?} arg {:?}", n, f, arg);
 
     match n {
         0 => {
@@ -241,7 +241,7 @@ static mut FAKE_SPIN_LOCK: u8 = 1;
 pub unsafe extern "C" fn spin_lock_create() -> *mut crate::binary::c_types::c_void {
     // original: return (void *)1;
     let ptr = &mut FAKE_SPIN_LOCK as *mut _ as *mut crate::binary::c_types::c_void;
-    trace!("spin_lock_create {:p}", ptr);
+    trace!("spin_lock_create {:?}", ptr);
     ptr
 }
 
@@ -260,7 +260,7 @@ pub unsafe extern "C" fn spin_lock_create() -> *mut crate::binary::c_types::c_vo
  ****************************************************************************/
 pub unsafe extern "C" fn spin_lock_delete(lock: *mut crate::binary::c_types::c_void) {
     // original: DEBUGASSERT((int)lock == 1);
-    trace!("spin_lock_delete {:p}", lock);
+    trace!("spin_lock_delete {:?}", lock);
 }
 
 /****************************************************************************
@@ -696,7 +696,7 @@ pub unsafe extern "C" fn task_create_pinned_to_core(
     task_handle: *mut crate::binary::c_types::c_void,
     core_id: u32,
 ) -> i32 {
-    trace!("task_create_pinned_to_core task_func {:p} name {} stack_depth {} param {:p} prio {}, task_handle {:p} core_id {}",
+    trace!("task_create_pinned_to_core task_func {:?} name {} stack_depth {} param {:?} prio {}, task_handle {:?} core_id {}",
         task_func,
         StrBuf::from(name as *const u8).as_str_ref(),
         stack_depth,
@@ -825,7 +825,7 @@ pub unsafe extern "C" fn task_ms_to_tick(ms: u32) -> i32 {
  ****************************************************************************/
 pub unsafe extern "C" fn task_get_current_task() -> *mut crate::binary::c_types::c_void {
     let res = crate::preempt::preempt::current_task() as *mut crate::binary::c_types::c_void;
-    trace!("task get current task - return {:p}", res);
+    trace!("task get current task - return {:?}", res);
 
     res
 }
@@ -911,7 +911,7 @@ pub unsafe extern "C" fn event_post(
     ticks_to_wait: u32,
 ) -> i32 {
     trace!(
-        "event_post {:?} {} {:p} {} {:?}",
+        "event_post {:?} {} {:?} {} {:?}",
         event_base,
         event_id,
         event_data,
@@ -1771,7 +1771,7 @@ pub unsafe extern "C" fn wifi_create_queue(
  ****************************************************************************/
 pub unsafe extern "C" fn wifi_delete_queue(queue: *mut crate::binary::c_types::c_void) {
     trace!(
-        "wifi_delete_queue {:p} - not implemented - doing nothing",
+        "wifi_delete_queue {:?} - not implemented - doing nothing",
         queue
     );
 }
@@ -1953,7 +1953,7 @@ pub unsafe extern "C" fn coex_pti_get(event: u32, pti: *mut u8) -> crate::binary
 
 #[cfg(any(esp32, esp32s2))]
 pub unsafe extern "C" fn coex_pti_get(event: u32, pti: *mut u8) -> crate::binary::c_types::c_int {
-    log::debug!("coex_pti_get {} {:p}", event, pti);
+    log::debug!("coex_pti_get {} {:?}", event, pti);
     0
 }
 

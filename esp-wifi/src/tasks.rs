@@ -51,7 +51,7 @@ pub extern "C" fn worker_task2() {
                 match &TIMERS[i] {
                     Some(old) => {
                         if old.active && get_systimer_count() >= old.expire {
-                            debug!("timer is due.... {:p}", old.ptimer);
+                            debug!("timer is due.... {:?}", old.ptimer);
                             let fnctn: fn(*mut crate::binary::c_types::c_void) =
                                 core::mem::transmute(old.timer_ptr);
                             to_run.enqueue((fnctn, old.arg_ptr)).unwrap();

@@ -26,7 +26,7 @@ pub unsafe extern "C" fn malloc(size: u32) -> *const u8 {
 }
 
 pub unsafe extern "C" fn free(ptr: *const u8) {
-    log::trace!("free {:p}", ptr);
+    log::trace!("free {:?}", ptr);
 
     if ptr.is_null() {
         return;

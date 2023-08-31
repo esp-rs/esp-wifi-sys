@@ -93,7 +93,7 @@ pub fn setup_timer_isr(timg1_timer0: Timer<Timer0<TIMG1>>) {
 fn Software0(_level: u32) {
     unsafe {
         let (fnc, arg) = crate::ble::btdm::ble_os_adapter_chip_specific::ISR_INTERRUPT_7;
-        trace!("interrupt Software0 {:p} {:p}", fnc, arg);
+        trace!("interrupt Software0 {:?} {:?}", fnc, arg);
 
         if !fnc.is_null() {
             let fnc: fn(*mut crate::binary::c_types::c_void) = core::mem::transmute(fnc);
@@ -115,7 +115,7 @@ fn Timer0(_level: u32) {
 fn WIFI_MAC() {
     unsafe {
         let (fnc, arg) = crate::wifi::os_adapter::ISR_INTERRUPT_1;
-        trace!("interrupt WIFI_MAC {:p} {:p}", fnc, arg);
+        trace!("interrupt WIFI_MAC {:?} {:?}", fnc, arg);
 
         if !fnc.is_null() {
             let fnc: fn(*mut crate::binary::c_types::c_void) = core::mem::transmute(fnc);
@@ -129,7 +129,7 @@ fn WIFI_MAC() {
 fn RWBT() {
     unsafe {
         let (fnc, arg) = crate::ble::btdm::ble_os_adapter_chip_specific::ISR_INTERRUPT_5;
-        trace!("interrupt RWBT {:p} {:p}", fnc, arg);
+        trace!("interrupt RWBT {:?} {:?}", fnc, arg);
 
         if !fnc.is_null() {
             let fnc: fn(*mut crate::binary::c_types::c_void) = core::mem::transmute(fnc);
@@ -143,7 +143,7 @@ fn RWBT() {
 fn RWBLE() {
     unsafe {
         let (fnc, arg) = crate::ble::btdm::ble_os_adapter_chip_specific::ISR_INTERRUPT_5;
-        trace!("interrupt RWBLE {:p} {:p}", fnc, arg);
+        trace!("interrupt RWBLE {:?} {:?}", fnc, arg);
 
         if !fnc.is_null() {
             let fnc: fn(*mut crate::binary::c_types::c_void) = core::mem::transmute(fnc);
@@ -157,7 +157,7 @@ fn RWBLE() {
 fn BT_BB() {
     unsafe {
         let (fnc, arg) = crate::ble::btdm::ble_os_adapter_chip_specific::ISR_INTERRUPT_8;
-        trace!("interrupt BT_BB {:p} {:p}", fnc, arg);
+        trace!("interrupt BT_BB {:?} {:?}", fnc, arg);
 
         if !fnc.is_null() {
             let fnc: fn(*mut crate::binary::c_types::c_void) = core::mem::transmute(fnc);

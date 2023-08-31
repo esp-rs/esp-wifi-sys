@@ -80,7 +80,7 @@ fn WIFI_MAC() {
     unsafe {
         let (fnc, arg) = crate::wifi::os_adapter::ISR_INTERRUPT_1;
 
-        trace!("interrupt WIFI_MAC {:p} {:p}", fnc, arg);
+        trace!("interrupt WIFI_MAC {:?} {:?}", fnc, arg);
 
         if !fnc.is_null() {
             let fnc: fn(*mut binary::c_types::c_void) = core::mem::transmute(fnc);
@@ -97,7 +97,7 @@ fn WIFI_PWR() {
     unsafe {
         let (fnc, arg) = crate::wifi::os_adapter::ISR_INTERRUPT_1;
 
-        trace!("interrupt WIFI_PWR {:p} {:p}", fnc, arg);
+        trace!("interrupt WIFI_PWR {:?} {:?}", fnc, arg);
 
         if !fnc.is_null() {
             let fnc: fn(*mut binary::c_types::c_void) = core::mem::transmute(fnc);
@@ -117,7 +117,7 @@ fn RWBT() {
 
         let (fnc, arg) = crate::ble::btdm::ble_os_adapter_chip_specific::BT_INTERRUPT_FUNCTION5;
 
-        trace!("interrupt RWBT {:p} {:p}", fnc, arg);
+        trace!("interrupt RWBT {:?} {:?}", fnc, arg);
 
         if !fnc.is_null() {
             let fnc: fn(*mut binary::c_types::c_void) = core::mem::transmute(fnc);
@@ -137,7 +137,7 @@ fn RWBLE() {
 
         let (fnc, arg) = crate::ble::btdm::ble_os_adapter_chip_specific::BT_INTERRUPT_FUNCTION5;
 
-        trace!("interrupt RWBLE {:p} {:p}", fnc, arg);
+        trace!("interrupt RWBLE {:?} {:?}", fnc, arg);
 
         if !fnc.is_null() {
             let fnc: fn(*mut binary::c_types::c_void) = core::mem::transmute(fnc);
@@ -157,7 +157,7 @@ fn BT_BB(_trap_frame: &mut TrapFrame) {
 
         let (fnc, arg) = crate::ble::btdm::ble_os_adapter_chip_specific::BT_INTERRUPT_FUNCTION8;
 
-        trace!("interrupt BT_BB {:p} {:p}", fnc, arg);
+        trace!("interrupt BT_BB {:?} {:?}", fnc, arg);
 
         if !fnc.is_null() {
             let fnc: fn(*mut binary::c_types::c_void) = core::mem::transmute(fnc);

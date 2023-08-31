@@ -229,7 +229,7 @@ pub(crate) unsafe extern "C" fn interrupt_handler_set(
     arg: *const (),
 ) {
     trace!(
-        "interrupt_handler_set {} {:p} {:p}",
+        "interrupt_handler_set {} {:?} {:?}",
         interrupt_no,
         func,
         arg

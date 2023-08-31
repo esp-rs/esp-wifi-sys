@@ -76,7 +76,7 @@ extern "C" fn notify_host_send_available() {
 }
 
 extern "C" fn notify_host_recv(data: *mut u8, len: u16) -> i32 {
-    trace!("notify_host_recv {:p} {}", data, len);
+    trace!("notify_host_recv {:?} {}", data, len);
 
     unsafe {
         let mut buf = [0u8; 256];
@@ -180,7 +180,7 @@ unsafe extern "C" fn queue_create(len: u32, item_size: u32) -> *const () {
 }
 
 unsafe extern "C" fn queue_delete(queue: *const ()) {
-    trace!("Unimplemented queue_delete {:p}", queue);
+    trace!("Unimplemented queue_delete {:?}", queue);
 }
 
 #[ram]
@@ -213,7 +213,7 @@ unsafe extern "C" fn queue_send_from_isr(
     _item: *const (),
     _hptw: *const (),
 ) -> i32 {
-    log::trace!("queue_send_from_isr {:p} {:p} {:p}", _queue, _item, _hptw);
+    log::trace!("queue_send_from_isr {:?} {:?} {:?}", _queue, _item, _hptw);
     // Force to set the value to be false
     *(_hptw as *mut bool) = false;
     queue_send(_queue, _item, 0)
@@ -221,7 +221,7 @@ unsafe extern "C" fn queue_send_from_isr(
 
 unsafe extern "C" fn queue_recv(queue: *const (), item: *const (), block_time_ms: u32) -> i32 {
     trace!(
-        "queue_recv {:p} item {:p} block_time_tick {}",
+        "queue_recv {:?} item {:?} block_time_tick {}",
         queue,
         item,
         block_time_ms
@@ -291,7 +291,7 @@ unsafe extern "C" fn task_create(
 ) -> i32 {
     let n = StrBuf::from(name);
     trace!(
-        "task_create {:p} {:p} {} {} {:p} {} {:p} {}",
+        "task_create {:?} {:?} {} {} {:?} {} {:?} {}",
         func,
         name,
         n.as_str_ref(),
@@ -334,7 +334,7 @@ unsafe extern "C" fn cause_sw_intr_to_core(_core: i32, _intr_no: i32) -> i32 {
     {
         log::trace!("cause_sw_intr_to_core {} {}", _core, _intr_no);
         let intr = 1 << _intr_no;
-        core::arch::asm!("wsr.intset  {0}", in(reg) intr, options(nostack)); 
+        core::arch::asm!("wsr.intset  {0}", in(reg) intr, options(nostack));
         0
     }
 }

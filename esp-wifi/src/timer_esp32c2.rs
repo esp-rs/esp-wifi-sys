@@ -68,7 +68,7 @@ fn WIFI_MAC() {
     unsafe {
         let (fnc, arg) = crate::wifi::os_adapter::ISR_INTERRUPT_1;
 
-        trace!("interrupt WIFI_MAC {:p} {:p}", fnc, arg);
+        trace!("interrupt WIFI_MAC {:?} {:?}", fnc, arg);
 
         if !fnc.is_null() {
             let fnc: fn(*mut binary::c_types::c_void) = core::mem::transmute(fnc);
@@ -85,7 +85,7 @@ fn WIFI_PWR() {
     unsafe {
         let (fnc, arg) = crate::wifi::os_adapter::ISR_INTERRUPT_1;
 
-        trace!("interrupt WIFI_PWR {:p} {:p}", fnc, arg);
+        trace!("interrupt WIFI_PWR {:?} {:?}", fnc, arg);
 
         if !fnc.is_null() {
             let fnc: fn(*mut binary::c_types::c_void) = core::mem::transmute(fnc);
@@ -104,7 +104,7 @@ fn LP_TIMER() {
 
         let (fnc, arg) = crate::ble::npl::ble_os_adapter_chip_specific::ISR_INTERRUPT_7;
 
-        trace!("interrupt LP_TIMER {:p} {:p}", fnc, arg);
+        trace!("interrupt LP_TIMER {:?} {:?}", fnc, arg);
 
         if !fnc.is_null() {
             trace!("interrupt LP_TIMER call");
@@ -126,7 +126,7 @@ fn BT_MAC() {
 
         let (fnc, arg) = crate::ble::npl::ble_os_adapter_chip_specific::ISR_INTERRUPT_4;
 
-        trace!("interrupt BT_MAC {:p} {:p}", fnc, arg);
+        trace!("interrupt BT_MAC {:?} {:?}", fnc, arg);
 
         if !fnc.is_null() {
             trace!("interrupt BT_MAC call");

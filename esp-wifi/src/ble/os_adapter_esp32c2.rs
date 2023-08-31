@@ -81,7 +81,7 @@ pub(super) unsafe extern "C" fn esp_intr_alloc(
     ret_handle: *mut *mut crate::binary::c_types::c_void,
 ) -> i32 {
     log::trace!(
-        "esp_intr_alloc {} {} {:p} {:p} {:p}",
+        "esp_intr_alloc {} {} {:?} {:?} {:?}",
         source,
         flags,
         handler,

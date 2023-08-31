@@ -30,7 +30,7 @@ pub fn compat_timer_arm_us(ptimer: *mut crate::binary::c_types::c_void, us: u32,
     );
 
     let ticks = us as u64 * (crate::timer::TICKS_PER_SECOND / 1_000_000);
-    debug!("timer_arm_us {:p} {} {}", ptimer, ticks, repeat);
+    debug!("timer_arm_us {:?} {} {}", ptimer, ticks, repeat);
     critical_section::with(|_| unsafe {
         memory_fence();
 
@@ -56,7 +56,7 @@ pub fn compat_timer_arm_us(ptimer: *mut crate::binary::c_types::c_void, us: u32,
 }
 
 pub fn compat_timer_disarm(ptimer: *mut crate::binary::c_types::c_void) {
-    debug!("timer_disarm {:p}", ptimer);
+    debug!("timer_disarm {:?}", ptimer);
     critical_section::with(|_| unsafe {
         memory_fence();
 
@@ -75,7 +75,7 @@ pub fn compat_timer_disarm(ptimer: *mut crate::binary::c_types::c_void) {
 }
 
 pub fn compat_timer_done(ptimer: *mut crate::binary::c_types::c_void) {
-    debug!("timer_done {:p}", ptimer);
+    debug!("timer_done {:?}", ptimer);
     critical_section::with(|_| unsafe {
         memory_fence();
 
@@ -105,7 +105,7 @@ pub fn compat_timer_setfn(
     pfunction: *mut crate::binary::c_types::c_void,
     parg: *mut crate::binary::c_types::c_void,
 ) {
-    trace!("timer_setfn {:p} {:p} {:p}", ptimer, pfunction, parg,);
+    trace!("timer_setfn {:?} {:?} {:?}", ptimer, pfunction, parg,);
 
     critical_section::with(|_| unsafe {
         memory_fence();
@@ -162,7 +162,7 @@ pub fn compat_esp_timer_create(
 ) -> i32 {
     unsafe {
         debug!(
-            "esp_timer_create {:?} {:?} {:p}",
+            "esp_timer_create {:?} {:?} {:?}",
             (*args).callback,
             (*args).arg,
             out_handle
@@ -190,7 +190,7 @@ pub fn compat_esp_timer_create(
                 });
                 out_handle = &ESP_FAKE_TIMER as *const _ as *mut esp_timer_handle_t;
                 success = true;
-                debug!("esp_timer_create {:p} {:p}", args, out_handle);
+                debug!("esp_timer_create {:?} {:?}", args, out_handle);
 
                 break;
             }

@@ -370,7 +370,7 @@ unsafe extern "C" fn task_create(
 ) -> i32 {
     let name_str = StrBuf::from(name as *const u8);
     log::trace!(
-        "task_create {:p} {} {} {:p} {} {:p} {}",
+        "task_create {:?} {} {} {:?} {} {:?} {}",
         task_func,
         name_str.as_str_ref(),
         stack_depth,
@@ -702,7 +702,7 @@ unsafe extern "C" fn ble_npl_callout_deinit(callout: *const ble_npl_callout) {
 }
 
 unsafe extern "C" fn ble_npl_callout_stop(callout: *const ble_npl_callout) {
-    log::trace!("ble_npl_callout_stop {:p}", callout);
+    log::trace!("ble_npl_callout_stop {:?}", callout);
 
     if (*callout).dummy == 0 {
         panic!("Trying to stop an uninitialzed callout");
@@ -718,7 +718,7 @@ unsafe extern "C" fn ble_npl_callout_reset(
     callout: *const ble_npl_callout,
     time: ble_npl_time_t,
 ) -> ble_npl_error_t {
-    log::trace!("ble_npl_callout_reset {:p} {}", callout, time);
+    log::trace!("ble_npl_callout_reset {:?} {}", callout, time);
 
     let co = CALLOUTS[((*callout).dummy - 1) as usize].as_mut().unwrap();
 
@@ -767,7 +767,7 @@ unsafe extern "C" fn ble_npl_mutex_deinit(_mutex: *const ble_npl_mutex) -> ble_n
 }
 
 unsafe extern "C" fn ble_npl_event_set_arg(event: *const ble_npl_event, arg: *const c_void) {
-    log::trace!("ble_npl_event_set_arg {:p} {:p}", event, arg);
+    log::trace!("ble_npl_event_set_arg {:?} {:?}", event, arg);
     if (*event).dummy == 0 {
         panic!("Call set_arg on uninitialized event");
     }
@@ -779,7 +779,7 @@ unsafe extern "C" fn ble_npl_event_set_arg(event: *const ble_npl_event, arg: *co
 }
 
 unsafe extern "C" fn ble_npl_event_get_arg(event: *const ble_npl_event) -> *const c_void {
-    log::trace!("ble_npl_event_get_arg {:p}", event);
+    log::trace!("ble_npl_event_get_arg {:?}", event);
     if (*event).dummy == 0 {
         panic!("Call get_arg on uninitialized event");
     }
@@ -799,7 +799,7 @@ unsafe extern "C" fn ble_npl_event_get_arg(event: *const ble_npl_event) -> *cons
 }
 
 unsafe extern "C" fn ble_npl_event_is_queued(event: *const ble_npl_event) -> bool {
-    log::trace!("ble_npl_event_is_queued {:p}", event);
+    log::trace!("ble_npl_event_is_queued {:?}", event);
     if (*event).dummy == 0 {
         panic!("Call is_queued on uninitialized event");
     }
@@ -811,7 +811,7 @@ unsafe extern "C" fn ble_npl_event_is_queued(event: *const ble_npl_event) -> boo
 }
 
 unsafe extern "C" fn ble_npl_event_reset(event: *const ble_npl_event) {
-    log::trace!("ble_npl_event_reset {:p}", event);
+    log::trace!("ble_npl_event_reset {:?}", event);
 
     let event = event as *mut ble_npl_event;
     if (*event).dummy == 0 {
@@ -833,7 +833,7 @@ unsafe extern "C" fn ble_npl_event_init(
     func: *const ble_npl_event_fn,
     arg: *const c_void,
 ) {
-    log::trace!("ble_npl_event_init {:p} {:p} {:p}", event, func, arg);
+    log::trace!("ble_npl_event_init {:?} {:?} {:?}", event, func, arg);
 
     let event = event as *mut ble_npl_event;
 
@@ -850,7 +850,7 @@ unsafe extern "C" fn ble_npl_event_init(
 }
 
 unsafe extern "C" fn ble_npl_eventq_is_empty(queue: *const ble_npl_eventq) -> bool {
-    log::trace!("ble_npl_eventq_is_empty {:p}", queue);
+    log::trace!("ble_npl_eventq_is_empty {:?}", queue);
 
     if (*queue).dummy == 0 {
         panic!("Try to use uninitialized queue");
@@ -860,7 +860,7 @@ unsafe extern "C" fn ble_npl_eventq_is_empty(queue: *const ble_npl_eventq) -> bo
 }
 
 unsafe extern "C" fn ble_npl_event_run(event: *const ble_npl_event) {
-    log::trace!("ble_npl_event_run {:p}", event);
+    log::trace!("ble_npl_event_run {:?}", event);
 
     let event = event as *mut ble_npl_event;
     if (*event).dummy == 0 {
@@ -879,7 +879,7 @@ unsafe extern "C" fn ble_npl_eventq_remove(
     queue: *const ble_npl_eventq,
     event: *const ble_npl_event,
 ) {
-    log::trace!("ble_npl_eventq_remove {:p} {:p}", queue, event);
+    log::trace!("ble_npl_eventq_remove {:?} {:?}", queue, event);
 
     if (*queue).dummy == 0 {
         panic!("Try to use uninitialized queue");
@@ -898,7 +898,7 @@ unsafe extern "C" fn ble_npl_eventq_remove(
 }
 
 unsafe extern "C" fn ble_npl_eventq_put(queue: *const ble_npl_eventq, event: *const ble_npl_event) {
-    log::trace!("ble_npl_eventq_put {:p} {:p}", queue, event);
+    log::trace!("ble_npl_eventq_put {:?} {:?}", queue, event);
 
     if (*queue).dummy == 0 {
         panic!("Try to use uninitialized queue");
@@ -921,7 +921,7 @@ unsafe extern "C" fn ble_npl_eventq_get(
     queue: *const ble_npl_eventq,
     time: ble_npl_time_t,
 ) -> *const ble_npl_event {
-    log::trace!("ble_npl_eventq_get {:p} {}", queue, time);
+    log::trace!("ble_npl_eventq_get {:?} {}", queue, time);
 
     if time == TIME_FOREVER {
         loop {
@@ -954,7 +954,7 @@ unsafe extern "C" fn ble_npl_callout_init(
     args: *const c_void,
 ) -> i32 {
     log::trace!(
-        "ble_npl_callout_init {:p} {:p} {:p} {:p}",
+        "ble_npl_callout_init {:?} {:?} {:?} {:?}",
         callout,
         eventq,
         func,
@@ -988,7 +988,7 @@ unsafe extern "C" fn ble_npl_callout_init(
 }
 
 unsafe extern "C" fn callout_timer_callback_wrapper(arg: *mut c_void) {
-    log::info!("callout_timer_callback_wrapper {:p}", arg);
+    log::info!("callout_timer_callback_wrapper {:?}", arg);
     let co = CALLOUTS[arg as usize].as_mut().unwrap();
 
     if co.eventq_id == 0 {
@@ -1002,7 +1002,7 @@ unsafe extern "C" fn callout_timer_callback_wrapper(arg: *mut c_void) {
 }
 
 unsafe extern "C" fn ble_npl_eventq_init(queue: *const ble_npl_eventq) {
-    log::trace!("ble_npl_eventq_init {:p}", queue);
+    log::trace!("ble_npl_eventq_init {:?}", queue);
 
     critical_section::with(|_cs| {
         let queue = queue as *mut ble_npl_eventq;
@@ -1218,7 +1218,7 @@ fn os_msys_init() {
 }
 
 unsafe extern "C" fn ble_hs_hci_rx_evt(cmd: *const u8, arg: *const c_void) {
-    log::trace!("ble_hs_hci_rx_evt {:p} {:p}", cmd, arg);
+    log::trace!("ble_hs_hci_rx_evt {:?} {:?}", cmd, arg);
     log::debug!("$ cmd = {:x}", *cmd);
     log::debug!("$ len = {:x}", *(cmd.offset(1)));
 
@@ -1256,7 +1256,7 @@ unsafe extern "C" fn ble_hs_hci_rx_evt(cmd: *const u8, arg: *const c_void) {
 }
 
 unsafe extern "C" fn ble_hs_rx_data(om: *const OsMbuf, arg: *const c_void) {
-    log::trace!("ble_hs_rx_data {:p} {:p}", om, arg);
+    log::trace!("ble_hs_rx_data {:?} {:?}", om, arg);
 
     let data_ptr = (*om).om_data;
     let len = (*om).om_len;

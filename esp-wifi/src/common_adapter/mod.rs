@@ -92,7 +92,7 @@ pub unsafe extern "C" fn semphr_create(max: u32, init: u32) -> *mut crate::binar
  ****************************************************************************/
 #[allow(unused)]
 pub unsafe extern "C" fn semphr_delete(semphr: *mut crate::binary::c_types::c_void) {
-    trace!("semphr_delete {:p}", semphr);
+    trace!("semphr_delete {:?}", semphr);
     sem_delete(semphr);
 }
 
@@ -273,7 +273,7 @@ pub unsafe extern "C" fn timer_arm_us(
  *
  ****************************************************************************/
 pub unsafe extern "C" fn read_mac(mac: *mut u8, type_: u32) -> crate::binary::c_types::c_int {
-    trace!("read_mac {:p} {}", mac, type_);
+    trace!("read_mac {:?} {}", mac, type_);
 
     let base_mac = crate::hal::efuse::Efuse::get_mac_address();
 

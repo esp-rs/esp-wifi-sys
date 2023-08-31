@@ -305,7 +305,7 @@ pub(crate) fn btdm_controller_mem_init() {
         core::ptr::copy_nonoverlapping(data_start_rom, data_start, len);
 
         log::debug!(
-            "btdm_controller_mem_init {:p} {:p} {}",
+            "btdm_controller_mem_init {:?} {:?} {}",
             data_start_rom,
             data_start,
             len,
@@ -401,7 +401,7 @@ pub(crate) unsafe extern "C" fn coex_bt_release(event: u32) -> i32 {
 pub(crate) unsafe extern "C" fn coex_register_bt_cb_wrapper(
     callback: unsafe extern "C" fn(),
 ) -> i32 {
-    log::warn!("coex_register_bt_cb {:p}", callback);
+    log::warn!("coex_register_bt_cb {:?}", callback);
     extern "C" {
         #[cfg(coex)]
         fn coex_register_bt_cb(callback: unsafe extern "C" fn()) -> i32;
@@ -443,7 +443,7 @@ pub(crate) unsafe extern "C" fn coex_bb_reset_unlock(event: u32) {
 pub(crate) unsafe extern "C" fn coex_schm_register_btdm_callback_wrapper(
     callback: unsafe extern "C" fn(),
 ) -> i32 {
-    log::warn!("coex_schm_register_btdm_callback {:p}", callback);
+    log::warn!("coex_schm_register_btdm_callback {:?}", callback);
     extern "C" {
         #[cfg(coex)]
         fn coex_schm_register_callback(kind: u32, callback: unsafe extern "C" fn()) -> i32;
@@ -521,7 +521,7 @@ pub(crate) unsafe extern "C" fn coex_register_wifi_channel_change_callback(
 }
 
 pub(crate) unsafe extern "C" fn set_isr(n: i32, f: unsafe extern "C" fn(), arg: *const ()) -> i32 {
-    log::trace!("set_isr called {} {:p} {:p}", n, f, arg);
+    log::trace!("set_isr called {} {:?} {:?}", n, f, arg);
 
     match n {
         5 => {

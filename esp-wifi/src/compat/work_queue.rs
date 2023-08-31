@@ -21,7 +21,7 @@ pub fn queue_work(
     _core_id: u32,
 ) {
     trace!(
-        "work_queue task {:p} param {:p} prio {}",
+        "work_queue task {:?} param {:?} prio {}",
         task_func,
         param,
         prio
@@ -66,7 +66,7 @@ pub fn do_work() {
         for worker in todo.iter() {
             match worker {
                 core::option::Option::Some((f, p)) => {
-                    trace!("before worker {:p} {:p}", f, *p);
+                    trace!("before worker {:?} {:?}", f, *p);
 
                     f(*p);
 
