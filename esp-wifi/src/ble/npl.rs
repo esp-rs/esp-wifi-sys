@@ -9,7 +9,7 @@ use crate::compat;
 use crate::compat::common::StrBuf;
 use crate::compat::queue::SimpleQueue;
 use crate::timer::yield_task;
-use crate::{debug, error, info, trace, warn};
+use crate::{debug, error, info, panic, trace, warn};
 
 #[cfg_attr(esp32c2, path = "os_adapter_esp32c2.rs")]
 pub(crate) mod ble_os_adapter_chip_specific;
@@ -407,13 +407,6 @@ unsafe extern "C" fn osi_assert(
     param2: u32,
 ) {
     let name_str = StrBuf::from(fn_name as *const u8);
-    error!(
-        "ASSERT {}:{} {} {}",
-        name_str.as_str_ref(),
-        ln,
-        param1,
-        param2
-    );
     panic!(
         "ASSERT {}:{} {} {}",
         name_str.as_str_ref(),

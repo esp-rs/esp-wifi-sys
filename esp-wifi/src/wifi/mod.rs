@@ -5,7 +5,7 @@ use core::{cell::RefCell, mem::MaybeUninit};
 
 use crate::common_adapter::*;
 use crate::EspWifiInitialization;
-use crate::{debug, error, info, trace, warn};
+use crate::{debug, error, info, panic, trace, warn};
 
 use crate::esp_wifi_result;
 use critical_section::Mutex;
@@ -1471,6 +1471,7 @@ mod asynch {
     use num_traits::FromPrimitive;
 
     use super::*;
+    use crate::panic;
 
     // TODO assumes STA mode only
     impl<'d> WifiController<'d> {

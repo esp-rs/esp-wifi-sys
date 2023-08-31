@@ -8,6 +8,12 @@ pub use defmt;
 #[cfg(not(feature = "log-defmt"))]
 pub use noop as defmt;
 
+#[cfg(feature = "log-defmt")]
+pub use defmt::panic;
+
+#[cfg(not(feature = "log-defmt"))]
+pub use core::panic;
+
 #[cfg(any(not(feature = "log-defmt"), not(feature = "log")))]
 pub mod noop {
     #[macro_export]

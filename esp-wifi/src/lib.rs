@@ -79,6 +79,8 @@ pub mod tasks;
 
 mod log_macros;
 
+pub use log_macros::panic;
+
 pub(crate) mod memory_fence;
 
 pub use critical_section;

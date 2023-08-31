@@ -27,7 +27,7 @@ use crate::{
     memory_fence::memory_fence,
     timer::yield_task,
 };
-use crate::{debug, info, trace, warn};
+use crate::{debug, info, panic, trace, warn};
 
 #[cfg(target_arch = "riscv32")]
 use crate::compat::common::syslog;

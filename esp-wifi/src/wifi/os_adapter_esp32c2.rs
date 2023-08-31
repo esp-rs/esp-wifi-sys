@@ -1,4 +1,4 @@
-use crate::trace;
+use crate::{panic, trace};
 
 pub(crate) fn chip_ints_on(mask: u32) {
     let cpuint = match mask {

@@ -11,7 +11,7 @@ use crate::{
     memory_fence::memory_fence,
     timer::yield_task,
 };
-use crate::{debug, info, trace, warn};
+use crate::{debug, info, panic, trace, warn};
 
 #[cfg(esp32)]
 use esp32_hal as hal;
