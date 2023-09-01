@@ -9,7 +9,6 @@ use crate::hal::macros::ram;
 use crate::hal::peripheral::Peripheral;
 use crate::hal::peripheral::PeripheralRef;
 use crate::EspWifiInitialization;
-use crate::{debug, error, info, panic, trace, unwrap, warn};
 
 use critical_section::Mutex;
 use embedded_svc::wifi::{AccessPointInfo, AuthMethod, Protocol, SecondaryChannel, Wifi};
@@ -1386,7 +1385,6 @@ mod asynch {
     use num_traits::FromPrimitive;
 
     use super::*;
-    use crate::panic;
 
     // TODO assumes STA mode only
     impl<'d> WifiController<'d> {
