@@ -9,7 +9,7 @@ use bleps::{
     gatt, Ble, HciConnector,
 };
 use esp_backtrace as _;
-use esp_println::{logger::init_logger, println};
+use esp_println::println;
 use esp_wifi::{ble::controller::BleConnector, initialize, EspWifiInitFor};
 use examples_util::hal;
 use hal::{
@@ -21,7 +21,8 @@ use hal::{
 
 #[entry]
 fn main() -> ! {
-    init_logger(log::LevelFilter::Info);
+    #[cfg(feature = "log")]
+    esp_println::logger::init_logger(log::LevelFilter::Info);
 
     let peripherals = Peripherals::take();
 
@@ -73,11 +74,11 @@ fn main() -> ! {
             17
         };
         let mut wf = |offset: usize, data: &[u8]| {
-            println!("RECEIVED: {} {:x?}", offset, data);
+            println!("RECEIVED: {} {:?}", offset, data);
         };
 
         let mut wf2 = |offset: usize, data: &[u8]| {
-            println!("RECEIVED: {} {:x?}", offset, data);
+            println!("RECEIVED: {} {:?}", offset, data);
         };
 
         let mut rf3 = |_offset: usize, data: &mut [u8]| {
@@ -85,7 +86,7 @@ fn main() -> ! {
             5
         };
         let mut wf3 = |offset: usize, data: &[u8]| {
-            println!("RECEIVED: Offset {}, data {:x?}", offset, data);
+            println!("RECEIVED: Offset {}, data {:?}", offset, data);
         };
 
         gatt!([service {
@@ -146,7 +147,7 @@ fn main() -> ! {
                     }
                 }
                 Err(err) => {
-                    println!("{:x?}", err);
+                    println!("{:?}", err);
                 }
             }
         }

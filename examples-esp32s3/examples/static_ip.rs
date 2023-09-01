@@ -8,7 +8,7 @@ use embedded_svc::ipv4::Interface;
 use embedded_svc::wifi::{AccessPointInfo, ClientConfiguration, Configuration, Wifi};
 
 use esp_backtrace as _;
-use esp_println::logger::init_logger;
+
 use esp_println::{print, println};
 use esp_wifi::initialize;
 use esp_wifi::wifi::WifiMode;
@@ -28,7 +28,8 @@ const GATEWAY_IP: &str = env!("GATEWAY_IP");
 
 #[entry]
 fn main() -> ! {
-    init_logger(log::LevelFilter::Info);
+    #[cfg(feature = "log")]
+    esp_println::logger::init_logger(log::LevelFilter::Info);
 
     let peripherals = Peripherals::take();
 

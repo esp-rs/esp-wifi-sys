@@ -2,7 +2,6 @@
 #![no_main]
 
 use esp_backtrace as _;
-use esp_println::logger::init_logger;
 use esp_println::println;
 use esp_wifi::esp_now::{PeerInfo, BROADCAST_ADDRESS};
 use esp_wifi::{current_millis, initialize, EspWifiInitFor};
@@ -13,7 +12,8 @@ use hal::{peripherals::Peripherals, prelude::*, Rtc};
 
 #[entry]
 fn main() -> ! {
-    init_logger(log::LevelFilter::Info);
+    #[cfg(feature = "log")]
+    esp_println::logger::init_logger(log::LevelFilter::Info);
 
     let peripherals = Peripherals::take();
 
@@ -41,7 +41,7 @@ fn main() -> ! {
     loop {
         let r = esp_now.receive();
         if let Some(r) = r {
-            println!("Received {:x?}", r);
+            println!("Received {:?}", r);
 
             if r.info.dst_address == BROADCAST_ADDRESS {
                 if !esp_now.peer_exists(&r.info.src_address) {
@@ -54,7 +54,10 @@ fn main() -> ! {
                         })
                         .unwrap();
                 }
-                let status = esp_now.send(&r.info.src_address, b"Hello Peer").unwrap().wait();
+                let status = esp_now
+                    .send(&r.info.src_address, b"Hello Peer")
+                    .unwrap()
+                    .wait();
                 println!("Send hello to peer status: {:?}", status);
             }
         }
@@ -62,7 +65,10 @@ fn main() -> ! {
         if current_millis() >= next_send_time {
             next_send_time = current_millis() + 5 * 1000;
             println!("Send");
-            let status = esp_now.send(&BROADCAST_ADDRESS, b"0123456789").unwrap().wait();
+            let status = esp_now
+                .send(&BROADCAST_ADDRESS, b"0123456789")
+                .unwrap()
+                .wait();
             println!("Send broadcast status: {:?}", status)
         }
     }

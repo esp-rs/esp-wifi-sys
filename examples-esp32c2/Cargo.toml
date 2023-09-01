@@ -14,7 +14,7 @@ embassy-futures.workspace = true
 futures-util.workspace = true
 embedded-io.workspace = true
 smoltcp.workspace = true
-log.workspace = true
+log = { workspace = true, optional = true }
 heapless.workspace = true
 embassy-net = { workspace = true, optional = true }
 
@@ -43,3 +43,5 @@ ps-min-modem = ["esp-wifi/ps-min-modem"]
 esp-now = ["esp-wifi/esp-now"]
 ipv6 = ["esp-wifi/ipv6"]
 #coex = ["esp-wifi/coex"]
+log = ["esp-println/log", "esp-wifi/log", "dep:log"]
+log-defmt = ["esp-wifi/log-defmt"]
