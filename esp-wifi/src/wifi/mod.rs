@@ -99,7 +99,32 @@ impl WifiMode {
     }
 }
 
-const DATA_FRAMES_MAX_COUNT: usize = RX_QUEUE_SIZE + TX_QUEUE_SIZE;
+pub struct EspWifiPacketBuffer {
+    pub(crate) buffer: *mut crate::binary::c_types::c_void,
+    pub(crate) len: u16,
+    pub(crate) eb: *mut crate::binary::c_types::c_void,
+}
+
+unsafe impl Send for EspWifiPacketBuffer {}
+
+impl Drop for EspWifiPacketBuffer {
+    fn drop(&mut self) {
+        trace!("Dropping EspWifiPacketBuffer, freeing memory");
+        unsafe { esp_wifi_internal_free_rx_buffer(self.eb) };
+    }
+}
+
+impl EspWifiPacketBuffer {
+    pub fn as_slice(&self) -> &[u8] {
+        unsafe { core::slice::from_raw_parts(self.buffer as *mut u8, self.len as usize) }
+    }
+
+    pub fn as_slice_mut(&mut self) -> &mut [u8] {
+        unsafe { core::slice::from_raw_parts_mut(self.buffer as *mut u8, self.len as usize) }
+    }
+}
+
+const DATA_FRAMES_MAX_COUNT: usize = TX_QUEUE_SIZE;
 const DATA_FRAME_SIZE: usize = MTU + ETHERNET_FRAME_HEADER_SIZE;
 
 static mut DATA_FRAME_BACKING_MEMORY: MaybeUninit<[u8; DATA_FRAMES_MAX_COUNT * DATA_FRAME_SIZE]> =
@@ -182,7 +207,7 @@ impl Drop for DataFrame {
 const RX_QUEUE_SIZE: usize = crate::CONFIG.rx_queue_size;
 const TX_QUEUE_SIZE: usize = crate::CONFIG.tx_queue_size;
 
-pub(crate) static DATA_QUEUE_RX: Mutex<RefCell<SimpleQueue<DataFrame, RX_QUEUE_SIZE>>> =
+pub(crate) static DATA_QUEUE_RX: Mutex<RefCell<SimpleQueue<EspWifiPacketBuffer, RX_QUEUE_SIZE>>> =
     Mutex::new(RefCell::new(SimpleQueue::new()));
 
 pub(crate) static DATA_QUEUE_TX: Mutex<RefCell<SimpleQueue<DataFrame, TX_QUEUE_SIZE>>> =
@@ -665,27 +690,24 @@ unsafe extern "C" fn recv_cb(
     len: u16,
     eb: *mut crate::binary::c_types::c_void,
 ) -> esp_err_t {
-    let src = core::slice::from_raw_parts_mut(buffer as *mut u8, len as usize);
-
     let res = critical_section::with(|cs| {
         let mut queue = DATA_QUEUE_RX.borrow_ref_mut(cs);
         if queue.is_full() {
             error!("RX QUEUE FULL");
+            esp_wifi_internal_free_rx_buffer(eb);
             esp_wifi_sys::include::ESP_ERR_NO_MEM as esp_err_t
-        } else if let Some(packet) = DataFrame::from_bytes(src) {
+        } else {
+            let packet = EspWifiPacketBuffer {
+                buffer, len, eb
+            };
             unwrap!(queue.enqueue(packet));
 
             #[cfg(feature = "embassy-net")]
             embassy::RECEIVE_WAKER.wake();
 
             esp_wifi_sys::include::ESP_OK as esp_err_t
-        } else {
-            error!("No free DataFrame");
-            esp_wifi_sys::include::ESP_ERR_NO_MEM as esp_err_t
         }
     });
-
-    esp_wifi_internal_free_rx_buffer(eb);
 
     res
 }
@@ -1039,10 +1061,9 @@ impl RxToken for WifiRxToken {
                 queue.dequeue(),
                 "unreachable: transmit()/receive() ensures there is a packet to process"
             );
-            let buffer = data.slice_mut();
+            let buffer = data.as_slice_mut();
             dump_packet_info(&buffer);
             let res = f(buffer);
-            data.free();
             res
         })
     }
@@ -1353,10 +1374,9 @@ pub(crate) mod embassy {
                     queue.dequeue(),
                     "unreachable: transmit()/receive() ensures there is a packet to process"
                 );
-                let buffer = data.slice_mut();
+                let buffer = data.as_slice_mut();
                 dump_packet_info(&buffer);
                 let res = f(buffer);
-                data.free();
                 res
             })
         }
