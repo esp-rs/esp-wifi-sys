@@ -657,27 +657,26 @@ unsafe extern "C" fn recv_cb(
     eb: *mut crate::binary::c_types::c_void,
 ) -> esp_err_t {
     let src = core::slice::from_raw_parts_mut(buffer as *mut u8, len as usize);
-    let packet = if let Some(packet) = DataFrame::from_bytes(src) {
-        packet
+
+    let res = if let Some(packet) = DataFrame::from_bytes(src) {
+        critical_section::with(|cs| {
+            let mut queue = DATA_QUEUE_RX.borrow_ref_mut(cs);
+            if !queue.is_full() {
+                unwrap!(queue.enqueue(packet));
+
+                #[cfg(feature = "embassy-net")]
+                embassy::RECEIVE_WAKER.wake();
+
+                esp_wifi_sys::include::ESP_OK as esp_err_t
+            } else {
+                packet.free();
+                error!("RX QUEUE FULL");
+                esp_wifi_sys::include::ESP_ERR_NO_MEM as esp_err_t
+            }
+        })
     } else {
-        return esp_wifi_sys::include::ESP_ERR_NO_MEM as esp_err_t;
+        esp_wifi_sys::include::ESP_ERR_NO_MEM as esp_err_t
     };
-
-    let res = critical_section::with(|cs| {
-        let mut queue = DATA_QUEUE_RX.borrow_ref_mut(cs);
-        if !queue.is_full() {
-            unwrap!(queue.enqueue(packet));
-
-            #[cfg(feature = "embassy-net")]
-            embassy::RECEIVE_WAKER.wake();
-
-            0
-        } else {
-            packet.free();
-            error!("RX QUEUE FULL");
-            1
-        }
-    });
 
     esp_wifi_internal_free_rx_buffer(eb);
 
