@@ -1099,11 +1099,10 @@ pub fn send_data_if_needed() {
             dump_packet_info(packet.slice());
 
             unsafe {
-                let _res = esp_wifi_internal_tx(
-                    interface,
-                    packet.slice() as *const _ as *mut crate::binary::c_types::c_void,
-                    packet.len as u16,
-                );
+                let len = packet.len as u16;
+                let ptr = packet.slice_mut().as_mut_ptr().cast();
+
+                let _res = esp_wifi_internal_tx(interface, ptr, len);
                 if _res != 0 {
                     warn!("esp_wifi_internal_tx {}", _res);
                 }
