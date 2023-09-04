@@ -28,16 +28,12 @@ lto = "off"
 
 [workspace.dependencies]
 defmt = "=0.3.5"
-esp-hal-common = { version = "0.11.0" }
 esp32c3-hal = { version = "0.11.0" }
 esp32c2-hal = { version = "0.9.0" }
 esp32c6-hal = { version = "0.4.0" }
 esp32-hal = { version = "0.14.0", features = [ "rt" ] }
 esp32s3-hal = { version = "0.11.0", features = [ "rt" ] }
 esp32s2-hal = { version = "0.11.0", features = [ "rt" ] }
-esp32c3 = { version = "0.16.0",  features = ["critical-section"] }
-esp32c2 = { version = "0.13.0",  features = ["critical-section"] }
-esp32c6 = { version = "0.6.0",  features = ["critical-section"] }
 smoltcp = { version = "0.10.0", default-features=false, features = ["proto-igmp", "proto-ipv4", "proto-dns", "socket-tcp", "socket-icmp", "socket-udp", "socket-dns", "medium-ethernet", "proto-dhcpv4", "socket-raw", "socket-dhcpv4"] }
 critical-section = "1.1.1"
 atomic-polyfill = "1.0.2"
