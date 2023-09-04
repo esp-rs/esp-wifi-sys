@@ -108,7 +108,7 @@ static mut DATA_FRAME_BACKING_MEMORY: MaybeUninit<[u8; DATA_FRAMES_MAX_COUNT * D
 static DATA_FRAME_BACKING_MEMORY_FREE_SLOTS: Mutex<RefCell<Vec<usize, DATA_FRAMES_MAX_COUNT>>> =
     Mutex::new(RefCell::new(Vec::new()));
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub(crate) struct DataFrame {
     len: usize,
     index: usize,
@@ -138,10 +138,7 @@ impl DataFrame {
     }
 
     pub(crate) fn free(self) {
-        critical_section::with(|cs| {
-            let mut free_slots = DATA_FRAME_BACKING_MEMORY_FREE_SLOTS.borrow_ref_mut(cs);
-            unwrap!(free_slots.push(self.index));
-        });
+        // Drop impl will free up the frame
     }
 
     fn data_mut(&mut self) -> &mut [u8] {
@@ -170,6 +167,15 @@ impl DataFrame {
     pub(crate) fn slice_mut(&mut self) -> &mut [u8] {
         let len = self.len;
         &mut self.data_mut()[..len]
+    }
+}
+
+impl Drop for DataFrame {
+    fn drop(&mut self) {
+        critical_section::with(|cs| {
+            let mut free_slots = DATA_FRAME_BACKING_MEMORY_FREE_SLOTS.borrow_ref_mut(cs);
+            unwrap!(free_slots.push(self.index));
+        });
     }
 }
 
