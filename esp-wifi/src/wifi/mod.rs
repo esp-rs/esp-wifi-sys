@@ -149,16 +149,18 @@ impl DataFrame {
         &mut data[(self.index * DATA_FRAME_SIZE)..][..DATA_FRAME_SIZE]
     }
 
-    pub(crate) fn from_bytes(bytes: &[u8]) -> Option<DataFrame> {
-        let mut data = DataFrame::new()?;
-        data.len = bytes.len();
-        let mem = unsafe { DATA_FRAME_BACKING_MEMORY.assume_init_mut() };
-        let len = usize::min(bytes.len(), DATA_FRAME_SIZE);
-        if len != bytes.len() {
+    pub(crate) fn from_bytes(mut bytes: &[u8]) -> Option<DataFrame> {
+        if bytes.len() > DATA_FRAME_SIZE {
             warn!("Trying to store more data than available into DataFrame. Check MTU");
+            bytes = &bytes[..DATA_FRAME_SIZE];
         }
 
-        mem[(data.index * DATA_FRAME_SIZE)..][..len].copy_from_slice(bytes);
+        let len = bytes.len();
+
+        let mut data = DataFrame::new()?;
+        data.len = len;
+        data.data_mut()[..len].copy_from_slice(bytes);
+
         Some(data)
     }
 
