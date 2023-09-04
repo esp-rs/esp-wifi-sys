@@ -36,6 +36,9 @@ use heapless::Vec;
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
 
+use core::sync::atomic::Ordering;
+use atomic_polyfill::AtomicBool;
+
 #[doc(hidden)]
 pub use os_adapter::*;
 use smoltcp::phy::{Device, DeviceCapabilities, RxToken, TxToken};
@@ -169,19 +172,6 @@ impl DataFrame {
     fn data_mut(&mut self) -> &mut [u8] {
         let data = unsafe { DATA_FRAME_BACKING_MEMORY.assume_init_mut() };
         &mut data[(self.index * DATA_FRAME_SIZE)..][..DATA_FRAME_SIZE]
-    }
-
-    pub(crate) fn from_bytes(mut bytes: &[u8]) -> Option<DataFrame> {
-        if bytes.len() > DATA_FRAME_SIZE {
-            warn!("Trying to store more data than available into DataFrame. Check MTU");
-            bytes = &bytes[..DATA_FRAME_SIZE];
-        }
-
-        let mut data = DataFrame::new()?;
-        data.len = bytes.len();
-        data.slice_mut().copy_from_slice(bytes);
-
-        Some(data)
     }
 
     pub(crate) fn slice(&self) -> &[u8] {
@@ -712,6 +702,8 @@ unsafe extern "C" fn recv_cb(
     res
 }
 
+pub(crate) static WIFI_TX_READY: AtomicBool = AtomicBool::new(true);
+
 #[ram]
 unsafe extern "C" fn esp_wifi_tx_done_cb(
     _ifidx: u8,
@@ -719,7 +711,10 @@ unsafe extern "C" fn esp_wifi_tx_done_cb(
     _data_len: *mut u16,
     _tx_status: bool,
 ) {
-    debug!("esp_wifi_tx_done_cb");
+    info!("esp_wifi_tx_done_cb");
+    WIFI_TX_READY.store(true, Ordering::SeqCst);
+    #[cfg(feature = "embassy-net")]
+    embassy::TRANSMIT_WAKER.wake();
 }
 
 pub fn wifi_start() -> Result<(), WifiError> {
@@ -1017,8 +1012,7 @@ impl<'d> Device for WifiDevice<'d> {
     ) -> Option<(Self::RxToken<'_>, Self::TxToken<'_>)> {
         critical_section::with(|cs| {
             let rx = DATA_QUEUE_RX.borrow_ref_mut(cs);
-            let tx = DATA_QUEUE_TX.borrow_ref_mut(cs);
-            if !rx.is_empty() && !tx.is_full() {
+            if !rx.is_empty() && WIFI_TX_READY.load(Ordering::SeqCst) {
                 Some((WifiRxToken::default(), WifiTxToken::default()))
             } else {
                 None
@@ -1027,15 +1021,12 @@ impl<'d> Device for WifiDevice<'d> {
     }
 
     fn transmit(&mut self, _instant: smoltcp::time::Instant) -> Option<Self::TxToken<'_>> {
-        critical_section::with(|cs| {
-            let tx = DATA_QUEUE_TX.borrow_ref_mut(cs);
-            if !tx.is_full() {
-                Some(WifiTxToken::default())
-            } else {
-                warn!("no Tx token available");
-                None
-            }
-        })
+        if WIFI_TX_READY.load(Ordering::SeqCst) {
+            Some(WifiTxToken::default())
+        } else {
+            warn!("no Tx token available");
+            None
+        }
     }
 
     fn capabilities(&self) -> smoltcp::phy::DeviceCapabilities {
@@ -1077,27 +1068,21 @@ impl TxToken for WifiTxToken {
     where
         F: FnOnce(&mut [u8]) -> R,
     {
-        let res = critical_section::with(|cs| {
-            let mut queue = DATA_QUEUE_TX.borrow_ref_mut(cs);
+        WIFI_TX_READY.store(false, Ordering::SeqCst);
+        let mut tmp = [0u8; DATA_FRAME_SIZE]; // TODO static buffer?
+        let buffer = &mut tmp[..len];
+        let res = f(buffer);
 
-            let mut packet = unwrap!(DataFrame::new(), "unreachable: transmit()/receive() ensures there is a buffer free (which means we also have free buffer space)");
-            packet.len = len;
-            let res = f(packet.slice_mut());
-            unwrap!(
-                queue.enqueue(packet),
-                "unreachable: transmit()/receive() ensures there is a buffer free"
-            );
-            res
-        });
+        send_data_if_needed(buffer);
 
-        send_data_if_needed();
         res
     }
 }
 
-pub fn send_data_if_needed() {
-    critical_section::with(|cs| {
-        let mut queue = DATA_QUEUE_TX.borrow_ref_mut(cs);
+// FIXME data here has to be &mut because of `esp_wifi_internal_tx` signature, requiring a *mut ptr to the buffer
+// Casting const to mut is instant UB, even though in reality `esp_wifi_internal_tx` copies the buffer into its own memory and 
+// does not modify
+pub fn send_data_if_needed(data: &mut [u8]) {
         let mut wifi_mode = 0u32;
         unsafe {
             esp_wifi_get_mode(&mut wifi_mode);
@@ -1115,26 +1100,19 @@ pub fn send_data_if_needed() {
             wifi_interface_t_WIFI_IF_STA
         };
 
-        while let Some(mut packet) = queue.dequeue() {
-            trace!("sending... {} bytes", packet.len);
-            dump_packet_info(packet.slice());
+        trace!("sending... {} bytes", data.len());
+        dump_packet_info(data);
 
-            unsafe {
-                let len = packet.len as u16;
-                let ptr = packet.slice_mut().as_mut_ptr().cast();
+        unsafe {
+            let len = data.len() as u16;
+            let ptr = data.as_mut_ptr().cast();
 
-                let _res = esp_wifi_internal_tx(interface, ptr, len);
-                if _res != 0 {
-                    warn!("esp_wifi_internal_tx {}", _res);
-                }
-                trace!("esp_wifi_internal_tx {}", _res);
+            let _res = esp_wifi_internal_tx(interface, ptr, len);
+            if _res != 0 {
+                warn!("esp_wifi_internal_tx {}", _res);
             }
-            #[cfg(feature = "embassy-net")]
-            embassy::TRANSMIT_WAKER.wake();
-
-            packet.free();
+            trace!("esp_wifi_internal_tx {}", _res);
         }
-    });
 }
 
 impl Wifi for WifiController<'_> {
@@ -1387,24 +1365,14 @@ pub(crate) mod embassy {
         where
             F: FnOnce(&mut [u8]) -> R,
         {
-            let res = critical_section::with(|cs| {
-                let mut queue = DATA_QUEUE_TX.borrow_ref_mut(cs);
+            WIFI_TX_READY.store(false, Ordering::SeqCst);
+            info!("Consuming TX token, setting WIFI_TX_READY to false");
+            let mut tmp = [0u8; DATA_FRAME_SIZE]; // TODO static buffer?
+            let buffer = &mut tmp[..len];
+            let res = f(buffer);
 
-                let mut packet = unwrap!(
-                    DataFrame::new(),
-                    "unreachable: transmit()/receive() ensures there is a buffer free and space available"
-                );
+            send_data_if_needed(buffer);
 
-                packet.len = len;
-                let res = f(packet.slice_mut());
-                unwrap!(
-                    queue.enqueue(packet),
-                    "unreachable: transmit()/receive() ensures there is a buffer free"
-                );
-                res
-            });
-
-            send_data_if_needed();
             res
         }
     }
@@ -1425,8 +1393,7 @@ pub(crate) mod embassy {
             RECEIVE_WAKER.register(cx.waker());
             critical_section::with(|cs| {
                 let rx = DATA_QUEUE_RX.borrow_ref_mut(cs);
-                let tx = DATA_QUEUE_TX.borrow_ref_mut(cs);
-                if !rx.is_empty() && !tx.is_full() {
+                if !rx.is_empty() && WIFI_TX_READY.load(Ordering::SeqCst) {
                     Some((WifiRxToken::default(), WifiTxToken::default()))
                 } else {
                     None
@@ -1436,14 +1403,11 @@ pub(crate) mod embassy {
 
         fn transmit(&mut self, cx: &mut core::task::Context) -> Option<Self::TxToken<'_>> {
             TRANSMIT_WAKER.register(cx.waker());
-            critical_section::with(|cs| {
-                let tx = DATA_QUEUE_TX.borrow_ref_mut(cs);
-                if !tx.is_full() {
-                    Some(WifiTxToken::default())
-                } else {
-                    None
-                }
-            })
+            if WIFI_TX_READY.load(Ordering::SeqCst) {
+                Some(WifiTxToken::default())
+            } else {
+                None
+            }
         }
 
         fn link_state(&mut self, cx: &mut core::task::Context) -> embassy_net_driver::LinkState {
