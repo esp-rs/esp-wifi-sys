@@ -94,7 +94,12 @@ macro_rules! boot_button {
 #[macro_export]
 macro_rules! get_bluetooth {
     ($peripherals: ident) => {{
-        #[cfg(any(feature = "esp32", feature = "esp32s3", feature = "esp32c2", feature = "esp32c3"))]
+        #[cfg(any(
+            feature = "esp32",
+            feature = "esp32s3",
+            feature = "esp32c2",
+            feature = "esp32c3"
+        ))]
         let (_, bluetooth) = $peripherals.RADIO.split();
         #[cfg(any(feature = "esp32c6"))]
         let (_, bluetooth, _) = $peripherals.RADIO.split();
@@ -107,7 +112,12 @@ macro_rules! get_bluetooth {
 #[macro_export]
 macro_rules! get_wifi {
     ($peripherals: ident) => {{
-        #[cfg(any(feature = "esp32", feature = "esp32s3", feature = "esp32c2", feature = "esp32c3"))]
+        #[cfg(any(
+            feature = "esp32",
+            feature = "esp32s3",
+            feature = "esp32c2",
+            feature = "esp32c3"
+        ))]
         let (wifi, _) = $peripherals.RADIO.split();
         #[cfg(any(feature = "esp32s2"))]
         let wifi = $peripherals.RADIO.split();
@@ -120,7 +130,12 @@ macro_rules! get_wifi {
 #[macro_export]
 macro_rules! get_wifi_bluetooth {
     ($peripherals: ident) => {{
-        #[cfg(any(feature = "esp32", feature = "esp32s3", feature = "esp32c2", feature = "esp32c3"))]
+        #[cfg(any(
+            feature = "esp32",
+            feature = "esp32s3",
+            feature = "esp32c2",
+            feature = "esp32c3"
+        ))]
         let (wifi, bluetooth) = $peripherals.RADIO.split();
         #[cfg(any(feature = "esp32c6"))]
         let (wifi, bluetooth, _) = $peripherals.RADIO.split();

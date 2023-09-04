@@ -7446,7 +7446,7 @@ pub struct wpa_crypto_funcs_t {
     pub ccmp_encrypt: esp_ccmp_encrypt_t,
     pub aes_gmac: esp_aes_gmac_t,
     pub sha256_vector: esp_sha256_vector_t,
-    pub crc32: esp_crc32_le_t,    
+    pub crc32: esp_crc32_le_t,
 }
 #[doc = " @brief The crypto callback function structure used in mesh vendor IE encryption. The"]
 #[doc = "        structure can be set as software crypto or the crypto optimized by device's"]

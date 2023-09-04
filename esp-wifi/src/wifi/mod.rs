@@ -32,12 +32,11 @@ use esp_wifi_sys::include::wifi_interface_t_WIFI_IF_AP;
 use esp_wifi_sys::include::wifi_mode_t_WIFI_MODE_AP;
 use esp_wifi_sys::include::wifi_mode_t_WIFI_MODE_APSTA;
 use esp_wifi_sys::include::wifi_mode_t_WIFI_MODE_NULL;
-use heapless::Vec;
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
 
+use atomic_polyfill::AtomicUsize;
 use core::sync::atomic::Ordering;
-use atomic_polyfill::AtomicBool;
 
 #[doc(hidden)]
 pub use os_adapter::*;
@@ -127,80 +126,12 @@ impl EspWifiPacketBuffer {
     }
 }
 
-const DATA_FRAMES_MAX_COUNT: usize = TX_QUEUE_SIZE;
 const DATA_FRAME_SIZE: usize = MTU + ETHERNET_FRAME_HEADER_SIZE;
-
-static mut DATA_FRAME_BACKING_MEMORY: MaybeUninit<[u8; DATA_FRAMES_MAX_COUNT * DATA_FRAME_SIZE]> =
-    MaybeUninit::uninit();
-
-static DATA_FRAME_BACKING_MEMORY_FREE_SLOTS: Mutex<RefCell<Vec<usize, DATA_FRAMES_MAX_COUNT>>> =
-    Mutex::new(RefCell::new(Vec::new()));
-
-#[derive(Debug, Clone)]
-pub(crate) struct DataFrame {
-    len: usize,
-    index: usize,
-}
-
-impl DataFrame {
-    pub(crate) fn internal_init() {
-        critical_section::with(|cs| {
-            let mut free_slots = DATA_FRAME_BACKING_MEMORY_FREE_SLOTS.borrow_ref_mut(cs);
-            for i in 0..DATA_FRAMES_MAX_COUNT {
-                unwrap!(free_slots.push(i));
-            }
-        });
-    }
-
-    pub(crate) fn new() -> Option<DataFrame> {
-        let index = critical_section::with(|cs| {
-            DATA_FRAME_BACKING_MEMORY_FREE_SLOTS
-                .borrow_ref_mut(cs)
-                .pop()
-        });
-
-        match index {
-            Some(index) => Some(DataFrame { len: 0, index }),
-            None => None,
-        }
-    }
-
-    pub(crate) fn free(self) {
-        // Drop impl will free up the frame
-    }
-
-    fn data_mut(&mut self) -> &mut [u8] {
-        let data = unsafe { DATA_FRAME_BACKING_MEMORY.assume_init_mut() };
-        &mut data[(self.index * DATA_FRAME_SIZE)..][..DATA_FRAME_SIZE]
-    }
-
-    pub(crate) fn slice(&self) -> &[u8] {
-        let data = unsafe { DATA_FRAME_BACKING_MEMORY.assume_init_ref() };
-        &data[(self.index * DATA_FRAME_SIZE)..][..self.len]
-    }
-
-    pub(crate) fn slice_mut(&mut self) -> &mut [u8] {
-        let len = self.len;
-        &mut self.data_mut()[..len]
-    }
-}
-
-impl Drop for DataFrame {
-    fn drop(&mut self) {
-        critical_section::with(|cs| {
-            let mut free_slots = DATA_FRAME_BACKING_MEMORY_FREE_SLOTS.borrow_ref_mut(cs);
-            unwrap!(free_slots.push(self.index));
-        });
-    }
-}
 
 const RX_QUEUE_SIZE: usize = crate::CONFIG.rx_queue_size;
 const TX_QUEUE_SIZE: usize = crate::CONFIG.tx_queue_size;
 
 pub(crate) static DATA_QUEUE_RX: Mutex<RefCell<SimpleQueue<EspWifiPacketBuffer, RX_QUEUE_SIZE>>> =
-    Mutex::new(RefCell::new(SimpleQueue::new()));
-
-pub(crate) static DATA_QUEUE_TX: Mutex<RefCell<SimpleQueue<DataFrame, TX_QUEUE_SIZE>>> =
     Mutex::new(RefCell::new(SimpleQueue::new()));
 
 #[derive(Debug, Clone, Copy)]
@@ -687,9 +618,7 @@ unsafe extern "C" fn recv_cb(
             esp_wifi_internal_free_rx_buffer(eb);
             esp_wifi_sys::include::ESP_ERR_NO_MEM as esp_err_t
         } else {
-            let packet = EspWifiPacketBuffer {
-                buffer, len, eb
-            };
+            let packet = EspWifiPacketBuffer { buffer, len, eb };
             unwrap!(queue.enqueue(packet));
 
             #[cfg(feature = "embassy-net")]
@@ -702,7 +631,7 @@ unsafe extern "C" fn recv_cb(
     res
 }
 
-pub(crate) static WIFI_TX_READY: AtomicBool = AtomicBool::new(true);
+pub(crate) static WIFI_TX_INFLIGHT: AtomicUsize = AtomicUsize::new(0);
 
 #[ram]
 unsafe extern "C" fn esp_wifi_tx_done_cb(
@@ -711,8 +640,12 @@ unsafe extern "C" fn esp_wifi_tx_done_cb(
     _data_len: *mut u16,
     _tx_status: bool,
 ) {
-    info!("esp_wifi_tx_done_cb");
-    WIFI_TX_READY.store(true, Ordering::SeqCst);
+    trace!("esp_wifi_tx_done_cb");
+    WIFI_TX_INFLIGHT
+        .fetch_update(Ordering::SeqCst, Ordering::SeqCst, |x| {
+            Some(x.saturating_sub(1))
+        })
+        .unwrap();
     #[cfg(feature = "embassy-net")]
     embassy::TRANSMIT_WAKER.wake();
 }
@@ -1012,7 +945,7 @@ impl<'d> Device for WifiDevice<'d> {
     ) -> Option<(Self::RxToken<'_>, Self::TxToken<'_>)> {
         critical_section::with(|cs| {
             let rx = DATA_QUEUE_RX.borrow_ref_mut(cs);
-            if !rx.is_empty() && WIFI_TX_READY.load(Ordering::SeqCst) {
+            if !rx.is_empty() && WIFI_TX_INFLIGHT.load(Ordering::SeqCst) < TX_QUEUE_SIZE {
                 Some((WifiRxToken::default(), WifiTxToken::default()))
             } else {
                 None
@@ -1021,7 +954,7 @@ impl<'d> Device for WifiDevice<'d> {
     }
 
     fn transmit(&mut self, _instant: smoltcp::time::Instant) -> Option<Self::TxToken<'_>> {
-        if WIFI_TX_READY.load(Ordering::SeqCst) {
+        if WIFI_TX_INFLIGHT.load(Ordering::SeqCst) < TX_QUEUE_SIZE {
             Some(WifiTxToken::default())
         } else {
             warn!("no Tx token available");
@@ -1068,7 +1001,7 @@ impl TxToken for WifiTxToken {
     where
         F: FnOnce(&mut [u8]) -> R,
     {
-        WIFI_TX_READY.store(false, Ordering::SeqCst);
+        WIFI_TX_INFLIGHT.fetch_add(1, Ordering::SeqCst);
         let mut tmp = [0u8; DATA_FRAME_SIZE]; // TODO static buffer?
         let buffer = &mut tmp[..len];
         let res = f(buffer);
@@ -1080,39 +1013,39 @@ impl TxToken for WifiTxToken {
 }
 
 // FIXME data here has to be &mut because of `esp_wifi_internal_tx` signature, requiring a *mut ptr to the buffer
-// Casting const to mut is instant UB, even though in reality `esp_wifi_internal_tx` copies the buffer into its own memory and 
+// Casting const to mut is instant UB, even though in reality `esp_wifi_internal_tx` copies the buffer into its own memory and
 // does not modify
 pub fn send_data_if_needed(data: &mut [u8]) {
-        let mut wifi_mode = 0u32;
-        unsafe {
-            esp_wifi_get_mode(&mut wifi_mode);
+    let mut wifi_mode = 0u32;
+    unsafe {
+        esp_wifi_get_mode(&mut wifi_mode);
+    }
+
+    #[allow(non_upper_case_globals)]
+    let is_ap = matches!(
+        wifi_mode,
+        wifi_mode_t_WIFI_MODE_AP | wifi_mode_t_WIFI_MODE_APSTA
+    );
+
+    let interface = if is_ap {
+        wifi_interface_t_WIFI_IF_AP
+    } else {
+        wifi_interface_t_WIFI_IF_STA
+    };
+
+    trace!("sending... {} bytes", data.len());
+    dump_packet_info(data);
+
+    unsafe {
+        let len = data.len() as u16;
+        let ptr = data.as_mut_ptr().cast();
+
+        let _res = esp_wifi_internal_tx(interface, ptr, len);
+        if _res != 0 {
+            warn!("esp_wifi_internal_tx {}", _res);
         }
-
-        #[allow(non_upper_case_globals)]
-        let is_ap = matches!(
-            wifi_mode,
-            wifi_mode_t_WIFI_MODE_AP | wifi_mode_t_WIFI_MODE_APSTA
-        );
-
-        let interface = if is_ap {
-            wifi_interface_t_WIFI_IF_AP
-        } else {
-            wifi_interface_t_WIFI_IF_STA
-        };
-
-        trace!("sending... {} bytes", data.len());
-        dump_packet_info(data);
-
-        unsafe {
-            let len = data.len() as u16;
-            let ptr = data.as_mut_ptr().cast();
-
-            let _res = esp_wifi_internal_tx(interface, ptr, len);
-            if _res != 0 {
-                warn!("esp_wifi_internal_tx {}", _res);
-            }
-            trace!("esp_wifi_internal_tx {}", _res);
-        }
+        trace!("esp_wifi_internal_tx {}", _res);
+    }
 }
 
 impl Wifi for WifiController<'_> {
@@ -1365,8 +1298,7 @@ pub(crate) mod embassy {
         where
             F: FnOnce(&mut [u8]) -> R,
         {
-            WIFI_TX_READY.store(false, Ordering::SeqCst);
-            info!("Consuming TX token, setting WIFI_TX_READY to false");
+            WIFI_TX_INFLIGHT.fetch_add(1, Ordering::SeqCst);
             let mut tmp = [0u8; DATA_FRAME_SIZE]; // TODO static buffer?
             let buffer = &mut tmp[..len];
             let res = f(buffer);
@@ -1393,7 +1325,7 @@ pub(crate) mod embassy {
             RECEIVE_WAKER.register(cx.waker());
             critical_section::with(|cs| {
                 let rx = DATA_QUEUE_RX.borrow_ref_mut(cs);
-                if !rx.is_empty() && WIFI_TX_READY.load(Ordering::SeqCst) {
+                if !rx.is_empty() && WIFI_TX_INFLIGHT.load(Ordering::SeqCst) < TX_QUEUE_SIZE {
                     Some((WifiRxToken::default(), WifiTxToken::default()))
                 } else {
                     None
@@ -1403,7 +1335,7 @@ pub(crate) mod embassy {
 
         fn transmit(&mut self, cx: &mut core::task::Context) -> Option<Self::TxToken<'_>> {
             TRANSMIT_WAKER.register(cx.waker());
-            if WIFI_TX_READY.load(Ordering::SeqCst) {
+            if WIFI_TX_INFLIGHT.load(Ordering::SeqCst) < TX_QUEUE_SIZE {
                 Some(WifiTxToken::default())
             } else {
                 None
