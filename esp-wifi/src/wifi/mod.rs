@@ -661,25 +661,23 @@ unsafe extern "C" fn recv_cb(
 ) -> esp_err_t {
     let src = core::slice::from_raw_parts_mut(buffer as *mut u8, len as usize);
 
-    let res = if let Some(packet) = DataFrame::from_bytes(src) {
-        critical_section::with(|cs| {
-            let mut queue = DATA_QUEUE_RX.borrow_ref_mut(cs);
-            if !queue.is_full() {
-                unwrap!(queue.enqueue(packet));
+    let res = critical_section::with(|cs| {
+        let mut queue = DATA_QUEUE_RX.borrow_ref_mut(cs);
+        if queue.is_full() {
+            error!("RX QUEUE FULL");
+            esp_wifi_sys::include::ESP_ERR_NO_MEM as esp_err_t
+        } else if let Some(packet) = DataFrame::from_bytes(src) {
+            unwrap!(queue.enqueue(packet));
 
-                #[cfg(feature = "embassy-net")]
-                embassy::RECEIVE_WAKER.wake();
+            #[cfg(feature = "embassy-net")]
+            embassy::RECEIVE_WAKER.wake();
 
-                esp_wifi_sys::include::ESP_OK as esp_err_t
-            } else {
-                packet.free();
-                error!("RX QUEUE FULL");
-                esp_wifi_sys::include::ESP_ERR_NO_MEM as esp_err_t
-            }
-        })
-    } else {
-        esp_wifi_sys::include::ESP_ERR_NO_MEM as esp_err_t
-    };
+            esp_wifi_sys::include::ESP_OK as esp_err_t
+        } else {
+            error!("No free DataFrame");
+            esp_wifi_sys::include::ESP_ERR_NO_MEM as esp_err_t
+        }
+    });
 
     esp_wifi_internal_free_rx_buffer(eb);
 
