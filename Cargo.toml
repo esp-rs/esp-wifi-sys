@@ -28,12 +28,12 @@ lto = "off"
 
 [workspace.dependencies]
 defmt = "=0.3.5"
-esp32c3-hal = { version = "0.11.0" }
-esp32c2-hal = { version = "0.9.0" }
-esp32c6-hal = { version = "0.4.0" }
-esp32-hal = { version = "0.14.0", features = [ "rt" ] }
-esp32s3-hal = { version = "0.11.0", features = [ "rt" ] }
-esp32s2-hal = { version = "0.11.0", features = [ "rt" ] }
+esp32c3-hal = { version = "0.12.0" }
+esp32c2-hal = { version = "0.10.0" }
+esp32c6-hal = { version = "0.5.0" }
+esp32-hal   = { version = "0.15.0" }
+esp32s3-hal = { version = "0.12.0" }
+esp32s2-hal = { version = "0.12.0" }
 smoltcp = { version = "0.10.0", default-features=false, features = ["proto-igmp", "proto-ipv4", "proto-dns", "socket-tcp", "socket-icmp", "socket-udp", "socket-dns", "medium-ethernet", "proto-dhcpv4", "socket-raw", "socket-dhcpv4"] }
 critical-section = "1.1.1"
 atomic-polyfill = "1.0.2"
@@ -54,9 +54,9 @@ toml-cfg = "0.1.3"
 
 embassy-net = { version = "0.1.0", features = ["nightly", "tcp", "udp", "dhcpv4", "medium-ethernet"] }
 bleps = { git = "https://github.com/bjoernQ/bleps", package = "bleps", rev = "b82f1e7009bef7e32f0918be5b186188aa5e7109", features = ["macros"] }
-embassy-executor = { version = "0.2.1", package = "embassy-executor", features = ["nightly", "executor-thread", "integrated-timers"] }
-embassy-time = { version = "0.1.1", features = ["nightly"] }
+embassy-executor = { version = "0.3.0", package = "embassy-executor", features = ["nightly", "executor-thread", "integrated-timers"] }
+embassy-time = { version = "0.1.3", features = ["nightly"] }
 futures-util = { version = "0.3.28", default-features = false }
-esp-println = { version = "0.5.0", features = ["log"] }
-esp-backtrace = { version = "0.7.0", features = ["panic-handler", "exception-handler", "print-uart"] }
-embedded-hal-async = { version = "0.2.0-alpha.1" }
+esp-println = { version = "0.6.0" }
+esp-backtrace = { version = "0.8.0", features = ["panic-handler", "exception-handler", "print-uart"] }
+embedded-hal-async = { version = "1.0.0-rc.1" }

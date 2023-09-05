@@ -8,7 +8,7 @@ edition = "2021"
 [dependencies]
 embedded-svc.workspace = true
 bleps.workspace = true
-embassy-executor.workspace = true
+embassy-executor = { workspace = true, optional = true }
 embassy-time.workspace = true
 embassy-futures.workspace = true
 futures-util.workspace = true
@@ -20,14 +20,16 @@ embassy-net = { workspace = true, optional = true }
 
 esp32c6-hal.workspace = true
 examples-util = { path = "../examples-util", features = ["esp32c6"] }
-esp-println = { workspace = true, features = [ "esp32c6" ] }
 esp-backtrace = { workspace = true, features = ["esp32c6"] }
-esp-wifi = { path = "../esp-wifi", features = ["esp32c6"] }
+esp-wifi = { path = "../esp-wifi", default-features = false, features = ["esp32c6", "utils"] }
+
+[dev-dependencies]
+esp-println = { workspace = true, features = [ "esp32c6", "log" ] }
 
 [features]
-default = ["esp32c6"]
-esp32c6 = ["embassy-executor/arch-riscv32"]
-async = ["esp-wifi/async", "esp32c6-hal/embassy-time-timg0"]
+default = ["esp32c6", "log"]
+esp32c6 = []
+async = ["esp-wifi/async", "esp32c6-hal/embassy-time-timg0", "dep:embassy-executor", "embassy-executor?/arch-riscv32"]
 embassy-net = ["esp-wifi/embassy-net", "dep:embassy-net"]
 wifi-logs = ["esp-wifi/wifi-logs"]
 dump-packets = ["esp-wifi/dump-packets"]
@@ -42,5 +44,5 @@ ps-min-modem = ["esp-wifi/ps-min-modem"]
 esp-now = ["esp-wifi/esp-now"]
 ipv6 = ["esp-wifi/ipv6"]
 #coex = ["esp-wifi/coex"]
-log = ["esp-println/log", "esp-wifi/log", "dep:log"]
-log-defmt = ["esp-wifi/log-defmt"]
+log = ["esp-wifi/log", "dep:log", "esp-println/log"]
+defmt = ["esp-wifi/defmt", "esp-println/defmt"]
