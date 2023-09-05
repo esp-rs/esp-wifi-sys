@@ -945,7 +945,7 @@ impl<'d> Device for WifiDevice<'d> {
     ) -> Option<(Self::RxToken<'_>, Self::TxToken<'_>)> {
         critical_section::with(|cs| {
             let rx = DATA_QUEUE_RX.borrow_ref_mut(cs);
-            if !rx.is_empty() && WIFI_TX_INFLIGHT.load(Ordering::SeqCst) < TX_QUEUE_SIZE {
+            if !rx.is_empty() && esp_wifi_can_send() {
                 Some((WifiRxToken::default(), WifiTxToken::default()))
             } else {
                 None
@@ -954,7 +954,7 @@ impl<'d> Device for WifiDevice<'d> {
     }
 
     fn transmit(&mut self, _instant: smoltcp::time::Instant) -> Option<Self::TxToken<'_>> {
-        if WIFI_TX_INFLIGHT.load(Ordering::SeqCst) < TX_QUEUE_SIZE {
+        if esp_wifi_can_send() {
             Some(WifiTxToken::default())
         } else {
             warn!("no Tx token available");
@@ -978,18 +978,7 @@ impl RxToken for WifiRxToken {
     where
         F: FnOnce(&mut [u8]) -> R,
     {
-        critical_section::with(|cs| {
-            let mut queue = DATA_QUEUE_RX.borrow_ref_mut(cs);
-
-            let mut data = unwrap!(
-                queue.dequeue(),
-                "unreachable: transmit()/receive() ensures there is a packet to process"
-            );
-            let buffer = data.as_slice_mut();
-            dump_packet_info(&buffer);
-            let res = f(buffer);
-            res
-        })
+        rx_token_consume(f)
     }
 }
 
@@ -1001,21 +990,51 @@ impl TxToken for WifiTxToken {
     where
         F: FnOnce(&mut [u8]) -> R,
     {
-        WIFI_TX_INFLIGHT.fetch_add(1, Ordering::SeqCst);
-        let mut tmp = [0u8; DATA_FRAME_SIZE]; // TODO static buffer?
-        let buffer = &mut tmp[..len];
-        let res = f(buffer);
-
-        send_data_if_needed(buffer);
-
-        res
+        tx_token_consume(len, f)
     }
+}
+
+fn rx_token_consume<R, F>(f: F) -> R
+where
+    F: FnOnce(&mut [u8]) -> R,
+{
+    critical_section::with(|cs| {
+        let mut queue = DATA_QUEUE_RX.borrow_ref_mut(cs);
+
+        let mut data = unwrap!(
+            queue.dequeue(),
+            "unreachable: transmit()/receive() ensures there is a packet to process"
+        );
+        let buffer = data.as_slice_mut();
+        dump_packet_info(&buffer);
+        let res = f(buffer);
+        res
+    })
+}
+
+fn tx_token_consume<R, F>(len: usize, f: F) -> R
+where
+    F: FnOnce(&mut [u8]) -> R,
+{
+    WIFI_TX_INFLIGHT.fetch_add(1, Ordering::SeqCst);
+    // (safety): creation of multiple WiFi devices is impossible in safe Rust, therefore only smoltcp _or_ embassy-net can be used at one time
+    static mut BUFFER: [u8; DATA_FRAME_SIZE] = [0u8; DATA_FRAME_SIZE];
+    let buffer = unsafe { &mut BUFFER[..len] };
+    let res = f(buffer);
+
+    esp_wifi_send_data(buffer);
+
+    res
+}
+
+fn esp_wifi_can_send() -> bool {
+    WIFI_TX_INFLIGHT.load(Ordering::SeqCst) < TX_QUEUE_SIZE
 }
 
 // FIXME data here has to be &mut because of `esp_wifi_internal_tx` signature, requiring a *mut ptr to the buffer
 // Casting const to mut is instant UB, even though in reality `esp_wifi_internal_tx` copies the buffer into its own memory and
 // does not modify
-pub fn send_data_if_needed(data: &mut [u8]) {
+pub fn esp_wifi_send_data(data: &mut [u8]) {
     let mut wifi_mode = 0u32;
     unsafe {
         esp_wifi_get_mode(&mut wifi_mode);
@@ -1278,18 +1297,7 @@ pub(crate) mod embassy {
         where
             F: FnOnce(&mut [u8]) -> R,
         {
-            critical_section::with(|cs| {
-                let mut queue = DATA_QUEUE_RX.borrow_ref_mut(cs);
-
-                let mut data = unwrap!(
-                    queue.dequeue(),
-                    "unreachable: transmit()/receive() ensures there is a packet to process"
-                );
-                let buffer = data.as_slice_mut();
-                dump_packet_info(&buffer);
-                let res = f(buffer);
-                res
-            })
+            rx_token_consume(f)
         }
     }
 
@@ -1298,14 +1306,7 @@ pub(crate) mod embassy {
         where
             F: FnOnce(&mut [u8]) -> R,
         {
-            WIFI_TX_INFLIGHT.fetch_add(1, Ordering::SeqCst);
-            let mut tmp = [0u8; DATA_FRAME_SIZE]; // TODO static buffer?
-            let buffer = &mut tmp[..len];
-            let res = f(buffer);
-
-            send_data_if_needed(buffer);
-
-            res
+            tx_token_consume(len, f)
         }
     }
 
@@ -1325,7 +1326,7 @@ pub(crate) mod embassy {
             RECEIVE_WAKER.register(cx.waker());
             critical_section::with(|cs| {
                 let rx = DATA_QUEUE_RX.borrow_ref_mut(cs);
-                if !rx.is_empty() && WIFI_TX_INFLIGHT.load(Ordering::SeqCst) < TX_QUEUE_SIZE {
+                if !rx.is_empty() && esp_wifi_can_send() {
                     Some((WifiRxToken::default(), WifiTxToken::default()))
                 } else {
                     None
@@ -1335,7 +1336,7 @@ pub(crate) mod embassy {
 
         fn transmit(&mut self, cx: &mut core::task::Context) -> Option<Self::TxToken<'_>> {
             TRANSMIT_WAKER.register(cx.waker());
-            if WIFI_TX_INFLIGHT.load(Ordering::SeqCst) < TX_QUEUE_SIZE {
+            if esp_wifi_can_send() {
                 Some(WifiTxToken::default())
             } else {
                 None
