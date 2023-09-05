@@ -23,7 +23,7 @@ If a cell contains am em dash (&mdash;) this means that the particular feature i
 | ESP32-S3 |                          ✓                           |                          ✓                          |                          ✓                           |    ✓    |
 | ESP32-C3 |                          ✓                           |                          ✓                          |                          ✓                           |    ✓    |
 | ESP32-C2 |                          ✓                           |                          ✓                          |                                                      |    ✓    |
-| ESP32-C6 |                          ✓                           |                                                     |                                                      |    ✓    |
+| ESP32-C6 |                          ✓                           |                          ✓                          |                                                      |    ✓    |
 
 
 ## Usage

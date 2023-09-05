@@ -93,6 +93,8 @@ set CARGO_PROFILE_RELEASE_LTO=off
 echo.
 echo Connect ESP32-C6
 pause
+cargo run --example ble --release --features "ble"
+cargo run --example async_ble --release --features "async,ble"
 cargo run --example dhcp --release --features "wifi"
 cargo run --example static_ip --release --features "wifi"
 cargo run --example embassy_dhcp --release --features "async,wifi,embassy-net"
