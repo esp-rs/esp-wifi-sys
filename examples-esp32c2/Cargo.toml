@@ -21,7 +21,7 @@ embassy-net = { workspace = true, optional = true }
 esp32c2-hal.workspace = true
 examples-util = { path = "../examples-util", features = ["esp32c2"] }
 esp-backtrace = { workspace = true, features = ["esp32c2"] }
-esp-wifi = { path = "../esp-wifi", features = ["esp32c2"] }
+esp-wifi = { path = "../esp-wifi", default-features = false, features = ["esp32c2", "utils"] }
 embedded-hal-async = { workspace = true, optional = true }
 
 [dev-dependencies]
@@ -45,5 +45,5 @@ ps-min-modem = ["esp-wifi/ps-min-modem"]
 esp-now = ["esp-wifi/esp-now"]
 ipv6 = ["esp-wifi/ipv6"]
 #coex = ["esp-wifi/coex"]
-log = ["esp-wifi/log", "dep:log"]
-defmt = ["esp-wifi/defmt"]
+log = ["esp-wifi/log", "dep:log", "esp-println/log"]
+defmt = ["esp-wifi/defmt", "esp-println/defmt"]

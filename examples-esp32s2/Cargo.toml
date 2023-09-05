@@ -21,7 +21,7 @@ embassy-net = { workspace = true, optional = true }
 esp32s2-hal.workspace = true
 examples-util = { path = "../examples-util", features = ["esp32s2"] }
 esp-backtrace = { workspace = true, features = ["esp32s2"] }
-esp-wifi = { path = "../esp-wifi", features = ["esp32s2"] }
+esp-wifi = { path = "../esp-wifi", default-features = false, features = ["esp32s2", "utils"] }
 
 [dev-dependencies]
 esp-println = { workspace = true, features = [ "esp32s2", "log" ] }
@@ -42,5 +42,5 @@ phy-enable-usb = ["esp-wifi/phy-enable-usb"]
 ps-min-modem = ["esp-wifi/ps-min-modem"]
 esp-now = ["esp-wifi/esp-now"]
 ipv6 = ["esp-wifi/ipv6"]
-log = ["esp-wifi/log", "dep:log"]
-defmt = ["esp-wifi/defmt"]
+log = ["esp-wifi/log", "dep:log", "esp-println/log"]
+defmt = ["esp-wifi/defmt", "esp-println/defmt"]
