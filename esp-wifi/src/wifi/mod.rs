@@ -86,6 +86,8 @@ impl WifiMode {
     }
 }
 
+#[derive(Debug)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct EspWifiPacketBuffer {
     pub(crate) buffer: *mut crate::binary::c_types::c_void,
     pub(crate) len: u16,
