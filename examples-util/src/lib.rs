@@ -14,20 +14,6 @@ pub use esp32s2_hal as hal;
 pub use esp32s3_hal as hal;
 
 #[macro_export]
-macro_rules! system {
-    ($peripherals: ident) => {{
-        #[cfg(not(any(feature = "esp32", feature = "esp32c6")))]
-        let system = $peripherals.SYSTEM.split();
-        #[cfg(feature = "esp32")]
-        let system = $peripherals.DPORT.split();
-        #[cfg(any(feature = "esp32c6"))]
-        let system = $peripherals.PCR.split();
-
-        system
-    }};
-}
-
-#[macro_export]
 macro_rules! timer {
     ($peripherals: ident, $clocks: ident, $peripheral_clock_control: ident) => {{
         #[cfg(any(feature = "esp32c3", feature = "esp32c2", feature = "esp32c6"))]

@@ -129,7 +129,7 @@ fn main() -> ! {
 
     let peripherals = Peripherals::take();
 
-    let system = examples_util::system!(peripherals);
+    let system = peripherals.DPORT.split();
     let mut peripheral_clock_control = system.peripheral_clock_control;
     let clocks = ClockControl::max(system.clock_control).freeze();
 
