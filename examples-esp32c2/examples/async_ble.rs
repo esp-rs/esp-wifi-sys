@@ -25,13 +25,8 @@ use esp_wifi::{
 use examples_util::hal;
 use examples_util::BootButton;
 use hal::{
-    clock::{ClockControl, CpuClock},
-    embassy,
-    peripherals::*,
-    prelude::*,
-    radio::Bluetooth,
-    timer::TimerGroup,
-    Rng, Rtc, IO,
+    clock::ClockControl, embassy, peripherals::*, prelude::*, radio::Bluetooth, timer::TimerGroup,
+    Rng, IO,
 };
 
 #[embassy_executor::task]
@@ -136,8 +131,7 @@ fn main() -> ! {
 
     let system = examples_util::system!(peripherals);
     let mut peripheral_clock_control = system.peripheral_clock_control;
-    let clocks = examples_util::clocks!(system);
-    examples_util::rtc!(peripherals);
+    let clocks = ClockControl::max(system.clock_control).freeze();
 
     let timer = examples_util::timer!(peripherals, clocks, peripheral_clock_control);
     let init = initialize(

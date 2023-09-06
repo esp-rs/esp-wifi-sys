@@ -4,7 +4,7 @@ use crate::hal::interrupt::{self, TrapFrame};
 use crate::hal::peripherals::{self, Interrupt};
 use crate::hal::prelude::*;
 use crate::hal::riscv;
-use crate::hal::systimer::{Alarm, Periodic, Target, SystemTimer};
+use crate::hal::systimer::{Alarm, Periodic, SystemTimer, Target};
 use critical_section::Mutex;
 
 use crate::{binary, preempt::preempt::task_switch};

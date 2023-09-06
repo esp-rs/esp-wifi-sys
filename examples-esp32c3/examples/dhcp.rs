@@ -14,9 +14,9 @@ use esp_wifi::wifi::utils::create_network_interface;
 use esp_wifi::wifi::{WifiError, WifiMode};
 use esp_wifi::wifi_interface::WifiStack;
 use esp_wifi::{current_millis, initialize, EspWifiInitFor};
-use hal::clock::{ClockControl, CpuClock};
+use hal::clock::ClockControl;
 use hal::Rng;
-use hal::{peripherals::Peripherals, prelude::*, Rtc};
+use hal::{peripherals::Peripherals, prelude::*};
 use smoltcp::iface::SocketStorage;
 use smoltcp::wire::IpAddress;
 use smoltcp::wire::Ipv4Address;
@@ -33,8 +33,7 @@ fn main() -> ! {
 
     let system = examples_util::system!(peripherals);
     let mut peripheral_clock_control = system.peripheral_clock_control;
-    let clocks = examples_util::clocks!(system);
-    examples_util::rtc!(peripherals);
+    let clocks = ClockControl::max(system.clock_control).freeze();
 
     let timer = examples_util::timer!(peripherals, clocks, peripheral_clock_control);
     let init = initialize(

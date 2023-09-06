@@ -14,25 +14,6 @@ pub use esp32s2_hal as hal;
 pub use esp32s3_hal as hal;
 
 #[macro_export]
-macro_rules! rtc {
-    ($peripherals: ident) => {{
-        #[cfg(not(any(feature = "esp32c6")))]
-        let mut rtc = Rtc::new($peripherals.RTC_CNTL);
-
-        #[cfg(any(feature = "esp32c6"))]
-        let mut rtc = Rtc::new($peripherals.LP_CLKRST);
-
-        // Disable watchdog timers
-        #[cfg(not(any(feature = "esp32", feature = "esp32s2")))]
-        rtc.swd.disable();
-
-        rtc.rwdt.disable();
-
-        rtc
-    }};
-}
-
-#[macro_export]
 macro_rules! system {
     ($peripherals: ident) => {{
         #[cfg(not(any(feature = "esp32", feature = "esp32c6")))]
@@ -43,22 +24,6 @@ macro_rules! system {
         let system = $peripherals.PCR.split();
 
         system
-    }};
-}
-
-#[macro_export]
-macro_rules! clocks {
-    ($system: ident) => {{
-        #[cfg(feature = "esp32c3")]
-        let clocks = ClockControl::configure($system.clock_control, CpuClock::Clock160MHz).freeze();
-        #[cfg(feature = "esp32c2")]
-        let clocks = ClockControl::configure($system.clock_control, CpuClock::Clock120MHz).freeze();
-        #[cfg(feature = "esp32c6")]
-        let clocks = ClockControl::configure($system.clock_control, CpuClock::Clock160MHz).freeze();
-        #[cfg(any(feature = "esp32", feature = "esp32s3", feature = "esp32s2"))]
-        let clocks = ClockControl::configure($system.clock_control, CpuClock::Clock240MHz).freeze();
-
-        clocks
     }};
 }
 

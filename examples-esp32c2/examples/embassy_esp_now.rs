@@ -13,9 +13,9 @@ use esp_backtrace as _;
 use esp_println::println;
 use esp_wifi::esp_now::{EspNow, PeerInfo, BROADCAST_ADDRESS};
 use esp_wifi::{initialize, EspWifiInitFor};
-use hal::clock::{ClockControl, CpuClock};
+use hal::clock::ClockControl;
 use hal::Rng;
-use hal::{embassy, peripherals::Peripherals, prelude::*, timer::TimerGroup, Rtc};
+use hal::{embassy, peripherals::Peripherals, prelude::*, timer::TimerGroup};
 
 #[cfg(any(feature = "esp32c3", feature = "esp32c2", feature = "esp32c6"))]
 use hal::system::SystemExt;
@@ -66,8 +66,7 @@ fn main() -> ! {
 
     let system = examples_util::system!(peripherals);
     let mut peripheral_clock_control = system.peripheral_clock_control;
-    let clocks = examples_util::clocks!(system);
-    examples_util::rtc!(peripherals);
+    let clocks = ClockControl::max(system.clock_control).freeze();
 
     let timer = examples_util::timer!(peripherals, clocks, peripheral_clock_control);
     let init = initialize(

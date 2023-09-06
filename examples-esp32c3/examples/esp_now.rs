@@ -7,9 +7,9 @@ use esp_println::println;
 use esp_wifi::esp_now::{PeerInfo, BROADCAST_ADDRESS};
 use esp_wifi::{current_millis, initialize, EspWifiInitFor};
 use examples_util::hal;
-use hal::clock::{ClockControl, CpuClock};
+use hal::clock::ClockControl;
 use hal::Rng;
-use hal::{peripherals::Peripherals, prelude::*, Rtc};
+use hal::{peripherals::Peripherals, prelude::*};
 
 #[entry]
 fn main() -> ! {
@@ -20,8 +20,7 @@ fn main() -> ! {
 
     let system = examples_util::system!(peripherals);
     let mut peripheral_clock_control = system.peripheral_clock_control;
-    let clocks = examples_util::clocks!(system);
-    examples_util::rtc!(peripherals);
+    let clocks = ClockControl::max(system.clock_control).freeze();
 
     let timer = examples_util::timer!(peripherals, clocks, peripheral_clock_control);
     let init = initialize(
