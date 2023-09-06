@@ -6,6 +6,8 @@ use esp_backtrace as _;
 use esp_println::println;
 use esp_wifi::esp_now::{PeerInfo, BROADCAST_ADDRESS};
 use esp_wifi::{current_millis, initialize, EspWifiInitFor};
+#[path = "../../examples-util/util.rs"]
+mod examples_util;
 use examples_util::hal;
 use hal::clock::ClockControl;
 use hal::Rng;

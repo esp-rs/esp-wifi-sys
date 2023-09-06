@@ -20,7 +20,6 @@ embassy-net = { workspace = true, optional = true }
 embassy-sync.workspace = true
 
 esp32c2-hal.workspace = true
-examples-util = { path = "../examples-util", features = ["esp32c2"] }
 esp-backtrace = { workspace = true, features = ["esp32c2"] }
 esp-wifi = { path = "../esp-wifi", default-features = false, features = ["esp32c2", "utils"] }
 embedded-hal-async = { workspace = true, optional = true }

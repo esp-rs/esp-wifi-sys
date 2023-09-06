@@ -3,6 +3,8 @@
 #![feature(c_variadic)]
 #![feature(const_mut_refs)]
 
+#[path = "../../examples-util/util.rs"]
+mod examples_util;
 use examples_util::hal;
 
 use embedded_io::blocking::*;

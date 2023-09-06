@@ -11,6 +11,8 @@ use bleps::{
 use esp_backtrace as _;
 use esp_println::println;
 use esp_wifi::{ble::controller::BleConnector, initialize, EspWifiInitFor};
+#[path = "../../examples-util/util.rs"]
+mod examples_util;
 use examples_util::hal;
 use hal::{clock::ClockControl, peripherals::*, prelude::*, Rng, IO};
 
@@ -39,7 +41,8 @@ fn main() -> ! {
     )
     .unwrap();
 
-    let button = examples_util::boot_button!(peripherals);
+    let io = IO::new(peripherals.GPIO, peripherals.IO_MUX);
+    let button = io.pins.gpio0.into_pull_down_input();
 
     let mut debounce_cnt = 500;
 

@@ -22,6 +22,8 @@ use esp_println::println;
 use esp_wifi::{
     ble::controller::asynch::BleConnector, initialize, EspWifiInitFor, EspWifiInitialization,
 };
+#[path = "../../examples-util/util.rs"]
+mod examples_util;
 use examples_util::hal;
 use examples_util::BootButton;
 use hal::{
@@ -142,7 +144,8 @@ fn main() -> ! {
     )
     .unwrap();
 
-    let button = examples_util::boot_button!(peripherals);
+    let io = IO::new(peripherals.GPIO, peripherals.IO_MUX);
+    let button = io.pins.gpio9.into_pull_down_input();
 
     // Async requires the GPIO interrupt to wake futures
     hal::interrupt::enable(

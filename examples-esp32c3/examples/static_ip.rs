@@ -1,6 +1,8 @@
 #![no_std]
 #![no_main]
 
+#[path = "../../examples-util/util.rs"]
+mod examples_util;
 use examples_util::hal;
 
 use embedded_io::blocking::*;

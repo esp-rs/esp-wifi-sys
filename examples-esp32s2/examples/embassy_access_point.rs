@@ -10,6 +10,8 @@ use embassy_net::ConfigV4;
 use embassy_net::{
     Config, IpListenEndpoint, Ipv4Address, Ipv4Cidr, Stack, StackResources, StaticConfigV4,
 };
+#[path = "../../examples-util/util.rs"]
+mod examples_util;
 use examples_util::hal;
 
 use embassy_executor::Executor;
