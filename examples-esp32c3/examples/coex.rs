@@ -51,7 +51,7 @@ fn main() -> ! {
     )
     .unwrap();
 
-    let (wifi, bluetooth) = examples_util::get_wifi_bluetooth!(peripherals);
+    let (wifi, bluetooth, ..) = peripherals.RADIO.split();
 
     let mut socket_set_entries: [SocketStorage; 3] = Default::default();
     let (iface, device, mut controller, sockets) =

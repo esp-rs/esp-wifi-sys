@@ -43,7 +43,7 @@ fn main() -> ! {
 
     let mut debounce_cnt = 500;
 
-    let mut bluetooth = examples_util::get_bluetooth!(peripherals);
+    let (_, mut bluetooth, ..) = peripherals.RADIO.split();
 
     loop {
         let connector = BleConnector::new(&init, &mut bluetooth);

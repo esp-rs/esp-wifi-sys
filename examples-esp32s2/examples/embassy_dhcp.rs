@@ -61,7 +61,7 @@ fn main() -> ! {
     )
     .unwrap();
 
-    let wifi = examples_util::get_wifi!(peripherals);
+    let wifi = peripherals.RADIO.split();
     let (wifi_interface, controller) =
         esp_wifi::wifi::new_with_mode(&init, wifi, WifiMode::Sta).unwrap();
 

@@ -156,7 +156,7 @@ fn main() -> ! {
     )
     .unwrap();
 
-    let bluetooth = examples_util::get_bluetooth!(peripherals);
+    let (_, bluetooth, ..) = peripherals.RADIO.split();
 
     let timer_group0 = TimerGroup::new(
         peripherals.TIMG0,
