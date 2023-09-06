@@ -25,8 +25,8 @@ use esp_wifi::{
 use examples_util::hal;
 use examples_util::BootButton;
 use hal::{
-    clock::ClockControl, embassy, peripherals::*, prelude::*, radio::Bluetooth, timer::TimerGroup,
-    Rng, IO,
+    clock::ClockControl, embassy, peripherals::*, prelude::*, radio::Bluetooth,
+    systimer::SystemTimer, timer::TimerGroup, Rng, IO,
 };
 
 #[embassy_executor::task]
@@ -129,11 +129,10 @@ fn main() -> ! {
 
     let peripherals = Peripherals::take();
 
-    let system = peripherals.SYSTEM.split();
-    let mut peripheral_clock_control = system.peripheral_clock_control;
+    let mut system = peripherals.SYSTEM.split();
     let clocks = ClockControl::max(system.clock_control).freeze();
 
-    let timer = examples_util::timer!(peripherals, clocks, peripheral_clock_control);
+    let timer = SystemTimer::new(peripherals.SYSTIMER).alarm0;
     let init = initialize(
         EspWifiInitFor::Ble,
         timer,
@@ -154,7 +153,11 @@ fn main() -> ! {
 
     let bluetooth = examples_util::get_bluetooth!(peripherals);
 
-    let timer_group0 = TimerGroup::new(peripherals.TIMG0, &clocks, &mut peripheral_clock_control);
+    let timer_group0 = TimerGroup::new(
+        peripherals.TIMG0,
+        &clocks,
+        &mut system.peripheral_clock_control,
+    );
     embassy::init(&clocks, timer_group0.timer0);
     let executor = EXECUTOR.init(Executor::new());
     executor.run(|spawner| {

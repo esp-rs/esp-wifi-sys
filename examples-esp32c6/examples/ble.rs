@@ -12,7 +12,7 @@ use esp_backtrace as _;
 use esp_println::println;
 use esp_wifi::{ble::controller::BleConnector, initialize, EspWifiInitFor};
 use examples_util::hal;
-use hal::{clock::ClockControl, peripherals::*, prelude::*, Rng, IO};
+use hal::{clock::ClockControl, peripherals::*, prelude::*, systimer::SystemTimer, Rng, IO};
 
 #[entry]
 fn main() -> ! {
@@ -22,10 +22,9 @@ fn main() -> ! {
     let peripherals = Peripherals::take();
 
     let system = peripherals.PCR.split();
-    let mut peripheral_clock_control = system.peripheral_clock_control;
     let clocks = ClockControl::max(system.clock_control).freeze();
 
-    let timer = examples_util::timer!(peripherals, clocks, peripheral_clock_control);
+    let timer = SystemTimer::new(peripherals.SYSTIMER).alarm0;
     let init = initialize(
         EspWifiInitFor::Ble,
         timer,

@@ -64,11 +64,15 @@ fn main() -> ! {
 
     let peripherals = Peripherals::take();
 
-    let system = peripherals.SYSTEM.split();
-    let mut peripheral_clock_control = system.peripheral_clock_control;
+    let mut system = peripherals.SYSTEM.split();
     let clocks = ClockControl::max(system.clock_control).freeze();
 
-    let timer = examples_util::timer!(peripherals, clocks, peripheral_clock_control);
+    let timer = esp32s3_hal::timer::TimerGroup::new(
+        peripherals.TIMG1,
+        &clocks,
+        &mut system.peripheral_clock_control,
+    )
+    .timer0;
     let init = initialize(
         EspWifiInitFor::Wifi,
         timer,
@@ -82,7 +86,11 @@ fn main() -> ! {
     let esp_now = esp_wifi::esp_now::EspNow::new(&init, wifi).unwrap();
     println!("esp-now version {}", esp_now.get_version().unwrap());
 
-    let timer_group0 = TimerGroup::new(peripherals.TIMG0, &clocks, &mut peripheral_clock_control);
+    let timer_group0 = TimerGroup::new(
+        peripherals.TIMG0,
+        &clocks,
+        &mut system.peripheral_clock_control,
+    );
     embassy::init(&clocks, timer_group0.timer0);
     let executor = EXECUTOR.init(Executor::new());
     executor.run(|spawner| {

@@ -32,11 +32,15 @@ fn main() -> ! {
 
     let peripherals = Peripherals::take();
 
-    let system = peripherals.DPORT.split();
-    let mut peripheral_clock_control = system.peripheral_clock_control;
+    let mut system = peripherals.DPORT.split();
     let clocks = ClockControl::max(system.clock_control).freeze();
 
-    let timer = examples_util::timer!(peripherals, clocks, peripheral_clock_control);
+    let timer = esp32_hal::timer::TimerGroup::new(
+        peripherals.TIMG1,
+        &clocks,
+        &mut system.peripheral_clock_control,
+    )
+    .timer0;
     let init = initialize(
         EspWifiInitFor::Wifi,
         timer,

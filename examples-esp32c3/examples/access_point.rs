@@ -18,8 +18,8 @@ use esp_wifi::wifi::WifiMode;
 use esp_wifi::wifi_interface::WifiStack;
 use esp_wifi::{current_millis, EspWifiInitFor};
 use hal::clock::ClockControl;
-use hal::Rng;
 use hal::{peripherals::Peripherals, prelude::*};
+use hal::{systimer::SystemTimer, Rng};
 
 use smoltcp::iface::SocketStorage;
 
@@ -31,10 +31,9 @@ fn main() -> ! {
     let peripherals = Peripherals::take();
 
     let system = peripherals.SYSTEM.split();
-    let mut peripheral_clock_control = system.peripheral_clock_control;
     let clocks = ClockControl::max(system.clock_control).freeze();
 
-    let timer = examples_util::timer!(peripherals, clocks, peripheral_clock_control);
+    let timer = SystemTimer::new(peripherals.SYSTIMER).alarm0;
     let init = initialize(
         EspWifiInitFor::Wifi,
         timer,

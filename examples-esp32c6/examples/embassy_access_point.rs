@@ -21,8 +21,8 @@ use esp_println::{print, println};
 use esp_wifi::wifi::{WifiController, WifiDevice, WifiEvent, WifiMode, WifiState};
 use esp_wifi::{initialize, EspWifiInitFor};
 use hal::clock::ClockControl;
-use hal::Rng;
 use hal::{embassy, peripherals::Peripherals, prelude::*, timer::TimerGroup};
+use hal::{systimer::SystemTimer, Rng};
 
 macro_rules! singleton {
     ($val:expr) => {{
@@ -42,11 +42,10 @@ fn main() -> ! {
 
     let peripherals = Peripherals::take();
 
-    let system = peripherals.PCR.split();
-    let mut peripheral_clock_control = system.peripheral_clock_control;
+    let mut system = peripherals.PCR.split();
     let clocks = ClockControl::max(system.clock_control).freeze();
 
-    let timer = examples_util::timer!(peripherals, clocks, peripheral_clock_control);
+    let timer = SystemTimer::new(peripherals.SYSTIMER).alarm0;
     let init = initialize(
         EspWifiInitFor::Wifi,
         timer,
@@ -60,7 +59,11 @@ fn main() -> ! {
     let (wifi_interface, controller) =
         esp_wifi::wifi::new_with_mode(&init, wifi, WifiMode::Ap).unwrap();
 
-    let timer_group0 = TimerGroup::new(peripherals.TIMG0, &clocks, &mut peripheral_clock_control);
+    let timer_group0 = TimerGroup::new(
+        peripherals.TIMG0,
+        &clocks,
+        &mut system.peripheral_clock_control,
+    );
     embassy::init(&clocks, timer_group0.timer0);
 
     let config = Config {
