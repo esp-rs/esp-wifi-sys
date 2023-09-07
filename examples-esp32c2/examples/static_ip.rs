@@ -1,6 +1,8 @@
 #![no_std]
 #![no_main]
 
+#[path = "../../examples-util/util.rs"]
+mod examples_util;
 use examples_util::hal;
 
 use embedded_io::blocking::*;
@@ -15,9 +17,9 @@ use esp_wifi::wifi::WifiMode;
 use esp_wifi::wifi::{utils::create_network_interface, WifiError};
 use esp_wifi::wifi_interface::WifiStack;
 use esp_wifi::{current_millis, EspWifiInitFor};
-use hal::clock::{ClockControl, CpuClock};
-use hal::Rng;
-use hal::{peripherals::Peripherals, prelude::*, Rtc};
+use hal::clock::ClockControl;
+use hal::{peripherals::Peripherals, prelude::*};
+use hal::{systimer::SystemTimer, Rng};
 
 use smoltcp::iface::SocketStorage;
 
@@ -33,12 +35,10 @@ fn main() -> ! {
 
     let peripherals = Peripherals::take();
 
-    let system = examples_util::system!(peripherals);
-    let mut peripheral_clock_control = system.peripheral_clock_control;
-    let clocks = examples_util::clocks!(system);
-    examples_util::rtc!(peripherals);
+    let system = peripherals.SYSTEM.split();
+    let clocks = ClockControl::max(system.clock_control).freeze();
 
-    let timer = examples_util::timer!(peripherals, clocks, peripheral_clock_control);
+    let timer = SystemTimer::new(peripherals.SYSTIMER).alarm0;
     let init = initialize(
         EspWifiInitFor::Wifi,
         timer,
@@ -48,7 +48,7 @@ fn main() -> ! {
     )
     .unwrap();
 
-    let wifi = examples_util::get_wifi!(peripherals);
+    let (wifi, ..) = peripherals.RADIO.split();
     let mut socket_set_entries: [SocketStorage; 3] = Default::default();
     let (iface, device, mut controller, sockets) =
         create_network_interface(&init, wifi, WifiMode::Sta, &mut socket_set_entries).unwrap();

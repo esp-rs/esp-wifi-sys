@@ -6,10 +6,12 @@ use esp_backtrace as _;
 use esp_println::println;
 use esp_wifi::esp_now::{PeerInfo, BROADCAST_ADDRESS};
 use esp_wifi::{current_millis, initialize, EspWifiInitFor};
+#[path = "../../examples-util/util.rs"]
+mod examples_util;
 use examples_util::hal;
-use hal::clock::{ClockControl, CpuClock};
-use hal::Rng;
-use hal::{peripherals::Peripherals, prelude::*, Rtc};
+use hal::clock::ClockControl;
+use hal::{peripherals::Peripherals, prelude::*};
+use hal::{systimer::SystemTimer, Rng};
 
 #[entry]
 fn main() -> ! {
@@ -18,12 +20,10 @@ fn main() -> ! {
 
     let peripherals = Peripherals::take();
 
-    let system = examples_util::system!(peripherals);
-    let mut peripheral_clock_control = system.peripheral_clock_control;
-    let clocks = examples_util::clocks!(system);
-    examples_util::rtc!(peripherals);
+    let system = peripherals.PCR.split();
+    let clocks = ClockControl::max(system.clock_control).freeze();
 
-    let timer = examples_util::timer!(peripherals, clocks, peripheral_clock_control);
+    let timer = SystemTimer::new(peripherals.SYSTIMER).alarm0;
     let init = initialize(
         EspWifiInitFor::Wifi,
         timer,
@@ -33,7 +33,7 @@ fn main() -> ! {
     )
     .unwrap();
 
-    let wifi = examples_util::get_wifi!(peripherals);
+    let (wifi, ..) = peripherals.RADIO.split();
     let mut esp_now = esp_wifi::esp_now::EspNow::new(&init, wifi).unwrap();
 
     println!("esp-now version {}", esp_now.get_version().unwrap());

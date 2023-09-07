@@ -11,13 +11,10 @@ use bleps::{
 use esp_backtrace as _;
 use esp_println::println;
 use esp_wifi::{ble::controller::BleConnector, initialize, EspWifiInitFor};
+#[path = "../../examples-util/util.rs"]
+mod examples_util;
 use examples_util::hal;
-use hal::{
-    clock::{ClockControl, CpuClock},
-    peripherals::*,
-    prelude::*,
-    Rng, Rtc, IO,
-};
+use hal::{clock::ClockControl, peripherals::*, prelude::*, systimer::SystemTimer, Rng, IO};
 
 #[entry]
 fn main() -> ! {
@@ -26,12 +23,10 @@ fn main() -> ! {
 
     let peripherals = Peripherals::take();
 
-    let system = examples_util::system!(peripherals);
-    let mut peripheral_clock_control = system.peripheral_clock_control;
-    let clocks = examples_util::clocks!(system);
-    examples_util::rtc!(peripherals);
+    let system = peripherals.SYSTEM.split();
+    let clocks = ClockControl::max(system.clock_control).freeze();
 
-    let timer = examples_util::timer!(peripherals, clocks, peripheral_clock_control);
+    let timer = SystemTimer::new(peripherals.SYSTIMER).alarm0;
     let init = initialize(
         EspWifiInitFor::Ble,
         timer,
@@ -41,11 +36,12 @@ fn main() -> ! {
     )
     .unwrap();
 
-    let button = examples_util::boot_button!(peripherals);
+    let io = IO::new(peripherals.GPIO, peripherals.IO_MUX);
+    let button = io.pins.gpio9.into_pull_down_input();
 
     let mut debounce_cnt = 500;
 
-    let mut bluetooth = examples_util::get_bluetooth!(peripherals);
+    let (_, mut bluetooth, ..) = peripherals.RADIO.split();
 
     loop {
         let connector = BleConnector::new(&init, &mut bluetooth);

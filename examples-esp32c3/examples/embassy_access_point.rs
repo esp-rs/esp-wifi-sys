@@ -10,6 +10,8 @@ use embassy_net::ConfigV4;
 use embassy_net::{
     Config, IpListenEndpoint, Ipv4Address, Ipv4Cidr, Stack, StackResources, StaticConfigV4,
 };
+#[path = "../../examples-util/util.rs"]
+mod examples_util;
 use examples_util::hal;
 
 use embassy_executor::Executor;
@@ -20,9 +22,9 @@ use esp_backtrace as _;
 use esp_println::{print, println};
 use esp_wifi::wifi::{WifiController, WifiDevice, WifiEvent, WifiMode, WifiState};
 use esp_wifi::{initialize, EspWifiInitFor};
-use hal::clock::{ClockControl, CpuClock};
-use hal::Rng;
-use hal::{embassy, peripherals::Peripherals, prelude::*, timer::TimerGroup, Rtc};
+use hal::clock::ClockControl;
+use hal::{embassy, peripherals::Peripherals, prelude::*, timer::TimerGroup};
+use hal::{systimer::SystemTimer, Rng};
 
 macro_rules! singleton {
     ($val:expr) => {{
@@ -42,12 +44,10 @@ fn main() -> ! {
 
     let peripherals = Peripherals::take();
 
-    let system = examples_util::system!(peripherals);
-    let mut peripheral_clock_control = system.peripheral_clock_control;
-    let clocks = examples_util::clocks!(system);
-    examples_util::rtc!(peripherals);
+    let mut system = peripherals.SYSTEM.split();
+    let clocks = ClockControl::max(system.clock_control).freeze();
 
-    let timer = examples_util::timer!(peripherals, clocks, peripheral_clock_control);
+    let timer = SystemTimer::new(peripherals.SYSTIMER).alarm0;
     let init = initialize(
         EspWifiInitFor::Wifi,
         timer,
@@ -57,11 +57,15 @@ fn main() -> ! {
     )
     .unwrap();
 
-    let wifi = examples_util::get_wifi!(peripherals);
+    let (wifi, ..) = peripherals.RADIO.split();
     let (wifi_interface, controller) =
         esp_wifi::wifi::new_with_mode(&init, wifi, WifiMode::Ap).unwrap();
 
-    let timer_group0 = TimerGroup::new(peripherals.TIMG0, &clocks, &mut peripheral_clock_control);
+    let timer_group0 = TimerGroup::new(
+        peripherals.TIMG0,
+        &clocks,
+        &mut system.peripheral_clock_control,
+    );
     embassy::init(&clocks, timer_group0.timer0);
 
     let config = Config {

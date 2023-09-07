@@ -4,6 +4,8 @@
 
 use embassy_executor::_export::StaticCell;
 use embassy_futures::select::{select, Either};
+#[path = "../../examples-util/util.rs"]
+mod examples_util;
 use examples_util::hal;
 
 use embassy_executor::Executor;
@@ -13,12 +15,9 @@ use esp_backtrace as _;
 use esp_println::println;
 use esp_wifi::esp_now::{EspNow, PeerInfo, BROADCAST_ADDRESS};
 use esp_wifi::{initialize, EspWifiInitFor};
-use hal::clock::{ClockControl, CpuClock};
-use hal::Rng;
-use hal::{embassy, peripherals::Peripherals, prelude::*, timer::TimerGroup, Rtc};
-
-#[cfg(any(feature = "esp32c3", feature = "esp32c2", feature = "esp32c6"))]
-use hal::system::SystemExt;
+use hal::clock::ClockControl;
+use hal::{embassy, peripherals::Peripherals, prelude::*, timer::TimerGroup};
+use hal::{systimer::SystemTimer, Rng};
 
 #[embassy_executor::task]
 async fn run(mut esp_now: EspNow<'static>) {
@@ -64,12 +63,10 @@ fn main() -> ! {
 
     let peripherals = Peripherals::take();
 
-    let system = examples_util::system!(peripherals);
-    let mut peripheral_clock_control = system.peripheral_clock_control;
-    let clocks = examples_util::clocks!(system);
-    examples_util::rtc!(peripherals);
+    let mut system = peripherals.SYSTEM.split();
+    let clocks = ClockControl::max(system.clock_control).freeze();
 
-    let timer = examples_util::timer!(peripherals, clocks, peripheral_clock_control);
+    let timer = SystemTimer::new(peripherals.SYSTIMER).alarm0;
     let init = initialize(
         EspWifiInitFor::Wifi,
         timer,
@@ -79,11 +76,15 @@ fn main() -> ! {
     )
     .unwrap();
 
-    let wifi = examples_util::get_wifi!(peripherals);
+    let (wifi, ..) = peripherals.RADIO.split();
     let esp_now = esp_wifi::esp_now::EspNow::new(&init, wifi).unwrap();
     println!("esp-now version {}", esp_now.get_version().unwrap());
 
-    let timer_group0 = TimerGroup::new(peripherals.TIMG0, &clocks, &mut peripheral_clock_control);
+    let timer_group0 = TimerGroup::new(
+        peripherals.TIMG0,
+        &clocks,
+        &mut system.peripheral_clock_control,
+    );
     embassy::init(&clocks, timer_group0.timer0);
     let executor = EXECUTOR.init(Executor::new());
     executor.run(|spawner| {

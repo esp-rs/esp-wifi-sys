@@ -69,10 +69,8 @@ jobs:
         run: cd examples-${{ matrix.chip }} && cargo build --release --example=esp_now --features=esp-now
       - name: check (embassy_esp_now)
         run: cd examples-${{ matrix.chip }} && cargo build --release --example=embassy_esp_now --features=async,esp-now
-      - name: check (esp_now_duplex)
-        run: cd examples-${{ matrix.chip }} && cargo build --release --example=esp_now_duplex --features=async,esp-now
-      - name: check (esp_now_async_duplex)
-        run: cd examples-${{ matrix.chip }} && cargo build --release --example=esp_now_async_duplex --features=async,esp-now
+      - name: check (embassy_esp_now_duplex)
+        run: cd examples-${{ matrix.chip }} && cargo build --release --example=embassy_esp_now_duplex --features=async,esp-now
       - name: check (embassy_dhcp)
         run: cd examples-${{ matrix.chip }} && cargo build --release --example=embassy_dhcp --features=async,wifi,embassy-net
       - name: check (embassy_access_point)
@@ -90,6 +88,9 @@ jobs:
       - name: check (async_ble)
         if: ${{ matrix.chip == 'esp32' || matrix.chip == 'esp32s3' }}
         run: cd examples-${{ matrix.chip }} && cargo build --release --example=async_ble --features=async,ble
+      - name: check (coex)
+        if: ${{ matrix.chip == 'esp32' || matrix.chip == 'esp32s3' }}
+        run: cd examples-${{ matrix.chip }} && cargo build --release --example=coex --features=wifi,ble,coex
 
   checks-riscv:
     strategy:
@@ -120,10 +121,8 @@ jobs:
         run: cd examples-${{ matrix.chip }} && cargo +nightly-2023-05-16 build --release --example=esp_now --features=esp-now
       - name: check (embassy_esp_now)
         run: cd examples-${{ matrix.chip }} && cargo +nightly-2023-05-16 build --release --example=embassy_esp_now --features=async,esp-now
-      - name: check (esp_now_duplex)
-        run: cd examples-${{ matrix.chip }} && cargo +nightly-2023-05-16 build --release --example=esp_now_duplex --features=async,esp-now
-      - name: check (esp_now_async_duplex)
-        run: cd examples-${{ matrix.chip }} && cargo +nightly-2023-05-16 build --release --example=esp_now_async_duplex --features=async,esp-now
+      - name: check (embassy_esp_now_duplex)
+        run: cd examples-${{ matrix.chip }} && cargo +nightly-2023-05-16 build --release --example=embassy_esp_now_duplex --features=async,esp-now
       - name: check (embassy_dhcp)
         run: cd examples-${{ matrix.chip }} && cargo +nightly-2023-05-16 build --release --example=embassy_dhcp --features=async,wifi,embassy-net
       - name: check (embassy_access_point)
@@ -141,3 +140,6 @@ jobs:
       - name: check (async_ble)
         if: ${{ matrix.chip == 'esp32c2' || matrix.chip == 'esp32c3' }}
         run: cd examples-${{ matrix.chip }} && cargo +nightly-2023-05-16 build --release --example=async_ble --features=async,ble
+      - name: check (coex)
+        if: ${{ matrix.chip == 'esp32c3' }}
+        run: cd examples-${{ matrix.chip }} && cargo +nightly-2023-05-16 build --release --example=coex --features=wifi,ble,coex

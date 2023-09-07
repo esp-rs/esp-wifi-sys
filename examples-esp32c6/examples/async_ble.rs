@@ -22,16 +22,13 @@ use esp_println::println;
 use esp_wifi::{
     ble::controller::asynch::BleConnector, initialize, EspWifiInitFor, EspWifiInitialization,
 };
+#[path = "../../examples-util/util.rs"]
+mod examples_util;
 use examples_util::hal;
 use examples_util::BootButton;
 use hal::{
-    clock::{ClockControl, CpuClock},
-    embassy,
-    peripherals::*,
-    prelude::*,
-    radio::Bluetooth,
-    timer::TimerGroup,
-    Rng, Rtc, IO,
+    clock::ClockControl, embassy, peripherals::*, prelude::*, radio::Bluetooth,
+    systimer::SystemTimer, timer::TimerGroup, Rng, IO,
 };
 
 #[embassy_executor::task]
@@ -134,12 +131,10 @@ fn main() -> ! {
 
     let peripherals = Peripherals::take();
 
-    let system = examples_util::system!(peripherals);
-    let mut peripheral_clock_control = system.peripheral_clock_control;
-    let clocks = examples_util::clocks!(system);
-    examples_util::rtc!(peripherals);
+    let mut system = peripherals.PCR.split();
+    let clocks = ClockControl::max(system.clock_control).freeze();
 
-    let timer = examples_util::timer!(peripherals, clocks, peripheral_clock_control);
+    let timer = SystemTimer::new(peripherals.SYSTIMER).alarm0;
     let init = initialize(
         EspWifiInitFor::Ble,
         timer,
@@ -149,7 +144,8 @@ fn main() -> ! {
     )
     .unwrap();
 
-    let button = examples_util::boot_button!(peripherals);
+    let io = IO::new(peripherals.GPIO, peripherals.IO_MUX);
+    let button = io.pins.gpio9.into_pull_down_input();
 
     // Async requires the GPIO interrupt to wake futures
     hal::interrupt::enable(
@@ -158,9 +154,13 @@ fn main() -> ! {
     )
     .unwrap();
 
-    let bluetooth = examples_util::get_bluetooth!(peripherals);
+    let (_, bluetooth, ..) = peripherals.RADIO.split();
 
-    let timer_group0 = TimerGroup::new(peripherals.TIMG0, &clocks, &mut peripheral_clock_control);
+    let timer_group0 = TimerGroup::new(
+        peripherals.TIMG0,
+        &clocks,
+        &mut system.peripheral_clock_control,
+    );
     embassy::init(&clocks, timer_group0.timer0);
     let executor = EXECUTOR.init(Executor::new());
     executor.run(|spawner| {
