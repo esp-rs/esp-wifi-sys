@@ -21,7 +21,7 @@ use hal::{embassy, peripherals::Peripherals, prelude::*, timer::TimerGroup, Rtc}
 use hal::system::SystemExt;
 
 #[embassy_executor::task]
-async fn run(esp_now: EspNow<'static>) {
+async fn run(mut esp_now: EspNow<'static>) {
     let mut ticker = Ticker::every(Duration::from_secs(5));
     loop {
         let res = select(ticker.next(), async {
@@ -38,10 +38,7 @@ async fn run(esp_now: EspNow<'static>) {
                         })
                         .unwrap();
                 }
-                let status = esp_now
-                    .send_async(&r.info.src_address, b"Hello Peer")
-                    .unwrap()
-                    .await;
+                let status = esp_now.send_async(&r.info.src_address, b"Hello Peer").await;
                 println!("Send hello to peer status: {:?}", status);
             }
         })
@@ -50,10 +47,7 @@ async fn run(esp_now: EspNow<'static>) {
         match res {
             Either::First(_) => {
                 println!("Send");
-                let status = esp_now
-                    .send_async(&BROADCAST_ADDRESS, b"0123456789")
-                    .unwrap()
-                    .await;
+                let status = esp_now.send_async(&BROADCAST_ADDRESS, b"0123456789").await;
                 println!("Send broadcast status: {:?}", status)
             }
             Either::Second(_) => (),

@@ -17,6 +17,7 @@ smoltcp.workspace = true
 log = { workspace = true, optional = true }
 heapless.workspace = true
 embassy-net = { workspace = true, optional = true }
+embassy-sync.workspace = true
 
 esp32c3-hal.workspace = true
 examples-util = { path = "../examples-util", features = ["esp32c3"] }
