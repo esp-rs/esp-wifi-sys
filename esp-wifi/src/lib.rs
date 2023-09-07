@@ -4,7 +4,6 @@
 #![feature(linkage)]
 #![cfg_attr(feature = "async", feature(async_fn_in_trait))]
 #![cfg_attr(feature = "async", allow(incomplete_features))]
-
 #![doc = include_str!("../../README.md")]
 
 // MUST be the first module
@@ -90,6 +89,7 @@ use timer::{get_systimer_count, TICKS_PER_SECOND};
 #[cfg(all(feature = "embedded-svc", feature = "wifi"))]
 pub mod wifi_interface;
 
+/// Return the current systimer time in milliseconds
 pub fn current_millis() -> u64 {
     get_systimer_count() / (TICKS_PER_SECOND / 1000)
 }
@@ -119,6 +119,7 @@ const DEFAULT_TICK_RATE_HZ: u32 = 100;
 #[derive(Debug)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[toml_cfg::toml_config]
+/// Tunable parameters for the WiFi driver
 struct Config {
     #[default(5)]
     rx_queue_size: usize,
@@ -176,10 +177,12 @@ pub type EspWifiTimer = hal::timer::Timer<hal::timer::Timer0<hal::peripherals::T
 #[derive(Debug, PartialEq, PartialOrd)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[non_exhaustive]
+/// An internal struct designed to make [`EspWifiInitialization`] uncreatable outside of this crate.
 pub struct EspWifiInitializationInternal;
 
 #[derive(Debug, PartialEq, PartialOrd)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+/// Initialized the driver for WiFi, Bluetooth or both.
 pub enum EspWifiInitialization {
     #[cfg(feature = "wifi")]
     Wifi(EspWifiInitializationInternal),
@@ -211,6 +214,7 @@ impl EspWifiInitialization {
 
 #[derive(Debug, PartialEq, PartialOrd)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+/// Initialize the driver for WiFi, Bluetooth or both.
 pub enum EspWifiInitFor {
     #[cfg(feature = "wifi")]
     Wifi,
@@ -240,8 +244,7 @@ impl EspWifiInitFor {
     }
 }
 
-/// Initialize for using WiFi / BLE
-/// This will initialize internals and also initialize WiFi and BLE
+/// Initialize for using WiFi and or BLE
 pub fn initialize(
     init_for: EspWifiInitFor,
     timer: EspWifiTimer,
@@ -342,6 +345,7 @@ pub fn initialize(
 
 #[derive(Debug, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+/// Error which can be returned during [`initialize`].
 pub enum InitializationError {
     General(i32),
     #[cfg(feature = "wifi")]
@@ -356,6 +360,8 @@ impl From<WifiError> for InitializationError {
     }
 }
 
+/// Enable verbose logging within the WiFi driver
+/// Does nothing unless the `wifi-logs` feature is enabled.
 pub fn wifi_set_log_verbose() {
     #[cfg(feature = "wifi-logs")]
     unsafe {
