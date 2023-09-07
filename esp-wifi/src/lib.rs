@@ -82,7 +82,7 @@ pub mod tasks;
 
 pub(crate) mod memory_fence;
 
-pub use critical_section;
+use critical_section;
 use timer::{get_systimer_count, TICKS_PER_SECOND};
 
 #[cfg(all(feature = "embedded-svc", feature = "wifi"))]
@@ -296,7 +296,6 @@ pub fn initialize(
     setup_timer_isr(timer);
     wifi_set_log_verbose();
     init_clocks();
-    init_buffer();
 
     #[cfg(coex)]
     {
@@ -365,11 +364,7 @@ pub fn wifi_set_log_verbose() {
     }
 }
 
-pub fn init_buffer() {
-    // nothing anymore for now
-}
-
-pub fn init_clocks() {
+fn init_clocks() {
     unsafe {
         unwrap!(RADIO_CLOCKS.as_mut()).init_clocks();
     }
