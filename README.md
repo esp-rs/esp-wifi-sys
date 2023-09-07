@@ -87,10 +87,9 @@ Don't use this feature if your are _not_ using USB-SERIAL-JTAG since it might re
 | mtu-XXX        | Set MTU to XXX, XXX can be 746, 1492, 1500, 1514. Defaults to 1492                                  |
 | big-heap       | Reserve more heap memory for the drivers                                                            |
 | ipv6           | IPv6 support                                                                                        |
-| phy-enable-usb | See _USB-SERIAL-JTAG_ below                                                                       |
+| phy-enable-usb | See _USB-SERIAL-JTAG_ below                                                                         |
 | ps-min-modem   | Enable modem sleep                                                                                  |
 | log            | Route log output to the `log` crate                                                                 |
-| log-defmt      | Route log output to the `defmt` crate                                                               |
 | defmt          | Add `defmt::Format` implementation                                                                  |
 
 When using the `dump-packets` feature you can use the extcap in `extras/esp-wifishark` to analyze the frames in Wireshark.
