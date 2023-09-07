@@ -164,6 +164,7 @@ fn copy_libraries(out: &PathBuf) -> Result<()> {
 
 #[cfg(feature = "esp32c6")]
 fn copy_libraries(out: &PathBuf) -> Result<()> {
+    copy_file(out, "libs/esp32c6/libble_app.a", "libble_app.a")?;
     copy_file(out, "libs/esp32c6/libbtbb.a", "libbtbb.a")?;
     copy_file(out, "libs/esp32c6/libcoexist.a", "libcoexist.a")?;
     copy_file(out, "libs/esp32c6/libcore.a", "libcore.a")?;
@@ -180,6 +181,7 @@ fn copy_libraries(out: &PathBuf) -> Result<()> {
         "libwpa_supplicant.a",
     )?;
 
+    println!("cargo:rustc-link-lib={}", "ble_app");
     println!("cargo:rustc-link-lib={}", "btbb");
     println!("cargo:rustc-link-lib={}", "coexist");
     println!("cargo:rustc-link-lib={}", "core");

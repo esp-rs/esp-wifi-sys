@@ -129,16 +129,12 @@ jobs:
         run: cd examples-${{ matrix.chip }} && cargo +nightly-2023-05-16 build --release --example=embassy_access_point --features=async,wifi,embassy-net
 
       - name: check (common features + ble)
-        if: ${{ matrix.chip == 'esp32c2' || matrix.chip == 'esp32c3' }}
         run: cd examples-${{ matrix.chip }} && cargo +nightly-2023-05-16 check --features=async,wifi,ble,esp-now,embassy-net,log
       - name: check (common features + ble + defmt)
-        if: ${{ matrix.chip == 'esp32c2' || matrix.chip == 'esp32c3' }}
         run: cd examples-${{ matrix.chip }} && cargo +nightly-2023-05-16 check --no-default-features --features=${{ matrix.chip }},async,wifi,ble,esp-now,embassy-net,defmt
       - name: check (ble)
-        if: ${{ matrix.chip == 'esp32c2' || matrix.chip == 'esp32c3' }}
         run: cd examples-${{ matrix.chip }} && cargo +nightly-2023-05-16 build --release --example=ble --features=ble
       - name: check (async_ble)
-        if: ${{ matrix.chip == 'esp32c2' || matrix.chip == 'esp32c3' }}
         run: cd examples-${{ matrix.chip }} && cargo +nightly-2023-05-16 build --release --example=async_ble --features=async,ble
       - name: check (coex)
         if: ${{ matrix.chip == 'esp32c3' }}
