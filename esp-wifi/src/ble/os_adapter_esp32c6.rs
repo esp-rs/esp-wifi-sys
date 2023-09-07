@@ -89,11 +89,7 @@ pub(super) unsafe extern "C" fn esp_intr_alloc(
 ) -> i32 {
     debug!(
         "esp_intr_alloc {} {} {:?} {:?} {:?}",
-        source,
-        flags,
-        handler,
-        arg,
-        ret_handle
+        source, flags, handler, arg, ret_handle
     );
 
     match source {

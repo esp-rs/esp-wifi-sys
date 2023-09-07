@@ -1118,7 +1118,8 @@ pub(crate) fn ble_init() {
         // probably long term we should rather initialize syscall_table_ptr
         #[cfg(esp32c2)]
         {
-            *(r_ble_stub_funcs_ptr.offset(0x7dc / 4)) = self::ble_os_adapter_chip_specific::ble_ll_random_override as *const u32 as u32;
+            *(r_ble_stub_funcs_ptr.offset(0x7dc / 4)) =
+                self::ble_os_adapter_chip_specific::ble_ll_random_override as *const u32 as u32;
         }
 
         // this is a workaround for an unclear problem
