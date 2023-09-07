@@ -207,17 +207,11 @@ To build these ensure you are in the `examples-esp32XXX` directory matching your
 
 `cargo run --example embassy_esp_now --release --features "async,esp-now"`        
 
-### esp_now_duplex
-
-- broadcasts, sends and asynchronously receives messages via esp-now in multiple embassy tasks
-
-`cargo run --example esp_now_duplex --release --features "async,esp-now"` 
-
-### esp_now_async_duplex
+### embassy_esp_now_duplex
 
 - asynchronously broadcasts, receives and sends messages via esp-now in multiple embassy tasks
 
-`cargo run --example esp_now_async_duplex --release --features "async,esp-now"` 
+`cargo run --example embassy_esp_now_duplex --release --features "async,esp-now"` 
 
 ### embassy_dhcp
 

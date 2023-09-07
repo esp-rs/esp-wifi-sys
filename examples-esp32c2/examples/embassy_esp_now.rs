@@ -19,9 +19,6 @@ use hal::clock::ClockControl;
 use hal::{embassy, peripherals::Peripherals, prelude::*, timer::TimerGroup};
 use hal::{systimer::SystemTimer, Rng};
 
-#[cfg(any(feature = "esp32c3", feature = "esp32c2", feature = "esp32c6"))]
-use hal::system::SystemExt;
-
 #[embassy_executor::task]
 async fn run(mut esp_now: EspNow<'static>) {
     let mut ticker = Ticker::every(Duration::from_secs(5));

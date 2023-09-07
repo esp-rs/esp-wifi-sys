@@ -21,9 +21,6 @@ use hal::clock::ClockControl;
 use hal::Rng;
 use hal::{embassy, peripherals::Peripherals, prelude::*, timer::TimerGroup};
 
-#[cfg(any(feature = "esp32c3", feature = "esp32c2", feature = "esp32c6"))]
-use hal::system::SystemExt;
-
 const SSID: &str = env!("SSID");
 const PASSWORD: &str = env!("PASSWORD");
 
