@@ -5,6 +5,8 @@
 #![cfg_attr(feature = "async", feature(async_fn_in_trait))]
 #![cfg_attr(feature = "async", allow(incomplete_features))]
 
+#![doc = include_str!("../../README.md")]
+
 // MUST be the first module
 mod fmt;
 
