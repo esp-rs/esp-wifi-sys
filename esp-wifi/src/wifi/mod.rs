@@ -1272,7 +1272,7 @@ macro_rules! esp_wifi_result {
 #[cfg(feature = "embassy-net")]
 pub(crate) mod embassy {
     use super::*;
-    use embassy_net_driver::{Capabilities, Driver, RxToken, TxToken};
+    use embassy_net_driver::{Capabilities, Driver, HardwareAddress, RxToken, TxToken};
     use embassy_sync::waitqueue::AtomicWaker;
 
     pub(crate) static TRANSMIT_WAKER: AtomicWaker = AtomicWaker::new();
@@ -1367,14 +1367,14 @@ pub(crate) mod embassy {
             caps
         }
 
-        fn ethernet_address(&self) -> [u8; 6] {
+        fn hardware_address(&self) -> HardwareAddress {
             let mut mac = [0; 6];
             match self.get_wifi_mode() {
                 Ok(WifiMode::Ap) => get_ap_mac(&mut mac),
                 Ok(WifiMode::Sta) => get_sta_mac(&mut mac),
                 _ => get_sta_mac(&mut mac),
             }
-            mac
+            HardwareAddress::Ethernet(mac)
         }
     }
 }
