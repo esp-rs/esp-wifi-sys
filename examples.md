@@ -27,17 +27,17 @@ To build these ensure you are in the `examples-esp32XXX` directory matching your
 - pressing the boot-button on a dev-board will send a notification if it is subscribed
 - this uses a toy level BLE stack - might not work with every BLE central device (tested with Android and Windows Bluetooth LE Explorer)
 
-`cargo run --example ble --release --features "ble"` 
+`cargo run --example ble --release --features "ble"`
 
-**NOTE:** ESP32-S2 doesn't support bluetooth, for ESP32-C6 bluetooth support isn't implemented yet 
+**NOTE:** ESP32-S2 doesn't support bluetooth
 
 ### async_ble
 
 - same as `ble` but async
 
-`cargo run --example async_ble --release --features "async,ble"` 
+`cargo run --example async_ble --release --features "async,ble"`
 
-**NOTE:** ESP32-S2 doesn't support bluetooth, for ESP32-C6 bluetooth support isn't implemented yet 
+**NOTE:** ESP32-S2 doesn't support bluetooth
 
 ### coex
 
@@ -61,13 +61,13 @@ To build these ensure you are in the `examples-esp32XXX` directory matching your
 
 - broadcasts, receives and sends messages via esp-now in an async way
 
-`cargo run --example embassy_esp_now --release --features "async,esp-now"`        
+`cargo run --example embassy_esp_now --release --features "async,esp-now"`
 
 ### embassy_esp_now_duplex
 
 - asynchronously broadcasts, receives and sends messages via esp-now in multiple embassy tasks
 
-`cargo run --example embassy_esp_now_duplex --release --features "async,esp-now"` 
+`cargo run --example embassy_esp_now_duplex --release --features "async,esp-now"`
 
 ### embassy_dhcp
 
