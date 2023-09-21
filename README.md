@@ -25,7 +25,7 @@ Ensure that the right features are enabled for your chip. See the examples for m
 
 ```toml
 [dependencies.esp-wifi]
-# A supported chip needs to be specified, as well as specific use-case features 
+# A supported chip needs to be specified, as well as specific use-case features
 features = ["esp32s3", "wifi", "esp-now"]
 ```
 
