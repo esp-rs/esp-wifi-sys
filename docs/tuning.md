@@ -46,6 +46,8 @@ You can set the following settings
 |mtu|MTU, see [documentation](https://docs.rs/smoltcp/0.10.0/smoltcp/phy/struct.DeviceCapabilities.html#structfield.max_transmission_unit)|
 |heap_size|Size of the WiFi/BLE heap in bytes|
 |tick_rate_hz|Tick rate of the internal task scheduler in hertz.|
+|listen_interval|Interval for station to listen to beacon from AP. The unit of listen interval is one beacon interval. For example, if beacon interval is 100 ms and listen interval is 3, the interval for station to listen to beacon is 300 ms|
+|beacon_timeout|For Station, If the station does not receive a beacon frame from the connected SoftAP during the  inactive time, disconnect from SoftAP. Default 6s. Range 6-30|
 
 ## Globally disable logging
 
