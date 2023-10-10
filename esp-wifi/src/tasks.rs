@@ -43,12 +43,13 @@ pub extern "C" fn worker_task2() {
         > = SimpleQueue::new();
 
         critical_section::with(|_| unsafe {
+            let current_timestamp = get_systimer_count();
             memory_fence();
             for i in 0..TIMERS.len() {
                 memory_fence();
                 match &TIMERS[i] {
                     Some(old) => {
-                        if old.active && get_systimer_count() >= old.expire {
+                        if old.active && current_timestamp >= old.expire {
                             debug!("timer is due.... {:?}", old.ptimer);
                             let fnctn: fn(*mut crate::binary::c_types::c_void) =
                                 core::mem::transmute(old.timer_ptr);
@@ -56,7 +57,7 @@ pub extern "C" fn worker_task2() {
 
                             TIMERS[i] = Some(Timer {
                                 expire: if old.period != 0 {
-                                    get_systimer_count() + old.period
+                                    current_timestamp + old.period
                                 } else {
                                     0
                                 },

@@ -22,10 +22,9 @@ pub fn compat_timer_arm(ptimer: *mut crate::binary::c_types::c_void, tmout: u32,
 }
 
 pub fn compat_timer_arm_us(ptimer: *mut crate::binary::c_types::c_void, us: u32, repeat: bool) {
-    debug!(
-        "timer_arm_us, current time {}",
-        crate::timer::get_systimer_count()
-    );
+    let systick = crate::timer::get_systimer_count();
+
+    debug!("timer_arm_us, current time {}", systick);
 
     let ticks = us as u64 * (crate::timer::TICKS_PER_SECOND / 1_000_000);
     debug!("timer_arm_us {:?} {} {}", ptimer, ticks, repeat);
@@ -38,13 +37,9 @@ pub fn compat_timer_arm_us(ptimer: *mut crate::binary::c_types::c_void, us: u32,
 
                 if timer.ptimer == ptimer {
                     trace!("found timer ...");
-                    timer.expire = ticks as u64 + crate::timer::get_systimer_count();
+                    timer.expire = ticks + systick;
                     timer.active = true;
-                    if repeat {
-                        timer.period = ticks as u64;
-                    } else {
-                        timer.period = 0;
-                    }
+                    timer.period = if repeat { ticks } else { 0 };
                     TIMERS[i] = Some(timer);
                     break;
                 }
