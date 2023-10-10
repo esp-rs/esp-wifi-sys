@@ -31,8 +31,8 @@ static mut MUTEXES: [Mutex; 10] = [Mutex {
 }; 10];
 static mut MUTEX_IDX_CURRENT: usize = 0;
 
-static mut FAKE_WIFI_QUEUE: &Option<SimpleQueue<[u8; 8], 200>> = unsafe { &REAL_WIFI_QUEUE };
-static mut REAL_WIFI_QUEUE: Option<SimpleQueue<[u8; 8], 200>> = None; // first there is a ptr to the real queue - driver checks it's not null
+static mut FAKE_WIFI_QUEUE: &SimpleQueue<[u8; 8], 200> = unsafe { &REAL_WIFI_QUEUE };
+static mut REAL_WIFI_QUEUE: SimpleQueue<[u8; 8], 200> = SimpleQueue::new(); // first there is a ptr to the real queue - driver checks it's not null
 
 pub struct StrBuf {
     buffer: [u8; 512],
@@ -418,15 +418,7 @@ pub fn create_wifi_queue(
         panic!("don't expecting the wifi queue to hold items larger than 8");
     }
 
-    unsafe {
-        if REAL_WIFI_QUEUE.is_none() {
-            REAL_WIFI_QUEUE = Some(SimpleQueue::new());
-        } else {
-            panic!("don't expecting more than one wifi queue");
-        }
-
-        &mut FAKE_WIFI_QUEUE as *mut _ as *mut crate::binary::c_types::c_void
-    }
+    unsafe { &mut FAKE_WIFI_QUEUE as *mut _ as *mut crate::binary::c_types::c_void }
 }
 
 pub fn send_queued(
@@ -453,7 +445,7 @@ pub fn send_queued(
                 }
                 trace!("queue posting {:?}", data);
 
-                unwrap!(REAL_WIFI_QUEUE.as_mut()).enqueue(data);
+                REAL_WIFI_QUEUE.enqueue(data);
                 memory_fence();
             });
         }
@@ -478,41 +470,39 @@ pub fn receive_queued(
 
     // handle the WIFI_QUEUE
     unsafe {
-        if queue == &mut REAL_WIFI_QUEUE as *mut _ as *mut crate::binary::c_types::c_void {
-            loop {
-                let res = critical_section::with(|_| {
-                    memory_fence();
-                    let message = unwrap!(REAL_WIFI_QUEUE.as_mut()).dequeue();
-                    if message.is_some() {
-                        let message = unwrap!(message);
-                        let item = item as *mut u8;
-                        for i in 0..8 {
-                            item.offset(i).write_volatile(message[i as usize]);
-                        }
-                        trace!("received {:?}", message);
-                        1
-                    } else {
-                        0
-                    }
-                });
-
-                if res == 1 {
-                    trace!("queue_recv returns");
-                    return res;
-                }
-
-                if block_time_tick != OSI_FUNCS_TIME_BLOCKING
-                    && crate::timer::get_systimer_count() > end_time
-                {
-                    trace!("queue_recv returns with timeout");
-                    return -1;
-                }
-
-                yield_task();
-            }
-        } else {
+        if queue != &mut REAL_WIFI_QUEUE as *mut _ as *mut crate::binary::c_types::c_void {
             panic!("Unknown queue to handle in queue_recv");
-            -1
+            return -1;
+        }
+
+        loop {
+            let res = critical_section::with(|_| {
+                memory_fence();
+                if let Some(message) = REAL_WIFI_QUEUE.dequeue() {
+                    let item = item as *mut u8;
+                    for i in 0..8 {
+                        item.offset(i).write_volatile(message[i as usize]);
+                    }
+                    trace!("received {:?}", message);
+                    1
+                } else {
+                    0
+                }
+            });
+
+            if res == 1 {
+                trace!("queue_recv returns");
+                return res;
+            }
+
+            if block_time_tick != OSI_FUNCS_TIME_BLOCKING
+                && crate::timer::get_systimer_count() > end_time
+            {
+                trace!("queue_recv returns with timeout");
+                return -1;
+            }
+
+            yield_task();
         }
     }
 }
