@@ -1,20 +1,19 @@
+use crate::binary::c_types;
+
 use super::queue::SimpleQueue;
 
 static mut WORKER_HIGH: SimpleQueue<
-    (
-        extern "C" fn(*mut crate::binary::c_types::c_void),
-        *mut crate::binary::c_types::c_void,
-    ),
+    (extern "C" fn(*mut c_types::c_void), *mut c_types::c_void),
     10,
 > = SimpleQueue::new();
 
 pub fn queue_work(
-    task_func: *mut crate::binary::c_types::c_void,
-    _name: *const crate::binary::c_types::c_char,
+    task_func: *mut c_types::c_void,
+    _name: *const c_types::c_char,
     _stack_depth: u32,
-    param: *mut crate::binary::c_types::c_void,
+    param: *mut c_types::c_void,
     prio: u32,
-    _task_handle: *mut crate::binary::c_types::c_void,
+    _task_handle: *mut c_types::c_void,
     _core_id: u32,
 ) {
     trace!(
