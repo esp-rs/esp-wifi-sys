@@ -329,14 +329,13 @@ pub fn thread_sem_get() -> *mut crate::binary::c_types::c_void {
     trace!("wifi_thread_semphr_get");
     critical_section::with(|_| unsafe {
         let tid = current_task();
-        if PER_THREAD_SEM[tid].is_none() {
+        if let Some(sem) = PER_THREAD_SEM[tid] {
+            trace!("wifi_thread_semphr_get - return for {} {:?}", tid, sem);
+            sem
+        } else {
             let sem = sem_create(1, 0);
             trace!("wifi_thread_semphr_get - create for {} {:?}", tid, sem);
             PER_THREAD_SEM[tid] = Some(sem);
-            sem
-        } else {
-            let sem = unwrap!(PER_THREAD_SEM[tid]);
-            trace!("wifi_thread_semphr_get - return for {} {:?}", tid, sem);
             sem
         }
     })
