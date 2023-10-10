@@ -356,37 +356,31 @@ pub fn lock_mutex(mutex: *mut crate::binary::c_types::c_void) -> i32 {
     trace!("mutex_lock ptr = {:?}", mutex);
 
     unsafe {
-        let success = loop {
+        loop {
             let ptr = mutex as *mut Mutex;
             let current_task = current_task();
 
-            let (should_break, success) = critical_section::with(|_| {
+            let result = critical_section::with(|_| {
                 if (*ptr).count == 0 {
                     (*ptr).locking_pid = current_task;
                     (*ptr).count += 1;
-                    (true, true)
+                    Some(true)
                 } else if (*ptr).count != 0 && (*ptr).locking_pid == current_task {
                     (*ptr).count += 1;
-                    (true, true)
+                    Some(true)
                 } else if (*ptr).count != 0 && (*ptr).locking_pid != current_task {
-                    (true, false)
+                    Some(false)
                 } else {
-                    (false, false)
+                    None
                 }
             });
             memory_fence();
 
-            if should_break {
-                break success;
+            if let Some(success) = result {
+                return if success { 1 } else { 0 };
             }
 
             yield_task();
-        };
-
-        if success {
-            1
-        } else {
-            0
         }
     }
 }
