@@ -32,7 +32,7 @@ pub fn compat_timer_arm_us(ptimer: *mut crate::binary::c_types::c_void, us: u32,
         memory_fence();
 
         for i in 0..TIMERS.len() {
-            if let Some(mut timer) = TIMERS[i] {
+            if let Some(ref mut timer) = TIMERS[i] {
                 memory_fence();
 
                 if timer.ptimer == ptimer {
@@ -40,7 +40,6 @@ pub fn compat_timer_arm_us(ptimer: *mut crate::binary::c_types::c_void, us: u32,
                     timer.expire = ticks + systick;
                     timer.active = true;
                     timer.period = if repeat { ticks } else { 0 };
-                    TIMERS[i] = Some(timer);
                     break;
                 }
             }
@@ -55,11 +54,10 @@ pub fn compat_timer_disarm(ptimer: *mut crate::binary::c_types::c_void) {
 
         for i in 0..TIMERS.len() {
             memory_fence();
-            if let Some(mut timer) = TIMERS[i] {
+            if let Some(ref mut timer) = TIMERS[i] {
                 if timer.ptimer == ptimer {
                     trace!("found timer ...");
                     timer.active = false;
-                    TIMERS[i] = Some(timer);
                     break;
                 }
             }
@@ -75,13 +73,10 @@ pub fn compat_timer_done(ptimer: *mut crate::binary::c_types::c_void) {
         for i in 0..TIMERS.len() {
             memory_fence();
 
-            if let Some(timer) = TIMERS[i] {
+            if let Some(ref mut timer) = TIMERS[i] {
                 if timer.ptimer == ptimer {
                     trace!("found timer ...");
-                    TIMERS[i] = Some(Timer {
-                        active: false,
-                        ..timer
-                    });
+                    timer.active = false;
 
                     let ets_timer = ptimer as *mut crate::binary::include::ets_timer;
                     (*ets_timer).priv_ = core::ptr::null_mut();
@@ -106,14 +101,12 @@ pub fn compat_timer_setfn(
         for i in 0..TIMERS.len() {
             memory_fence();
 
-            if let Some(timer) = TIMERS[i] {
+            if let Some(ref mut timer) = TIMERS[i] {
                 if timer.ptimer == ptimer {
-                    TIMERS[i] = Some(Timer {
-                        timer_ptr: pfunction,
-                        arg_ptr: parg,
-                        active: false,
-                        ..timer
-                    });
+                    timer.timer_ptr = pfunction;
+                    timer.arg_ptr = parg;
+                    timer.active = false;
+
                     success = true;
                     break;
                 }
@@ -135,7 +128,7 @@ pub fn compat_timer_setfn(
 
                 if TIMERS[i].is_none() {
                     TIMERS[i] = Some(Timer {
-                        ptimer: ptimer,
+                        ptimer,
                         expire: 0,
                         period: 0,
                         active: false,

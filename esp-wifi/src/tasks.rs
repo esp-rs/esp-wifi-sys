@@ -46,23 +46,21 @@ pub extern "C" fn worker_task2() {
             let current_timestamp = get_systimer_count();
             memory_fence();
             for i in 0..TIMERS.len() {
-                if let Some(old) = TIMERS[i] {
+                if let Some(ref mut timer) = TIMERS[i] {
                     memory_fence();
-                    if old.active && current_timestamp >= old.expire {
-                        debug!("timer is due.... {:?}", old.ptimer);
+                    if timer.active && current_timestamp >= timer.expire {
+                        debug!("timer is due.... {:?}", timer.ptimer);
                         let fnctn: fn(*mut crate::binary::c_types::c_void) =
-                            core::mem::transmute(old.timer_ptr);
-                        unwrap!(to_run.enqueue((fnctn, old.arg_ptr)));
+                            core::mem::transmute(timer.timer_ptr);
+                        unwrap!(to_run.enqueue((fnctn, timer.arg_ptr)));
 
-                        TIMERS[i] = Some(Timer {
-                            expire: if old.period != 0 {
-                                current_timestamp + old.period
-                            } else {
-                                0
-                            },
-                            active: if old.period != 0 { old.active } else { false },
-                            ..old
-                        });
+                        if timer.period != 0 {
+                            timer.expire = current_timestamp + timer.period;
+                            timer.active = timer.active;
+                        } else {
+                            timer.expire = 0;
+                            timer.active = false;
+                        };
                     }
                 };
             }
