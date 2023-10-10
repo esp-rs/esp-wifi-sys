@@ -31,10 +31,7 @@ pub fn queue_work(
 
 pub fn do_work() {
     unsafe {
-        let mut todo: [Option<(
-            extern "C" fn(*mut crate::binary::c_types::c_void),
-            *mut crate::binary::c_types::c_void,
-        )>; 10] = [None; 10];
+        let mut todo = [None; 10];
 
         critical_section::with(|_| {
             todo.iter_mut().for_each(|e| {
