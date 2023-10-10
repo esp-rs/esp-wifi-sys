@@ -43,32 +43,22 @@ pub fn do_work() {
         )>; 10] = [None; 10];
 
         critical_section::with(|_| {
-            if WORKER_HIGH.is_none() {
-                return;
-            }
-
-            todo.iter_mut().for_each(|e| {
-                let work = &unwrap!(WORKER_HIGH.as_mut()).dequeue();
-
-                match work {
-                    Some(worker) => {
-                        e.replace(*worker);
+            if let Some(queue) = WORKER_HIGH.as_mut() {
+                todo.iter_mut().for_each(|e| {
+                    if let Some(worker) = queue.dequeue() {
+                        e.replace(worker);
                     }
-                    None => {}
-                }
-            });
+                });
+            }
         });
 
         for worker in todo.iter() {
-            match worker {
-                core::option::Option::Some((f, p)) => {
-                    trace!("before worker {:?} {:?}", f, *p);
+            if let Some((f, p)) = worker {
+                trace!("before worker {:?} {:?}", f, *p);
 
-                    f(*p);
+                f(*p);
 
-                    trace!("after worker");
-                }
-                core::option::Option::None => {}
+                trace!("after worker");
             }
         }
     }

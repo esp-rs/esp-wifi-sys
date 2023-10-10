@@ -46,39 +46,30 @@ pub extern "C" fn worker_task2() {
             let current_timestamp = get_systimer_count();
             memory_fence();
             for i in 0..TIMERS.len() {
-                memory_fence();
-                match &TIMERS[i] {
-                    Some(old) => {
-                        if old.active && current_timestamp >= old.expire {
-                            debug!("timer is due.... {:?}", old.ptimer);
-                            let fnctn: fn(*mut crate::binary::c_types::c_void) =
-                                core::mem::transmute(old.timer_ptr);
-                            unwrap!(to_run.enqueue((fnctn, old.arg_ptr)));
+                if let Some(old) = TIMERS[i] {
+                    memory_fence();
+                    if old.active && current_timestamp >= old.expire {
+                        debug!("timer is due.... {:?}", old.ptimer);
+                        let fnctn: fn(*mut crate::binary::c_types::c_void) =
+                            core::mem::transmute(old.timer_ptr);
+                        unwrap!(to_run.enqueue((fnctn, old.arg_ptr)));
 
-                            TIMERS[i] = Some(Timer {
-                                expire: if old.period != 0 {
-                                    current_timestamp + old.period
-                                } else {
-                                    0
-                                },
-                                active: if old.period != 0 { old.active } else { false },
-                                ..*old
-                            });
-                        }
+                        TIMERS[i] = Some(Timer {
+                            expire: if old.period != 0 {
+                                current_timestamp + old.period
+                            } else {
+                                0
+                            },
+                            active: if old.period != 0 { old.active } else { false },
+                            ..old
+                        });
                     }
-                    None => (),
                 };
             }
         });
 
         // run the due timer callbacks NOT in an interrupt free context
-        loop {
-            let run_now = to_run.dequeue();
-            if run_now.is_none() {
-                break;
-            }
-
-            let (fnc, arg) = unwrap!(run_now);
+        while let Some((fnc, arg)) = to_run.dequeue() {
             trace!("trigger timer....");
             fnc(arg);
             trace!("timer callback called");
