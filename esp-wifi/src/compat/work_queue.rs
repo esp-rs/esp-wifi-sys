@@ -25,7 +25,12 @@ pub fn queue_work(
     );
 
     critical_section::with(|_| unsafe {
-        let _ = WORKER_HIGH.enqueue((core::mem::transmute(task_func), param));
+        if WORKER_HIGH
+            .enqueue((core::mem::transmute(task_func), param))
+            .is_err()
+        {
+            warn!("work queue full");
+        }
     });
 }
 
