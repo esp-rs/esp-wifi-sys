@@ -33,8 +33,6 @@ pub fn compat_timer_arm_us(ptimer: *mut crate::binary::c_types::c_void, us: u32,
 
         for i in 0..TIMERS.len() {
             if let Some(ref mut timer) = TIMERS[i] {
-                memory_fence();
-
                 if timer.ptimer == ptimer {
                     trace!("found timer ...");
                     timer.expire = ticks + systick;
@@ -44,6 +42,8 @@ pub fn compat_timer_arm_us(ptimer: *mut crate::binary::c_types::c_void, us: u32,
                 }
             }
         }
+
+        memory_fence();
     });
 }
 
@@ -53,7 +53,6 @@ pub fn compat_timer_disarm(ptimer: *mut crate::binary::c_types::c_void) {
         memory_fence();
 
         for i in 0..TIMERS.len() {
-            memory_fence();
             if let Some(ref mut timer) = TIMERS[i] {
                 if timer.ptimer == ptimer {
                     trace!("found timer ...");
@@ -62,6 +61,8 @@ pub fn compat_timer_disarm(ptimer: *mut crate::binary::c_types::c_void) {
                 }
             }
         }
+
+        memory_fence();
     });
 }
 
@@ -71,8 +72,6 @@ pub fn compat_timer_done(ptimer: *mut crate::binary::c_types::c_void) {
         memory_fence();
 
         for i in 0..TIMERS.len() {
-            memory_fence();
-
             if let Some(ref mut timer) = TIMERS[i] {
                 if timer.ptimer == ptimer {
                     trace!("found timer ...");
@@ -85,6 +84,8 @@ pub fn compat_timer_done(ptimer: *mut crate::binary::c_types::c_void) {
                 }
             }
         }
+
+        memory_fence();
     });
 }
 
@@ -97,17 +98,15 @@ pub fn compat_timer_setfn(
 
     critical_section::with(|_| unsafe {
         memory_fence();
-        let mut success = false;
+        let mut timer_found = false;
         for i in 0..TIMERS.len() {
-            memory_fence();
-
             if let Some(ref mut timer) = TIMERS[i] {
                 if timer.ptimer == ptimer {
                     timer.timer_ptr = pfunction;
                     timer.arg_ptr = parg;
                     timer.active = false;
 
-                    success = true;
+                    timer_found = true;
                     break;
                 }
             }
@@ -116,10 +115,8 @@ pub fn compat_timer_setfn(
         let ets_timer = ptimer as *mut crate::binary::include::ets_timer;
         (*ets_timer).expire = 0;
 
-        if !success {
+        if !timer_found {
             for i in 0..TIMERS.len() {
-                memory_fence();
-
                 (*ets_timer).next = core::ptr::null_mut();
                 (*ets_timer).expire = 0;
                 (*ets_timer).period = 0;
@@ -139,6 +136,7 @@ pub fn compat_timer_setfn(
                 }
             }
         }
+        memory_fence();
     });
 }
 
@@ -158,12 +156,10 @@ pub fn compat_esp_timer_create(
     let args = args as *const esp_timer_create_args_t;
 
     critical_section::with(|_| unsafe {
-        let mut success = false;
+        let mut timer_found = false;
         memory_fence();
 
         for i in 0..TIMERS.len() {
-            memory_fence();
-
             debug!("esp_timer_create {}", i);
             if TIMERS[i].is_none() {
                 TIMERS[i] = Some(Timer {
@@ -175,15 +171,16 @@ pub fn compat_esp_timer_create(
                     arg_ptr: (*args).arg,
                 });
                 out_handle = &ESP_FAKE_TIMER as *const _ as *mut esp_timer_handle_t;
-                success = true;
+                timer_found = true;
                 debug!("esp_timer_create {:?} {:?}", args, out_handle);
 
                 break;
             }
         }
-        if !success {
+        if !timer_found {
             panic!("ran out of timers");
         }
+        memory_fence();
     });
 
     0

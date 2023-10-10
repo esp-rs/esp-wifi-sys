@@ -41,7 +41,6 @@ pub extern "C" fn worker_task2() {
             memory_fence();
             for i in 0..TIMERS.len() {
                 if let Some(ref mut timer) = TIMERS[i] {
-                    memory_fence();
                     if timer.active && current_timestamp >= timer.expire {
                         debug!("timer is due.... {:?}", timer.ptimer);
                         let fnctn: fn(*mut crate::binary::c_types::c_void) =
@@ -59,6 +58,7 @@ pub extern "C" fn worker_task2() {
                     }
                 };
             }
+            memory_fence();
         });
 
         // run the due timer callbacks NOT in an interrupt free context
