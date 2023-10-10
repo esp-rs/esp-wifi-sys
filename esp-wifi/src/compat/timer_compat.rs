@@ -94,7 +94,7 @@ pub fn compat_timer_setfn(
     pfunction: *mut crate::binary::c_types::c_void,
     parg: *mut crate::binary::c_types::c_void,
 ) {
-    trace!("timer_setfn {:?} {:?} {:?}", ptimer, pfunction, parg,);
+    trace!("timer_setfn {:?} {:?} {:?}", ptimer, pfunction, parg);
 
     critical_section::with(|_| unsafe {
         memory_fence();
@@ -116,13 +116,12 @@ pub fn compat_timer_setfn(
         (*ets_timer).expire = 0;
 
         if !timer_found {
-            for i in 0..TIMERS.len() {
-                (*ets_timer).next = core::ptr::null_mut();
-                (*ets_timer).expire = 0;
-                (*ets_timer).period = 0;
-                (*ets_timer).func = None;
-                (*ets_timer).priv_ = core::ptr::null_mut();
+            (*ets_timer).next = core::ptr::null_mut();
+            (*ets_timer).period = 0;
+            (*ets_timer).func = None;
+            (*ets_timer).priv_ = core::ptr::null_mut();
 
+            for i in 0..TIMERS.len() {
                 if TIMERS[i].is_none() {
                     TIMERS[i] = Some(Timer {
                         ptimer,
