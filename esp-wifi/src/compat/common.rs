@@ -355,33 +355,27 @@ pub fn create_recursive_mutex() -> *mut crate::binary::c_types::c_void {
 pub fn lock_mutex(mutex: *mut crate::binary::c_types::c_void) -> i32 {
     trace!("mutex_lock ptr = {:?}", mutex);
 
-    unsafe {
-        loop {
-            let ptr = mutex as *mut Mutex;
-            let current_task = current_task();
+    let ptr = mutex as *mut Mutex;
+    let current_task = current_task();
 
-            let result = critical_section::with(|_| {
-                if (*ptr).count == 0 {
-                    (*ptr).locking_pid = current_task;
-                    (*ptr).count += 1;
-                    Some(true)
-                } else if (*ptr).count != 0 && (*ptr).locking_pid == current_task {
-                    (*ptr).count += 1;
-                    Some(true)
-                } else if (*ptr).count != 0 && (*ptr).locking_pid != current_task {
-                    Some(false)
-                } else {
-                    None
-                }
-            });
-            memory_fence();
-
-            if let Some(success) = result {
-                return if success { 1 } else { 0 };
-            }
-
-            yield_task();
+    let mutex_locked = critical_section::with(|_| unsafe {
+        if (*ptr).count == 0 {
+            (*ptr).locking_pid = current_task;
+            (*ptr).count += 1;
+            true
+        } else if (*ptr).locking_pid == current_task {
+            (*ptr).count += 1;
+            true
+        } else {
+            false
         }
+    });
+    memory_fence();
+
+    if mutex_locked {
+        1
+    } else {
+        0
     }
 }
 
