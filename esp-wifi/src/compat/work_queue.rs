@@ -1,14 +1,12 @@
 use super::queue::SimpleQueue;
 
-static mut WORKER_HIGH: Option<
-    SimpleQueue<
-        (
-            extern "C" fn(*mut crate::binary::c_types::c_void),
-            *mut crate::binary::c_types::c_void,
-        ),
-        10,
-    >,
-> = None;
+static mut WORKER_HIGH: SimpleQueue<
+    (
+        extern "C" fn(*mut crate::binary::c_types::c_void),
+        *mut crate::binary::c_types::c_void,
+    ),
+    10,
+> = SimpleQueue::new();
 
 pub fn queue_work(
     task_func: *mut crate::binary::c_types::c_void,
@@ -27,11 +25,7 @@ pub fn queue_work(
     );
 
     critical_section::with(|_| unsafe {
-        if WORKER_HIGH.is_none() {
-            WORKER_HIGH = Some(SimpleQueue::new());
-        }
-
-        let _ = &unwrap!(WORKER_HIGH.as_mut()).enqueue((core::mem::transmute(task_func), param));
+        let _ = WORKER_HIGH.enqueue((core::mem::transmute(task_func), param));
     });
 }
 
@@ -43,13 +37,11 @@ pub fn do_work() {
         )>; 10] = [None; 10];
 
         critical_section::with(|_| {
-            if let Some(queue) = WORKER_HIGH.as_mut() {
-                todo.iter_mut().for_each(|e| {
-                    if let Some(worker) = queue.dequeue() {
-                        e.replace(worker);
-                    }
-                });
-            }
+            todo.iter_mut().for_each(|e| {
+                if let Some(work) = WORKER_HIGH.dequeue() {
+                    _ = e.replace(work);
+                }
+            });
         });
 
         for worker in todo.iter() {
