@@ -153,8 +153,6 @@ pub fn compat_esp_timer_create(
         );
     }
 
-    let args = args as *const esp_timer_create_args_t;
-
     critical_section::with(|_| unsafe {
         let mut timer_found = false;
         memory_fence();
