@@ -269,43 +269,37 @@ pub fn sem_delete(semphr: *mut crate::binary::c_types::c_void) {
 pub fn sem_take(semphr: *mut crate::binary::c_types::c_void, tick: u32) -> i32 {
     trace!(">>>> semphr_take {:?} block_time_tick {}", semphr, tick);
 
-    let forever = if tick == OSI_FUNCS_TIME_BLOCKING {
-        true
-    } else {
-        false
-    };
+    let forever = tick == OSI_FUNCS_TIME_BLOCKING;
     let tick = if tick == 0 { 1 } else { tick };
     let end_time = crate::timer::get_systimer_count() + tick as u64;
 
     'outer: loop {
-        loop {
-            let res = critical_section::with(|_| unsafe {
-                memory_fence();
-                if let Some(cnt) = CURR_SEM[semphr as usize - 1] {
-                    if cnt > 0 {
-                        CURR_SEM[semphr as usize - 1] = Some(cnt - 1);
-                        1
-                    } else {
-                        0
-                    }
+        let res = critical_section::with(|_| unsafe {
+            memory_fence();
+            if let Some(cnt) = CURR_SEM[semphr as usize - 1] {
+                if cnt > 0 {
+                    CURR_SEM[semphr as usize - 1] = Some(cnt - 1);
+                    1
                 } else {
                     0
                 }
-            });
-
-            if res == 1 {
-                trace!(">>>> return from semphr_take");
-                return 1;
+            } else {
+                0
             }
+        });
 
-            if !forever {
-                if crate::timer::get_systimer_count() > end_time {
-                    break 'outer;
-                }
-            }
-
-            yield_task();
+        if res == 1 {
+            trace!(">>>> return from semphr_take");
+            return 1;
         }
+
+        if !forever {
+            if crate::timer::get_systimer_count() > end_time {
+                break 'outer;
+            }
+        }
+
+        yield_task();
     }
 
     trace!(">>>> return from semphr_take with timeout");
