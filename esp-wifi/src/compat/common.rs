@@ -273,12 +273,14 @@ pub fn sem_take(semphr: *mut crate::binary::c_types::c_void, tick: u32) -> i32 {
     let tick = if tick == 0 { 1 } else { tick };
     let end_time = crate::timer::get_systimer_count() + tick as u64;
 
+    let sem_idx = semphr as usize - 1;
+
     'outer: loop {
         let res = critical_section::with(|_| unsafe {
             memory_fence();
-            if let Some(cnt) = CURR_SEM[semphr as usize - 1] {
+            if let Some(cnt) = CURR_SEM[sem_idx] {
                 if cnt > 0 {
-                    CURR_SEM[semphr as usize - 1] = Some(cnt - 1);
+                    CURR_SEM[sem_idx] = Some(cnt - 1);
                     1
                 } else {
                     0
@@ -308,10 +310,11 @@ pub fn sem_take(semphr: *mut crate::binary::c_types::c_void, tick: u32) -> i32 {
 
 pub fn sem_give(semphr: *mut crate::binary::c_types::c_void) -> i32 {
     trace!("semphr_give {:?}", semphr);
+    let sem_idx = semphr as usize - 1;
 
     let res = critical_section::with(|_| unsafe {
-        if let Some(cnt) = CURR_SEM[semphr as usize - 1] {
-            CURR_SEM[semphr as usize - 1] = Some(cnt + 1);
+        if let Some(cnt) = CURR_SEM[sem_idx] {
+            CURR_SEM[sem_idx] = Some(cnt + 1);
             memory_fence();
             1
         } else {
