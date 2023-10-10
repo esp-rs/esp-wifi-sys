@@ -430,15 +430,15 @@ pub fn send_queued(
     // handle the WIFI_QUEUE
     unsafe {
         if queue == &mut REAL_WIFI_QUEUE as *mut _ as *mut crate::binary::c_types::c_void {
-            critical_section::with(|_| {
-                // assume the size is 8 - shouldn't rely on that
-                let message = item as *const u8;
-                let mut data = [0u8; 8];
-                for i in 0..8 as usize {
-                    data[i] = *(message.offset(i as isize));
-                }
-                trace!("queue posting {:?}", data);
+            // assume the size is 8 - shouldn't rely on that
+            let message = item as *const u8;
+            let mut data = [0u8; 8];
+            for i in 0..8 as usize {
+                data[i] = *(message.offset(i as isize));
+            }
+            trace!("queue posting {:?}", data);
 
+            critical_section::with(|_| {
                 REAL_WIFI_QUEUE.enqueue(data);
                 memory_fence();
             });
@@ -470,24 +470,20 @@ pub fn receive_queued(
         }
 
         loop {
-            let res = critical_section::with(|_| {
+            let message = critical_section::with(|_| {
                 memory_fence();
-                if let Some(message) = REAL_WIFI_QUEUE.dequeue() {
-                    let item = item as *mut u8;
-                    for i in 0..8 {
-                        item.offset(i).write_volatile(message[i as usize]);
-                    }
-                    trace!("received {:?}", message);
-                    1
-                } else {
-                    0
-                }
+                REAL_WIFI_QUEUE.dequeue()
             });
 
-            if res == 1 {
-                trace!("queue_recv returns");
-                return res;
-            }
+            if let Some(message) = message {
+                let item = item as *mut u8;
+                for i in 0..8 {
+                    item.offset(i).write_volatile(message[i as usize]);
+                }
+                trace!("received {:?}", message);
+
+                return 1;
+            };
 
             if block_time_tick != OSI_FUNCS_TIME_BLOCKING
                 && crate::timer::get_systimer_count() > end_time
