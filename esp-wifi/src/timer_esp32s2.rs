@@ -25,10 +25,22 @@ static TIMER1: Mutex<RefCell<Option<Timer<Timer0<TIMG1>>>>> = Mutex::new(RefCell
 
 static TIMER_OVERFLOWS: AtomicU32 = AtomicU32::new(0);
 
+/// This function must not be called in a critical section. Doing so may return an incorrect value.
 pub fn get_systimer_count() -> u64 {
-    let overflow = (TIMER_OVERFLOWS.load(Ordering::Relaxed) as u64) << 32;
-    let counter = xtensa_lx::timer::get_cycle_count() as u64;
-    (overflow + counter) * 40_000_000 / 240_000_000
+    // We read the cycle counter twice to detect overflows.
+    // If we don't detect an overflow, we use the TIMER_OVERFLOWS count we read between.
+    // If we detect an overflow, we read the TIMER_OVERFLOWS count again to make sure we use the
+    // value after the overflow has been handled.
+
+    let counter_before = xtensa_lx::timer::get_cycle_count();
+    let mut overflow = TIMER_OVERFLOWS.load(Ordering::Relaxed);
+    let counter_after = xtensa_lx::timer::get_cycle_count();
+
+    if counter_after < counter_before {
+        overflow = TIMER_OVERFLOWS.load(Ordering::Relaxed);
+    }
+
+    (((overflow as u64) << 32) + counter_after as u64) * 40_000_000 / 240_000_000
 }
 
 pub fn setup_timer_isr(timg1_timer0: Timer<Timer0<TIMG1>>) {
