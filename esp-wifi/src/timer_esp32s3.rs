@@ -8,7 +8,7 @@ use esp32s3_hal::{
     peripherals::{self, TIMG1},
     prelude::*,
     timer::{Timer, Timer0},
-    xtensa_lx,
+    xtensa_lx, xtensa_lx_rt,
 };
 
 use crate::preempt::preempt::task_switch;
@@ -82,12 +82,12 @@ pub fn setup_timer_isr(timg1_timer0: Timer<Timer0<TIMG1>>) {
     esp32s3_hal::xtensa_lx::timer::set_ccompare0(0xffffffff);
 
     unsafe {
-        let enabled = esp32s3_hal::xtensa_lx::interrupt::disable();
-        esp32s3_hal::xtensa_lx::interrupt::enable_mask(
+        let enabled = xtensa_lx::interrupt::disable();
+        xtensa_lx::interrupt::enable_mask(
             1 << 6 // Timer0
             | 1 << 29 // Software1
-                | esp32s3_hal::xtensa_lx_rt::interrupt::CpuInterruptLevel::Level2.mask()
-                | esp32s3_hal::xtensa_lx_rt::interrupt::CpuInterruptLevel::Level6.mask() | enabled,
+                | xtensa_lx_rt::interrupt::CpuInterruptLevel::Level2.mask()
+                | xtensa_lx_rt::interrupt::CpuInterruptLevel::Level6.mask() | enabled,
         );
     }
 

@@ -2,14 +2,13 @@ use core::cell::RefCell;
 
 use atomic_polyfill::{AtomicU32, Ordering};
 use critical_section::Mutex;
-use esp32s2_hal::xtensa_lx;
-use esp32s2_hal::xtensa_lx_rt;
-use esp32s2_hal::xtensa_lx_rt::exception::Context;
+use esp32s2_hal::trapframe::TrapFrame;
 use esp32s2_hal::{
     interrupt,
     peripherals::{self, TIMG1},
     prelude::*,
     timer::{Timer, Timer0},
+    xtensa_lx, xtensa_lx_rt,
 };
 
 use crate::preempt::preempt::task_switch;
@@ -71,7 +70,7 @@ pub fn setup_timer_isr(timg1_timer0: Timer<Timer0<TIMG1>>) {
     xtensa_lx::timer::set_ccompare0(0xffffffff);
 
     unsafe {
-        let enabled = esp32s2_hal::xtensa_lx::interrupt::disable();
+        let enabled = xtensa_lx::interrupt::disable();
         xtensa_lx::interrupt::enable_mask(
             1 << 6 // Timer0
             | 1 << 29 // Software1
@@ -123,7 +122,7 @@ fn WIFI_PWR() {
 }
 
 #[interrupt]
-fn TG1_T0_LEVEL(context: &mut Context) {
+fn TG1_T0_LEVEL(context: &mut TrapFrame) {
     task_switch(context);
 
     critical_section::with(|cs| {
@@ -138,7 +137,7 @@ fn TG1_T0_LEVEL(context: &mut Context) {
 
 #[allow(non_snake_case)]
 #[no_mangle]
-fn Software1(_level: u32, context: &mut Context) {
+fn Software1(_level: u32, context: &mut TrapFrame) {
     let intr = 1 << 29;
     unsafe {
         core::arch::asm!("wsr.intclear  {0}", in(reg) intr, options(nostack));
