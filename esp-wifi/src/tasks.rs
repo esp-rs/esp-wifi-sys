@@ -2,11 +2,7 @@ use core::mem;
 
 use crate::{
     binary::c_types,
-    compat::{
-        self,
-        queue::SimpleQueue,
-        timer_compat::{Timer, TIMERS},
-    },
+    compat::{self, queue::SimpleQueue, timer_compat::TIMERS},
     memory_fence::memory_fence,
     preempt::preempt::task_create,
     timer::{get_systimer_count, yield_task},
