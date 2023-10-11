@@ -1,6 +1,6 @@
 use core::cell::RefCell;
 
-use atomic_polyfill::{AtomicU64, Ordering};
+use atomic_polyfill::{AtomicU32, Ordering};
 use critical_section::Mutex;
 use esp32s3_hal::trapframe::TrapFrame;
 use esp32s3_hal::{
@@ -21,16 +21,12 @@ const TIMER_DELAY: fugit::HertzU32 = fugit::HertzU32::from_raw(crate::CONFIG.tic
 
 static TIMER1: Mutex<RefCell<Option<Timer<Timer0<TIMG1>>>>> = Mutex::new(RefCell::new(None));
 
-static TIME: AtomicU64 = AtomicU64::new(0);
+static TIMER_OVERFLOWS: AtomicU32 = AtomicU32::new(0);
 
 pub fn get_systimer_count() -> u64 {
-    TIME.load(Ordering::Relaxed) + read_timer_value()
-}
-
-#[inline(always)]
-fn read_timer_value() -> u64 {
-    let value = esp32s3_hal::xtensa_lx::timer::get_cycle_count() as u64;
-    value * 40_000_000 / 240_000_000
+    let overflow = (TIMER_OVERFLOWS.load(Ordering::Relaxed) as u64) << 32;
+    let counter = esp32s3_hal::xtensa_lx::timer::get_cycle_count() as u64;
+    (overflow + counter) * 40_000_000 / 240_000_000
 }
 
 pub fn setup_timer_isr(timg1_timer0: Timer<Timer0<TIMG1>>) {
@@ -88,7 +84,7 @@ pub fn setup_timer_isr(timg1_timer0: Timer<Timer0<TIMG1>>) {
 #[allow(non_snake_case)]
 #[no_mangle]
 fn Timer0(_level: u32) {
-    TIME.fetch_add(0x1_0000_0000 * 40_000_000 / 240_000_000, Ordering::Relaxed);
+    TIMER_OVERFLOWS.fetch_add(1, Ordering::Relaxed);
 
     esp32s3_hal::xtensa_lx::timer::set_ccompare0(0xffffffff);
 }
