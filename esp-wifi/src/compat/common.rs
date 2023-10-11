@@ -466,7 +466,6 @@ pub fn receive_queued(
     unsafe {
         if queue != &mut REAL_WIFI_QUEUE as *mut _ as *mut crate::binary::c_types::c_void {
             panic!("Unknown queue to handle in queue_recv");
-            return -1;
         }
 
         loop {
