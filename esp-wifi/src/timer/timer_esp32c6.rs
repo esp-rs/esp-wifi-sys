@@ -1,20 +1,13 @@
 use crate::{
     binary,
     hal::{
-        interrupt::{self, TrapFrame},
+        interrupt,
+        macros::interrupt,
         peripherals::{self, Interrupt},
-        prelude::*,
-        riscv,
-        systimer::{Alarm, Periodic, SystemTimer, Target},
     },
 };
 
-pub use super::arch_specific::{get_systimer_count, yield_task, TICKS_PER_SECOND};
-use super::arch_specific::{setup_multitasking, setup_timer};
-
-pub fn setup_timer_isr(systimer: Alarm<Target, 0>) {
-    setup_timer(systimer);
-
+pub fn setup_radio_isr() {
     #[cfg(feature = "wifi")]
     {
         unwrap!(interrupt::enable(
@@ -48,8 +41,6 @@ pub fn setup_timer_isr(systimer: Alarm<Target, 0>) {
             interrupt::Priority::Priority1
         ));
     }
-
-    setup_multitasking();
 }
 
 #[cfg(feature = "wifi")]

@@ -3,7 +3,6 @@ use core::cell::RefCell;
 use critical_section::Mutex;
 
 use crate::{
-    binary,
     hal::{
         interrupt::{self, TrapFrame},
         peripherals::{self, Interrupt},
@@ -19,13 +18,15 @@ use peripherals::INTPRI as SystemPeripheral;
 #[cfg(not(feature = "esp32c6"))]
 use peripherals::SYSTEM as SystemPeripheral;
 
+pub type TimeBase = Alarm<Target, 0>;
+
 pub const TICKS_PER_SECOND: u64 = 16_000_000;
 
 const TIMER_DELAY: fugit::HertzU32 = fugit::HertzU32::from_raw(crate::CONFIG.tick_rate_hz);
 
 static ALARM0: Mutex<RefCell<Option<Alarm<Periodic, 0>>>> = Mutex::new(RefCell::new(None));
 
-pub fn setup_timer(systimer: Alarm<Target, 0>) {
+pub fn setup_timer(systimer: TimeBase) {
     let alarm0 = systimer.into_periodic();
     alarm0.set_period(TIMER_DELAY.into());
     alarm0.clear_interrupt();

@@ -1,5 +1,7 @@
 use core::cell::RefCell;
 
+use critical_section::Mutex;
+
 use crate::{
     hal::{
         interrupt,
@@ -13,9 +15,10 @@ use crate::{
     preempt::preempt::task_switch,
 };
 use atomic_polyfill::{AtomicU32, Ordering};
-use critical_section::Mutex;
 
-static TIMER1: Mutex<RefCell<Option<Timer<Timer0<TIMG1>>>>> = Mutex::new(RefCell::new(None));
+pub type TimeBase = Timer<Timer0<TIMG1>>;
+
+static TIMER1: Mutex<RefCell<Option<TimeBase>>> = Mutex::new(RefCell::new(None));
 
 static TIMER_OVERFLOWS: AtomicU32 = AtomicU32::new(0);
 
@@ -41,9 +44,7 @@ pub fn get_systimer_count() -> u64 {
     (((overflow as u64) << 32) + counter_after as u64) * 40_000_000 / 240_000_000
 }
 
-pub fn setup_timer(timg1_timer0: Timer<Timer0<TIMG1>>) {
-    let mut timer1 = timg1_timer0;
-
+pub fn setup_timer(mut timer1: TimeBase) {
     unwrap!(interrupt::enable(
         peripherals::Interrupt::TG1_T0_LEVEL,
         interrupt::Priority::Priority2,

@@ -1,19 +1,6 @@
-use crate::hal::{
-    interrupt,
-    macros::interrupt,
-    peripherals::{self, TIMG1},
-    timer::{Timer, Timer0},
-};
+use crate::hal::{interrupt, macros::interrupt, peripherals};
 
-pub use super::arch_specific::{get_systimer_count, yield_task, TICKS_PER_SECOND};
-use super::arch_specific::{setup_multitasking, setup_timer};
-
-pub fn setup_timer_isr(timg1_timer0: Timer<Timer0<TIMG1>>) {
-    unwrap!(interrupt::enable(
-        peripherals::Interrupt::TG1_T0_LEVEL,
-        interrupt::Priority::Priority2,
-    ));
-
+pub fn setup_radio_isr() {
     #[cfg(feature = "wifi")]
     {
         unwrap!(interrupt::enable(
@@ -26,9 +13,7 @@ pub fn setup_timer_isr(timg1_timer0: Timer<Timer0<TIMG1>>) {
         ));
     }
 
-    setup_timer(timg1_timer0);
-
-    setup_multitasking();
+    // ble not supported
 }
 
 #[cfg(feature = "wifi")]

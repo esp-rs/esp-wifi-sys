@@ -10,4 +10,13 @@ mod chip_specific;
 #[cfg_attr(any(esp32c2, esp32c3, esp32c6), path = "riscv.rs")]
 mod arch_specific;
 
+pub use arch_specific::*;
 pub use chip_specific::*;
+
+pub fn setup_timer_isr(timebase: TimeBase) {
+    setup_radio_isr();
+
+    setup_timer(timebase);
+
+    setup_multitasking();
+}
