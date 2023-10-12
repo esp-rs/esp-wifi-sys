@@ -1,18 +1,17 @@
 use core::cell::RefCell;
 
-use atomic_polyfill::{AtomicU32, Ordering};
-use critical_section::Mutex;
-use esp32_hal::trapframe::TrapFrame;
-use esp32_hal::{
+use crate::hal::{
     interrupt,
+    macros::interrupt,
     peripherals::{self, TIMG1},
+    preempt::preempt::task_switch,
     prelude::*,
     timer::{Timer, Timer0},
+    trapframe::TrapFrame,
     xtensa_lx, xtensa_lx_rt,
 };
-
-use crate::preempt::preempt::task_switch;
-use esp32_hal::macros::interrupt;
+use atomic_polyfill::{AtomicU32, Ordering};
+use critical_section::Mutex;
 
 pub const TICKS_PER_SECOND: u64 = 40_000_000;
 
@@ -68,8 +67,8 @@ pub fn setup_timer_isr(timg1_timer0: Timer<Timer0<TIMG1>>) {
 
         // It's a mystery why these interrupts are enabled now since it worked without this before
         // Now at least without disabling these nothing will work
-        interrupt::disable(esp32_hal::Cpu::ProCpu, peripherals::Interrupt::ETH_MAC);
-        interrupt::disable(esp32_hal::Cpu::ProCpu, peripherals::Interrupt::UART0);
+        interrupt::disable(crate::hal::Cpu::ProCpu, peripherals::Interrupt::ETH_MAC);
+        interrupt::disable(crate::hal::Cpu::ProCpu, peripherals::Interrupt::UART0);
     }
 
     timer1.listen();

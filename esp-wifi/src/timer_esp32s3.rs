@@ -1,18 +1,17 @@
 use core::cell::RefCell;
 
-use atomic_polyfill::{AtomicU32, Ordering};
-use critical_section::Mutex;
-use esp32s3_hal::trapframe::TrapFrame;
-use esp32s3_hal::{
+use crate::hal::{
     interrupt,
+    macros::interrupt,
     peripherals::{self, TIMG1},
+    preempt::preempt::task_switch,
     prelude::*,
     timer::{Timer, Timer0},
+    trapframe::TrapFrame,
     xtensa_lx, xtensa_lx_rt,
 };
-
-use crate::preempt::preempt::task_switch;
-use esp32s3_hal::macros::interrupt;
+use atomic_polyfill::{AtomicU32, Ordering};
+use critical_section::Mutex;
 
 pub const TICKS_PER_SECOND: u64 = 40_000_000;
 
@@ -50,16 +49,16 @@ pub fn setup_timer_isr(timg1_timer0: Timer<Timer0<TIMG1>>) {
     ));
 
     #[cfg(feature = "wifi")]
-    unwrap!(interrupt::enable(
-        peripherals::Interrupt::WIFI_MAC,
-        interrupt::Priority::Priority1,
-    ));
-
-    #[cfg(feature = "wifi")]
-    unwrap!(interrupt::enable(
-        peripherals::Interrupt::WIFI_PWR,
-        interrupt::Priority::Priority1,
-    ));
+    {
+        unwrap!(interrupt::enable(
+            peripherals::Interrupt::WIFI_MAC,
+            interrupt::Priority::Priority1,
+        ));
+        unwrap!(interrupt::enable(
+            peripherals::Interrupt::WIFI_PWR,
+            interrupt::Priority::Priority1,
+        ));
+    }
 
     #[cfg(feature = "ble")]
     {
@@ -79,7 +78,7 @@ pub fn setup_timer_isr(timg1_timer0: Timer<Timer0<TIMG1>>) {
         TIMER1.borrow_ref_mut(cs).replace(timer1);
     });
 
-    esp32s3_hal::xtensa_lx::timer::set_ccompare0(0xffffffff);
+    xtensa_lx::timer::set_ccompare0(0xffffffff);
 
     unsafe {
         let enabled = xtensa_lx::interrupt::disable();
@@ -99,7 +98,7 @@ pub fn setup_timer_isr(timg1_timer0: Timer<Timer0<TIMG1>>) {
 fn Timer0(_level: u32) {
     TIMER_OVERFLOWS.fetch_add(1, Ordering::Relaxed);
 
-    esp32s3_hal::xtensa_lx::timer::set_ccompare0(0xffffffff);
+    xtensa_lx::timer::set_ccompare0(0xffffffff);
 }
 
 #[cfg(feature = "wifi")]

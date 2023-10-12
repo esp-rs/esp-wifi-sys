@@ -2,13 +2,17 @@ use core::cell::RefCell;
 
 use critical_section::Mutex;
 
-use crate::hal::interrupt::{self, TrapFrame};
-use crate::hal::peripherals::{self, Interrupt};
-use crate::hal::prelude::*;
-use crate::hal::riscv;
-use crate::hal::systimer::{Alarm, Periodic, SystemTimer, Target};
-
-use crate::{binary, preempt::preempt::task_switch};
+use crate::{
+    binary,
+    hal::{
+        interrupt::{self, TrapFrame},
+        peripherals::{self, Interrupt},
+        prelude::*,
+        riscv,
+        systimer::{Alarm, Periodic, SystemTimer, Target},
+    },
+    preempt::preempt::task_switch,
+};
 
 pub const TICKS_PER_SECOND: u64 = 16_000_000;
 
@@ -32,16 +36,16 @@ pub fn setup_timer_isr(systimer: Alarm<Target, 0>) {
     ));
 
     #[cfg(feature = "wifi")]
-    unwrap!(interrupt::enable(
-        Interrupt::WIFI_MAC,
-        interrupt::Priority::Priority1
-    ));
-
-    #[cfg(feature = "wifi")]
-    unwrap!(interrupt::enable(
-        Interrupt::WIFI_PWR,
-        interrupt::Priority::Priority1
-    ));
+    {
+        unwrap!(interrupt::enable(
+            Interrupt::WIFI_MAC,
+            interrupt::Priority::Priority1
+        ));
+        unwrap!(interrupt::enable(
+            Interrupt::WIFI_PWR,
+            interrupt::Priority::Priority1
+        ));
+    }
 
     #[cfg(feature = "ble")]
     {
