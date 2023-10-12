@@ -88,8 +88,8 @@ Don't use this feature if your are _not_ using USB-SERIAL-JTAG since it might re
 | big-heap       | Reserve more heap memory for the drivers                                                            |
 | ipv6           | IPv6 support                                                                                        |
 | phy-enable-usb | See _USB-SERIAL-JTAG_ below                                                                         |
-| ps-min-modem   | Enable minimum modem sleep                                                                          |
-| ps-max-modem   | Enable maximum modem sleep                                                                          |
+| ps-min-modem   | Enable minimum modem sleep. Only for STA mode                                                       |
+| ps-max-modem   | Enable maximum modem sleep. Only for STA mode                                                       |
 | log            | Route log output to the `log` crate                                                                 |
 | defmt          | Add `defmt::Format` implementation                                                                  |
 

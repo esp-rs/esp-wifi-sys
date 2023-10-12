@@ -17,7 +17,6 @@ use enumset::EnumSetType;
 use esp_wifi_sys::include::esp_interface_t_ESP_IF_WIFI_AP;
 use esp_wifi_sys::include::esp_wifi_disconnect;
 use esp_wifi_sys::include::esp_wifi_get_mode;
-use esp_wifi_sys::include::esp_wifi_set_inactive_time;
 use esp_wifi_sys::include::esp_wifi_set_protocol;
 use esp_wifi_sys::include::wifi_ap_config_t;
 use esp_wifi_sys::include::wifi_auth_mode_t_WIFI_AUTH_WAPI_PSK;
@@ -641,7 +640,9 @@ unsafe extern "C" fn esp_wifi_tx_done_cb(
 pub fn wifi_start() -> Result<(), WifiError> {
     unsafe {
         esp_wifi_result!(esp_wifi_start())?;
-        esp_wifi_result!(esp_wifi_set_inactive_time(
+
+        #[cfg(feature = "ps-max-modem")]
+        esp_wifi_result!(esp_wifi_sys::include::esp_wifi_set_inactive_time(
             wifi_interface_t_WIFI_IF_STA,
             crate::CONFIG.beacon_timeout
         ))?;
