@@ -80,8 +80,7 @@ fn Timer0(_level: u32) {
     xtensa_lx::timer::set_ccompare0(0xffffffff);
 }
 
-#[interrupt]
-fn TG1_T0_LEVEL(context: &mut TrapFrame) {
+fn do_task_switch(context: &mut TrapFrame) {
     task_switch(context);
 
     critical_section::with(|cs| {
@@ -94,6 +93,11 @@ fn TG1_T0_LEVEL(context: &mut TrapFrame) {
     });
 }
 
+#[interrupt]
+fn TG1_T0_LEVEL(context: &mut TrapFrame) {
+    do_task_switch(context);
+}
+
 #[allow(non_snake_case)]
 #[no_mangle]
 fn Software1(_level: u32, context: &mut TrapFrame) {
@@ -102,16 +106,7 @@ fn Software1(_level: u32, context: &mut TrapFrame) {
         core::arch::asm!("wsr.intclear  {0}", in(reg) intr, options(nostack));
     }
 
-    task_switch(context);
-
-    critical_section::with(|cs| {
-        crate::memory_fence::memory_fence();
-
-        let mut timer = TIMER1.borrow_ref_mut(cs);
-        let timer = unwrap!(timer.as_mut());
-        timer.clear_interrupt();
-        timer.start(TIMER_DELAY.into_duration());
-    });
+    do_task_switch(context);
 }
 
 pub fn yield_task() {
