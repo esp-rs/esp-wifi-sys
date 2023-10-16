@@ -32,42 +32,56 @@ use crate::compat::common::syslog;
 
 use super::WifiEvent;
 
-pub(crate) static mut WIFI_STATE: i32 = -1;
+pub(crate) static mut STA_STATE: WifiState = WifiState::Invalid;
+pub(crate) static mut AP_STATE: WifiState = WifiState::Invalid;
 
 // useful for waiting for events - clear and wait for the event bit to be set again
 pub(crate) static WIFI_EVENTS: Mutex<RefCell<EnumSet<WifiEvent>>> =
     Mutex::new(RefCell::new(enumset::enum_set!()));
 
 pub fn is_connected() -> bool {
-    unsafe { WIFI_STATE == wifi_event_t_WIFI_EVENT_STA_CONNECTED as i32 }
+    unsafe { STA_STATE == WifiState::StaConnected }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum WifiState {
-    WifiReady,
-    StaStart,
-    StaStop,
+    StaStarted,
     StaConnected,
     StaDisconnected,
-    ApStart,
-    ApStop,
-    ApStaConnected,
-    ApStaDisconnected,
+    StaStopped,
+
+    ApStarted,
+    ApStopped,
+
     Invalid,
 }
 
-#[allow(non_upper_case_globals)]
+impl From<WifiEvent> for WifiState {
+    fn from(event: WifiEvent) -> WifiState {
+        match event {
+            WifiEvent::StaStart => WifiState::StaStarted,
+            WifiEvent::StaConnected => WifiState::StaConnected,
+            WifiEvent::StaDisconnected => WifiState::StaDisconnected,
+            WifiEvent::StaStop => WifiState::StaStopped,
+            WifiEvent::ApStart => WifiState::ApStarted,
+            WifiEvent::ApStop => WifiState::ApStopped,
+            _ => WifiState::Invalid,
+        }
+    }
+}
+
+pub fn get_ap_state() -> WifiState {
+    unsafe { AP_STATE }
+}
+
+pub fn get_sta_state() -> WifiState {
+    unsafe { STA_STATE }
+}
+
 pub fn get_wifi_state() -> WifiState {
-    match unsafe { WIFI_STATE as u32 } {
-        wifi_event_t_WIFI_EVENT_WIFI_READY => WifiState::WifiReady,
-        wifi_event_t_WIFI_EVENT_STA_START => WifiState::StaStart,
-        wifi_event_t_WIFI_EVENT_STA_STOP => WifiState::StaStop,
-        wifi_event_t_WIFI_EVENT_STA_CONNECTED => WifiState::StaConnected,
-        wifi_event_t_WIFI_EVENT_STA_DISCONNECTED => WifiState::StaDisconnected,
-        wifi_event_t_WIFI_EVENT_AP_START => WifiState::ApStart,
-        wifi_event_t_WIFI_EVENT_AP_STOP => WifiState::ApStop,
-        wifi_event_t_WIFI_EVENT_AP_STACONNECTED => WifiState::ApStaConnected,
-        wifi_event_t_WIFI_EVENT_AP_STADISCONNECTED => WifiState::ApStaDisconnected,
+    match super::get_wifi_mode() {
+        Ok(super::WifiMode::Sta) => get_sta_state(),
+        Ok(super::WifiMode::Ap) => get_ap_state(),
         _ => WifiState::Invalid,
     }
 }
@@ -920,25 +934,13 @@ pub unsafe extern "C" fn event_post(
     trace!("EVENT: {:?}", event);
     critical_section::with(|cs| WIFI_EVENTS.borrow_ref_mut(cs).insert(event));
 
-    let take_state = match event {
+    match event {
         WifiEvent::StaConnected
         | WifiEvent::StaDisconnected
         | WifiEvent::StaStart
-        | WifiEvent::StaStop
-        | WifiEvent::WifiReady
-        | WifiEvent::ScanDone
-        | WifiEvent::ApStart
-        | WifiEvent::ApStop
-        | WifiEvent::ApStaconnected
-        | WifiEvent::ApStadisconnected => true,
-        other => {
-            info!("Unhandled event: {:?}", other);
-            false
-        }
-    };
-
-    if take_state {
-        WIFI_STATE = event_id;
+        | WifiEvent::StaStop => STA_STATE = WifiState::from(event),
+        WifiEvent::ApStart | WifiEvent::ApStop => AP_STATE = WifiState::from(event),
+        other => debug!("Unhandled event: {:?}", other),
     }
 
     #[cfg(feature = "async")]
