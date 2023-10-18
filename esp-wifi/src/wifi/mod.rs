@@ -1,6 +1,8 @@
 #[doc(hidden)]
 pub mod os_adapter;
 
+use atomic_polyfill::AtomicUsize;
+use core::sync::atomic::Ordering;
 use core::{cell::RefCell, mem::MaybeUninit};
 
 use crate::common_adapter::*;
@@ -34,9 +36,6 @@ use esp_wifi_sys::include::wifi_mode_t_WIFI_MODE_APSTA;
 use esp_wifi_sys::include::wifi_mode_t_WIFI_MODE_NULL;
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
-
-use atomic_polyfill::AtomicUsize;
-use core::sync::atomic::Ordering;
 
 #[doc(hidden)]
 pub use os_adapter::*;
@@ -1461,8 +1460,8 @@ mod asynch {
             WifiEventFuture::new(event).await;
 
             unsafe {
-                AP_STATE = WifiState::Invalid;
-                STA_STATE = WifiState::Invalid;
+                AP_STATE.store(WifiState::Invalid, Ordering::Relaxed);
+                STA_STATE.store(WifiState::Invalid, Ordering::Relaxed);
             }
 
             Ok(())

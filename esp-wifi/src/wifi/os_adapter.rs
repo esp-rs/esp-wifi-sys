@@ -7,7 +7,9 @@
 pub(crate) mod os_adapter_chip_specific;
 
 use core::cell::RefCell;
+use core::sync::atomic::Ordering;
 
+use atomic_enum::atomic_enum;
 use critical_section::Mutex;
 use enumset::EnumSet;
 
@@ -32,18 +34,20 @@ use crate::compat::common::syslog;
 
 use super::WifiEvent;
 
-pub(crate) static mut STA_STATE: WifiState = WifiState::Invalid;
-pub(crate) static mut AP_STATE: WifiState = WifiState::Invalid;
+pub(crate) static STA_STATE: AtomicWifiState = AtomicWifiState::new(WifiState::Invalid);
+pub(crate) static AP_STATE: AtomicWifiState = AtomicWifiState::new(WifiState::Invalid);
 
 // useful for waiting for events - clear and wait for the event bit to be set again
 pub(crate) static WIFI_EVENTS: Mutex<RefCell<EnumSet<WifiEvent>>> =
     Mutex::new(RefCell::new(enumset::enum_set!()));
 
 pub fn is_connected() -> bool {
-    unsafe { STA_STATE == WifiState::StaConnected }
+    unsafe { get_sta_state() == WifiState::StaConnected }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[atomic_enum]
+#[derive(PartialEq)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum WifiState {
     StaStarted,
     StaConnected,
@@ -71,11 +75,11 @@ impl From<WifiEvent> for WifiState {
 }
 
 pub fn get_ap_state() -> WifiState {
-    unsafe { AP_STATE }
+    AP_STATE.load(Ordering::Relaxed)
 }
 
 pub fn get_sta_state() -> WifiState {
-    unsafe { STA_STATE }
+    STA_STATE.load(Ordering::Relaxed)
 }
 
 pub fn get_wifi_state() -> WifiState {
@@ -938,8 +942,10 @@ pub unsafe extern "C" fn event_post(
         WifiEvent::StaConnected
         | WifiEvent::StaDisconnected
         | WifiEvent::StaStart
-        | WifiEvent::StaStop => STA_STATE = WifiState::from(event),
-        WifiEvent::ApStart | WifiEvent::ApStop => AP_STATE = WifiState::from(event),
+        | WifiEvent::StaStop => STA_STATE.store(WifiState::from(event), Ordering::Relaxed),
+        WifiEvent::ApStart | WifiEvent::ApStop => {
+            AP_STATE.store(WifiState::from(event), Ordering::Relaxed)
+        }
         other => debug!("Unhandled event: {:?}", other),
     }
 
