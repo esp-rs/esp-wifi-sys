@@ -1,4 +1,5 @@
 pub(crate) mod os_adapter;
+pub(crate) mod state;
 
 use atomic_polyfill::AtomicUsize;
 use core::sync::atomic::Ordering;
@@ -38,6 +39,8 @@ use num_traits::FromPrimitive;
 
 #[doc(hidden)]
 pub use os_adapter::*;
+pub use state::*;
+
 use smoltcp::phy::{Device, DeviceCapabilities, RxToken, TxToken};
 
 const ETHERNET_FRAME_HEADER_SIZE: usize = 18;
@@ -1458,8 +1461,8 @@ mod asynch {
             embedded_svc::wifi::Wifi::stop(self)?;
             WifiEventFuture::new(event).await;
 
-            AP_STATE.store(WifiState::Invalid, Ordering::Relaxed);
-            STA_STATE.store(WifiState::Invalid, Ordering::Relaxed);
+            reset_ap_state();
+            reset_sta_state();
 
             Ok(())
         }
