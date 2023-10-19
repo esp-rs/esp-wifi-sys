@@ -2,6 +2,7 @@ pub(crate) mod os_adapter;
 pub(crate) mod state;
 
 use atomic_polyfill::AtomicUsize;
+use core::ptr::{addr_of, addr_of_mut};
 use core::sync::atomic::Ordering;
 use core::{cell::RefCell, mem::MaybeUninit};
 
@@ -347,9 +348,7 @@ unsafe extern "C" fn is_in_isr_wrapper() -> i32 {
 pub(crate) fn coex_initialize() -> i32 {
     debug!("call coex-initialize");
     unsafe {
-        let res = esp_coex_adapter_register(
-            &mut G_COEX_ADAPTER_FUNCS as *mut _ as *mut coex_adapter_funcs_t,
-        );
+        let res = esp_coex_adapter_register(addr_of_mut!(G_COEX_ADAPTER_FUNCS).cast());
         if res != 0 {
             error!("Error: esp_coex_adapter_register {}", res);
             return res;
@@ -489,13 +488,9 @@ static g_wifi_osi_funcs: wifi_osi_funcs_t = wifi_osi_funcs_t {
     #[cfg(any(esp32c3, esp32c2, esp32c6, esp32s3, esp32s2,))]
     _slowclk_cal_get: Some(slowclk_cal_get),
     #[cfg(any(esp32, esp32s2))]
-    _phy_common_clock_disable: Some(
-        crate::wifi::os_adapter::os_adapter_chip_specific::phy_common_clock_disable,
-    ),
+    _phy_common_clock_disable: Some(os_adapter_chip_specific::phy_common_clock_disable),
     #[cfg(any(esp32, esp32s2))]
-    _phy_common_clock_enable: Some(
-        crate::wifi::os_adapter::os_adapter_chip_specific::phy_common_clock_enable,
-    ),
+    _phy_common_clock_enable: Some(os_adapter_chip_specific::phy_common_clock_enable),
     _coex_register_start_cb: Some(coex_register_start_cb),
 
     #[cfg(any(esp32c6))]
@@ -628,8 +623,7 @@ pub fn wifi_init() -> Result<(), WifiError> {
         #[cfg(any(esp32, esp32s3))]
         {
             static mut NVS_STRUCT: [u32; 12] = [0; 12];
-            crate::common_adapter::chip_specific::g_misc_nvs =
-                &NVS_STRUCT as *const _ as *const u32 as u32;
+            crate::common_adapter::chip_specific::g_misc_nvs = addr_of!(NVS_STRUCT) as u32;
         }
 
         Ok(())
