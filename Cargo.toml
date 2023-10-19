@@ -3,12 +3,6 @@ members = [
     "esp-wifi",
     "esp-wifi-sys",
     "xtask",
-    "examples-esp32c2",
-    "examples-esp32c3",
-    "examples-esp32c6",
-    "examples-esp32",
-    "examples-esp32s2",
-    "examples-esp32s3",
 ]
 exclude = [
     "extras/esp-wifishark",
@@ -27,12 +21,12 @@ lto = "off"
 
 [workspace.dependencies]
 defmt = "=0.3.5"
-esp32c3-hal = { version = "0.12.0" }
-esp32c2-hal = { version = "0.10.0" }
-esp32c6-hal = { version = "0.5.0" }
-esp32-hal   = { version = "0.15.0" }
-esp32s3-hal = { version = "0.12.0" }
-esp32s2-hal = { version = "0.12.0" }
+esp32c3-hal = { version = "0.13.0" }
+esp32c2-hal = { version = "0.11.0" }
+esp32c6-hal = { version = "0.6.0" }
+esp32-hal   = { version = "0.16.0" }
+esp32s3-hal = { version = "0.13.0" }
+esp32s2-hal = { version = "0.13.0" }
 smoltcp = { version = "0.10.0", default-features=false, features = ["proto-igmp", "proto-ipv4", "proto-dns", "socket-tcp", "socket-icmp", "socket-udp", "socket-dns", "medium-ethernet", "proto-dhcpv4", "socket-raw", "socket-dhcpv4"] }
 critical-section = "1.1.1"
 atomic-polyfill = "1.0.2"
@@ -53,6 +47,7 @@ embassy-net-driver = { version = "0.1.0" }
 toml-cfg = "0.1.3"
 libm = "0.2.7"
 cfg-if = "1.0.0"
+static_cell = { version = "1", features = ["nightly"] }
 
 embassy-net = { version = "0.1.0", features = ["nightly", "tcp", "udp", "dhcpv4", "medium-ethernet"] }
 bleps = { git = "https://github.com/bjoernQ/bleps", package = "bleps", rev = "b82f1e7009bef7e32f0918be5b186188aa5e7109", features = ["macros"] }
@@ -63,7 +58,7 @@ esp-println = { version = "0.6.0" }
 esp-backtrace = { version = "0.8.0", features = ["panic-handler", "exception-handler", "print-uart"] }
 embedded-hal-async = { version = "1.0.0-rc.1" }
 
-# patching esp32c6-hal for BLE - it would compile with 0.5.0 but not work
+# required until https://github.com/esp-rs/esp-hal/pull/891 is released
 [patch.crates-io]
-esp32c6-hal = { git = "https://github.com/esp-rs/esp-hal.git", rev = "4c34ebe9e264fcc31fabba862274adae8daa680a" }
-esp-hal-common = {  git = "https://github.com/esp-rs/esp-hal.git", rev = "4c34ebe9e264fcc31fabba862274adae8daa680a" }
+esp32c3-hal = { git = "https://github.com/esp-rs/esp-hal.git", rev = "8eddb9e737a1bfe0a36f90f54103e9167114813a" }
+esp-hal-common = {  git = "https://github.com/esp-rs/esp-hal.git", rev = "8eddb9e737a1bfe0a36f90f54103e9167114813a" }
