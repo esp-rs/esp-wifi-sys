@@ -2,10 +2,12 @@
 runner = "espflash flash --monitor"
 
 rustflags = [
-    "-C", "link-arg=-Tlinkall.x",
     "-C", "link-arg=-Trom_functions.x",
 
-    "-C", "target-feature=-loop",
+    # LLD
+    "-C", "linker=rust-lld",
+    "-C", "link-arg=-Tlinkall.x",
+    "-C", "llvm-args=-mtext-section-literals"
 ]
 
 [build]

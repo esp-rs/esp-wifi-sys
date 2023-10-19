@@ -64,5 +64,6 @@ embedded-hal-async = { version = "1.0.0-rc.1" }
 
 # patching esp32c6-hal for BLE - it would compile with 0.5.0 but not work
 [patch.crates-io]
-esp32c6-hal = { git = "https://github.com/esp-rs/esp-hal.git", rev = "4c34ebe9e264fcc31fabba862274adae8daa680a" }
-esp-hal-common = {  git = "https://github.com/esp-rs/esp-hal.git", rev = "4c34ebe9e264fcc31fabba862274adae8daa680a" }
+esp32s3-hal = { git = "https://github.com/MabezDev/esp-hal", rev = "3dda1e29e366602cd8952265b7a7c826fe9a0a6a" }
+esp-hal-common = { git = "https://github.com/MabezDev/esp-hal", rev = "3dda1e29e366602cd8952265b7a7c826fe9a0a6a" }
+esp-hal-procmacros = { git = "https://github.com/MabezDev/esp-hal", rev = "3dda1e29e366602cd8952265b7a7c826fe9a0a6a" }
