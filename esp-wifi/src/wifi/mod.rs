@@ -13,7 +13,12 @@ use crate::hal::peripheral::PeripheralRef;
 use crate::EspWifiInitialization;
 
 use critical_section::Mutex;
-use embedded_svc::wifi::{AccessPointInfo, AuthMethod, Protocol, SecondaryChannel, Wifi};
+
+use embedded_svc::wifi::{
+    AccessPointConfiguration, AccessPointInfo, AuthMethod, ClientConfiguration, Protocol,
+    SecondaryChannel, Wifi,
+};
+
 use enumset::EnumSet;
 use enumset::EnumSetType;
 use esp_wifi_sys::include::esp_interface_t_ESP_IF_WIFI_AP;
@@ -733,12 +738,6 @@ pub fn new_with_config<'d>(
     }
 
     crate::hal::into_ref!(device);
-    match config {
-        embedded_svc::wifi::Configuration::None => panic!(),
-        embedded_svc::wifi::Configuration::Client(_) => (),
-        embedded_svc::wifi::Configuration::AccessPoint(_) => (),
-        embedded_svc::wifi::Configuration::Mixed(_, _) => panic!(),
-    };
 
     Ok((
         WifiDevice::new(unsafe { device.clone_unchecked() }),
@@ -862,16 +861,35 @@ impl<'d> WifiController<'d> {
             _device,
             config: Default::default(),
         };
+
+        match config {
+            embedded_svc::wifi::Configuration::None => panic!(),
+            embedded_svc::wifi::Configuration::Client(_) => {
+                esp_wifi_result!(unsafe { esp_wifi_set_mode(wifi_mode_t_WIFI_MODE_STA) })?;
+                debug!("Wifi mode STA set");
+            }
+            embedded_svc::wifi::Configuration::AccessPoint(_) => {
+                esp_wifi_result!(unsafe { esp_wifi_set_mode(wifi_mode_t_WIFI_MODE_AP) })?;
+                debug!("Wifi mode AP set");
+            }
+            embedded_svc::wifi::Configuration::Mixed(_, _) => unimplemented!(),
+        };
+
         this.set_configuration(&config)?;
         Ok(this)
     }
 
     /// Set the wifi mode.
+    ///
     /// This will set the wifi protocol to the desired protocol, the default for this is:
     /// `WIFI_PROTOCOL_11B|WIFI_PROTOCOL_11G|WIFI_PROTOCOL_11N`
+    ///
     /// # Arguments:
+    ///
     /// * `protocol` - The desired protocol
+    ///
     /// # Example:
+    ///
     /// ```
     /// use embedded_svc::wifi::Protocol;
     /// use esp_wifi::wifi::WifiController;
@@ -1073,6 +1091,97 @@ pub fn esp_wifi_send_data(data: &mut [u8]) {
     }
 }
 
+fn apply_ap_config(config: &AccessPointConfiguration) -> Result<(), WifiError> {
+    let mut cfg = wifi_config_t {
+        ap: wifi_ap_config_t {
+            ssid: [0u8; 32usize],
+            password: [0u8; 64usize],
+            ssid_len: 0,
+            channel: config.channel,
+            authmode: match config.auth_method {
+                AuthMethod::None => wifi_auth_mode_t_WIFI_AUTH_OPEN,
+                AuthMethod::WEP => wifi_auth_mode_t_WIFI_AUTH_WEP,
+                AuthMethod::WPA => wifi_auth_mode_t_WIFI_AUTH_WPA_PSK,
+                AuthMethod::WPA2Personal => wifi_auth_mode_t_WIFI_AUTH_WPA2_PSK,
+                AuthMethod::WPAWPA2Personal => wifi_auth_mode_t_WIFI_AUTH_WPA_WPA2_PSK,
+                AuthMethod::WPA2Enterprise => wifi_auth_mode_t_WIFI_AUTH_WPA2_ENTERPRISE,
+                AuthMethod::WPA3Personal => wifi_auth_mode_t_WIFI_AUTH_WPA3_PSK,
+                AuthMethod::WPA2WPA3Personal => wifi_auth_mode_t_WIFI_AUTH_WPA2_WPA3_PSK,
+                AuthMethod::WAPIPersonal => wifi_auth_mode_t_WIFI_AUTH_WAPI_PSK,
+            },
+            ssid_hidden: if config.ssid_hidden { 1 } else { 0 },
+            max_connection: config.max_connections as u8,
+            beacon_interval: 100,
+            pairwise_cipher: wifi_cipher_type_t_WIFI_CIPHER_TYPE_TKIP,
+            ftm_responder: false,
+            pmf_cfg: wifi_pmf_config_t {
+                capable: true,
+                required: false,
+            },
+            sae_pwe_h2e: 0,
+        },
+    };
+
+    unsafe {
+        cfg.ap.ssid[0..(config.ssid.len())].copy_from_slice(config.ssid.as_bytes());
+        cfg.ap.ssid_len = config.ssid.len() as u8;
+        cfg.ap.password[0..(config.password.len())].copy_from_slice(config.password.as_bytes());
+    }
+    esp_wifi_result!(unsafe { esp_wifi_set_config(wifi_interface_t_WIFI_IF_AP, &mut cfg) })
+}
+
+fn apply_sta_config(config: &ClientConfiguration) -> Result<(), WifiError> {
+    let bssid: [u8; 6] = match &config.bssid {
+        Some(bssid_ref) => *bssid_ref,
+        None => [0; 6],
+    };
+
+    let mut cfg = wifi_config_t {
+        sta: wifi_sta_config_t {
+            ssid: [0; 32],
+            password: [0; 64],
+            scan_method: crate::CONFIG.scan_method,
+            bssid_set: config.bssid.is_some(),
+            bssid,
+            channel: config.channel.unwrap_or(0u8),
+            listen_interval: crate::CONFIG.listen_interval,
+            sort_method: wifi_sort_method_t_WIFI_CONNECT_AP_BY_SIGNAL,
+            threshold: wifi_scan_threshold_t {
+                rssi: -99,
+                authmode: match config.auth_method {
+                    AuthMethod::None => wifi_auth_mode_t_WIFI_AUTH_OPEN,
+                    AuthMethod::WEP => wifi_auth_mode_t_WIFI_AUTH_WEP,
+                    AuthMethod::WPA => wifi_auth_mode_t_WIFI_AUTH_WPA_PSK,
+                    AuthMethod::WPA2Personal => wifi_auth_mode_t_WIFI_AUTH_WPA2_PSK,
+                    AuthMethod::WPAWPA2Personal => wifi_auth_mode_t_WIFI_AUTH_WPA_WPA2_PSK,
+                    AuthMethod::WPA2Enterprise => wifi_auth_mode_t_WIFI_AUTH_WPA2_ENTERPRISE,
+                    AuthMethod::WPA3Personal => wifi_auth_mode_t_WIFI_AUTH_WPA3_PSK,
+                    AuthMethod::WPA2WPA3Personal => wifi_auth_mode_t_WIFI_AUTH_WPA2_WPA3_PSK,
+                    AuthMethod::WAPIPersonal => wifi_auth_mode_t_WIFI_AUTH_WAPI_PSK,
+                },
+            },
+            pmf_cfg: wifi_pmf_config_t {
+                capable: true,
+                required: false,
+            },
+            sae_pwe_h2e: 3,
+            _bitfield_align_1: [0u32; 0],
+            _bitfield_1: __BindgenBitfieldUnit::new([0u8; 4usize]),
+            failure_retry_cnt: crate::CONFIG.failure_retry_cnt,
+            _bitfield_align_2: [0u32; 0],
+            _bitfield_2: __BindgenBitfieldUnit::new([0u8; 4usize]),
+            sae_pk_mode: 0, // ??
+            sae_h2e_identifier: [0u8; 32usize],
+        },
+    };
+
+    unsafe {
+        cfg.sta.ssid[0..(config.ssid.len())].copy_from_slice(config.ssid.as_bytes());
+        cfg.sta.password[0..(config.password.len())].copy_from_slice(config.password.as_bytes());
+    }
+    esp_wifi_result!(unsafe { esp_wifi_set_config(wifi_interface_t_WIFI_IF_STA, &mut cfg) })
+}
+
 impl Wifi for WifiController<'_> {
     type Error = WifiError;
 
@@ -1112,118 +1221,8 @@ impl Wifi for WifiController<'_> {
 
         match conf {
             embedded_svc::wifi::Configuration::None => panic!(),
-            embedded_svc::wifi::Configuration::Client(config) => {
-                esp_wifi_result!(unsafe { esp_wifi_set_mode(wifi_mode_t_WIFI_MODE_STA) })?;
-
-                debug!("Wifi mode STA set");
-                let bssid: [u8; 6] = match &config.bssid {
-                    Some(bssid_ref) => *bssid_ref,
-                    None => [0; 6],
-                };
-
-                let mut cfg = wifi_config_t {
-                    sta: wifi_sta_config_t {
-                        ssid: [0; 32],
-                        password: [0; 64],
-                        scan_method: crate::CONFIG.scan_method,
-                        bssid_set: config.bssid.is_some(),
-                        bssid,
-                        channel: config.channel.unwrap_or(0u8),
-                        listen_interval: crate::CONFIG.listen_interval,
-                        sort_method: wifi_sort_method_t_WIFI_CONNECT_AP_BY_SIGNAL,
-                        threshold: wifi_scan_threshold_t {
-                            rssi: -99,
-                            authmode: match config.auth_method {
-                                AuthMethod::None => wifi_auth_mode_t_WIFI_AUTH_OPEN,
-                                AuthMethod::WEP => wifi_auth_mode_t_WIFI_AUTH_WEP,
-                                AuthMethod::WPA => wifi_auth_mode_t_WIFI_AUTH_WPA_PSK,
-                                AuthMethod::WPA2Personal => wifi_auth_mode_t_WIFI_AUTH_WPA2_PSK,
-                                AuthMethod::WPAWPA2Personal => {
-                                    wifi_auth_mode_t_WIFI_AUTH_WPA_WPA2_PSK
-                                }
-                                AuthMethod::WPA2Enterprise => {
-                                    wifi_auth_mode_t_WIFI_AUTH_WPA2_ENTERPRISE
-                                }
-                                AuthMethod::WPA3Personal => wifi_auth_mode_t_WIFI_AUTH_WPA3_PSK,
-                                AuthMethod::WPA2WPA3Personal => {
-                                    wifi_auth_mode_t_WIFI_AUTH_WPA2_WPA3_PSK
-                                }
-                                AuthMethod::WAPIPersonal => wifi_auth_mode_t_WIFI_AUTH_WAPI_PSK,
-                            },
-                        },
-                        pmf_cfg: wifi_pmf_config_t {
-                            capable: true,
-                            required: false,
-                        },
-                        sae_pwe_h2e: 3,
-                        _bitfield_align_1: [0u32; 0],
-                        _bitfield_1: __BindgenBitfieldUnit::new([0u8; 4usize]),
-                        failure_retry_cnt: crate::CONFIG.failure_retry_cnt,
-                        _bitfield_align_2: [0u32; 0],
-                        _bitfield_2: __BindgenBitfieldUnit::new([0u8; 4usize]),
-                        sae_pk_mode: 0, // ??
-                        sae_h2e_identifier: [0u8; 32usize],
-                    },
-                };
-
-                unsafe {
-                    cfg.sta.ssid[0..(config.ssid.len())].copy_from_slice(config.ssid.as_bytes());
-                    cfg.sta.password[0..(config.password.len())]
-                        .copy_from_slice(config.password.as_bytes());
-                }
-                esp_wifi_result!(unsafe {
-                    esp_wifi_set_config(wifi_interface_t_WIFI_IF_STA, &mut cfg)
-                })?;
-            }
-            embedded_svc::wifi::Configuration::AccessPoint(config) => {
-                esp_wifi_result!(unsafe { esp_wifi_set_mode(wifi_mode_t_WIFI_MODE_AP) })?;
-
-                debug!("Wifi mode AP set");
-
-                let mut cfg = wifi_config_t {
-                    ap: wifi_ap_config_t {
-                        ssid: [0u8; 32usize],
-                        password: [0u8; 64usize],
-                        ssid_len: 0,
-                        channel: config.channel,
-                        authmode: match config.auth_method {
-                            AuthMethod::None => wifi_auth_mode_t_WIFI_AUTH_OPEN,
-                            AuthMethod::WEP => wifi_auth_mode_t_WIFI_AUTH_WEP,
-                            AuthMethod::WPA => wifi_auth_mode_t_WIFI_AUTH_WPA_PSK,
-                            AuthMethod::WPA2Personal => wifi_auth_mode_t_WIFI_AUTH_WPA2_PSK,
-                            AuthMethod::WPAWPA2Personal => wifi_auth_mode_t_WIFI_AUTH_WPA_WPA2_PSK,
-                            AuthMethod::WPA2Enterprise => {
-                                wifi_auth_mode_t_WIFI_AUTH_WPA2_ENTERPRISE
-                            }
-                            AuthMethod::WPA3Personal => wifi_auth_mode_t_WIFI_AUTH_WPA3_PSK,
-                            AuthMethod::WPA2WPA3Personal => {
-                                wifi_auth_mode_t_WIFI_AUTH_WPA2_WPA3_PSK
-                            }
-                            AuthMethod::WAPIPersonal => wifi_auth_mode_t_WIFI_AUTH_WAPI_PSK,
-                        },
-                        ssid_hidden: if config.ssid_hidden { 1 } else { 0 },
-                        max_connection: config.max_connections as u8,
-                        beacon_interval: 100,
-                        pairwise_cipher: wifi_cipher_type_t_WIFI_CIPHER_TYPE_TKIP,
-                        ftm_responder: false,
-                        pmf_cfg: wifi_pmf_config_t {
-                            capable: true,
-                            required: false,
-                        },
-                        sae_pwe_h2e: 0,
-                    },
-                };
-
-                unsafe {
-                    cfg.ap.ssid[0..(config.ssid.len())].copy_from_slice(config.ssid.as_bytes());
-                    cfg.ap.ssid_len = config.ssid.len() as u8;
-                    cfg.ap.password[0..(config.password.len())]
-                        .copy_from_slice(config.password.as_bytes());
-                }
-                esp_wifi_result!(unsafe {
-                    esp_wifi_set_config(wifi_interface_t_WIFI_IF_AP, &mut cfg)
-                })?;
-            }
+            embedded_svc::wifi::Configuration::Client(config) => apply_sta_config(config)?,
+            embedded_svc::wifi::Configuration::AccessPoint(config) => apply_ap_config(config)?,
             embedded_svc::wifi::Configuration::Mixed(_, _) => panic!(),
         };
 
