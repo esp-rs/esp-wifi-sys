@@ -594,7 +594,6 @@ pub fn wifi_init() -> Result<(), WifiError> {
     unsafe {
         G_CONFIG.wpa_crypto_funcs = g_wifi_default_wpa_crypto_funcs;
         G_CONFIG.feature_caps = g_wifi_feature_caps;
-        crate::wifi_set_log_verbose();
 
         #[cfg(coex)]
         {
@@ -604,7 +603,6 @@ pub fn wifi_init() -> Result<(), WifiError> {
         esp_wifi_result!(esp_wifi_init_internal(&G_CONFIG))?;
         esp_wifi_result!(esp_wifi_set_mode(wifi_mode_t_WIFI_MODE_NULL))?;
 
-        crate::wifi_set_log_verbose();
         esp_wifi_result!(esp_supplicant_init())?;
 
         esp_wifi_result!(esp_wifi_set_tx_done_cb(Some(esp_wifi_tx_done_cb)))?;
