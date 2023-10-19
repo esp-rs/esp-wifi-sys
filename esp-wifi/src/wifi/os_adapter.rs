@@ -41,10 +41,6 @@ pub(crate) static AP_STATE: AtomicWifiState = AtomicWifiState::new(WifiState::In
 pub(crate) static WIFI_EVENTS: Mutex<RefCell<EnumSet<WifiEvent>>> =
     Mutex::new(RefCell::new(enumset::enum_set!()));
 
-pub fn is_connected() -> bool {
-    get_sta_state() == WifiState::StaConnected
-}
-
 #[atomic_enum]
 #[derive(PartialEq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
