@@ -1,5 +1,4 @@
-#[doc(hidden)]
-pub mod os_adapter;
+pub(crate) mod os_adapter;
 
 use atomic_polyfill::AtomicUsize;
 use core::sync::atomic::Ordering;
