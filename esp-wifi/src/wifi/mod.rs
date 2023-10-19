@@ -36,8 +36,8 @@ use esp_wifi_sys::include::wifi_auth_mode_t_WIFI_AUTH_WPA_PSK;
 use esp_wifi_sys::include::wifi_auth_mode_t_WIFI_AUTH_WPA_WPA2_PSK;
 use esp_wifi_sys::include::wifi_cipher_type_t_WIFI_CIPHER_TYPE_TKIP;
 use esp_wifi_sys::include::wifi_interface_t_WIFI_IF_AP;
+use esp_wifi_sys::include::wifi_mode_t;
 use esp_wifi_sys::include::wifi_mode_t_WIFI_MODE_AP;
-use esp_wifi_sys::include::wifi_mode_t_WIFI_MODE_APSTA;
 use esp_wifi_sys::include::wifi_mode_t_WIFI_MODE_NULL;
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
@@ -84,10 +84,47 @@ pub enum WifiMode {
 }
 
 impl WifiMode {
+    pub(crate) fn current() -> Result<Self, WifiError> {
+        let mut mode = wifi_mode_t_WIFI_MODE_NULL;
+        esp_wifi_result!(unsafe { esp_wifi_get_mode(&mut mode) })?;
+
+        WifiMode::try_from(mode)
+    }
+
+    pub fn is_sta(&self) -> bool {
+        match self {
+            WifiMode::Sta => true,
+            WifiMode::Ap => false,
+        }
+    }
+
     pub fn is_ap(&self) -> bool {
         match self {
             WifiMode::Sta => false,
             WifiMode::Ap => true,
+        }
+    }
+}
+
+impl TryFrom<wifi_mode_t> for WifiMode {
+    type Error = WifiError;
+
+    fn try_from(value: wifi_mode_t) -> Result<Self, Self::Error> {
+        #[allow(non_upper_case_globals)]
+        match value {
+            wifi_mode_t_WIFI_MODE_STA => Ok(WifiMode::Sta),
+            wifi_mode_t_WIFI_MODE_AP => Ok(WifiMode::Ap),
+            _ => Err(WifiError::UnknownWifiMode),
+        }
+    }
+}
+
+impl Into<wifi_mode_t> for WifiMode {
+    fn into(self) -> wifi_mode_t {
+        #[allow(non_upper_case_globals)]
+        match self {
+            WifiMode::Sta => wifi_mode_t_WIFI_MODE_STA,
+            WifiMode::Ap => wifi_mode_t_WIFI_MODE_AP,
         }
     }
 }
@@ -647,13 +684,16 @@ pub fn wifi_start() -> Result<(), WifiError> {
     unsafe {
         esp_wifi_result!(esp_wifi_start())?;
 
-        let mode = get_wifi_mode()?;
+        let mode = WifiMode::current()?;
+
+        // This is not an if-else because in AP-STA mode, both are true
         if mode.is_ap() {
             esp_wifi_result!(esp_wifi_sys::include::esp_wifi_set_inactive_time(
                 wifi_interface_t_WIFI_IF_AP,
                 crate::CONFIG.ap_beacon_timeout
             ))?;
-        } else {
+        }
+        if mode.is_sta() {
             esp_wifi_result!(esp_wifi_sys::include::esp_wifi_set_inactive_time(
                 wifi_interface_t_WIFI_IF_STA,
                 crate::CONFIG.beacon_timeout
@@ -767,18 +807,6 @@ pub fn new<'d>(
     new_with_config(&inited, device, Default::default())
 }
 
-pub(crate) fn get_wifi_mode() -> Result<WifiMode, WifiError> {
-    let mut mode = wifi_mode_t_WIFI_MODE_NULL;
-    esp_wifi_result!(unsafe { esp_wifi_get_mode(&mut mode) })?;
-
-    #[allow(non_upper_case_globals)]
-    match mode {
-        wifi_mode_t_WIFI_MODE_STA => Ok(WifiMode::Sta),
-        wifi_mode_t_WIFI_MODE_AP => Ok(WifiMode::Ap),
-        _ => Err(WifiError::UnknownWifiMode),
-    }
-}
-
 /// A wifi device implementing smoltcp's Device trait.
 pub struct WifiDevice<'d> {
     _device: PeripheralRef<'d, crate::hal::radio::Wifi>,
@@ -790,7 +818,7 @@ impl<'d> WifiDevice<'d> {
     }
 
     pub(crate) fn get_wifi_mode(&self) -> Result<WifiMode, WifiError> {
-        get_wifi_mode()
+        WifiMode::current()
     }
 }
 
@@ -905,18 +933,12 @@ impl<'d> WifiController<'d> {
 
     #[allow(unused)]
     fn is_sta_enabled(&self) -> Result<bool, WifiError> {
-        let mut mode: esp_wifi_sys::include::wifi_mode_t = 0;
-        esp_wifi_result!(unsafe { esp_wifi_sys::include::esp_wifi_get_mode(&mut mode) })?;
-
-        Ok(mode == wifi_mode_t_WIFI_MODE_STA)
+        WifiMode::current().map(|m| m.is_sta())
     }
 
     #[allow(unused)]
     fn is_ap_enabled(&self) -> Result<bool, WifiError> {
-        let mut mode: esp_wifi_sys::include::wifi_mode_t = 0;
-        esp_wifi_result!(unsafe { esp_wifi_sys::include::esp_wifi_get_mode(&mut mode) })?;
-
-        Ok(mode == wifi_mode_t_WIFI_MODE_AP || mode == wifi_mode_t_WIFI_MODE_APSTA)
+        WifiMode::current().map(|m| m.is_ap())
     }
 
     fn scan_result_count(&mut self) -> Result<usize, WifiError> {
@@ -1068,8 +1090,9 @@ fn esp_wifi_can_send() -> bool {
 // Casting const to mut is instant UB, even though in reality `esp_wifi_internal_tx` copies the buffer into its own memory and
 // does not modify
 pub fn esp_wifi_send_data(data: &mut [u8]) {
-    let mode = unwrap!(get_wifi_mode());
+    let mode = unwrap!(WifiMode::current());
 
+    // FIXME this won't do in AP-STA mode
     let interface = if mode.is_ap() {
         wifi_interface_t_WIFI_IF_AP
     } else {

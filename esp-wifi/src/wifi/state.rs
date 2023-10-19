@@ -69,9 +69,10 @@ pub(crate) fn reset_sta_state() {
 }
 
 pub fn get_wifi_state() -> WifiState {
-    match super::get_wifi_mode() {
-        Ok(super::WifiMode::Sta) => get_sta_state(),
-        Ok(super::WifiMode::Ap) => get_ap_state(),
+    use super::WifiMode;
+    match WifiMode::current() {
+        Ok(WifiMode::Sta) => get_sta_state(),
+        Ok(WifiMode::Ap) => get_ap_state(),
         _ => WifiState::Invalid,
     }
 }
