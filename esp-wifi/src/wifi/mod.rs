@@ -1243,12 +1243,11 @@ impl Wifi for WifiController<'_> {
     }
 }
 
-#[allow(unreachable_code, unused_variables)]
-fn dump_packet_info(buffer: &[u8]) {
-    #[cfg(not(feature = "dump-packets"))]
-    return;
-
-    info!("@WIFIFRAME {:?}", buffer);
+fn dump_packet_info(_buffer: &[u8]) {
+    #[cfg(feature = "dump-packets")]
+    {
+        info!("@WIFIFRAME {:?}", _buffer);
+    }
 }
 
 #[macro_export]
