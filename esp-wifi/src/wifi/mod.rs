@@ -1483,7 +1483,7 @@ mod asynch {
             if clear_pending {
                 Self::clear_events(events);
             }
-            MultiWifiEventFuture::new(EnumSet::from(events)).await
+            MultiWifiEventFuture::new(events).await
         }
     }
 
