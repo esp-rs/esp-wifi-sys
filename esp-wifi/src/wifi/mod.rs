@@ -59,11 +59,12 @@ use crate::{
             wifi_config_t, wifi_country_policy_t_WIFI_COUNTRY_POLICY_MANUAL, wifi_country_t,
             wifi_init_config_t, wifi_interface_t, wifi_interface_t_WIFI_IF_AP,
             wifi_interface_t_WIFI_IF_STA, wifi_mode_t, wifi_mode_t_WIFI_MODE_AP,
-            wifi_mode_t_WIFI_MODE_NULL, wifi_mode_t_WIFI_MODE_STA, wifi_osi_funcs_t,
-            wifi_pmf_config_t, wifi_scan_config_t, wifi_scan_threshold_t, wifi_scan_time_t,
-            wifi_scan_type_t_WIFI_SCAN_TYPE_ACTIVE, wifi_scan_type_t_WIFI_SCAN_TYPE_PASSIVE,
-            wifi_sort_method_t_WIFI_CONNECT_AP_BY_SIGNAL, wifi_sta_config_t, wpa_crypto_funcs_t,
-            ESP_WIFI_OS_ADAPTER_MAGIC, ESP_WIFI_OS_ADAPTER_VERSION, WIFI_INIT_CONFIG_MAGIC,
+            wifi_mode_t_WIFI_MODE_APSTA, wifi_mode_t_WIFI_MODE_NULL, wifi_mode_t_WIFI_MODE_STA,
+            wifi_osi_funcs_t, wifi_pmf_config_t, wifi_scan_config_t, wifi_scan_threshold_t,
+            wifi_scan_time_t, wifi_scan_type_t_WIFI_SCAN_TYPE_ACTIVE,
+            wifi_scan_type_t_WIFI_SCAN_TYPE_PASSIVE, wifi_sort_method_t_WIFI_CONNECT_AP_BY_SIGNAL,
+            wifi_sta_config_t, wpa_crypto_funcs_t, ESP_WIFI_OS_ADAPTER_MAGIC,
+            ESP_WIFI_OS_ADAPTER_VERSION, WIFI_INIT_CONFIG_MAGIC,
         },
     },
     compat::queue::SimpleQueue,
@@ -1007,7 +1008,10 @@ impl<'d> WifiController<'d> {
                 esp_wifi_result!(unsafe { esp_wifi_set_mode(wifi_mode_t_WIFI_MODE_AP) })?;
                 debug!("Wifi mode AP set");
             }
-            embedded_svc::wifi::Configuration::Mixed(_, _) => unimplemented!(),
+            embedded_svc::wifi::Configuration::Mixed(_, _) => {
+                esp_wifi_result!(unsafe { esp_wifi_set_mode(wifi_mode_t_WIFI_MODE_APSTA) })?;
+                debug!("Wifi mode AP-STA set");
+            }
         };
 
         this.set_configuration(&config)?;
@@ -1343,7 +1347,10 @@ impl Wifi for WifiController<'_> {
             embedded_svc::wifi::Configuration::None => panic!(),
             embedded_svc::wifi::Configuration::Client(config) => apply_sta_config(config)?,
             embedded_svc::wifi::Configuration::AccessPoint(config) => apply_ap_config(config)?,
-            embedded_svc::wifi::Configuration::Mixed(_, _) => panic!(),
+            embedded_svc::wifi::Configuration::Mixed(sta_config, ap_config) => {
+                apply_ap_config(ap_config)?;
+                apply_sta_config(sta_config)?;
+            }
         };
 
         Ok(())
