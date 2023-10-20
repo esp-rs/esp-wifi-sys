@@ -120,22 +120,22 @@ impl WifiMode {
         let mut mode = wifi_mode_t_WIFI_MODE_NULL;
         esp_wifi_result!(unsafe { esp_wifi_get_mode(&mut mode) })?;
 
-        WifiMode::try_from(mode)
+        Self::try_from(mode)
     }
 
     /// Returns true if this mode is STA
     pub fn is_sta(&self) -> bool {
         match self {
-            WifiMode::Sta | WifiMode::ApSta => true,
-            WifiMode::Ap => false,
+            Self::Sta | Self::ApSta => true,
+            Self::Ap => false,
         }
     }
 
     /// Returns true if this mode is AP
     pub fn is_ap(&self) -> bool {
         match self {
-            WifiMode::Sta => false,
-            WifiMode::Ap | WifiMode::ApSta => true,
+            Self::Sta => false,
+            Self::Ap | Self::ApSta => true,
         }
     }
 }
@@ -146,9 +146,9 @@ impl TryFrom<&embedded_svc::wifi::Configuration> for WifiMode {
     fn try_from(config: &embedded_svc::wifi::Configuration) -> Result<Self, Self::Error> {
         let mode = match config {
             embedded_svc::wifi::Configuration::None => return Err(WifiError::UnknownWifiMode),
-            embedded_svc::wifi::Configuration::AccessPoint(_) => WifiMode::Ap,
-            embedded_svc::wifi::Configuration::Client(_) => WifiMode::Sta,
-            embedded_svc::wifi::Configuration::Mixed(_, _) => WifiMode::ApSta,
+            embedded_svc::wifi::Configuration::AccessPoint(_) => Self::Ap,
+            embedded_svc::wifi::Configuration::Client(_) => Self::Sta,
+            embedded_svc::wifi::Configuration::Mixed(_, _) => Self::ApSta,
         };
 
         Ok(mode)
@@ -161,9 +161,9 @@ impl TryFrom<wifi_mode_t> for WifiMode {
     fn try_from(value: wifi_mode_t) -> Result<Self, Self::Error> {
         #[allow(non_upper_case_globals)]
         match value {
-            include::wifi_mode_t_WIFI_MODE_STA => Ok(WifiMode::Sta),
-            include::wifi_mode_t_WIFI_MODE_AP => Ok(WifiMode::Ap),
-            include::wifi_mode_t_WIFI_MODE_APSTA => Ok(WifiMode::ApSta),
+            include::wifi_mode_t_WIFI_MODE_STA => Ok(Self::Sta),
+            include::wifi_mode_t_WIFI_MODE_AP => Ok(Self::Ap),
+            include::wifi_mode_t_WIFI_MODE_APSTA => Ok(Self::ApSta),
             _ => Err(WifiError::UnknownWifiMode),
         }
     }
@@ -173,9 +173,9 @@ impl Into<wifi_mode_t> for WifiMode {
     fn into(self) -> wifi_mode_t {
         #[allow(non_upper_case_globals)]
         match self {
-            WifiMode::Sta => wifi_mode_t_WIFI_MODE_STA,
-            WifiMode::Ap => wifi_mode_t_WIFI_MODE_AP,
-            WifiMode::ApSta => wifi_mode_t_WIFI_MODE_APSTA,
+            Self::Sta => wifi_mode_t_WIFI_MODE_STA,
+            Self::Ap => wifi_mode_t_WIFI_MODE_AP,
+            Self::ApSta => wifi_mode_t_WIFI_MODE_APSTA,
         }
     }
 }
@@ -1054,12 +1054,12 @@ impl<'d> WifiController<'d> {
 
     #[allow(unused)]
     fn is_sta_enabled(&self) -> Result<bool, WifiError> {
-        WifiMode::current().map(|m| m.is_sta())
+        WifiMode::try_from(&self.config).map(|m| m.is_sta())
     }
 
     #[allow(unused)]
     fn is_ap_enabled(&self) -> Result<bool, WifiError> {
-        WifiMode::current().map(|m| m.is_ap())
+        WifiMode::try_from(&self.config).map(|m| m.is_ap())
     }
 
     fn scan_result_count(&mut self) -> Result<usize, WifiError> {
@@ -1578,12 +1578,7 @@ mod asynch {
 
         /// Async version of [`embedded_svc::wifi::Wifi`]'s `start` method
         pub async fn start(&mut self) -> Result<(), WifiError> {
-            let mode = match self.config {
-                embedded_svc::wifi::Configuration::None => panic!(),
-                embedded_svc::wifi::Configuration::Client(_) => WifiMode::Sta,
-                embedded_svc::wifi::Configuration::AccessPoint(_) => WifiMode::Ap,
-                embedded_svc::wifi::Configuration::Mixed(_, _) => panic!(),
-            };
+            let mode = WifiMode::try_from(&self.config)?;
 
             let mut events = enumset::enum_set! {};
             if mode.is_ap() {
@@ -1604,12 +1599,7 @@ mod asynch {
 
         /// Async version of [`embedded_svc::wifi::Wifi`]'s `stop` method
         pub async fn stop(&mut self) -> Result<(), WifiError> {
-            let mode = match self.config {
-                embedded_svc::wifi::Configuration::None => panic!(),
-                embedded_svc::wifi::Configuration::Client(_) => WifiMode::Sta,
-                embedded_svc::wifi::Configuration::AccessPoint(_) => WifiMode::Ap,
-                embedded_svc::wifi::Configuration::Mixed(_, _) => panic!(),
-            };
+            let mode = WifiMode::try_from(&self.config)?;
 
             let mut events = enumset::enum_set! {};
             if mode.is_ap() {
