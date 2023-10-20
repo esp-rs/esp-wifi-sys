@@ -112,6 +112,7 @@ impl AuthMethodExt for AuthMethod {
 pub enum WifiMode {
     Sta,
     Ap,
+    ApSta,
 }
 
 impl WifiMode {
@@ -125,7 +126,7 @@ impl WifiMode {
     /// Returns true if this mode is STA
     pub fn is_sta(&self) -> bool {
         match self {
-            WifiMode::Sta => true,
+            WifiMode::Sta | WifiMode::ApSta => true,
             WifiMode::Ap => false,
         }
     }
@@ -134,7 +135,7 @@ impl WifiMode {
     pub fn is_ap(&self) -> bool {
         match self {
             WifiMode::Sta => false,
-            WifiMode::Ap => true,
+            WifiMode::Ap | WifiMode::ApSta => true,
         }
     }
 }
@@ -147,6 +148,7 @@ impl TryFrom<wifi_mode_t> for WifiMode {
         match value {
             include::wifi_mode_t_WIFI_MODE_STA => Ok(WifiMode::Sta),
             include::wifi_mode_t_WIFI_MODE_AP => Ok(WifiMode::Ap),
+            include::wifi_mode_t_WIFI_MODE_APSTA => Ok(WifiMode::ApSta),
             _ => Err(WifiError::UnknownWifiMode),
         }
     }
@@ -158,6 +160,7 @@ impl Into<wifi_mode_t> for WifiMode {
         match self {
             WifiMode::Sta => wifi_mode_t_WIFI_MODE_STA,
             WifiMode::Ap => wifi_mode_t_WIFI_MODE_AP,
+            WifiMode::ApSta => wifi_mode_t_WIFI_MODE_APSTA,
         }
     }
 }
@@ -915,6 +918,7 @@ pub fn new_with_config<'d>(
 
     crate::hal::into_ref!(device);
 
+    // TODO: we'll need two devices for AP-STA mode
     Ok((
         WifiDevice::new(unsafe { device.clone_unchecked() }),
         WifiController::new_with_config(device, config)?,
@@ -933,6 +937,9 @@ pub fn new_with_mode<'d>(
         match mode {
             WifiMode::Sta => embedded_svc::wifi::Configuration::Client(Default::default()),
             WifiMode::Ap => embedded_svc::wifi::Configuration::AccessPoint(Default::default()),
+            WifiMode::ApSta => {
+                embedded_svc::wifi::Configuration::Mixed(Default::default(), Default::default())
+            }
         },
     )
 }
