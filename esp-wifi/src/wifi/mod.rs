@@ -1396,42 +1396,52 @@ mod asynch {
 
         /// Async version of [`embedded_svc::wifi::Wifi`]'s `start` method
         pub async fn start(&mut self) -> Result<(), WifiError> {
-            let is_ap = match self.config {
+            let mode = match self.config {
                 embedded_svc::wifi::Configuration::None => panic!(),
-                embedded_svc::wifi::Configuration::Client(_) => false,
-                embedded_svc::wifi::Configuration::AccessPoint(_) => true,
+                embedded_svc::wifi::Configuration::Client(_) => WifiMode::Sta,
+                embedded_svc::wifi::Configuration::AccessPoint(_) => WifiMode::Ap,
                 embedded_svc::wifi::Configuration::Mixed(_, _) => panic!(),
             };
-            let event = if is_ap {
-                WifiEvent::ApStart
-            } else {
-                WifiEvent::StaStart
-            };
 
-            Self::clear_events(event);
+            let mut events = enumset::enum_set! {};
+            if mode.is_ap() {
+                events |= WifiEvent::ApStart;
+            }
+            if mode.is_sta() {
+                events |= WifiEvent::StaStart;
+            }
+
+            Self::clear_events(events);
+
             wifi_start()?;
-            WifiEventFuture::new(event).await;
+
+            self.wait_for_all_events(events, false).await;
 
             Ok(())
         }
 
         /// Async version of [`embedded_svc::wifi::Wifi`]'s `stop` method
         pub async fn stop(&mut self) -> Result<(), WifiError> {
-            let is_ap = match self.config {
+            let mode = match self.config {
                 embedded_svc::wifi::Configuration::None => panic!(),
-                embedded_svc::wifi::Configuration::Client(_) => false,
-                embedded_svc::wifi::Configuration::AccessPoint(_) => true,
+                embedded_svc::wifi::Configuration::Client(_) => WifiMode::Sta,
+                embedded_svc::wifi::Configuration::AccessPoint(_) => WifiMode::Ap,
                 embedded_svc::wifi::Configuration::Mixed(_, _) => panic!(),
             };
-            let event = if is_ap {
-                WifiEvent::ApStop
-            } else {
-                WifiEvent::StaStop
-            };
 
-            Self::clear_events(event);
+            let mut events = enumset::enum_set! {};
+            if mode.is_ap() {
+                events |= WifiEvent::ApStop;
+            }
+            if mode.is_sta() {
+                events |= WifiEvent::StaStop;
+            }
+
+            Self::clear_events(events);
+
             embedded_svc::wifi::Wifi::stop(self)?;
-            WifiEventFuture::new(event).await;
+
+            self.wait_for_all_events(events, false).await;
 
             reset_ap_state();
             reset_sta_state();
@@ -1474,7 +1484,7 @@ mod asynch {
             WifiEventFuture::new(event).await
         }
 
-        /// Wait for multiple [`WifiEvent`]s. Returns the events that occurred while waiting.
+        /// Wait for one of multiple [`WifiEvent`]s. Returns the events that occurred while waiting.
         pub async fn wait_for_events(
             &mut self,
             events: EnumSet<WifiEvent>,
@@ -1484,6 +1494,22 @@ mod asynch {
                 Self::clear_events(events);
             }
             MultiWifiEventFuture::new(events).await
+        }
+
+        /// Wait for multiple [`WifiEvent`]s.
+        pub async fn wait_for_all_events(
+            &mut self,
+            mut events: EnumSet<WifiEvent>,
+            clear_pending: bool,
+        ) {
+            if clear_pending {
+                Self::clear_events(events);
+            }
+
+            while !events.is_empty() {
+                let fired = MultiWifiEventFuture::new(events).await;
+                events -= fired;
+            }
         }
     }
 
