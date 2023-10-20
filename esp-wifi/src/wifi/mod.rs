@@ -737,9 +737,7 @@ pub fn wifi_start() -> Result<(), WifiError> {
         let mut cntry_code = [0u8; 3];
         cntry_code[..crate::CONFIG.country_code.len()]
             .copy_from_slice(crate::CONFIG.country_code.as_bytes());
-        if crate::CONFIG.country_code_operating_class != 0 {
-            cntry_code[2] = crate::CONFIG.country_code_operating_class;
-        }
+        cntry_code[2] = crate::CONFIG.country_code_operating_class;
 
         let country = wifi_country_t {
             cc: core::mem::transmute(cntry_code),
