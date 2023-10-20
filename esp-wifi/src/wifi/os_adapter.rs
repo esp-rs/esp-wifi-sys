@@ -895,11 +895,11 @@ pub unsafe extern "C" fn event_post(
     #[cfg(feature = "embassy-net")]
     match event {
         WifiEvent::StaConnected | WifiEvent::StaDisconnected => {
-            crate::wifi::embassy::LINK_STATE.wake();
+            crate::wifi::embassy::STA_LINK_STATE_WAKER.wake();
         }
 
         WifiEvent::ApStart | WifiEvent::ApStop => {
-            crate::wifi::embassy::LINK_STATE.wake();
+            crate::wifi::embassy::AP_LINK_STATE_WAKER.wake();
         }
 
         _ => {}

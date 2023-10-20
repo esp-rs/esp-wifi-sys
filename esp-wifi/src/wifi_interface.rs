@@ -12,7 +12,7 @@ use smoltcp::time::Instant;
 use smoltcp::wire::{DnsQueryType, IpAddress, IpCidr, IpEndpoint, Ipv4Address};
 
 use crate::current_millis;
-use crate::wifi::{get_ap_mac, get_sta_mac, WifiDevice, WifiMode};
+use crate::wifi::{get_ap_mac, get_sta_mac, WifiDevice, WifiDeviceMode};
 
 use core::borrow::BorrowMut;
 
@@ -78,9 +78,8 @@ impl<'a> WifiStack<'a> {
     ) -> Result<(), WifiStackError> {
         let mut mac = [0u8; 6];
         match self.device.borrow().get_wifi_mode() {
-            Ok(WifiMode::Sta) => get_sta_mac(&mut mac),
-            Ok(WifiMode::Ap) => get_ap_mac(&mut mac),
-            _ => (),
+            WifiDeviceMode::Sta => get_sta_mac(&mut mac),
+            WifiDeviceMode::Ap => get_ap_mac(&mut mac),
         }
         let hw_address = smoltcp::wire::HardwareAddress::Ethernet(
             smoltcp::wire::EthernetAddress::from_bytes(&mac),
