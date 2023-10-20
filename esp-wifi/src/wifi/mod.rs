@@ -6,7 +6,7 @@ use core::ptr::addr_of;
 use core::sync::atomic::Ordering;
 use core::{cell::RefCell, mem::MaybeUninit};
 
-use crate::common_adapter::*;
+use crate::common_adapter::{self, *};
 use crate::esp_wifi_result;
 use crate::hal::macros::ram;
 use crate::hal::peripheral::Peripheral;
@@ -231,53 +231,74 @@ pub enum WifiEvent {
 #[derive(Copy, Clone, Debug, PartialEq, Eq, FromPrimitive)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum InternalWifiError {
-    ///Out of memory
+    /// Out of memory
     EspErrNoMem = 0x101,
-    ///Invalid argument
+
+    /// Invalid argument
     EspErrInvalidArg = 0x102,
-    ///WiFi driver was not installed by esp_wifi_init */
+
+    /// WiFi driver was not installed by esp_wifi_init
     EspErrWifiNotInit = 0x3001,
-    ///WiFi driver was not started by esp_wifi_start */
+
+    /// WiFi driver was not started by esp_wifi_start
     EspErrWifiNotStarted = 0x3002,
-    ///WiFi driver was not stopped by esp_wifi_stop */
+
+    /// WiFi driver was not stopped by esp_wifi_stop
     EspErrWifiNotStopped = 0x3003,
-    ///WiFi interface error */   
+
+    /// WiFi interface error
     EspErrWifiIf = 0x3004,
-    ///WiFi mode error */
+
+    /// WiFi mode error
     EspErrWifiMode = 0x3005,
-    ///WiFi internal state error */  
+
+    /// WiFi internal state error
     EspErrWifiState = 0x3006,
-    ///WiFi internal control block of station or soft-AP error */  
+
+    /// WiFi internal control block of station or soft-AP error
     EspErrWifiConn = 0x3007,
-    ///WiFi internal NVS module error */  
+
+    /// WiFi internal NVS module error
     EspErrWifiNvs = 0x3008,
-    ///MAC address is invalid */  
+
+    /// MAC address is invalid
     EspErrWifiMac = 0x3009,
-    ///SSID is invalid */
+
+    /// SSID is invalid
     EspErrWifiSsid = 0x300A,
-    ///Password is invalid */
+
+    /// Password is invalid
     EspErrWifiPassword = 0x300B,
-    ///Timeout error */
+
+    /// Timeout error
     EspErrWifiTimeout = 0x300C,
-    ///WiFi is in sleep state(RF closed) and wakeup fail */
+
+    /// WiFi is in sleep state(RF closed) and wakeup fail
     EspErrWifiWakeFail = 0x300D,
-    ///The caller would block */
+
+    /// The caller would block
     EspErrWifiWouldBlock = 0x300E,
-    ///Station still in disconnect status */
+
+    /// Station still in disconnect status
     EspErrWifiNotConnect = 0x300F,
-    ///Failed to post the event to WiFi task */
+
+    /// Failed to post the event to WiFi task
     EspErrWifiPost = 0x3012,
-    ///Invalid WiFi state when init/deinit is called */
+
+    /// Invalid WiFi state when init/deinit is called
     EspErrWifiInitState = 0x3013,
-    ///Returned when WiFi is stopping */
+
+    /// Returned when WiFi is stopping
     EspErrWifiStopState = 0x3014,
-    ///The WiFi connection is not associated */
+
+    /// The WiFi connection is not associated
     EspErrWifiNotAssoc = 0x3015,
-    ///The WiFi TX is disallowed */
+
+    /// The WiFi TX is disallowed
     EspErrWifiTxDisallow = 0x3016,
 }
 
-#[cfg(all(esp32c3, coex))]
+#[cfg(all(coex, any(esp32, esp32c3, esp32s3)))]
 static mut G_COEX_ADAPTER_FUNCS: coex_adapter_funcs_t = coex_adapter_funcs_t {
     _version: include::COEX_ADAPTER_VERSION as i32,
     _task_yield_from_isr: Some(task_yield_from_isr),
@@ -297,54 +318,15 @@ static mut G_COEX_ADAPTER_FUNCS: coex_adapter_funcs_t = coex_adapter_funcs_t {
     _timer_done: Some(timer_done),
     _timer_setfn: Some(timer_setfn),
     _timer_arm_us: Some(timer_arm_us),
-};
 
-#[cfg(all(esp32s3, coex))]
-static mut G_COEX_ADAPTER_FUNCS: coex_adapter_funcs_t = coex_adapter_funcs_t {
-    _version: include::COEX_ADAPTER_VERSION as i32,
-    _task_yield_from_isr: Some(task_yield_from_isr),
-    _semphr_create: Some(semphr_create),
-    _semphr_delete: Some(semphr_delete),
-    _semphr_take_from_isr: Some(semphr_take_from_isr_wrapper),
-    _semphr_give_from_isr: Some(semphr_give_from_isr_wrapper),
-    _semphr_take: Some(semphr_take),
-    _semphr_give: Some(semphr_give),
-    _is_in_isr: Some(is_in_isr_wrapper),
-    _malloc_internal: Some(malloc),
-    _free: Some(free),
-    _esp_timer_get_time: Some(esp_timer_get_time),
-    _env_is_chip: Some(env_is_chip),
-    _magic: include::COEX_ADAPTER_MAGIC as i32,
-    _timer_disarm: Some(timer_disarm),
-    _timer_done: Some(timer_done),
-    _timer_setfn: Some(timer_setfn),
-    _timer_arm_us: Some(timer_arm_us),
-};
-
-#[cfg(all(esp32, coex))]
-static mut G_COEX_ADAPTER_FUNCS: coex_adapter_funcs_t = coex_adapter_funcs_t {
-    _version: include::COEX_ADAPTER_VERSION as i32,
-    _task_yield_from_isr: Some(task_yield_from_isr),
-    _semphr_create: Some(semphr_create),
-    _semphr_delete: Some(semphr_delete),
-    _semphr_take_from_isr: Some(semphr_take_from_isr_wrapper),
-    _semphr_give_from_isr: Some(semphr_give_from_isr_wrapper),
-    _semphr_take: Some(semphr_take),
-    _semphr_give: Some(semphr_give),
-    _is_in_isr: Some(is_in_isr_wrapper),
-    _malloc_internal: Some(malloc),
-    _free: Some(free),
-    _esp_timer_get_time: Some(esp_timer_get_time),
+    #[cfg(esp32)]
     _spin_lock_create: Some(spin_lock_create),
+    #[cfg(esp32)]
     _spin_lock_delete: Some(spin_lock_delete),
+    #[cfg(esp32)]
     _int_disable: Some(wifi_int_disable),
+    #[cfg(esp32)]
     _int_enable: Some(wifi_int_restore),
-    _timer_disarm: Some(timer_disarm),
-    _timer_done: Some(timer_done),
-    _timer_setfn: Some(timer_setfn),
-    _timer_arm_us: Some(timer_arm_us),
-    _env_is_chip: Some(env_is_chip),
-    _magic: include::COEX_ADAPTER_MAGIC as i32,
 };
 
 #[cfg(coex)]
@@ -352,7 +334,7 @@ unsafe extern "C" fn semphr_take_from_isr_wrapper(
     semphr: *mut c_types::c_void,
     hptw: *mut c_types::c_void,
 ) -> i32 {
-    crate::common_adapter::semphr_take_from_isr(semphr as *const (), hptw as *const ())
+    common_adapter::semphr_take_from_isr(semphr as *const (), hptw as *const ())
 }
 
 #[cfg(coex)]
@@ -360,7 +342,7 @@ unsafe extern "C" fn semphr_give_from_isr_wrapper(
     semphr: *mut c_types::c_void,
     hptw: *mut c_types::c_void,
 ) -> i32 {
-    crate::common_adapter::semphr_give_from_isr(semphr as *const (), hptw as *const ())
+    common_adapter::semphr_give_from_isr(semphr as *const (), hptw as *const ())
 }
 
 #[cfg(coex)]
@@ -545,8 +527,10 @@ static g_wifi_osi_funcs: wifi_osi_funcs_t = wifi_osi_funcs_t {
 
 const CONFIG_FEATURE_WPA3_SAE_BIT: u64 = 1 << 0;
 
+const WIFI_FEATURE_CAPS: u64 = CONFIG_FEATURE_WPA3_SAE_BIT;
+
 #[no_mangle]
-static mut g_wifi_feature_caps: u64 = CONFIG_FEATURE_WPA3_SAE_BIT;
+static mut g_wifi_feature_caps: u64 = WIFI_FEATURE_CAPS;
 
 static mut G_CONFIG: wifi_init_config_t = wifi_init_config_t {
     osi_funcs: addr_of!(g_wifi_osi_funcs).cast_mut(),
@@ -599,7 +583,7 @@ static mut G_CONFIG: wifi_init_config_t = wifi_init_config_t {
     wifi_task_core_id: 0,
     beacon_max_len: 752,
     mgmt_sbuf_num: 32,
-    feature_caps: CONFIG_FEATURE_WPA3_SAE_BIT,
+    feature_caps: WIFI_FEATURE_CAPS,
     sta_disconnected_pm: false,
     espnow_max_encrypt_num: 7, // 2 for ESP32-C2
     magic: WIFI_INIT_CONFIG_MAGIC as i32,
@@ -648,7 +632,7 @@ pub fn wifi_init() -> Result<(), WifiError> {
         #[cfg(any(esp32, esp32s3))]
         {
             static mut NVS_STRUCT: [u32; 12] = [0; 12];
-            crate::common_adapter::chip_specific::g_misc_nvs = addr_of!(NVS_STRUCT) as u32;
+            chip_specific::g_misc_nvs = addr_of!(NVS_STRUCT) as u32;
         }
 
         Ok(())
@@ -695,6 +679,7 @@ unsafe extern "C" fn esp_wifi_tx_done_cb(
             Some(x.saturating_sub(1))
         })
         .unwrap();
+
     #[cfg(feature = "embassy-net")]
     embassy::TRANSMIT_WAKER.wake();
 }
@@ -774,7 +759,7 @@ pub fn wifi_start_scan(block: bool) -> i32 {
         channel: 0,
         show_hidden: false,
         scan_type: wifi_scan_type_t_WIFI_SCAN_TYPE_ACTIVE,
-        scan_time: scan_time,
+        scan_time,
     };
 
     unsafe { esp_wifi_scan_start(&scan_config, block) }
@@ -842,8 +827,6 @@ fn convert_ap_info(record: &include::wifi_ap_record_t) -> AccessPointInfo {
         .unwrap_or(record.ssid.len());
     let ssid_ref = unsafe { core::str::from_utf8_unchecked(&record.ssid[..str_len]) };
 
-    let auth_method = AuthMethod::from_raw(record.authmode);
-
     let mut ssid = heapless::String::<32>::new();
     unwrap!(ssid.push_str(ssid_ref));
 
@@ -859,7 +842,7 @@ fn convert_ap_info(record: &include::wifi_ap_record_t) -> AccessPointInfo {
         },
         signal_strength: record.rssi,
         protocols: EnumSet::empty(), // TODO
-        auth_method,
+        auth_method: AuthMethod::from_raw(record.authmode),
     }
 }
 
@@ -1059,6 +1042,7 @@ where
 {
     WIFI_TX_INFLIGHT.fetch_add(1, Ordering::SeqCst);
     // (safety): creation of multiple WiFi devices is impossible in safe Rust, therefore only smoltcp _or_ embassy-net can be used at one time
+    // TODO: this probably won't do in AP-STA mode
     static mut BUFFER: [u8; DATA_FRAME_SIZE] = [0u8; DATA_FRAME_SIZE];
     let buffer = unsafe { &mut BUFFER[..len] };
     let res = f(buffer);
@@ -1103,8 +1087,8 @@ pub fn esp_wifi_send_data(data: &mut [u8]) {
 fn apply_ap_config(config: &AccessPointConfiguration) -> Result<(), WifiError> {
     let mut cfg = wifi_config_t {
         ap: wifi_ap_config_t {
-            ssid: [0u8; 32usize],
-            password: [0u8; 64usize],
+            ssid: [0; 32],
+            password: [0; 64],
             ssid_len: 0,
             channel: config.channel,
             authmode: config.auth_method.to_raw(),
@@ -1125,24 +1109,23 @@ fn apply_ap_config(config: &AccessPointConfiguration) -> Result<(), WifiError> {
         cfg.ap.ssid[0..(config.ssid.len())].copy_from_slice(config.ssid.as_bytes());
         cfg.ap.ssid_len = config.ssid.len() as u8;
         cfg.ap.password[0..(config.password.len())].copy_from_slice(config.password.as_bytes());
+
+        esp_wifi_result!(esp_wifi_set_config(wifi_interface_t_WIFI_IF_AP, &mut cfg))
     }
-    esp_wifi_result!(unsafe { esp_wifi_set_config(wifi_interface_t_WIFI_IF_AP, &mut cfg) })
 }
 
 fn apply_sta_config(config: &ClientConfiguration) -> Result<(), WifiError> {
-    let bssid: [u8; 6] = match &config.bssid {
-        Some(bssid_ref) => *bssid_ref,
-        None => [0; 6],
-    };
-
     let mut cfg = wifi_config_t {
         sta: wifi_sta_config_t {
             ssid: [0; 32],
             password: [0; 64],
             scan_method: crate::CONFIG.scan_method,
             bssid_set: config.bssid.is_some(),
-            bssid,
-            channel: config.channel.unwrap_or(0u8),
+            bssid: match config.bssid {
+                Some(bssid_ref) => bssid_ref,
+                None => [0; 6],
+            },
+            channel: config.channel.unwrap_or(0),
             listen_interval: crate::CONFIG.listen_interval,
             sort_method: wifi_sort_method_t_WIFI_CONNECT_AP_BY_SIGNAL,
             threshold: wifi_scan_threshold_t {
@@ -1154,21 +1137,22 @@ fn apply_sta_config(config: &ClientConfiguration) -> Result<(), WifiError> {
                 required: false,
             },
             sae_pwe_h2e: 3,
-            _bitfield_align_1: [0u32; 0],
-            _bitfield_1: __BindgenBitfieldUnit::new([0u8; 4usize]),
+            _bitfield_align_1: [0; 0],
+            _bitfield_1: __BindgenBitfieldUnit::new([0; 4]),
             failure_retry_cnt: crate::CONFIG.failure_retry_cnt,
-            _bitfield_align_2: [0u32; 0],
-            _bitfield_2: __BindgenBitfieldUnit::new([0u8; 4usize]),
+            _bitfield_align_2: [0; 0],
+            _bitfield_2: __BindgenBitfieldUnit::new([0; 4]),
             sae_pk_mode: 0, // ??
-            sae_h2e_identifier: [0u8; 32usize],
+            sae_h2e_identifier: [0; 32],
         },
     };
 
     unsafe {
         cfg.sta.ssid[0..(config.ssid.len())].copy_from_slice(config.ssid.as_bytes());
         cfg.sta.password[0..(config.password.len())].copy_from_slice(config.password.as_bytes());
+
+        esp_wifi_result!(esp_wifi_set_config(wifi_interface_t_WIFI_IF_STA, &mut cfg))
     }
-    esp_wifi_result!(unsafe { esp_wifi_set_config(wifi_interface_t_WIFI_IF_STA, &mut cfg) })
 }
 
 impl Wifi for WifiController<'_> {
