@@ -140,6 +140,21 @@ impl WifiMode {
     }
 }
 
+impl TryFrom<&embedded_svc::wifi::Configuration> for WifiMode {
+    type Error = WifiError;
+
+    fn try_from(config: &embedded_svc::wifi::Configuration) -> Result<Self, Self::Error> {
+        let mode = match config {
+            embedded_svc::wifi::Configuration::None => return Err(WifiError::UnknownWifiMode),
+            embedded_svc::wifi::Configuration::AccessPoint(_) => WifiMode::Ap,
+            embedded_svc::wifi::Configuration::Client(_) => WifiMode::Sta,
+            embedded_svc::wifi::Configuration::Mixed(_, _) => WifiMode::ApSta,
+        };
+
+        Ok(mode)
+    }
+}
+
 impl TryFrom<wifi_mode_t> for WifiMode {
     type Error = WifiError;
 
@@ -1005,21 +1020,9 @@ impl<'d> WifiController<'d> {
             config: Default::default(),
         };
 
-        match config {
-            embedded_svc::wifi::Configuration::None => panic!(),
-            embedded_svc::wifi::Configuration::Client(_) => {
-                esp_wifi_result!(unsafe { esp_wifi_set_mode(wifi_mode_t_WIFI_MODE_STA) })?;
-                debug!("Wifi mode STA set");
-            }
-            embedded_svc::wifi::Configuration::AccessPoint(_) => {
-                esp_wifi_result!(unsafe { esp_wifi_set_mode(wifi_mode_t_WIFI_MODE_AP) })?;
-                debug!("Wifi mode AP set");
-            }
-            embedded_svc::wifi::Configuration::Mixed(_, _) => {
-                esp_wifi_result!(unsafe { esp_wifi_set_mode(wifi_mode_t_WIFI_MODE_APSTA) })?;
-                debug!("Wifi mode AP-STA set");
-            }
-        };
+        let mode = WifiMode::try_from(&config)?;
+        esp_wifi_result!(unsafe { esp_wifi_set_mode(mode.into()) })?;
+        debug!("Wifi mode {:?} set", mode);
 
         this.set_configuration(&config)?;
         Ok(this)
