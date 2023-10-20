@@ -858,6 +858,9 @@ impl<'d> WifiController<'d> {
         _device: PeripheralRef<'d, crate::hal::radio::Wifi>,
         config: embedded_svc::wifi::Configuration,
     ) -> Result<Self, WifiError> {
+        // We set up the controller with the default config because we need to call
+        // `set_configuration` to apply the actual configuration, and it will update the stored
+        // configuration anyway.
         let mut this = Self {
             _device,
             config: Default::default(),
