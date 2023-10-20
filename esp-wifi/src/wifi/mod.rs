@@ -1032,8 +1032,8 @@ where
         );
         let buffer = data.as_slice_mut();
         dump_packet_info(&buffer);
-        let res = f(buffer);
-        res
+
+        f(buffer)
     })
 }
 
