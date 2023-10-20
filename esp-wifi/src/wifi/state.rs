@@ -68,6 +68,9 @@ pub(crate) fn reset_sta_state() {
     STA_STATE.store(WifiState::Invalid, Ordering::Relaxed)
 }
 
+/// Returns the current state of the WiFi stack.
+///
+/// This does not support AP-STA mode. Use one of `get_sta_state` or `get_ap_state` instead.
 pub fn get_wifi_state() -> WifiState {
     use super::WifiMode;
     match WifiMode::current() {

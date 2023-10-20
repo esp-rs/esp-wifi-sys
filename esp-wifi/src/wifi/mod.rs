@@ -55,12 +55,13 @@ use crate::{
             esp_wifi_stop, g_wifi_default_wpa_crypto_funcs, wifi_active_scan_time_t,
             wifi_ap_config_t, wifi_auth_mode_t, wifi_cipher_type_t_WIFI_CIPHER_TYPE_TKIP,
             wifi_config_t, wifi_country_policy_t_WIFI_COUNTRY_POLICY_MANUAL, wifi_country_t,
-            wifi_init_config_t, wifi_interface_t_WIFI_IF_AP, wifi_interface_t_WIFI_IF_STA,
-            wifi_mode_t, wifi_mode_t_WIFI_MODE_AP, wifi_mode_t_WIFI_MODE_NULL,
-            wifi_mode_t_WIFI_MODE_STA, wifi_osi_funcs_t, wifi_pmf_config_t, wifi_scan_config_t,
-            wifi_scan_threshold_t, wifi_scan_time_t, wifi_scan_type_t_WIFI_SCAN_TYPE_ACTIVE,
-            wifi_sort_method_t_WIFI_CONNECT_AP_BY_SIGNAL, wifi_sta_config_t, wpa_crypto_funcs_t,
-            ESP_WIFI_OS_ADAPTER_MAGIC, ESP_WIFI_OS_ADAPTER_VERSION, WIFI_INIT_CONFIG_MAGIC,
+            wifi_init_config_t, wifi_interface_t, wifi_interface_t_WIFI_IF_AP,
+            wifi_interface_t_WIFI_IF_STA, wifi_mode_t, wifi_mode_t_WIFI_MODE_AP,
+            wifi_mode_t_WIFI_MODE_NULL, wifi_mode_t_WIFI_MODE_STA, wifi_osi_funcs_t,
+            wifi_pmf_config_t, wifi_scan_config_t, wifi_scan_threshold_t, wifi_scan_time_t,
+            wifi_scan_type_t_WIFI_SCAN_TYPE_ACTIVE, wifi_sort_method_t_WIFI_CONNECT_AP_BY_SIGNAL,
+            wifi_sta_config_t, wpa_crypto_funcs_t, ESP_WIFI_OS_ADAPTER_MAGIC,
+            ESP_WIFI_OS_ADAPTER_VERSION, WIFI_INIT_CONFIG_MAGIC,
         },
     },
     compat::queue::SimpleQueue,
@@ -1047,7 +1048,16 @@ where
     let buffer = unsafe { &mut BUFFER[..len] };
     let res = f(buffer);
 
-    esp_wifi_send_data(buffer);
+    let mode = unwrap!(WifiMode::current());
+
+    // FIXME this won't do in AP-STA mode
+    let interface = if mode.is_ap() {
+        wifi_interface_t_WIFI_IF_AP
+    } else {
+        wifi_interface_t_WIFI_IF_STA
+    };
+
+    esp_wifi_send_data(interface, buffer);
 
     res
 }
@@ -1059,16 +1069,7 @@ fn esp_wifi_can_send() -> bool {
 // FIXME data here has to be &mut because of `esp_wifi_internal_tx` signature, requiring a *mut ptr to the buffer
 // Casting const to mut is instant UB, even though in reality `esp_wifi_internal_tx` copies the buffer into its own memory and
 // does not modify
-pub fn esp_wifi_send_data(data: &mut [u8]) {
-    let mode = unwrap!(WifiMode::current());
-
-    // FIXME this won't do in AP-STA mode
-    let interface = if mode.is_ap() {
-        wifi_interface_t_WIFI_IF_AP
-    } else {
-        wifi_interface_t_WIFI_IF_STA
-    };
-
+pub fn esp_wifi_send_data(interface: wifi_interface_t, data: &mut [u8]) {
     trace!("sending... {} bytes", data.len());
     dump_packet_info(data);
 
