@@ -719,25 +719,20 @@ pub fn wifi_start() -> Result<(), WifiError> {
             ))?;
         };
 
+        let ps_mode;
         cfg_if::cfg_if! {
             if #[cfg(feature = "ps-min-modem")] {
-                esp_wifi_result!(esp_wifi_set_ps(
-                    include::wifi_ps_type_t_WIFI_PS_MIN_MODEM
-                ))?;
+                ps_mode = include::wifi_ps_type_t_WIFI_PS_MIN_MODEM;
             } else if #[cfg(feature = "ps-max-modem")] {
-                esp_wifi_result!(esp_wifi_set_ps(
-                    include::wifi_ps_type_t_WIFI_PS_MAX_MODEM
-                ))?;
+                ps_mode = include::wifi_ps_type_t_WIFI_PS_MAX_MODEM;
             } else if #[cfg(coex)] {
-                esp_wifi_result!(esp_wifi_set_ps(
-                    include::wifi_ps_type_t_WIFI_PS_MIN_MODEM
-                ))?;
+                ps_mode = include::wifi_ps_type_t_WIFI_PS_MIN_MODEM;
             } else {
-                esp_wifi_result!(esp_wifi_set_ps(
-                    include::wifi_ps_type_t_WIFI_PS_NONE
-                ))?;
+                ps_mode = include::wifi_ps_type_t_WIFI_PS_NONE;
             }
         };
+
+        esp_wifi_result!(esp_wifi_set_ps(ps_mode))?;
 
         let mut cntry_code = [0u8; 3];
         cntry_code[..crate::CONFIG.country_code.len()]
