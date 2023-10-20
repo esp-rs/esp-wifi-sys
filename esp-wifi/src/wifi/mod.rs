@@ -53,18 +53,54 @@ use crate::{
             esp_wifi_scan_start, esp_wifi_set_config, esp_wifi_set_country, esp_wifi_set_mode,
             esp_wifi_set_protocol, esp_wifi_set_ps, esp_wifi_set_tx_done_cb, esp_wifi_start,
             esp_wifi_stop, g_wifi_default_wpa_crypto_funcs, wifi_active_scan_time_t,
-            wifi_ap_config_t, wifi_cipher_type_t_WIFI_CIPHER_TYPE_TKIP, wifi_config_t,
-            wifi_country_policy_t_WIFI_COUNTRY_POLICY_MANUAL, wifi_country_t, wifi_init_config_t,
-            wifi_interface_t_WIFI_IF_AP, wifi_interface_t_WIFI_IF_STA, wifi_mode_t,
-            wifi_mode_t_WIFI_MODE_AP, wifi_mode_t_WIFI_MODE_NULL, wifi_mode_t_WIFI_MODE_STA,
-            wifi_osi_funcs_t, wifi_pmf_config_t, wifi_scan_config_t, wifi_scan_threshold_t,
-            wifi_scan_time_t, wifi_scan_type_t_WIFI_SCAN_TYPE_ACTIVE,
+            wifi_ap_config_t, wifi_auth_mode_t, wifi_cipher_type_t_WIFI_CIPHER_TYPE_TKIP,
+            wifi_config_t, wifi_country_policy_t_WIFI_COUNTRY_POLICY_MANUAL, wifi_country_t,
+            wifi_init_config_t, wifi_interface_t_WIFI_IF_AP, wifi_interface_t_WIFI_IF_STA,
+            wifi_mode_t, wifi_mode_t_WIFI_MODE_AP, wifi_mode_t_WIFI_MODE_NULL,
+            wifi_mode_t_WIFI_MODE_STA, wifi_osi_funcs_t, wifi_pmf_config_t, wifi_scan_config_t,
+            wifi_scan_threshold_t, wifi_scan_time_t, wifi_scan_type_t_WIFI_SCAN_TYPE_ACTIVE,
             wifi_sort_method_t_WIFI_CONNECT_AP_BY_SIGNAL, wifi_sta_config_t, wpa_crypto_funcs_t,
             ESP_WIFI_OS_ADAPTER_MAGIC, ESP_WIFI_OS_ADAPTER_VERSION, WIFI_INIT_CONFIG_MAGIC,
         },
     },
     compat::queue::SimpleQueue,
 };
+
+trait AuthMethodExt {
+    fn to_raw(&self) -> wifi_auth_mode_t;
+    fn from_raw(raw: wifi_auth_mode_t) -> Self;
+}
+
+impl AuthMethodExt for AuthMethod {
+    fn to_raw(&self) -> wifi_auth_mode_t {
+        match self {
+            AuthMethod::None => include::wifi_auth_mode_t_WIFI_AUTH_OPEN,
+            AuthMethod::WEP => include::wifi_auth_mode_t_WIFI_AUTH_WEP,
+            AuthMethod::WPA => include::wifi_auth_mode_t_WIFI_AUTH_WPA_PSK,
+            AuthMethod::WPA2Personal => include::wifi_auth_mode_t_WIFI_AUTH_WPA2_PSK,
+            AuthMethod::WPAWPA2Personal => include::wifi_auth_mode_t_WIFI_AUTH_WPA_WPA2_PSK,
+            AuthMethod::WPA2Enterprise => include::wifi_auth_mode_t_WIFI_AUTH_WPA2_ENTERPRISE,
+            AuthMethod::WPA3Personal => include::wifi_auth_mode_t_WIFI_AUTH_WPA3_PSK,
+            AuthMethod::WPA2WPA3Personal => include::wifi_auth_mode_t_WIFI_AUTH_WPA2_WPA3_PSK,
+            AuthMethod::WAPIPersonal => include::wifi_auth_mode_t_WIFI_AUTH_WAPI_PSK,
+        }
+    }
+
+    fn from_raw(raw: wifi_auth_mode_t) -> Self {
+        match raw {
+            include::wifi_auth_mode_t_WIFI_AUTH_OPEN => AuthMethod::None,
+            include::wifi_auth_mode_t_WIFI_AUTH_WEP => AuthMethod::WEP,
+            include::wifi_auth_mode_t_WIFI_AUTH_WPA_PSK => AuthMethod::WPA,
+            include::wifi_auth_mode_t_WIFI_AUTH_WPA2_PSK => AuthMethod::WPA2Personal,
+            include::wifi_auth_mode_t_WIFI_AUTH_WPA_WPA2_PSK => AuthMethod::WPAWPA2Personal,
+            include::wifi_auth_mode_t_WIFI_AUTH_WPA2_ENTERPRISE => AuthMethod::WPA2Enterprise,
+            include::wifi_auth_mode_t_WIFI_AUTH_WPA3_PSK => AuthMethod::WPA3Personal,
+            include::wifi_auth_mode_t_WIFI_AUTH_WPA2_WPA3_PSK => AuthMethod::WPA2WPA3Personal,
+            include::wifi_auth_mode_t_WIFI_AUTH_WAPI_PSK => AuthMethod::WAPIPersonal,
+            _ => unreachable!(),
+        }
+    }
+}
 
 #[derive(Debug, Clone, Copy)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
@@ -813,18 +849,7 @@ fn convert_ap_info(record: &include::wifi_ap_record_t) -> AccessPointInfo {
         .unwrap_or(record.ssid.len());
     let ssid_ref = unsafe { core::str::from_utf8_unchecked(&record.ssid[..str_len]) };
 
-    let auth_method = match record.authmode {
-        include::wifi_auth_mode_t_WIFI_AUTH_OPEN => AuthMethod::None,
-        include::wifi_auth_mode_t_WIFI_AUTH_WEP => AuthMethod::WEP,
-        include::wifi_auth_mode_t_WIFI_AUTH_WPA_PSK => AuthMethod::WPA,
-        include::wifi_auth_mode_t_WIFI_AUTH_WPA2_PSK => AuthMethod::WPA2Personal,
-        include::wifi_auth_mode_t_WIFI_AUTH_WPA_WPA2_PSK => AuthMethod::WPAWPA2Personal,
-        include::wifi_auth_mode_t_WIFI_AUTH_WPA2_ENTERPRISE => AuthMethod::WPA2Enterprise,
-        include::wifi_auth_mode_t_WIFI_AUTH_WPA3_PSK => AuthMethod::WPA3Personal,
-        include::wifi_auth_mode_t_WIFI_AUTH_WPA2_WPA3_PSK => AuthMethod::WPA2WPA3Personal,
-        include::wifi_auth_mode_t_WIFI_AUTH_WAPI_PSK => AuthMethod::WAPIPersonal,
-        _ => panic!(),
-    };
+    let auth_method = AuthMethod::from_raw(record.authmode);
 
     let mut ssid = heapless::String::<32>::new();
     unwrap!(ssid.push_str(ssid_ref));
@@ -1089,17 +1114,7 @@ fn apply_ap_config(config: &AccessPointConfiguration) -> Result<(), WifiError> {
             password: [0u8; 64usize],
             ssid_len: 0,
             channel: config.channel,
-            authmode: match config.auth_method {
-                AuthMethod::None => include::wifi_auth_mode_t_WIFI_AUTH_OPEN,
-                AuthMethod::WEP => include::wifi_auth_mode_t_WIFI_AUTH_WEP,
-                AuthMethod::WPA => include::wifi_auth_mode_t_WIFI_AUTH_WPA_PSK,
-                AuthMethod::WPA2Personal => include::wifi_auth_mode_t_WIFI_AUTH_WPA2_PSK,
-                AuthMethod::WPAWPA2Personal => include::wifi_auth_mode_t_WIFI_AUTH_WPA_WPA2_PSK,
-                AuthMethod::WPA2Enterprise => include::wifi_auth_mode_t_WIFI_AUTH_WPA2_ENTERPRISE,
-                AuthMethod::WPA3Personal => include::wifi_auth_mode_t_WIFI_AUTH_WPA3_PSK,
-                AuthMethod::WPA2WPA3Personal => include::wifi_auth_mode_t_WIFI_AUTH_WPA2_WPA3_PSK,
-                AuthMethod::WAPIPersonal => include::wifi_auth_mode_t_WIFI_AUTH_WAPI_PSK,
-            },
+            authmode: config.auth_method.to_raw(),
             ssid_hidden: if config.ssid_hidden { 1 } else { 0 },
             max_connection: config.max_connections as u8,
             beacon_interval: 100,
@@ -1139,21 +1154,7 @@ fn apply_sta_config(config: &ClientConfiguration) -> Result<(), WifiError> {
             sort_method: wifi_sort_method_t_WIFI_CONNECT_AP_BY_SIGNAL,
             threshold: wifi_scan_threshold_t {
                 rssi: -99,
-                authmode: match config.auth_method {
-                    AuthMethod::None => include::wifi_auth_mode_t_WIFI_AUTH_OPEN,
-                    AuthMethod::WEP => include::wifi_auth_mode_t_WIFI_AUTH_WEP,
-                    AuthMethod::WPA => include::wifi_auth_mode_t_WIFI_AUTH_WPA_PSK,
-                    AuthMethod::WPA2Personal => include::wifi_auth_mode_t_WIFI_AUTH_WPA2_PSK,
-                    AuthMethod::WPAWPA2Personal => include::wifi_auth_mode_t_WIFI_AUTH_WPA_WPA2_PSK,
-                    AuthMethod::WPA2Enterprise => {
-                        include::wifi_auth_mode_t_WIFI_AUTH_WPA2_ENTERPRISE
-                    }
-                    AuthMethod::WPA3Personal => include::wifi_auth_mode_t_WIFI_AUTH_WPA3_PSK,
-                    AuthMethod::WPA2WPA3Personal => {
-                        include::wifi_auth_mode_t_WIFI_AUTH_WPA2_WPA3_PSK
-                    }
-                    AuthMethod::WAPIPersonal => include::wifi_auth_mode_t_WIFI_AUTH_WAPI_PSK,
-                },
+                authmode: config.auth_method.to_raw(),
             },
             pmf_cfg: wifi_pmf_config_t {
                 capable: true,
