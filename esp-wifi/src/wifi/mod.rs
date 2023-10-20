@@ -1080,8 +1080,9 @@ pub fn esp_wifi_send_data(interface: wifi_interface_t, data: &mut [u8]) {
         let _res = esp_wifi_internal_tx(interface, ptr, len);
         if _res != 0 {
             warn!("esp_wifi_internal_tx {}", _res);
+        } else {
+            trace!("esp_wifi_internal_tx {}", _res);
         }
-        trace!("esp_wifi_internal_tx {}", _res);
     }
 }
 
