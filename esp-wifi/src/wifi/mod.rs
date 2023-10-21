@@ -798,13 +798,6 @@ pub fn new_with_mode<'d>(
     )
 }
 
-pub fn new<'d>(
-    inited: &EspWifiInitialization,
-    device: impl Peripheral<P = crate::hal::radio::Wifi> + 'd,
-) -> Result<(WifiDevice<'d>, WifiController<'d>), WifiError> {
-    new_with_config(&inited, device, Default::default())
-}
-
 /// A wifi device implementing smoltcp's Device trait.
 pub struct WifiDevice<'d> {
     _device: PeripheralRef<'d, crate::hal::radio::Wifi>,
