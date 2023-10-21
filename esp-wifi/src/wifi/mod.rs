@@ -946,28 +946,42 @@ pub(crate) fn wifi_start_scan(
     unsafe { esp_wifi_scan_start(&scan_config, block) }
 }
 
-/// Create a new [WifiDevice] and [WifiController] from the given config
+/// Creates a new [WifiDevice] and [WifiController] in either AP or STA mode with the given
+/// configuration.
+///
+/// This function will panic if the configuration is not
+/// [`embedded_svc::wifi::Configuration::Client`] or [`embedded_svc::wifi::Configuration::Station`].
+///
+/// If you want to use AP-STA mode, use `[new_ap_sta]`.
 pub fn new_with_config<'d>(
     inited: &EspWifiInitialization,
     device: impl Peripheral<P = crate::hal::peripherals::WIFI> + 'd,
     config: embedded_svc::wifi::Configuration,
 ) -> Result<(WifiDevice<'d>, WifiController<'d>), WifiError> {
-    if !inited.is_wifi() {
-        return Err(WifiError::NotInitialized);
-    }
-
     crate::hal::into_ref!(device);
+
+    match config {
+        embedded_svc::wifi::Configuration::None
+        | embedded_svc::wifi::Configuration::Mixed(_, _) => {
+            panic!("This constructor can not initialize the AP-STA mode")
+        }
+        _ => {}
+    }
 
     // TODO: we'll need two devices for AP-STA mode
     let mode = WifiMode::try_from(&config)?;
 
     Ok((
         WifiDevice::new(unsafe { device.clone_unchecked() }, mode),
-        WifiController::new_with_config(device, config)?,
+        WifiController::new_with_config(inited, device, config)?,
     ))
 }
 
-/// Create a new [WifiDevice] and [WifiController] for the given mode
+/// Creates a new [WifiDevice] and [WifiController] in either AP or STA mode with a default
+/// configuration.
+///
+/// This function will panic if the mode is [`WifiMode::ApSta`].
+/// If you want to use AP-STA mode, use `[new_ap_sta]`.
 pub fn new_with_mode<'d>(
     inited: &EspWifiInitialization,
     device: impl Peripheral<P = crate::hal::peripherals::WIFI> + 'd,
@@ -979,11 +993,31 @@ pub fn new_with_mode<'d>(
         match mode {
             WifiMode::Sta => embedded_svc::wifi::Configuration::Client(Default::default()),
             WifiMode::Ap => embedded_svc::wifi::Configuration::AccessPoint(Default::default()),
-            WifiMode::ApSta => {
-                embedded_svc::wifi::Configuration::Mixed(Default::default(), Default::default())
-            }
+            WifiMode::ApSta => panic!("This constructor can not initialize the AP-STA mode"),
         },
     )
+}
+
+/// Creates a new [WifiDevice] and [WifiController] in AP-STA mode.
+///
+/// Returns a tuple of `(AP device, STA device, controller)`.
+pub fn new_ap_sta<'d>(
+    inited: &EspWifiInitialization,
+    device: impl Peripheral<P = crate::hal::radio::Wifi> + 'd,
+    sta_config: embedded_svc::wifi::ClientConfiguration,
+    ap_config: embedded_svc::wifi::AccessPointConfiguration,
+) -> Result<(WifiDevice<'d>, WifiDevice<'d>, WifiController<'d>), WifiError> {
+    crate::hal::into_ref!(device);
+
+    Ok((
+        WifiDevice::new(unsafe { device.clone_unchecked() }, WifiMode::Ap),
+        WifiDevice::new(unsafe { device.clone_unchecked() }, WifiMode::Sta),
+        WifiController::new_with_config(
+            inited,
+            device,
+            embedded_svc::wifi::Configuration::Mixed(sta_config, ap_config),
+        )?,
+    ))
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -1103,9 +1137,14 @@ pub struct WifiController<'d> {
 
 impl<'d> WifiController<'d> {
     pub(crate) fn new_with_config(
+        inited: &EspWifiInitialization,
         _device: PeripheralRef<'d, crate::hal::peripherals::WIFI>,
         config: embedded_svc::wifi::Configuration,
     ) -> Result<Self, WifiError> {
+        if !inited.is_wifi() {
+            return Err(WifiError::NotInitialized);
+        }
+
         // We set up the controller with the default config because we need to call
         // `set_configuration` to apply the actual configuration, and it will update the stored
         // configuration anyway.
