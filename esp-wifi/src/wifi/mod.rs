@@ -956,7 +956,7 @@ impl<'d> WifiController<'d> {
 }
 
 // see https://docs.rs/smoltcp/0.7.1/smoltcp/phy/index.html
-impl<'d> Device for WifiDevice<'d> {
+impl Device for WifiDevice<'_> {
     type RxToken<'a> = WifiRxToken where Self: 'a;
     type TxToken<'a> = WifiTxToken where Self: 'a;
 
