@@ -1061,7 +1061,7 @@ impl WifiDeviceMode {
             if !rx.is_empty() {
                 self.tx_token().map(|tx| (WifiRxToken { mode: self }, tx))
             } else {
-                warn!("no Rx token available");
+                trace!("no Rx token available");
                 None
             }
         })
