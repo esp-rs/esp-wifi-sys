@@ -1476,10 +1476,44 @@ impl Wifi for WifiController<'_> {
         &mut self,
         conf: &embedded_svc::wifi::Configuration,
     ) -> Result<(), Self::Error> {
-        self.config = conf.clone();
+        match self.config {
+            embedded_svc::wifi::Configuration::None => self.config = conf.clone(), // initial config
+            embedded_svc::wifi::Configuration::Client(ref mut client) => {
+                if let embedded_svc::wifi::Configuration::Client(conf) = conf {
+                    *client = conf.clone();
+                } else {
+                    return Err(WifiError::InternalError(
+                        InternalWifiError::EspErrInvalidArg,
+                    ));
+                }
+            }
+            embedded_svc::wifi::Configuration::AccessPoint(ref mut ap) => {
+                if let embedded_svc::wifi::Configuration::AccessPoint(conf) = conf {
+                    *ap = conf.clone();
+                } else {
+                    return Err(WifiError::InternalError(
+                        InternalWifiError::EspErrInvalidArg,
+                    ));
+                }
+            }
+            embedded_svc::wifi::Configuration::Mixed(ref mut client, ref mut ap) => match conf {
+                embedded_svc::wifi::Configuration::None => {
+                    return Err(WifiError::InternalError(
+                        InternalWifiError::EspErrInvalidArg,
+                    ));
+                }
+                embedded_svc::wifi::Configuration::Mixed(_, _) => self.config = conf.clone(),
+                embedded_svc::wifi::Configuration::Client(conf) => *client = conf.clone(),
+                embedded_svc::wifi::Configuration::AccessPoint(conf) => *ap = conf.clone(),
+            },
+        }
 
         match conf {
-            embedded_svc::wifi::Configuration::None => panic!(),
+            embedded_svc::wifi::Configuration::None => {
+                return Err(WifiError::InternalError(
+                    InternalWifiError::EspErrInvalidArg,
+                ));
+            }
             embedded_svc::wifi::Configuration::Client(config) => apply_sta_config(config)?,
             embedded_svc::wifi::Configuration::AccessPoint(config) => apply_ap_config(config)?,
             embedded_svc::wifi::Configuration::Mixed(sta_config, ap_config) => {
