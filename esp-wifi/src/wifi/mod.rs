@@ -1185,13 +1185,11 @@ impl<'d> WifiController<'d> {
         Ok(())
     }
 
-    #[allow(unused)]
-    fn is_sta_enabled(&self) -> Result<bool, WifiError> {
+    pub fn is_sta_enabled(&self) -> Result<bool, WifiError> {
         WifiMode::try_from(&self.config).map(|m| m.is_sta())
     }
 
-    #[allow(unused)]
-    fn is_ap_enabled(&self) -> Result<bool, WifiError> {
+    pub fn is_ap_enabled(&self) -> Result<bool, WifiError> {
         WifiMode::try_from(&self.config).map(|m| m.is_ap())
     }
 
