@@ -111,7 +111,6 @@ See [Examples] for details.
 ## Missing / To be done
 
 - Make CoEx work on ESP32 (it kind of works when commenting out setting the country in wifi_start, probably some mis-compilation since it then crashes in a totally different code path)
-- Combined SoftAP/STA mode
 - Support for non-open SoftAP
 - Direct-boot mode isn't supported
 
