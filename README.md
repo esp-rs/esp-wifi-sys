@@ -112,11 +112,10 @@ See [Examples](https://github.com/esp-rs/esp-wifi/blob/main/examples.md) for det
 - Combined SoftAP/STA mode
 - Support for non-open SoftAP
 - Direct-boot mode isn't supported
-- On Xtensa, the WiFi logs only print the format string - not the actual values. See [esp-rs/rust#177](https://github.com/esp-rs/rust/issues/177)
 
 ## Directory Structure
 
-- `src/timer-espXXX.rs`: systimer code used for timing and task switching
+- `src/timer/`: systimer code used for timing and task switching
 - `src/preemt/`: a bare minimum RISCV and Xtensa round-robin task scheduler
 - `src/compat/`: code needed to emulate enough of an (RT)OS to use the driver
   - `common.rs`: basics like semaphores and recursive mutexes
