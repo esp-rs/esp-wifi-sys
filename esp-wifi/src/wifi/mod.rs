@@ -1,6 +1,7 @@
 #[doc(hidden)]
 pub mod os_adapter;
 
+use core::time::Duration;
 use core::{cell::RefCell, mem::MaybeUninit};
 
 use crate::common_adapter::*;
@@ -14,7 +15,6 @@ use critical_section::Mutex;
 use embedded_svc::wifi::{AccessPointInfo, AuthMethod, Protocol, SecondaryChannel, Wifi};
 use enumset::EnumSet;
 use enumset::EnumSetType;
-use esp_wifi_sys::include::esp_interface_t_ESP_IF_WIFI_AP;
 use esp_wifi_sys::include::esp_wifi_disconnect;
 use esp_wifi_sys::include::esp_wifi_get_mode;
 use esp_wifi_sys::include::esp_wifi_set_protocol;
@@ -32,6 +32,9 @@ use esp_wifi_sys::include::wifi_interface_t_WIFI_IF_AP;
 use esp_wifi_sys::include::wifi_mode_t_WIFI_MODE_AP;
 use esp_wifi_sys::include::wifi_mode_t_WIFI_MODE_APSTA;
 use esp_wifi_sys::include::wifi_mode_t_WIFI_MODE_NULL;
+use esp_wifi_sys::include::{
+    esp_interface_t_ESP_IF_WIFI_AP, wifi_scan_type_t_WIFI_SCAN_TYPE_PASSIVE,
+};
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
 
@@ -704,19 +707,87 @@ unsafe extern "C" fn coex_register_start_cb(
     0
 }
 
-pub fn wifi_start_scan(block: bool) -> i32 {
-    let scan_time = wifi_scan_time_t {
-        active: wifi_active_scan_time_t { min: 10, max: 20 },
-        passive: 20,
+#[derive(Clone, Copy)]
+pub enum ScanTypeConfig {
+    Active { min: Duration, max: Duration },
+    Passive(Duration),
+}
+
+impl Default for ScanTypeConfig {
+    fn default() -> Self {
+        Self::Active {
+            min: Duration::from_millis(10),
+            max: Duration::from_millis(20),
+        }
+    }
+}
+
+#[derive(Clone, Copy, Default)]
+pub struct ScanConfig<'a> {
+    pub ssid: Option<&'a str>,
+    pub bssid: Option<[u8; 6]>,
+    pub channel: Option<u8>,
+    pub show_hidden: bool,
+    pub scan_type: ScanTypeConfig,
+}
+
+pub fn wifi_start_scan(block: bool, config: ScanConfig<'_>) -> i32 {
+    let ScanConfig {
+        ssid,
+        mut bssid,
+        channel,
+        show_hidden,
+        scan_type,
+    } = config;
+    let (scan_time, scan_type) = match scan_type {
+        ScanTypeConfig::Active { min, max } => (
+            wifi_scan_time_t {
+                active: wifi_active_scan_time_t {
+                    min: min.as_millis() as u32,
+                    max: max.as_millis() as u32,
+                },
+                passive: 0,
+            },
+            wifi_scan_type_t_WIFI_SCAN_TYPE_ACTIVE,
+        ),
+        ScanTypeConfig::Passive(dur) => (
+            wifi_scan_time_t {
+                active: wifi_active_scan_time_t { min: 0, max: 0 },
+                passive: dur.as_millis() as u32,
+            },
+            wifi_scan_type_t_WIFI_SCAN_TYPE_PASSIVE,
+        ),
     };
 
+    if !ssid
+        .map(|e| e.chars().all(|e| e.is_ascii()))
+        .unwrap_or(true)
+    {
+        panic!("SSID muste be ASCII");
+    }
+
+    let mut ssid_buf = ssid.map(|m| {
+        let mut buf = heapless::Vec::<u8, 33>::from_iter(m.chars().map(|e| e as u8));
+        buf.push(b'\0').unwrap();
+        buf
+    });
+
+    let ssid = ssid_buf
+        .as_mut()
+        .map(|e| e.as_mut_ptr())
+        .unwrap_or_else(core::ptr::null_mut);
+    let bssid = bssid
+        .as_mut()
+        .map(|e| e.as_mut_ptr())
+        .unwrap_or_else(core::ptr::null_mut);
+
     let scan_config = wifi_scan_config_t {
-        ssid: core::ptr::null_mut(),
-        bssid: core::ptr::null_mut(),
-        channel: 0,
-        show_hidden: false,
-        scan_type: wifi_scan_type_t_WIFI_SCAN_TYPE_ACTIVE,
-        scan_time: scan_time,
+        ssid,
+        bssid,
+        channel: channel.unwrap_or(0),
+        show_hidden,
+        scan_type,
+        scan_time,
     };
 
     unsafe { esp_wifi_scan_start(&scan_config, block) }
@@ -1088,7 +1159,7 @@ impl Wifi for WifiController<'_> {
     fn scan_n<const N: usize>(
         &mut self,
     ) -> Result<(heapless::Vec<AccessPointInfo, N>, usize), Self::Error> {
-        esp_wifi_result!(crate::wifi::wifi_start_scan(true))?;
+        esp_wifi_result!(crate::wifi::wifi_start_scan(true, Default::default()))?;
 
         let count = self.scan_result_count()?;
         let result = self.scan_results()?;
@@ -1415,13 +1486,26 @@ mod asynch {
             &mut self,
         ) -> Result<(heapless::Vec<AccessPointInfo, N>, usize), WifiError> {
             Self::clear_events(WifiEvent::ScanDone);
-            esp_wifi_result!(wifi_start_scan(false))?;
+            esp_wifi_result!(wifi_start_scan(false, Default::default()))?;
             WifiEventFuture::new(WifiEvent::ScanDone).await;
 
             let count = self.scan_result_count()?;
             let result = self.scan_results()?;
 
             Ok((result, count))
+        }
+
+        pub async fn scan_with_config<const N: usize>(
+            &mut self,
+            config: ScanConfig<'_>,
+        ) -> Result<heapless::Vec<AccessPointInfo, N>, WifiError> {
+            Self::clear_events(WifiEvent::ScanDone);
+            esp_wifi_result!(wifi_start_scan(false, config))?;
+            WifiEventFuture::new(WifiEvent::ScanDone).await;
+
+            let result = self.scan_results()?;
+
+            Ok(result)
         }
 
         /// Async version of [`embedded_svc::wifi::Wifi`]'s `start` method
