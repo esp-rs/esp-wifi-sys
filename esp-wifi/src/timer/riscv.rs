@@ -36,6 +36,11 @@ pub fn setup_timer(systimer: TimeBase) {
 
     unwrap!(interrupt::enable(
         Interrupt::SYSTIMER_TARGET0,
+        // workaround for coex - when coex enable
+        // the 3 tasks start take over main function init for ble and wifi
+        #[cfg(coex)]
+        interrupt::Priority::Priority2,
+        #[cfg(not(coex))]
         interrupt::Priority::Priority1,
     ));
 }
