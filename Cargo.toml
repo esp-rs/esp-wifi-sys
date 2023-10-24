@@ -36,6 +36,7 @@ esp32s2-hal = { version = "0.12.0" }
 smoltcp = { version = "0.10.0", default-features=false, features = ["proto-igmp", "proto-ipv4", "proto-dns", "socket-tcp", "socket-icmp", "socket-udp", "socket-dns", "medium-ethernet", "proto-dhcpv4", "socket-raw", "socket-dhcpv4"] }
 critical-section = "1.1.1"
 atomic-polyfill = "1.0.2"
+atomic_enum = "0.2.0" # uses core atomic types which should be fine as long as only load and store is used on them
 log = "0.4.18"
 embedded-svc = { version = "0.25.1", default-features = false, features = [] }
 enumset = { version = "1", default-features = false }

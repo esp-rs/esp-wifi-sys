@@ -105,7 +105,7 @@ async fn connection(mut controller: WifiController<'static>) {
     println!("Device capabilities: {:?}", controller.get_capabilities());
     loop {
         match esp_wifi::wifi::get_wifi_state() {
-            WifiState::ApStart => {
+            WifiState::ApStarted => {
                 // wait until we're no longer connected
                 controller.wait_for_event(WifiEvent::ApStop).await;
                 Timer::after(Duration::from_millis(5000)).await
