@@ -1459,10 +1459,8 @@ mod asynch {
             embedded_svc::wifi::Wifi::stop(self)?;
             WifiEventFuture::new(event).await;
 
-            unsafe {
-                AP_STATE.store(WifiState::Invalid, Ordering::Relaxed);
-                STA_STATE.store(WifiState::Invalid, Ordering::Relaxed);
-            }
+            AP_STATE.store(WifiState::Invalid, Ordering::Relaxed);
+            STA_STATE.store(WifiState::Invalid, Ordering::Relaxed);
 
             Ok(())
         }

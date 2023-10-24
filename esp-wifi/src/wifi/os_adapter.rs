@@ -42,7 +42,7 @@ pub(crate) static WIFI_EVENTS: Mutex<RefCell<EnumSet<WifiEvent>>> =
     Mutex::new(RefCell::new(enumset::enum_set!()));
 
 pub fn is_connected() -> bool {
-    unsafe { get_sta_state() == WifiState::StaConnected }
+    get_sta_state() == WifiState::StaConnected
 }
 
 #[atomic_enum]
