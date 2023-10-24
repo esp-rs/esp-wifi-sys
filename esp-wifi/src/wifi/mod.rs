@@ -6,7 +6,7 @@ use core::ptr::addr_of;
 use core::sync::atomic::Ordering;
 use core::{cell::RefCell, mem::MaybeUninit};
 
-use crate::common_adapter::{self, *};
+use crate::common_adapter::*;
 use crate::esp_wifi_result;
 use crate::hal::macros::ram;
 use crate::hal::peripheral::Peripheral;
@@ -335,7 +335,7 @@ unsafe extern "C" fn semphr_take_from_isr_wrapper(
     semphr: *mut c_types::c_void,
     hptw: *mut c_types::c_void,
 ) -> i32 {
-    common_adapter::semphr_take_from_isr(semphr as *const (), hptw as *const ())
+    crate::common_adapter::semphr_take_from_isr(semphr as *const (), hptw as *const ())
 }
 
 #[cfg(coex)]
@@ -343,7 +343,7 @@ unsafe extern "C" fn semphr_give_from_isr_wrapper(
     semphr: *mut c_types::c_void,
     hptw: *mut c_types::c_void,
 ) -> i32 {
-    common_adapter::semphr_give_from_isr(semphr as *const (), hptw as *const ())
+    crate::common_adapter::semphr_give_from_isr(semphr as *const (), hptw as *const ())
 }
 
 #[cfg(coex)]
