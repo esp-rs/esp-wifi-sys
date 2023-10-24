@@ -759,15 +759,8 @@ pub fn wifi_start_scan(block: bool, config: ScanConfig<'_>) -> i32 {
         ),
     };
 
-    if !ssid
-        .map(|e| e.chars().all(|e| e.is_ascii()))
-        .unwrap_or(true)
-    {
-        panic!("SSID muste be ASCII");
-    }
-
     let mut ssid_buf = ssid.map(|m| {
-        let mut buf = heapless::Vec::<u8, 33>::from_iter(m.chars().map(|e| e as u8));
+        let mut buf = heapless::Vec::<u8, 33>::from_iter(m.bytes());
         buf.push(b'\0').unwrap();
         buf
     });
@@ -1485,27 +1478,21 @@ mod asynch {
         pub async fn scan_n<const N: usize>(
             &mut self,
         ) -> Result<(heapless::Vec<AccessPointInfo, N>, usize), WifiError> {
+            self.scan_with_config(Default::default()).await
+        }
+
+        pub async fn scan_with_config<const N: usize>(
+            &mut self,
+            config: ScanConfig<'_>,
+        ) -> Result<(heapless::Vec<AccessPointInfo, N>, usize), WifiError> {
             Self::clear_events(WifiEvent::ScanDone);
-            esp_wifi_result!(wifi_start_scan(false, Default::default()))?;
+            esp_wifi_result!(wifi_start_scan(false, config))?;
             WifiEventFuture::new(WifiEvent::ScanDone).await;
 
             let count = self.scan_result_count()?;
             let result = self.scan_results()?;
 
             Ok((result, count))
-        }
-
-        pub async fn scan_with_config<const N: usize>(
-            &mut self,
-            config: ScanConfig<'_>,
-        ) -> Result<heapless::Vec<AccessPointInfo, N>, WifiError> {
-            Self::clear_events(WifiEvent::ScanDone);
-            esp_wifi_result!(wifi_start_scan(false, config))?;
-            WifiEventFuture::new(WifiEvent::ScanDone).await;
-
-            let result = self.scan_results()?;
-
-            Ok(result)
         }
 
         /// Async version of [`embedded_svc::wifi::Wifi`]'s `start` method
