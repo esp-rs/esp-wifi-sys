@@ -1,4 +1,5 @@
 use core::cell::RefCell;
+use core::sync::atomic::Ordering;
 
 use critical_section::Mutex;
 
@@ -55,7 +56,7 @@ pub fn setup_multitasking() {
         riscv::interrupt::enable();
     }
 
-    while unsafe { crate::preempt::FIRST_SWITCH.load(core::sync::atomic::Ordering::Relaxed) } {}
+    while unsafe { crate::preempt::FIRST_SWITCH.load(Ordering::Relaxed) } {}
 }
 
 #[interrupt]
