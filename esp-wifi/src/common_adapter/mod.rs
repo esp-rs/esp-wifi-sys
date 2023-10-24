@@ -377,12 +377,23 @@ static mut WIFI_EVENT: esp_event_base_t = unsafe { &EVT };
 // stuff needed by wpa-supplicant
 #[no_mangle]
 pub unsafe extern "C" fn __assert_func(
-    _file: *const u8,
-    _line: u32,
-    _func: *const u8,
-    _failed_expr: *const u8,
+    file: *const u8,
+    line: u32,
+    func: *const u8,
+    failed_expr: *const u8,
 ) {
-    todo!("__assert_func");
+    let file = str_from_c(file);
+    let (func_pre, func) = if func.is_null() {
+        ("", "")
+    } else {
+        (", function: ", str_from_c(func))
+    };
+    let expr = str_from_c(failed_expr);
+
+    panic!(
+        "assertion \"{}\" failed: file \"{}\", line {}{}{}",
+        expr, file, line, func_pre, func
+    );
 }
 
 #[no_mangle]
