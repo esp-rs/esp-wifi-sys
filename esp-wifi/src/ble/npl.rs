@@ -36,15 +36,15 @@ struct Callout {
     timer_handle: u32,
 }
 
-static mut CALLOUTS: [Option<Callout>; 12] = [None; 12];
-static mut CALLOUT_TIMERS: [ets_timer; 12] = [ets_timer {
+static mut CALLOUTS: [Option<Callout>; 20] = [None; 20];
+static mut CALLOUT_TIMERS: [ets_timer; 20] = [ets_timer {
     next: core::ptr::null_mut(),
     expire: 0,
     period: 0,
     func: None,
     priv_: core::ptr::null_mut(),
-}; 12];
-static mut CALLOUT_EVENTS: [u32; 12] = [0u32; 12];
+}; 20];
+static mut CALLOUT_EVENTS: [u32; 20] = [0u32; 20];
 
 #[derive(Copy, Clone, Default)]
 struct Event {
@@ -695,14 +695,14 @@ unsafe extern "C" fn ble_npl_callout_deinit(callout: *const ble_npl_callout) {
 unsafe extern "C" fn ble_npl_callout_stop(callout: *const ble_npl_callout) {
     trace!("ble_npl_callout_stop {:?}", callout);
 
-    // if (*callout).dummy == 0 {
-    //     panic!("Trying to stop an uninitialzed callout");
-    // }
+    if (*callout).dummy == 0 {
+        panic!("Trying to stop an uninitialzed callout");
+    }
 
-    // let co = unwrap!(CALLOUTS[((*callout).dummy - 1) as usize].as_mut());
+    let co = unwrap!(CALLOUTS[((*callout).dummy - 1) as usize].as_mut());
 
-    // // stop timer
-    // compat::timer_compat::compat_timer_disarm(co.timer_handle as *mut c_void);
+    // stop timer
+    compat::timer_compat::compat_timer_disarm(co.timer_handle as *mut c_void);
 }
 
 unsafe extern "C" fn ble_npl_callout_reset(
@@ -931,28 +931,28 @@ unsafe extern "C" fn ble_npl_callout_init(
         args
     );
 
-    // let callout = callout as *mut ble_npl_callout;
+    let callout = callout as *mut ble_npl_callout;
 
-    // if (*callout).dummy == 0 {
-    //     let idx = unwrap!(CALLOUTS.iter().position(|item| item.is_none()));
+    if (*callout).dummy == 0 {
+        let idx = unwrap!(CALLOUTS.iter().position(|item| item.is_none()));
 
-    //     let timer = &CALLOUT_TIMERS[idx];
-    //     crate::compat::timer_compat::compat_timer_setfn(
-    //         core::mem::transmute(timer),
-    //         callout_timer_callback_wrapper as *mut c_void,
-    //         idx as *mut c_void,
-    //     );
+        let timer = &CALLOUT_TIMERS[idx];
+        crate::compat::timer_compat::compat_timer_setfn(
+            core::mem::transmute(timer),
+            callout_timer_callback_wrapper as *mut c_void,
+            idx as *mut c_void,
+        );
 
-    //     ble_npl_event_init(core::mem::transmute(&CALLOUT_EVENTS), func, args);
+        ble_npl_event_init(core::mem::transmute(&CALLOUT_EVENTS), func, args);
 
-    //     CALLOUTS[idx] = Some(Callout {
-    //         _callout_id: callout as u32,
-    //         eventq_id: eventq as u32,
-    //         event_id: core::mem::transmute(&CALLOUT_EVENTS),
-    //         timer_handle: timer as *const _ as u32,
-    //     });
-    //     (*callout).dummy = (idx + 1) as i32;
-    // }
+        CALLOUTS[idx] = Some(Callout {
+            _callout_id: callout as u32,
+            eventq_id: eventq as u32,
+            event_id: core::mem::transmute(&CALLOUT_EVENTS),
+            timer_handle: timer as *const _ as u32,
+        });
+        (*callout).dummy = (idx + 1) as i32;
+    }
 
     0
 }
@@ -1075,10 +1075,12 @@ pub(crate) fn ble_init() {
 
         // init bb
         bt_bb_v2_init_cmplx(1);
-
-        let rc = ble_osi_coex_funcs_register(&G_COEX_FUNCS as *const osi_coex_funcs_t);
-        if rc != 0 {
-            panic!("ble_osi_coex_funcs_register returned {}", res);
+        #[cfg(coex)]
+        {
+            let rc = ble_osi_coex_funcs_register(&G_COEX_FUNCS as *const osi_coex_funcs_t);
+            if rc != 0 {
+                panic!("ble_osi_coex_funcs_register returned {}", rc);
+            }
         }
 
         let res = ble_controller_init(&cfg as *const esp_bt_controller_config_t);

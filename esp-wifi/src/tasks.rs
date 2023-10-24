@@ -33,14 +33,14 @@ pub extern "C" fn worker_task3() {
 
 pub extern "C" fn worker_task2() {
     loop {
-        let mut to_run = SimpleQueue::<_, 20>::new();
+        let mut to_run = SimpleQueue::<_, 40>::new();
 
         let current_timestamp = get_systimer_count();
         critical_section::with(|_| unsafe {
             memory_fence();
             for i in 0..TIMERS.len() {
                 if let Some(ref mut timer) = TIMERS[i] {
-                    if timer.active && current_timestamp >= timer.expire {
+                    if timer.active && (current_timestamp >= timer.expire) {
                         debug!("timer is due.... {:?}", timer.ptimer);
                         let fnctn: fn(*mut c_types::c_void) = mem::transmute(timer.timer_ptr);
 

@@ -18,7 +18,7 @@ pub struct Timer {
     pub arg_ptr: *mut c_types::c_void,
 }
 
-pub static mut TIMERS: [Option<Timer>; 20] = [None; 20];
+pub static mut TIMERS: [Option<Timer>; 40] = [None; 40];
 
 pub fn compat_timer_arm(ptimer: *mut c_types::c_void, tmout: u32, repeat: bool) {
     compat_timer_arm_us(ptimer, tmout * 1000, repeat);
