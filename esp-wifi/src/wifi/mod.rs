@@ -760,7 +760,7 @@ pub fn wifi_start_scan(block: bool, config: ScanConfig<'_>) -> i32 {
 
     let mut ssid_buf = ssid.map(|m| {
         let mut buf = heapless::Vec::<u8, 33>::from_iter(m.bytes());
-        buf.push(b'\0').unwrap();
+        unwrap!(buf.push(b'\0').ok());
         buf
     });
 
