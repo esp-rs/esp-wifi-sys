@@ -1350,7 +1350,7 @@ pub(crate) mod embassy {
         fn capabilities(&self) -> Capabilities {
             let mut caps = Capabilities::default();
             caps.max_transmission_unit = MTU;
-            caps.max_burst_size = Some(1);
+            caps.max_burst_size = Some(crate::CONFIG.max_burst_size);
             caps
         }
 
