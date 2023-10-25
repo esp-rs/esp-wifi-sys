@@ -645,24 +645,23 @@ unsafe extern "C" fn recv_cb(
     len: u16,
     eb: *mut c_types::c_void,
 ) -> esp_err_t {
-    let res = critical_section::with(|cs| {
-        let mut queue = DATA_QUEUE_RX.borrow_ref_mut(cs);
-        if queue.is_full() {
-            error!("RX QUEUE FULL");
-            esp_wifi_internal_free_rx_buffer(eb);
-            include::ESP_ERR_NO_MEM as esp_err_t
-        } else {
-            let packet = EspWifiPacketBuffer { buffer, len, eb };
-            unwrap!(queue.enqueue(packet));
+    critical_section::with(|cs| {
+        let packet = EspWifiPacketBuffer { buffer, len, eb };
 
-            #[cfg(feature = "embassy-net")]
-            embassy::RECEIVE_WAKER.wake();
+        match DATA_QUEUE_RX.borrow_ref_mut(cs).enqueue(packet) {
+            Ok(_) => {
+                #[cfg(feature = "embassy-net")]
+                embassy::RECEIVE_WAKER.wake();
 
-            include::ESP_OK as esp_err_t
+                include::ESP_OK as esp_err_t
+            }
+
+            _ => {
+                debug!("RX QUEUE FULL");
+                include::ESP_ERR_NO_MEM as esp_err_t
+            }
         }
-    });
-
-    res
+    })
 }
 
 pub(crate) static WIFI_TX_INFLIGHT: AtomicUsize = AtomicUsize::new(0);
