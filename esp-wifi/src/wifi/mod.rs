@@ -933,10 +933,9 @@ impl<'d> WifiController<'d> {
         let mut scanned = heapless::Vec::<AccessPointInfo, N>::new();
         let mut bss_total: u16 = N as u16;
 
-        unsafe {
-            let mut records: [MaybeUninit<include::wifi_ap_record_t>; N] =
-                [MaybeUninit::uninit(); N];
+        let mut records: [MaybeUninit<include::wifi_ap_record_t>; N] = [MaybeUninit::uninit(); N];
 
+        unsafe {
             esp_wifi_result!(include::esp_wifi_scan_get_ap_records(
                 &mut bss_total,
                 records[0].as_mut_ptr(),
@@ -1396,7 +1395,21 @@ mod asynch {
         ) -> Result<(heapless::Vec<AccessPointInfo, N>, usize), WifiError> {
             Self::clear_events(WifiEvent::ScanDone);
             esp_wifi_result!(wifi_start_scan(false))?;
+
+            struct FreeOnDrop;
+            impl Drop for FreeOnDrop {
+                fn drop(&mut self) {
+                    unsafe {
+                        include::esp_wifi_clear_ap_list();
+                    }
+                }
+            }
+
+            let _guard = FreeOnDrop;
+
             WifiEventFuture::new(WifiEvent::ScanDone).await;
+
+            core::mem::forget(_guard);
 
             let count = self.scan_result_count()?;
             let result = self.scan_results()?;
