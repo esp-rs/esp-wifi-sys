@@ -1311,6 +1311,8 @@ pub(crate) mod embassy {
             cx: &mut core::task::Context,
         ) -> Option<(Self::RxToken<'_>, Self::TxToken<'_>)> {
             RECEIVE_WAKER.register(cx.waker());
+            TRANSMIT_WAKER.register(cx.waker());
+
             critical_section::with(|cs| {
                 let rx = DATA_QUEUE_RX.borrow_ref_mut(cs);
                 if !rx.is_empty() && esp_wifi_can_send() {
