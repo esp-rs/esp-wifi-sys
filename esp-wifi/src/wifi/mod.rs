@@ -667,6 +667,14 @@ unsafe extern "C" fn recv_cb(
 
 pub(crate) static WIFI_TX_INFLIGHT: AtomicUsize = AtomicUsize::new(0);
 
+fn decrement_inflight_counter() {
+    WIFI_TX_INFLIGHT
+        .fetch_update(Ordering::SeqCst, Ordering::SeqCst, |x| {
+            Some(x.saturating_sub(1))
+        })
+        .unwrap();
+}
+
 #[ram]
 unsafe extern "C" fn esp_wifi_tx_done_cb(
     _ifidx: u8,
@@ -675,11 +683,8 @@ unsafe extern "C" fn esp_wifi_tx_done_cb(
     _tx_status: bool,
 ) {
     trace!("esp_wifi_tx_done_cb");
-    WIFI_TX_INFLIGHT
-        .fetch_update(Ordering::SeqCst, Ordering::SeqCst, |x| {
-            Some(x.saturating_sub(1))
-        })
-        .unwrap();
+
+    decrement_inflight_counter();
 
     #[cfg(feature = "embassy-net")]
     embassy::TRANSMIT_WAKER.wake();
@@ -1077,11 +1082,12 @@ pub fn esp_wifi_send_data(interface: wifi_interface_t, data: &mut [u8]) {
         let len = data.len() as u16;
         let ptr = data.as_mut_ptr().cast();
 
-        let _res = esp_wifi_internal_tx(interface, ptr, len);
-        if _res != 0 {
-            warn!("esp_wifi_internal_tx {}", _res);
+        let res = esp_wifi_internal_tx(interface, ptr, len);
+        if res != 0 {
+            warn!("esp_wifi_internal_tx {}", res);
+            decrement_inflight_counter();
         } else {
-            trace!("esp_wifi_internal_tx {}", _res);
+            trace!("esp_wifi_internal_tx ok");
         }
     }
 }
