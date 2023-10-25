@@ -64,6 +64,11 @@ embedded-hal-async = { version = "1.0.0-rc.1" }
 
 # patching esp32c6-hal for BLE - it would compile with 0.5.0 but not work
 [patch.crates-io]
-esp32s3-hal = { git = "https://github.com/MabezDev/esp-hal", rev = "3dda1e29e366602cd8952265b7a7c826fe9a0a6a" }
-esp-hal-common = { git = "https://github.com/MabezDev/esp-hal", rev = "3dda1e29e366602cd8952265b7a7c826fe9a0a6a" }
-esp-hal-procmacros = { git = "https://github.com/MabezDev/esp-hal", rev = "3dda1e29e366602cd8952265b7a7c826fe9a0a6a" }
+esp32-hal = { git = "https://github.com/MabezDev/esp-hal", rev = "6eca968bb8283565f52bfe13f7eee9d486954c40" }
+esp32s2-hal = { git = "https://github.com/MabezDev/esp-hal", rev = "6eca968bb8283565f52bfe13f7eee9d486954c40" }
+esp32s3-hal = { git = "https://github.com/MabezDev/esp-hal", rev = "6eca968bb8283565f52bfe13f7eee9d486954c40" }
+esp32c2-hal = { git = "https://github.com/MabezDev/esp-hal", rev = "6eca968bb8283565f52bfe13f7eee9d486954c40" }
+esp32c3-hal = { git = "https://github.com/MabezDev/esp-hal", rev = "6eca968bb8283565f52bfe13f7eee9d486954c40" }
+esp32c6-hal = { git = "https://github.com/MabezDev/esp-hal", rev = "6eca968bb8283565f52bfe13f7eee9d486954c40" }
+esp-hal-common = { git = "https://github.com/MabezDev/esp-hal", rev = "6eca968bb8283565f52bfe13f7eee9d486954c40" }
+esp-hal-procmacros = { git = "https://github.com/MabezDev/esp-hal", rev = "6eca968bb8283565f52bfe13f7eee9d486954c40" }

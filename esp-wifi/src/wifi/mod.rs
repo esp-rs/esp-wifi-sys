@@ -724,7 +724,7 @@ pub fn wifi_start_scan(block: bool) -> i32 {
 
 pub fn new_with_config<'d>(
     inited: &EspWifiInitialization,
-    device: impl Peripheral<P = crate::hal::radio::Wifi> + 'd,
+    device: impl Peripheral<P = crate::hal::peripherals::WIFI> + 'd,
     config: embedded_svc::wifi::Configuration,
 ) -> Result<(WifiDevice<'d>, WifiController<'d>), WifiError> {
     if !inited.is_wifi() {
@@ -747,7 +747,7 @@ pub fn new_with_config<'d>(
 
 pub fn new_with_mode<'d>(
     inited: &EspWifiInitialization,
-    device: impl Peripheral<P = crate::hal::radio::Wifi> + 'd,
+    device: impl Peripheral<P = crate::hal::peripherals::WIFI> + 'd,
     mode: WifiMode,
 ) -> Result<(WifiDevice<'d>, WifiController<'d>), WifiError> {
     new_with_config(
@@ -762,7 +762,7 @@ pub fn new_with_mode<'d>(
 
 pub fn new<'d>(
     inited: &EspWifiInitialization,
-    device: impl Peripheral<P = crate::hal::radio::Wifi> + 'd,
+    device: impl Peripheral<P = crate::hal::peripherals::WIFI> + 'd,
 ) -> Result<(WifiDevice<'d>, WifiController<'d>), WifiError> {
     new_with_config(&inited, device, Default::default())
 }
@@ -781,11 +781,11 @@ pub(crate) fn get_wifi_mode() -> Result<WifiMode, WifiError> {
 
 /// A wifi device implementing smoltcp's Device trait.
 pub struct WifiDevice<'d> {
-    _device: PeripheralRef<'d, crate::hal::radio::Wifi>,
+    _device: PeripheralRef<'d, crate::hal::peripherals::WIFI>,
 }
 
 impl<'d> WifiDevice<'d> {
-    pub(crate) fn new(_device: PeripheralRef<'d, crate::hal::radio::Wifi>) -> WifiDevice {
+    pub(crate) fn new(_device: PeripheralRef<'d, crate::hal::peripherals::WIFI>) -> WifiDevice {
         Self { _device }
     }
 
@@ -848,13 +848,13 @@ fn convert_ap_info(record: &crate::binary::include::wifi_ap_record_t) -> AccessP
 
 /// A wifi controller implementing embedded_svc::Wifi traits
 pub struct WifiController<'d> {
-    _device: PeripheralRef<'d, crate::hal::radio::Wifi>,
+    _device: PeripheralRef<'d, crate::hal::peripherals::WIFI>,
     config: embedded_svc::wifi::Configuration,
 }
 
 impl<'d> WifiController<'d> {
     pub(crate) fn new_with_config(
-        _device: PeripheralRef<'d, crate::hal::radio::Wifi>,
+        _device: PeripheralRef<'d, crate::hal::peripherals::WIFI>,
         config: embedded_svc::wifi::Configuration,
     ) -> Result<Self, WifiError> {
         let mut this = Self {

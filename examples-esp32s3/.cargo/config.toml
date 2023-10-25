@@ -7,7 +7,7 @@ rustflags = [
     # LLD
     "-C", "linker=rust-lld",
     "-C", "link-arg=-Tlinkall.x",
-    "-C", "llvm-args=-mtext-section-literals"
+    # "-C", "llvm-args=-mtext-section-literals"
 ]
 
 [build]
