@@ -1076,17 +1076,16 @@ pub fn esp_wifi_send_data(interface: wifi_interface_t, data: &mut [u8]) {
     trace!("sending... {} bytes", data.len());
     dump_packet_info(data);
 
-    unsafe {
-        let len = data.len() as u16;
-        let ptr = data.as_mut_ptr().cast();
+    let len = data.len() as u16;
+    let ptr = data.as_mut_ptr().cast();
 
-        let res = esp_wifi_internal_tx(interface, ptr, len);
-        if res != 0 {
-            warn!("esp_wifi_internal_tx {}", res);
-            decrement_inflight_counter();
-        } else {
-            trace!("esp_wifi_internal_tx ok");
-        }
+    let res = unsafe { esp_wifi_internal_tx(interface, ptr, len) };
+
+    if res != 0 {
+        warn!("esp_wifi_internal_tx {}", res);
+        decrement_inflight_counter();
+    } else {
+        trace!("esp_wifi_internal_tx ok");
     }
 }
 
