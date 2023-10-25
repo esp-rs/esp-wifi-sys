@@ -672,6 +672,11 @@ fn decrement_inflight_counter() {
             Some(x.saturating_sub(1))
         })
         .unwrap();
+
+    trace!(
+        "decrement: inflight: {}",
+        WIFI_TX_INFLIGHT.load(Ordering::Relaxed)
+    );
 }
 
 #[ram]
@@ -969,21 +974,27 @@ impl Device for WifiDevice<'_> {
     ) -> Option<(Self::RxToken<'_>, Self::TxToken<'_>)> {
         critical_section::with(|cs| {
             let rx = DATA_QUEUE_RX.borrow_ref_mut(cs);
-            if !rx.is_empty() && esp_wifi_can_send() {
+            if rx.is_empty() {
+                return None;
+            }
+            if esp_wifi_can_send(cs) {
                 Some((WifiRxToken::default(), WifiTxToken::default()))
             } else {
+                warn!("receive: no packet to reply with");
                 None
             }
         })
     }
 
     fn transmit(&mut self, _instant: smoltcp::time::Instant) -> Option<Self::TxToken<'_>> {
-        if esp_wifi_can_send() {
-            Some(WifiTxToken::default())
-        } else {
-            warn!("no Tx token available");
-            None
-        }
+        critical_section::with(|cs| {
+            if esp_wifi_can_send(cs) {
+                Some(WifiTxToken::default())
+            } else {
+                warn!("no packet to transmit");
+                None
+            }
+        })
     }
 
     fn capabilities(&self) -> smoltcp::phy::DeviceCapabilities {
@@ -1045,6 +1056,10 @@ where
     F: FnOnce(&mut [u8]) -> R,
 {
     WIFI_TX_INFLIGHT.fetch_add(1, Ordering::SeqCst);
+    trace!(
+        "consume: inflight: {}",
+        WIFI_TX_INFLIGHT.load(Ordering::Relaxed)
+    );
     // (safety): creation of multiple WiFi devices is impossible in safe Rust, therefore only smoltcp _or_ embassy-net can be used at one time
     // TODO: this probably won't do in AP-STA mode
     static mut BUFFER: [u8; DATA_FRAME_SIZE] = [0u8; DATA_FRAME_SIZE];
@@ -1065,8 +1080,9 @@ where
     res
 }
 
-fn esp_wifi_can_send() -> bool {
+fn esp_wifi_can_send(cs: critical_section::CriticalSection) -> bool {
     WIFI_TX_INFLIGHT.load(Ordering::SeqCst) < TX_QUEUE_SIZE
+        && crate::HEAP.borrow_ref(cs).free() > 2 * DATA_FRAME_SIZE
 }
 
 // FIXME data here has to be &mut because of `esp_wifi_internal_tx` signature, requiring a *mut ptr to the buffer
@@ -1080,7 +1096,6 @@ pub fn esp_wifi_send_data(interface: wifi_interface_t, data: &mut [u8]) {
     let ptr = data.as_mut_ptr().cast();
 
     let res = unsafe { esp_wifi_internal_tx(interface, ptr, len) };
-
     if res != 0 {
         warn!("esp_wifi_internal_tx {}", res);
         decrement_inflight_counter();
@@ -1314,9 +1329,13 @@ pub(crate) mod embassy {
 
             critical_section::with(|cs| {
                 let rx = DATA_QUEUE_RX.borrow_ref_mut(cs);
-                if !rx.is_empty() && esp_wifi_can_send() {
+                if rx.is_empty() {
+                    return None;
+                }
+                if esp_wifi_can_send(cs) {
                     Some((WifiRxToken::default(), WifiTxToken::default()))
                 } else {
+                    warn!("receive: no packet to reply with");
                     None
                 }
             })
@@ -1324,11 +1343,15 @@ pub(crate) mod embassy {
 
         fn transmit(&mut self, cx: &mut core::task::Context) -> Option<Self::TxToken<'_>> {
             TRANSMIT_WAKER.register(cx.waker());
-            if esp_wifi_can_send() {
-                Some(WifiTxToken::default())
-            } else {
-                None
-            }
+
+            critical_section::with(|cs| {
+                if esp_wifi_can_send(cs) {
+                    Some(WifiTxToken::default())
+                } else {
+                    warn!("no packet to transmit");
+                    None
+                }
+            })
         }
 
         fn link_state(&mut self, cx: &mut core::task::Context) -> embassy_net_driver::LinkState {
