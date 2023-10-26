@@ -1064,15 +1064,14 @@ impl WifiDeviceMode {
     }
 
     fn rx_token(self) -> Option<(WifiRxToken, WifiTxToken)> {
-        critical_section::with(|cs| {
-            let rx = self.data_queue_rx(cs);
-            if !rx.is_empty() {
-                self.tx_token().map(|tx| (WifiRxToken { mode: self }, tx))
-            } else {
-                trace!("no Rx token available");
-                None
-            }
-        })
+        let is_empty = critical_section::with(|cs| self.data_queue_rx(cs).is_empty());
+
+        if !is_empty {
+            self.tx_token().map(|tx| (WifiRxToken { mode: self }, tx))
+        } else {
+            trace!("no Rx token available");
+            None
+        }
     }
 
     pub fn mac_address(self) -> [u8; 6] {
