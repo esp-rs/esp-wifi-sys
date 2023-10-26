@@ -917,12 +917,12 @@ impl<'d> WifiController<'d> {
     fn scan_result_count(&mut self) -> Result<usize, WifiError> {
         let mut bss_total: u16 = 0;
 
-        unsafe {
-            esp_wifi_result!(include::esp_wifi_scan_get_ap_num(&mut bss_total)).map_err(|e| {
-                include::esp_wifi_clear_ap_list();
-                e
-            })?;
-        }
+        // Prevents memory leak on error
+        let guard = FreeApListOnDrop;
+
+        unsafe { esp_wifi_result!(include::esp_wifi_scan_get_ap_num(&mut bss_total))? };
+
+        guard.defuse();
 
         Ok(bss_total as usize)
     }
@@ -935,23 +935,23 @@ impl<'d> WifiController<'d> {
 
         let mut records: [MaybeUninit<include::wifi_ap_record_t>; N] = [MaybeUninit::uninit(); N];
 
+        // Prevents memory leak on error
+        let guard = FreeApListOnDrop;
+
         unsafe {
             esp_wifi_result!(include::esp_wifi_scan_get_ap_records(
                 &mut bss_total,
                 records[0].as_mut_ptr(),
-            ))
-            .map_err(|e| {
-                // upon scan failure, list should be cleared to avoid memory leakage
-                include::esp_wifi_clear_ap_list();
-                e
-            })?;
+            ))?
+        };
 
-            for i in 0..bss_total {
-                let record = MaybeUninit::assume_init_ref(&records[i as usize]);
-                let ap_info = convert_ap_info(record);
+        guard.defuse();
 
-                scanned.push(ap_info).ok();
-            }
+        for i in 0..bss_total {
+            let record = unsafe { MaybeUninit::assume_init_ref(&records[i as usize]) };
+            let ap_info = convert_ap_info(record);
+
+            scanned.push(ap_info).ok();
         }
 
         Ok(scanned)
@@ -1397,20 +1397,12 @@ mod asynch {
             Self::clear_events(WifiEvent::ScanDone);
             esp_wifi_result!(wifi_start_scan(false))?;
 
-            struct FreeOnDrop;
-            impl Drop for FreeOnDrop {
-                fn drop(&mut self) {
-                    unsafe {
-                        include::esp_wifi_clear_ap_list();
-                    }
-                }
-            }
-
-            let _guard = FreeOnDrop;
+            // Prevents memory leak if `scan_n`'s future is dropped.
+            let guard = FreeApListOnDrop;
 
             WifiEventFuture::new(WifiEvent::ScanDone).await;
 
-            core::mem::forget(_guard);
+            guard.defuse();
 
             let count = self.scan_result_count()?;
             let result = self.scan_results()?;
@@ -1690,6 +1682,21 @@ mod asynch {
             } else {
                 Poll::Ready(output)
             }
+        }
+    }
+}
+
+struct FreeApListOnDrop;
+impl FreeApListOnDrop {
+    pub fn defuse(self) {
+        core::mem::forget(self);
+    }
+}
+
+impl Drop for FreeApListOnDrop {
+    fn drop(&mut self) {
+        unsafe {
+            include::esp_wifi_clear_ap_list();
         }
     }
 }
