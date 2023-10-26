@@ -673,7 +673,7 @@ fn decrement_inflight_counter() {
         })
         .unwrap();
 
-    trace!(
+    info!(
         "decrement: inflight: {}",
         WIFI_TX_INFLIGHT.load(Ordering::Relaxed)
     );
@@ -1056,7 +1056,7 @@ where
     F: FnOnce(&mut [u8]) -> R,
 {
     WIFI_TX_INFLIGHT.fetch_add(1, Ordering::SeqCst);
-    trace!(
+    info!(
         "consume: inflight: {}",
         WIFI_TX_INFLIGHT.load(Ordering::Relaxed)
     );
