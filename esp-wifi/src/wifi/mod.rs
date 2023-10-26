@@ -967,7 +967,6 @@ pub fn new_with_config<'d>(
         _ => {}
     }
 
-    // TODO: we'll need two devices for AP-STA mode
     let mode = WifiMode::try_from(&config)?;
 
     Ok((
@@ -997,10 +996,20 @@ pub fn new_with_mode<'d>(
     )
 }
 
-/// Creates a new [WifiDevice] and [WifiController] in AP-STA mode.
+/// Creates a new [WifiDevice] and [WifiController] in AP-STA mode, with a default configuration.
 ///
 /// Returns a tuple of `(AP device, STA device, controller)`.
 pub fn new_ap_sta<'d>(
+    inited: &EspWifiInitialization,
+    device: impl Peripheral<P = crate::hal::radio::Wifi> + 'd,
+) -> Result<(WifiDevice<'d>, WifiDevice<'d>, WifiController<'d>), WifiError> {
+    new_ap_sta_with_config(inited, device, Default::default(), Default::default())
+}
+
+/// Creates a new Wifi device and controller in AP-STA mode.
+///
+/// Returns a tuple of `(AP device, STA device, controller)`.
+pub fn new_ap_sta_with_config<'d>(
     inited: &EspWifiInitialization,
     device: impl Peripheral<P = crate::hal::radio::Wifi> + 'd,
     sta_config: embedded_svc::wifi::ClientConfiguration,
