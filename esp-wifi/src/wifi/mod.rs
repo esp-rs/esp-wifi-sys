@@ -22,8 +22,8 @@ use crate::EspWifiInitialization;
 use critical_section::{CriticalSection, Mutex};
 
 use embedded_svc::wifi::{
-    AccessPointConfiguration, AccessPointInfo, AuthMethod, ClientConfiguration, Protocol,
-    SecondaryChannel, Wifi,
+    AccessPointConfiguration, AccessPointInfo, AuthMethod, ClientConfiguration, Configuration,
+    Protocol, SecondaryChannel, Wifi,
 };
 
 use enumset::EnumSet;
@@ -143,15 +143,15 @@ impl WifiMode {
     }
 }
 
-impl TryFrom<&embedded_svc::wifi::Configuration> for WifiMode {
+impl TryFrom<&Configuration> for WifiMode {
     type Error = WifiError;
 
-    fn try_from(config: &embedded_svc::wifi::Configuration) -> Result<Self, Self::Error> {
+    fn try_from(config: &Configuration) -> Result<Self, Self::Error> {
         let mode = match config {
-            embedded_svc::wifi::Configuration::None => return Err(WifiError::UnknownWifiMode),
-            embedded_svc::wifi::Configuration::AccessPoint(_) => Self::Ap,
-            embedded_svc::wifi::Configuration::Client(_) => Self::Sta,
-            embedded_svc::wifi::Configuration::Mixed(_, _) => Self::ApSta,
+            Configuration::None => return Err(WifiError::UnknownWifiMode),
+            Configuration::AccessPoint(_) => Self::Ap,
+            Configuration::Client(_) => Self::Sta,
+            Configuration::Mixed(_, _) => Self::ApSta,
         };
 
         Ok(mode)
@@ -950,19 +950,18 @@ pub(crate) fn wifi_start_scan(
 /// configuration.
 ///
 /// This function will panic if the configuration is not
-/// [`embedded_svc::wifi::Configuration::Client`] or [`embedded_svc::wifi::Configuration::Station`].
+/// [`Configuration::Client`] or [`Configuration::Station`].
 ///
 /// If you want to use AP-STA mode, use `[new_ap_sta]`.
 pub fn new_with_config<'d>(
     inited: &EspWifiInitialization,
     device: impl Peripheral<P = crate::hal::peripherals::WIFI> + 'd,
-    config: embedded_svc::wifi::Configuration,
+    config: Configuration,
 ) -> Result<(WifiDevice<'d>, WifiController<'d>), WifiError> {
     crate::hal::into_ref!(device);
 
     match config {
-        embedded_svc::wifi::Configuration::None
-        | embedded_svc::wifi::Configuration::Mixed(_, _) => {
+        Configuration::None | Configuration::Mixed(_, _) => {
             panic!("This constructor can not initialize the AP-STA mode")
         }
         _ => {}
@@ -991,8 +990,8 @@ pub fn new_with_mode<'d>(
         inited,
         device,
         match mode {
-            WifiMode::Sta => embedded_svc::wifi::Configuration::Client(Default::default()),
-            WifiMode::Ap => embedded_svc::wifi::Configuration::AccessPoint(Default::default()),
+            WifiMode::Sta => Configuration::Client(Default::default()),
+            WifiMode::Ap => Configuration::AccessPoint(Default::default()),
             WifiMode::ApSta => panic!("This constructor can not initialize the AP-STA mode"),
         },
     )
@@ -1015,7 +1014,7 @@ pub fn new_ap_sta<'d>(
         WifiController::new_with_config(
             inited,
             device,
-            embedded_svc::wifi::Configuration::Mixed(sta_config, ap_config),
+            Configuration::Mixed(sta_config, ap_config),
         )?,
     ))
 }
@@ -1132,14 +1131,14 @@ fn convert_ap_info(record: &include::wifi_ap_record_t) -> AccessPointInfo {
 /// A wifi controller implementing embedded_svc::Wifi traits
 pub struct WifiController<'d> {
     _device: PeripheralRef<'d, crate::hal::peripherals::WIFI>,
-    config: embedded_svc::wifi::Configuration,
+    config: Configuration,
 }
 
 impl<'d> WifiController<'d> {
     pub(crate) fn new_with_config(
         inited: &EspWifiInitialization,
         _device: PeripheralRef<'d, crate::hal::peripherals::WIFI>,
-        config: embedded_svc::wifi::Configuration,
+        config: Configuration,
     ) -> Result<Self, WifiError> {
         if !inited.is_wifi() {
             return Err(WifiError::NotInitialized);
@@ -1446,10 +1445,17 @@ impl Wifi for WifiController<'_> {
 
     /// This currently only supports the `Client` and `AccessPoint` capability.
     fn get_capabilities(&self) -> Result<EnumSet<embedded_svc::wifi::Capability>, Self::Error> {
-        // we only support STA and AP mode
-        let mut caps = EnumSet::empty();
-        caps.insert(embedded_svc::wifi::Capability::Client);
-        caps.insert(embedded_svc::wifi::Capability::AccessPoint);
+        use embedded_svc::wifi::Capability;
+
+        let caps = match self.config {
+            Configuration::None => unreachable!(),
+            Configuration::Client(_) => enumset::enum_set! { Capability::Client },
+            Configuration::AccessPoint(_) => enumset::enum_set! { Capability::AccessPoint },
+            Configuration::Mixed(_, _) => {
+                Capability::Client | Capability::AccessPoint | Capability::Mixed
+            }
+        };
+
         Ok(caps)
     }
 
@@ -1466,20 +1472,17 @@ impl Wifi for WifiController<'_> {
     }
 
     /// Get the currently used configuration.
-    fn get_configuration(&self) -> Result<embedded_svc::wifi::Configuration, Self::Error> {
+    fn get_configuration(&self) -> Result<Configuration, Self::Error> {
         Ok(self.config.clone())
     }
 
     /// Set the configuration, you need to use Wifi::connect() for connecting to an AP
     /// Trying anything but `Configuration::Client` or `Configuration::AccessPoint` will result in a panic!
-    fn set_configuration(
-        &mut self,
-        conf: &embedded_svc::wifi::Configuration,
-    ) -> Result<(), Self::Error> {
+    fn set_configuration(&mut self, conf: &Configuration) -> Result<(), Self::Error> {
         match self.config {
-            embedded_svc::wifi::Configuration::None => self.config = conf.clone(), // initial config
-            embedded_svc::wifi::Configuration::Client(ref mut client) => {
-                if let embedded_svc::wifi::Configuration::Client(conf) = conf {
+            Configuration::None => self.config = conf.clone(), // initial config
+            Configuration::Client(ref mut client) => {
+                if let Configuration::Client(conf) = conf {
                     *client = conf.clone();
                 } else {
                     return Err(WifiError::InternalError(
@@ -1487,8 +1490,8 @@ impl Wifi for WifiController<'_> {
                     ));
                 }
             }
-            embedded_svc::wifi::Configuration::AccessPoint(ref mut ap) => {
-                if let embedded_svc::wifi::Configuration::AccessPoint(conf) = conf {
+            Configuration::AccessPoint(ref mut ap) => {
+                if let Configuration::AccessPoint(conf) = conf {
                     *ap = conf.clone();
                 } else {
                     return Err(WifiError::InternalError(
@@ -1496,27 +1499,27 @@ impl Wifi for WifiController<'_> {
                     ));
                 }
             }
-            embedded_svc::wifi::Configuration::Mixed(ref mut client, ref mut ap) => match conf {
-                embedded_svc::wifi::Configuration::None => {
+            Configuration::Mixed(ref mut client, ref mut ap) => match conf {
+                Configuration::None => {
                     return Err(WifiError::InternalError(
                         InternalWifiError::EspErrInvalidArg,
                     ));
                 }
-                embedded_svc::wifi::Configuration::Mixed(_, _) => self.config = conf.clone(),
-                embedded_svc::wifi::Configuration::Client(conf) => *client = conf.clone(),
-                embedded_svc::wifi::Configuration::AccessPoint(conf) => *ap = conf.clone(),
+                Configuration::Mixed(_, _) => self.config = conf.clone(),
+                Configuration::Client(conf) => *client = conf.clone(),
+                Configuration::AccessPoint(conf) => *ap = conf.clone(),
             },
         }
 
         match conf {
-            embedded_svc::wifi::Configuration::None => {
+            Configuration::None => {
                 return Err(WifiError::InternalError(
                     InternalWifiError::EspErrInvalidArg,
                 ));
             }
-            embedded_svc::wifi::Configuration::Client(config) => apply_sta_config(config)?,
-            embedded_svc::wifi::Configuration::AccessPoint(config) => apply_ap_config(config)?,
-            embedded_svc::wifi::Configuration::Mixed(sta_config, ap_config) => {
+            Configuration::Client(config) => apply_sta_config(config)?,
+            Configuration::AccessPoint(config) => apply_ap_config(config)?,
+            Configuration::Mixed(sta_config, ap_config) => {
                 apply_ap_config(ap_config)?;
                 apply_sta_config(sta_config)?;
             }
