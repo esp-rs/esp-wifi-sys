@@ -1081,7 +1081,8 @@ where
 }
 
 fn esp_wifi_can_send(cs: critical_section::CriticalSection) -> bool {
-    WIFI_TX_INFLIGHT.load(Ordering::SeqCst) < TX_QUEUE_SIZE
+    // TX_QUEUE_SIZE = 0 means no limit on TX queue
+    (TX_QUEUE_SIZE == 0 || WIFI_TX_INFLIGHT.load(Ordering::SeqCst) < TX_QUEUE_SIZE)
         && crate::HEAP.borrow_ref(cs).free() > 2 * DATA_FRAME_SIZE
 }
 
