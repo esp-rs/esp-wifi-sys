@@ -183,34 +183,6 @@ impl Into<wifi_mode_t> for WifiMode {
     }
 }
 
-#[derive(Debug)]
-#[cfg_attr(feature = "defmt", derive(defmt::Format))]
-/// Take care not to drop this while in a critical section.
-///
-/// Dropping an EspWifiPacketBuffer will call `esp_wifi_internal_free_rx_buffer` which
-/// will try to lock an internal mutex. If the mutex is already taken, the function will
-/// try to trigger a context switch, which will fail if we are in a critical section.
-pub(crate) struct EspWifiPacketBuffer {
-    pub(crate) buffer: *mut c_types::c_void,
-    pub(crate) len: u16,
-    pub(crate) eb: *mut c_types::c_void,
-}
-
-unsafe impl Send for EspWifiPacketBuffer {}
-
-impl Drop for EspWifiPacketBuffer {
-    fn drop(&mut self) {
-        trace!("Dropping EspWifiPacketBuffer, freeing memory");
-        unsafe { esp_wifi_internal_free_rx_buffer(self.eb) };
-    }
-}
-
-impl EspWifiPacketBuffer {
-    pub fn as_slice_mut(&mut self) -> &mut [u8] {
-        unsafe { core::slice::from_raw_parts_mut(self.buffer as *mut u8, self.len as usize) }
-    }
-}
-
 const DATA_FRAME_SIZE: usize = MTU + ETHERNET_FRAME_HEADER_SIZE;
 
 const RX_QUEUE_SIZE: usize = crate::CONFIG.rx_queue_size;
@@ -953,25 +925,16 @@ pub(crate) fn wifi_start_scan(
 /// [`Configuration::Client`] or [`Configuration::Station`].
 ///
 /// If you want to use AP-STA mode, use `[new_ap_sta]`.
-pub fn new_with_config<'d>(
+pub fn new_with_config<'d, MODE: WifiDeviceMode>(
     inited: &EspWifiInitialization,
     device: impl Peripheral<P = crate::hal::peripherals::WIFI> + 'd,
-    config: Configuration,
-) -> Result<(WifiDevice<'d>, WifiController<'d>), WifiError> {
+    config: MODE::Config,
+) -> Result<(WifiDevice<'d, MODE>, WifiController<'d>), WifiError> {
     crate::hal::into_ref!(device);
 
-    match config {
-        Configuration::None | Configuration::Mixed(_, _) => {
-            panic!("This constructor can not initialize the AP-STA mode")
-        }
-        _ => {}
-    }
-
-    let mode = WifiMode::try_from(&config)?;
-
     Ok((
-        WifiDevice::new(unsafe { device.clone_unchecked() }, mode),
-        WifiController::new_with_config(inited, device, config)?,
+        WifiDevice::new(unsafe { device.clone_unchecked() }, MODE::new()),
+        WifiController::new_with_config(inited, device, MODE::wrap_config(config))?,
     ))
 }
 
@@ -980,20 +943,12 @@ pub fn new_with_config<'d>(
 ///
 /// This function will panic if the mode is [`WifiMode::ApSta`].
 /// If you want to use AP-STA mode, use `[new_ap_sta]`.
-pub fn new_with_mode<'d>(
+pub fn new_with_mode<'d, MODE: WifiDeviceMode>(
     inited: &EspWifiInitialization,
-    device: impl Peripheral<P = crate::hal::peripherals::WIFI> + 'd,
-    mode: WifiMode,
-) -> Result<(WifiDevice<'d>, WifiController<'d>), WifiError> {
-    new_with_config(
-        inited,
-        device,
-        match mode {
-            WifiMode::Sta => Configuration::Client(Default::default()),
-            WifiMode::Ap => Configuration::AccessPoint(Default::default()),
-            WifiMode::ApSta => panic!("This constructor can not initialize the AP-STA mode"),
-        },
-    )
+    device: impl crate::hal::peripheral::Peripheral<P = crate::hal::peripherals::WIFI> + 'd,
+    _mode: MODE,
+) -> Result<(WifiDevice<'d, MODE>, WifiController<'d>), WifiError> {
+    new_with_config(inited, device, <MODE as Sealed>::Config::default())
 }
 
 /// Creates a new [WifiDevice] and [WifiController] in AP-STA mode, with a default configuration.
@@ -1001,8 +956,15 @@ pub fn new_with_mode<'d>(
 /// Returns a tuple of `(AP device, STA device, controller)`.
 pub fn new_ap_sta<'d>(
     inited: &EspWifiInitialization,
-    device: impl Peripheral<P = crate::hal::radio::Wifi> + 'd,
-) -> Result<(WifiDevice<'d>, WifiDevice<'d>, WifiController<'d>), WifiError> {
+    device: impl Peripheral<P = crate::hal::peripherals::WIFI> + 'd,
+) -> Result<
+    (
+        WifiDevice<'d, WifiApDevice>,
+        WifiDevice<'d, WifiStaDevice>,
+        WifiController<'d>,
+    ),
+    WifiError,
+> {
     new_ap_sta_with_config(inited, device, Default::default(), Default::default())
 }
 
@@ -1011,15 +973,22 @@ pub fn new_ap_sta<'d>(
 /// Returns a tuple of `(AP device, STA device, controller)`.
 pub fn new_ap_sta_with_config<'d>(
     inited: &EspWifiInitialization,
-    device: impl Peripheral<P = crate::hal::radio::Wifi> + 'd,
+    device: impl Peripheral<P = crate::hal::peripherals::WIFI> + 'd,
     sta_config: embedded_svc::wifi::ClientConfiguration,
     ap_config: embedded_svc::wifi::AccessPointConfiguration,
-) -> Result<(WifiDevice<'d>, WifiDevice<'d>, WifiController<'d>), WifiError> {
+) -> Result<
+    (
+        WifiDevice<'d, WifiApDevice>,
+        WifiDevice<'d, WifiStaDevice>,
+        WifiController<'d>,
+    ),
+    WifiError,
+> {
     crate::hal::into_ref!(device);
 
     Ok((
-        WifiDevice::new(unsafe { device.clone_unchecked() }, WifiMode::Ap),
-        WifiDevice::new(unsafe { device.clone_unchecked() }, WifiMode::Sta),
+        WifiDevice::new(unsafe { device.clone_unchecked() }, WifiApDevice),
+        WifiDevice::new(unsafe { device.clone_unchecked() }, WifiStaDevice),
         WifiController::new_with_config(
             inited,
             device,
@@ -1028,84 +997,235 @@ pub fn new_ap_sta_with_config<'d>(
     ))
 }
 
-#[derive(Debug, Clone, Copy, PartialEq)]
-#[cfg_attr(feature = "defmt", derive(defmt::Format))]
-pub enum WifiDeviceMode {
-    Ap,
-    Sta,
+mod sealed {
+    use super::*;
+
+    #[derive(Debug)]
+    #[cfg_attr(feature = "defmt", derive(defmt::Format))]
+    /// Take care not to drop this while in a critical section.
+    ///
+    /// Dropping an EspWifiPacketBuffer will call `esp_wifi_internal_free_rx_buffer` which
+    /// will try to lock an internal mutex. If the mutex is already taken, the function will
+    /// try to trigger a context switch, which will fail if we are in a critical section.
+    pub struct EspWifiPacketBuffer {
+        pub(crate) buffer: *mut c_types::c_void,
+        pub(crate) len: u16,
+        pub(crate) eb: *mut c_types::c_void,
+    }
+
+    unsafe impl Send for EspWifiPacketBuffer {}
+
+    impl Drop for EspWifiPacketBuffer {
+        fn drop(&mut self) {
+            trace!("Dropping EspWifiPacketBuffer, freeing memory");
+            unsafe { esp_wifi_internal_free_rx_buffer(self.eb) };
+        }
+    }
+
+    impl EspWifiPacketBuffer {
+        pub fn as_slice_mut(&mut self) -> &mut [u8] {
+            unsafe { core::slice::from_raw_parts_mut(self.buffer as *mut u8, self.len as usize) }
+        }
+    }
+
+    pub trait Sealed: Copy + Sized {
+        type Config: Default;
+
+        fn new() -> Self;
+
+        fn wrap_config(config: Self::Config) -> Configuration;
+
+        fn data_queue_rx(
+            self,
+            cs: CriticalSection,
+        ) -> RefMut<'_, SimpleQueue<EspWifiPacketBuffer, RX_QUEUE_SIZE>>;
+
+        fn can_send(self) -> bool {
+            WIFI_TX_INFLIGHT.load(Ordering::SeqCst) < TX_QUEUE_SIZE
+        }
+
+        fn increase_in_flight_counter(self) {
+            WIFI_TX_INFLIGHT.fetch_add(1, Ordering::SeqCst);
+        }
+
+        fn tx_token(self) -> Option<WifiTxToken<Self>> {
+            if self.can_send() {
+                Some(WifiTxToken { mode: self })
+            } else {
+                warn!("no Tx token available");
+                None
+            }
+        }
+
+        fn rx_token(self) -> Option<(WifiRxToken<Self>, WifiTxToken<Self>)> {
+            let is_empty = critical_section::with(|cs| self.data_queue_rx(cs).is_empty());
+
+            if !is_empty {
+                self.tx_token().map(|tx| (WifiRxToken { mode: self }, tx))
+            } else {
+                trace!("no Rx token available");
+                None
+            }
+        }
+
+        fn interface(self) -> wifi_interface_t;
+
+        #[cfg(feature = "embassy-net")]
+        fn register_transmit_waker(self, cx: &mut core::task::Context) {
+            embassy::TRANSMIT_WAKER.register(cx.waker())
+        }
+
+        #[cfg(feature = "embassy-net")]
+        fn register_receive_waker(self, cx: &mut core::task::Context);
+
+        #[cfg(feature = "embassy-net")]
+        fn register_link_state_waker(self, cx: &mut core::task::Context);
+
+        #[cfg(feature = "embassy-net")]
+        fn link_state(self) -> embassy_net::driver::LinkState;
+    }
+
+    impl Sealed for WifiStaDevice {
+        type Config = ClientConfiguration;
+
+        fn new() -> Self {
+            Self
+        }
+
+        fn wrap_config(config: ClientConfiguration) -> Configuration {
+            Configuration::Client(config)
+        }
+
+        fn data_queue_rx(
+            self,
+            cs: CriticalSection,
+        ) -> RefMut<'_, SimpleQueue<EspWifiPacketBuffer, RX_QUEUE_SIZE>> {
+            DATA_QUEUE_RX_STA.borrow_ref_mut(cs)
+        }
+
+        fn interface(self) -> wifi_interface_t {
+            wifi_interface_t_WIFI_IF_STA
+        }
+
+        #[cfg(feature = "embassy-net")]
+        fn register_receive_waker(self, cx: &mut core::task::Context) {
+            embassy::STA_RECEIVE_WAKER.register(cx.waker());
+        }
+
+        #[cfg(feature = "embassy-net")]
+        fn register_link_state_waker(self, cx: &mut core::task::Context) {
+            embassy::STA_LINK_STATE_WAKER.register(cx.waker());
+        }
+
+        #[cfg(feature = "embassy-net")]
+        fn link_state(self) -> embassy_net::driver::LinkState {
+            if matches!(get_sta_state(), WifiState::StaConnected) {
+                embassy_net::driver::LinkState::Up
+            } else {
+                embassy_net::driver::LinkState::Down
+            }
+        }
+    }
+
+    impl Sealed for WifiApDevice {
+        type Config = AccessPointConfiguration;
+
+        fn new() -> Self {
+            Self
+        }
+
+        fn wrap_config(config: AccessPointConfiguration) -> Configuration {
+            Configuration::AccessPoint(config)
+        }
+
+        fn data_queue_rx(
+            self,
+            cs: CriticalSection,
+        ) -> RefMut<'_, SimpleQueue<EspWifiPacketBuffer, RX_QUEUE_SIZE>> {
+            DATA_QUEUE_RX_AP.borrow_ref_mut(cs)
+        }
+
+        fn interface(self) -> wifi_interface_t {
+            wifi_interface_t_WIFI_IF_AP
+        }
+
+        #[cfg(feature = "embassy-net")]
+        fn register_receive_waker(self, cx: &mut core::task::Context) {
+            embassy::AP_RECEIVE_WAKER.register(cx.waker());
+        }
+
+        #[cfg(feature = "embassy-net")]
+        fn register_link_state_waker(self, cx: &mut core::task::Context) {
+            embassy::AP_LINK_STATE_WAKER.register(cx.waker());
+        }
+
+        #[cfg(feature = "embassy-net")]
+        fn link_state(self) -> embassy_net::driver::LinkState {
+            if matches!(get_ap_state(), WifiState::ApStarted) {
+                embassy_net::driver::LinkState::Up
+            } else {
+                embassy_net::driver::LinkState::Down
+            }
+        }
+    }
 }
 
-impl WifiDeviceMode {
-    fn data_queue_rx(
-        self,
-        cs: CriticalSection,
-    ) -> RefMut<'_, SimpleQueue<EspWifiPacketBuffer, RX_QUEUE_SIZE>> {
-        match self {
-            Self::Ap => DATA_QUEUE_RX_AP.borrow_ref_mut(cs),
-            Self::Sta => DATA_QUEUE_RX_STA.borrow_ref_mut(cs),
-        }
+use sealed::*;
+
+pub trait WifiDeviceMode: Sealed {
+    fn mode(self) -> WifiMode;
+
+    fn mac_address(self) -> [u8; 6];
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+pub struct WifiStaDevice;
+
+impl WifiDeviceMode for WifiStaDevice {
+    fn mode(self) -> WifiMode {
+        WifiMode::Sta
     }
 
-    fn can_send(self) -> bool {
-        WIFI_TX_INFLIGHT.load(Ordering::SeqCst) < TX_QUEUE_SIZE
-    }
-
-    fn increase_in_flight_counter(self) {
-        WIFI_TX_INFLIGHT.fetch_add(1, Ordering::SeqCst);
-    }
-
-    fn tx_token(self) -> Option<WifiTxToken> {
-        if self.can_send() {
-            Some(WifiTxToken { mode: self })
-        } else {
-            warn!("no Tx token available");
-            None
-        }
-    }
-
-    fn rx_token(self) -> Option<(WifiRxToken, WifiTxToken)> {
-        let is_empty = critical_section::with(|cs| self.data_queue_rx(cs).is_empty());
-
-        if !is_empty {
-            self.tx_token().map(|tx| (WifiRxToken { mode: self }, tx))
-        } else {
-            trace!("no Rx token available");
-            None
-        }
-    }
-
-    pub fn mac_address(self) -> [u8; 6] {
+    fn mac_address(self) -> [u8; 6] {
         let mut mac = [0; 6];
-        match self {
-            Self::Ap => get_ap_mac(&mut mac),
-            Self::Sta => get_sta_mac(&mut mac),
-        }
+        get_sta_mac(&mut mac);
+        mac
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+pub struct WifiApDevice;
+
+impl WifiDeviceMode for WifiApDevice {
+    fn mode(self) -> WifiMode {
+        WifiMode::Ap
+    }
+
+    fn mac_address(self) -> [u8; 6] {
+        let mut mac = [0; 6];
+        get_ap_mac(&mut mac);
         mac
     }
 }
 
 /// A wifi device implementing smoltcp's Device trait.
-pub struct WifiDevice<'d> {
+pub struct WifiDevice<'d, MODE: WifiDeviceMode> {
     _device: PeripheralRef<'d, crate::hal::peripherals::WIFI>,
-    mode: WifiDeviceMode,
+    mode: MODE,
 }
 
-impl<'d> WifiDevice<'d> {
+impl<'d, MODE: WifiDeviceMode> WifiDevice<'d, MODE> {
     pub(crate) fn new(
         _device: PeripheralRef<'d, crate::hal::peripherals::WIFI>,
-        mode: WifiMode,
-    ) -> WifiDevice {
-        let mode = match mode {
-            WifiMode::Sta => WifiDeviceMode::Sta,
-            WifiMode::Ap => WifiDeviceMode::Ap,
-            _ => panic!("A WifiDevice instance supports a single mode only"),
-        };
-
+        mode: MODE,
+    ) -> Self {
         Self { _device, mode }
     }
 
-    pub(crate) fn get_wifi_mode(&self) -> WifiDeviceMode {
-        self.mode
+    pub fn mac_address(&self) -> [u8; 6] {
+        self.mode.mac_address()
     }
 }
 
@@ -1245,9 +1365,9 @@ impl<'d> WifiController<'d> {
 }
 
 // see https://docs.rs/smoltcp/0.7.1/smoltcp/phy/index.html
-impl Device for WifiDevice<'_> {
-    type RxToken<'a> = WifiRxToken where Self: 'a;
-    type TxToken<'a> = WifiTxToken where Self: 'a;
+impl<MODE: WifiDeviceMode> Device for WifiDevice<'_, MODE> {
+    type RxToken<'a> = WifiRxToken<MODE> where Self: 'a;
+    type TxToken<'a> = WifiTxToken<MODE> where Self: 'a;
 
     fn receive(
         &mut self,
@@ -1274,11 +1394,11 @@ impl Device for WifiDevice<'_> {
 
 #[doc(hidden)]
 #[derive(Debug)]
-pub struct WifiRxToken {
-    mode: WifiDeviceMode,
+pub struct WifiRxToken<MODE: Sealed> {
+    mode: MODE,
 }
 
-impl WifiRxToken {
+impl<MODE: Sealed> WifiRxToken<MODE> {
     fn consume_token<R, F>(self, f: F) -> R
     where
         F: FnOnce(&mut [u8]) -> R,
@@ -1304,7 +1424,7 @@ impl WifiRxToken {
     }
 }
 
-impl RxToken for WifiRxToken {
+impl<MODE: Sealed> RxToken for WifiRxToken<MODE> {
     fn consume<R, F>(self, f: F) -> R
     where
         F: FnOnce(&mut [u8]) -> R,
@@ -1315,40 +1435,32 @@ impl RxToken for WifiRxToken {
 
 #[doc(hidden)]
 #[derive(Debug)]
-pub struct WifiTxToken {
-    mode: WifiDeviceMode,
+pub struct WifiTxToken<MODE: Sealed> {
+    mode: MODE,
 }
 
-impl WifiTxToken {
+impl<MODE: Sealed> WifiTxToken<MODE> {
     fn consume_token<R, F>(self, len: usize, f: F) -> R
     where
         F: FnOnce(&mut [u8]) -> R,
     {
         self.mode.increase_in_flight_counter();
 
-        // (safety): creation of multiple WiFi devices is impossible in safe Rust, therefore only smoltcp _or_ embassy-net can be used at one time
-        static mut AP_BUFFER: [u8; DATA_FRAME_SIZE] = [0u8; DATA_FRAME_SIZE];
-        static mut STA_BUFFER: [u8; DATA_FRAME_SIZE] = [0u8; DATA_FRAME_SIZE];
+        // (safety): creation of multiple WiFi devices with the same mode is impossible in safe Rust,
+        // therefore only smoltcp _or_ embassy-net can be used at one time
+        static mut BUFFER: [u8; DATA_FRAME_SIZE] = [0u8; DATA_FRAME_SIZE];
 
-        let buffer = match self.mode {
-            WifiDeviceMode::Ap => unsafe { &mut AP_BUFFER[..len] },
-            WifiDeviceMode::Sta => unsafe { &mut STA_BUFFER[..len] },
-        };
+        let buffer = unsafe { &mut BUFFER[..len] };
 
         let res = f(buffer);
 
-        let interface = match self.mode {
-            WifiDeviceMode::Ap => wifi_interface_t_WIFI_IF_AP,
-            WifiDeviceMode::Sta => wifi_interface_t_WIFI_IF_STA,
-        };
-
-        esp_wifi_send_data(interface, buffer);
+        esp_wifi_send_data(self.mode.interface(), buffer);
 
         res
     }
 }
 
-impl TxToken for WifiTxToken {
+impl<MODE: Sealed> TxToken for WifiTxToken<MODE> {
     fn consume<R, F>(self, len: usize, f: F) -> R
     where
         F: FnOnce(&mut [u8]) -> R,
@@ -1614,27 +1726,7 @@ pub(crate) mod embassy {
     pub(crate) static STA_RECEIVE_WAKER: AtomicWaker = AtomicWaker::new();
     pub(crate) static STA_LINK_STATE_WAKER: AtomicWaker = AtomicWaker::new();
 
-    impl WifiDeviceMode {
-        fn register_transmit_waker(self, cx: &mut core::task::Context) {
-            TRANSMIT_WAKER.register(cx.waker())
-        }
-
-        fn register_receive_waker(self, cx: &mut core::task::Context) {
-            match self {
-                Self::Ap => AP_RECEIVE_WAKER.register(cx.waker()),
-                Self::Sta => STA_RECEIVE_WAKER.register(cx.waker()),
-            }
-        }
-
-        fn register_link_state_waker(self, cx: &mut core::task::Context) {
-            match self {
-                Self::Ap => AP_LINK_STATE_WAKER.register(cx.waker()),
-                Self::Sta => STA_LINK_STATE_WAKER.register(cx.waker()),
-            }
-        }
-    }
-
-    impl RxToken for WifiRxToken {
+    impl<MODE: WifiDeviceMode> RxToken for WifiRxToken<MODE> {
         fn consume<R, F>(self, f: F) -> R
         where
             F: FnOnce(&mut [u8]) -> R,
@@ -1643,7 +1735,7 @@ pub(crate) mod embassy {
         }
     }
 
-    impl TxToken for WifiTxToken {
+    impl<MODE: WifiDeviceMode> TxToken for WifiTxToken<MODE> {
         fn consume<R, F>(self, len: usize, f: F) -> R
         where
             F: FnOnce(&mut [u8]) -> R,
@@ -1652,14 +1744,9 @@ pub(crate) mod embassy {
         }
     }
 
-    impl Driver for WifiDevice<'_> {
-        type RxToken<'a> = WifiRxToken
-    where
-        Self: 'a;
-
-        type TxToken<'a> = WifiTxToken
-    where
-        Self: 'a;
+    impl<MODE: WifiDeviceMode> Driver for WifiDevice<'_, MODE> {
+        type RxToken<'a> = WifiRxToken<MODE> where Self: 'a;
+        type TxToken<'a> = WifiTxToken<MODE> where Self: 'a;
 
         fn receive(
             &mut self,
@@ -1677,22 +1764,7 @@ pub(crate) mod embassy {
 
         fn link_state(&mut self, cx: &mut core::task::Context) -> embassy_net::driver::LinkState {
             self.mode.register_link_state_waker(cx);
-            match self.mode {
-                WifiDeviceMode::Sta => {
-                    if matches!(get_sta_state(), WifiState::StaConnected) {
-                        embassy_net::driver::LinkState::Up
-                    } else {
-                        embassy_net::driver::LinkState::Down
-                    }
-                }
-                WifiDeviceMode::Ap => {
-                    if matches!(get_ap_state(), WifiState::ApStarted) {
-                        embassy_net::driver::LinkState::Up
-                    } else {
-                        embassy_net::driver::LinkState::Down
-                    }
-                }
-            }
+            self.mode.link_state()
         }
 
         fn capabilities(&self) -> Capabilities {
@@ -1707,7 +1779,7 @@ pub(crate) mod embassy {
         }
 
         fn hardware_address(&self) -> HardwareAddress {
-            HardwareAddress::Ethernet(self.mode.mac_address())
+            HardwareAddress::Ethernet(self.mac_address())
         }
     }
 }

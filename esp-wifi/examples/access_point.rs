@@ -13,7 +13,7 @@ use esp_backtrace as _;
 use esp_println::{print, println};
 use esp_wifi::initialize;
 use esp_wifi::wifi::utils::create_network_interface;
-use esp_wifi::wifi::WifiMode;
+use esp_wifi::wifi::WifiApDevice;
 use esp_wifi::wifi_interface::WifiStack;
 use esp_wifi::{current_millis, EspWifiInitFor};
 use hal::clock::ClockControl;
@@ -48,7 +48,7 @@ fn main() -> ! {
     let wifi = peripherals.WIFI;
     let mut socket_set_entries: [SocketStorage; 3] = Default::default();
     let (iface, device, mut controller, sockets) =
-        create_network_interface(&init, wifi, WifiMode::Ap, &mut socket_set_entries).unwrap();
+        create_network_interface(&init, wifi, WifiApDevice, &mut socket_set_entries).unwrap();
     let mut wifi_stack = WifiStack::new(iface, device, sockets, current_millis);
 
     let client_config = Configuration::AccessPoint(AccessPointConfiguration {
