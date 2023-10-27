@@ -289,12 +289,12 @@ pub unsafe extern "C" fn __assert_func(
 
 #[no_mangle]
 pub unsafe extern "C" fn ets_timer_disarm(timer: *mut crate::binary::c_types::c_void) {
-    compat_timer_disarm(timer);
+    compat_timer_disarm(timer.cast());
 }
 
 #[no_mangle]
 pub unsafe extern "C" fn ets_timer_done(timer: *mut crate::binary::c_types::c_void) {
-    compat_timer_done(timer);
+    compat_timer_done(timer.cast());
 }
 
 #[no_mangle]
@@ -303,7 +303,7 @@ pub unsafe extern "C" fn ets_timer_setfn(
     pfunction: *mut crate::binary::c_types::c_void,
     parg: *mut crate::binary::c_types::c_void,
 ) {
-    compat_timer_setfn(ptimer, pfunction, parg);
+    compat_timer_setfn(ptimer.cast(), core::mem::transmute(pfunction), parg);
 }
 
 #[no_mangle]
@@ -312,7 +312,7 @@ pub unsafe extern "C" fn ets_timer_arm(
     tmout: u32,
     repeat: bool,
 ) {
-    compat_timer_arm(timer, tmout, repeat);
+    compat_timer_arm(timer.cast(), tmout, repeat);
 }
 
 #[no_mangle]
@@ -321,7 +321,7 @@ pub unsafe extern "C" fn ets_timer_arm_us(
     tmout: u32,
     repeat: bool,
 ) {
-    compat_timer_arm_us(timer, tmout, repeat);
+    compat_timer_arm_us(timer.cast(), tmout, repeat);
 }
 
 #[no_mangle]

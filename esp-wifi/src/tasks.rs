@@ -41,9 +41,9 @@ pub extern "C" fn worker_task2() {
                         && crate::timer::time_diff(timer.started, current_timestamp)
                             >= timer.timeout
                     {
-                        debug!("timer is due.... {:x}", timer.ptimer as usize);
+                        debug!("timer is due.... {:x}", timer.id());
 
-                        if to_run.enqueue((timer.timer_ptr, timer.arg_ptr)).is_err() {
+                        if to_run.enqueue(timer.callback).is_err() {
                             break;
                         }
 
@@ -55,9 +55,9 @@ pub extern "C" fn worker_task2() {
         });
 
         // run the due timer callbacks NOT in an interrupt free context
-        while let Some((fnc, arg)) = to_run.dequeue() {
+        while let Some(callback) = to_run.dequeue() {
             trace!("trigger timer....");
-            unsafe { fnc(arg) };
+            callback.call();
             trace!("timer callback called");
         }
 
