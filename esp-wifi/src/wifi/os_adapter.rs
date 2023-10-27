@@ -1406,12 +1406,19 @@ pub unsafe extern "C" fn nvs_erase_key(
  *
  ****************************************************************************/
 pub unsafe extern "C" fn get_random(buf: *mut u8, len: usize) -> crate::binary::c_types::c_int {
-    for i in 0..len as usize {
-        buf.add(i)
-            .write_volatile((crate::wifi::rand() & 0xff) as u8)
-    }
+    trace!("get_random");
+    if let Some(ref mut rng) = crate::common_adapter::RANDOM_GENERATOR {
+        let buffer = unsafe { core::slice::from_raw_parts_mut(buf, len) };
 
-    0
+        for chunk in buffer.chunks_mut(4) {
+            let bytes = rng.random().to_le_bytes();
+            chunk.copy_from_slice(&bytes[..chunk.len()]);
+        }
+
+        0
+    } else {
+        -1
+    }
 }
 
 /****************************************************************************
