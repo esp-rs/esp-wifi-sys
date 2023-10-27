@@ -119,7 +119,7 @@ pub fn compat_timer_setfn(
     pfunction: *mut c_types::c_void,
     parg: *mut c_types::c_void,
 ) {
-    trace!(
+    debug!(
         "timer_setfn {:x} {:?} {:?}",
         TimerId(ptimer),
         pfunction,
@@ -187,7 +187,6 @@ pub fn compat_esp_timer_create(
         memory_fence();
 
         for i in 0..TIMERS.len() {
-            debug!("esp_timer_create {}", i);
             if TIMERS[i].is_none() {
                 TIMERS[i] = Some(Timer {
                     ptimer: &ESP_FAKE_TIMER as *const _ as *mut c_types::c_void,
