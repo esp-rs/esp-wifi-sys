@@ -285,8 +285,9 @@ pub struct ext_funcs_t {
     malloc: Option<unsafe extern "C" fn(size: u32) -> *mut c_void>,
     free: Option<unsafe extern "C" fn(*mut c_void)>,
     hal_uart_start_tx: Option<unsafe extern "C" fn(i32)>,
-    hal_uart_init_cbs:
-        Option<unsafe extern "C" fn(i32, *const c_void, c_void, c_void, c_void) -> i32>,
+    hal_uart_init_cbs: Option<
+        unsafe extern "C" fn(i32, *const c_void, *const c_void, *const c_void, c_void) -> i32,
+    >,
     hal_uart_config: Option<unsafe extern "C" fn(i32, i32, u8, u8, u8, u8) -> i32>,
     hal_uart_close: Option<unsafe extern "C" fn(i32) -> i32>,
     hal_uart_blocking_tx: Option<unsafe extern "C" fn(i32, u8)>,
