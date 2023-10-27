@@ -772,7 +772,7 @@ pub unsafe extern "C" fn task_delay(tick: u32) {
  ****************************************************************************/
 pub unsafe extern "C" fn task_ms_to_tick(ms: u32) -> i32 {
     trace!("task_ms_to_tick ms {}", ms);
-    (ms as u64 * crate::timer::TICKS_PER_SECOND / 1000) as i32
+    crate::timer::millis_to_ticks(ms as u64) as i32
 }
 
 /****************************************************************************
@@ -1127,7 +1127,7 @@ pub unsafe extern "C" fn wifi_rtc_disable_iso() {
 #[no_mangle]
 pub unsafe extern "C" fn esp_timer_get_time() -> i64 {
     trace!("esp_timer_get_time");
-    (crate::timer::get_systimer_count() / (crate::timer::TICKS_PER_SECOND / 1_000_000)) as i64
+    crate::timer::ticks_to_micros(crate::timer::get_systimer_count()) as i64
 }
 
 /****************************************************************************

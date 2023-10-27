@@ -227,8 +227,8 @@ unsafe extern "C" fn queue_recv(queue: *const (), item: *const (), block_time_ms
     );
 
     // is this ticks or millis?
-    let end_time = crate::timer::get_systimer_count()
-        + (block_time_ms as u64 * (crate::timer::TICKS_PER_SECOND / 1000));
+    let end_time =
+        crate::timer::get_systimer_count() + crate::timer::millis_to_ticks(block_time_ms as u64);
 
     // handle the BT_QUEUE
     if queue == &BT_INTERNAL_QUEUE as *const _ as *const () {
