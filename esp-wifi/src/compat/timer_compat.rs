@@ -15,7 +15,7 @@ pub struct Timer {
     pub timeout: u64,
     pub active: bool,
     pub periodic: bool,
-    pub timer_ptr: *mut c_types::c_void,
+    pub timer_ptr: unsafe extern "C" fn(*mut c_types::c_void),
     pub arg_ptr: *mut c_types::c_void,
 }
 
@@ -111,7 +111,7 @@ pub fn compat_timer_setfn(
         for i in 0..TIMERS.len() {
             if let Some(ref mut timer) = TIMERS[i] {
                 if timer.ptimer == ptimer {
-                    timer.timer_ptr = pfunction;
+                    timer.timer_ptr = core::mem::transmute(pfunction);
                     timer.arg_ptr = parg;
                     timer.active = false;
 
@@ -138,7 +138,7 @@ pub fn compat_timer_setfn(
                         timeout: 0,
                         active: false,
                         periodic: false,
-                        timer_ptr: pfunction,
+                        timer_ptr: core::mem::transmute(pfunction),
                         arg_ptr: parg,
                     });
                     break;
@@ -174,7 +174,7 @@ pub fn compat_esp_timer_create(
                     timeout: 0,
                     active: false,
                     periodic: false,
-                    timer_ptr: core::mem::transmute(unwrap!((*args).callback)),
+                    timer_ptr: unwrap!((*args).callback),
                     arg_ptr: (*args).arg,
                 });
                 out_handle = &ESP_FAKE_TIMER as *const _ as *mut esp_timer_handle_t;

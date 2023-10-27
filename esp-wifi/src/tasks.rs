@@ -1,7 +1,4 @@
-use core::mem;
-
 use crate::{
-    binary::c_types,
     compat::{self, queue::SimpleQueue, timer_compat::TIMERS},
     memory_fence::memory_fence,
     preempt::preempt::task_create,
@@ -45,9 +42,10 @@ pub extern "C" fn worker_task2() {
                             >= timer.timeout
                     {
                         debug!("timer is due.... {:x}", timer.ptimer as usize);
-                        let fnctn: fn(*mut c_types::c_void) = mem::transmute(timer.timer_ptr);
 
-                        _ = to_run.enqueue((fnctn, timer.arg_ptr));
+                        if to_run.enqueue((timer.timer_ptr, timer.arg_ptr)).is_err() {
+                            break;
+                        }
 
                         timer.active = timer.periodic;
                     }
@@ -59,7 +57,7 @@ pub extern "C" fn worker_task2() {
         // run the due timer callbacks NOT in an interrupt free context
         while let Some((fnc, arg)) = to_run.dequeue() {
             trace!("trigger timer....");
-            fnc(arg);
+            unsafe { fnc(arg) };
             trace!("timer callback called");
         }
 
