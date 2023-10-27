@@ -35,20 +35,17 @@ pub extern "C" fn worker_task2() {
         let current_timestamp = get_systimer_count();
         critical_section::with(|_| unsafe {
             memory_fence();
-            for i in 0..TIMERS.len() {
-                if let Some(ref mut timer) = TIMERS[i] {
-                    if timer.active
-                        && crate::timer::time_diff(timer.started, current_timestamp)
-                            >= timer.timeout
-                    {
-                        debug!("timer is due.... {:x}", timer.id());
+            for timer in TIMERS.iter_mut() {
+                if timer.active
+                    && crate::timer::time_diff(timer.started, current_timestamp) >= timer.timeout
+                {
+                    debug!("timer is due.... {:x}", timer.id());
 
-                        if to_run.enqueue(timer.callback).is_err() {
-                            break;
-                        }
-
-                        timer.active = timer.periodic;
+                    if to_run.enqueue(timer.callback).is_err() {
+                        break;
                     }
+
+                    timer.active = timer.periodic;
                 };
             }
             memory_fence();
