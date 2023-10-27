@@ -828,7 +828,7 @@ pub unsafe extern "C" fn task_get_max_priority() -> i32 {
  ****************************************************************************/
 #[no_mangle]
 pub unsafe extern "C" fn malloc(size: usize) -> *mut crate::binary::c_types::c_void {
-    crate::compat::malloc::malloc(size) as *mut crate::binary::c_types::c_void
+    crate::compat::malloc::malloc(size).cast()
 }
 
 /****************************************************************************
@@ -846,7 +846,7 @@ pub unsafe extern "C" fn malloc(size: usize) -> *mut crate::binary::c_types::c_v
  ****************************************************************************/
 #[no_mangle]
 pub unsafe extern "C" fn free(p: *mut crate::binary::c_types::c_void) {
-    crate::compat::malloc::free(p as *const _ as *const u8);
+    crate::compat::malloc::free(p.cast());
 }
 
 /****************************************************************************
@@ -1523,7 +1523,7 @@ pub unsafe extern "C" fn log_timestamp() -> u32 {
  *
  ****************************************************************************/
 pub unsafe extern "C" fn malloc_internal(size: usize) -> *mut crate::binary::c_types::c_void {
-    crate::compat::malloc::malloc(size) as *mut crate::binary::c_types::c_void
+    crate::compat::malloc::malloc(size).cast()
 }
 
 /****************************************************************************
