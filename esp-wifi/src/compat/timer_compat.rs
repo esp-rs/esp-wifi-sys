@@ -29,8 +29,8 @@ pub fn compat_timer_arm_us(ptimer: *mut c_types::c_void, us: u32, repeat: bool) 
 
     let ticks = crate::timer::micros_to_ticks(us as u64);
     debug!(
-        "timer_arm_us {:?} current: {} ticks: {} repeat: {}",
-        ptimer, systick, ticks, repeat
+        "timer_arm_us {:x} current: {} ticks: {} repeat: {}",
+        ptimer as usize, systick, ticks, repeat
     );
     critical_section::with(|_| unsafe {
         memory_fence();
@@ -52,7 +52,7 @@ pub fn compat_timer_arm_us(ptimer: *mut c_types::c_void, us: u32, repeat: bool) 
 }
 
 pub fn compat_timer_disarm(ptimer: *mut c_types::c_void) {
-    debug!("timer_disarm {:?}", ptimer);
+    debug!("timer_disarm {:x}", ptimer as usize);
     critical_section::with(|_| unsafe {
         memory_fence();
 
@@ -71,7 +71,7 @@ pub fn compat_timer_disarm(ptimer: *mut c_types::c_void) {
 }
 
 pub fn compat_timer_done(ptimer: *mut c_types::c_void) {
-    debug!("timer_done {:?}", ptimer);
+    debug!("timer_done {:x}", ptimer as usize);
     critical_section::with(|_| unsafe {
         memory_fence();
 
@@ -98,7 +98,10 @@ pub fn compat_timer_setfn(
     pfunction: *mut c_types::c_void,
     parg: *mut c_types::c_void,
 ) {
-    trace!("timer_setfn {:?} {:?} {:?}", ptimer, pfunction, parg);
+    trace!(
+        "timer_setfn {:x} {:?} {:?}",
+        ptimer as usize, pfunction, parg
+    );
 
     critical_section::with(|_| unsafe {
         memory_fence();
