@@ -27,10 +27,11 @@ pub fn compat_timer_arm(ptimer: *mut c_types::c_void, tmout: u32, repeat: bool) 
 pub fn compat_timer_arm_us(ptimer: *mut c_types::c_void, us: u32, repeat: bool) {
     let systick = crate::timer::get_systimer_count();
 
-    debug!("timer_arm_us, current time {}", systick);
-
     let ticks = us as u64 * (crate::timer::TICKS_PER_SECOND / 1_000_000);
-    debug!("timer_arm_us {:?} {} {}", ptimer, ticks, repeat);
+    debug!(
+        "timer_arm_us {:?} current: {} ticks: {} repeat: {}",
+        ptimer, systick, ticks, repeat
+    );
     critical_section::with(|_| unsafe {
         memory_fence();
 
