@@ -4,13 +4,13 @@ pub(crate) mod btdm;
 #[cfg(any(esp32c2, esp32c6))]
 pub(crate) mod npl;
 
-use core::mem::MaybeUninit;
-
 #[cfg(any(esp32, esp32c3, esp32s3))]
 use self::btdm as ble;
 
 #[cfg(any(esp32c2, esp32c6))]
 use self::npl as ble;
+
+use core::mem::MaybeUninit;
 
 pub(crate) use ble::ble_init;
 pub(crate) use ble::read_hci;
@@ -18,6 +18,18 @@ pub(crate) use ble::read_next;
 pub(crate) use ble::send_hci;
 
 pub mod controller;
+
+pub unsafe extern "C" fn malloc(size: u32) -> *mut crate::binary::c_types::c_void {
+    crate::compat::malloc::malloc(size as usize).cast()
+}
+
+pub unsafe extern "C" fn malloc_internal(size: u32) -> *mut crate::binary::c_types::c_void {
+    crate::compat::malloc::malloc(size as usize).cast()
+}
+
+pub unsafe extern "C" fn free(ptr: *mut crate::binary::c_types::c_void) {
+    crate::compat::malloc::free(ptr.cast())
+}
 
 static mut HCI_OUT_COLLECTOR: MaybeUninit<HciOutCollector> = MaybeUninit::uninit();
 
