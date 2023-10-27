@@ -1,3 +1,5 @@
+use core::fmt::LowerHex;
+
 use crate::{
     binary::{
         c_types,
@@ -20,6 +22,22 @@ pub struct Timer {
 
 pub static mut TIMERS: [Option<Timer>; 20] = [None; 20];
 
+/// Makes timer addresses printable without the 0x prefix
+pub(crate) struct TimerId(pub *mut c_types::c_void);
+
+impl LowerHex for TimerId {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        LowerHex::fmt(&(self.0 as usize), f)
+    }
+}
+
+#[cfg(feature = "defmt")]
+impl defmt::Format for TimerId {
+    fn format(&self, fmt: defmt::Formatter) {
+        defmt::write!(fmt, "{:x}", self.0 as usize)
+    }
+}
+
 pub fn compat_timer_arm(ptimer: *mut c_types::c_void, tmout: u32, repeat: bool) {
     compat_timer_arm_us(ptimer, tmout * 1000, repeat);
 }
@@ -29,8 +47,11 @@ pub fn compat_timer_arm_us(ptimer: *mut c_types::c_void, us: u32, repeat: bool) 
 
     let ticks = crate::timer::micros_to_ticks(us as u64);
     debug!(
-        "timer_arm_us {:?} current: {} ticks: {} repeat: {}",
-        ptimer, systick, ticks, repeat
+        "timer_arm_us {:x} current: {} ticks: {} repeat: {}",
+        TimerId(ptimer),
+        systick,
+        ticks,
+        repeat
     );
     critical_section::with(|_| unsafe {
         memory_fence();
@@ -52,7 +73,7 @@ pub fn compat_timer_arm_us(ptimer: *mut c_types::c_void, us: u32, repeat: bool) 
 }
 
 pub fn compat_timer_disarm(ptimer: *mut c_types::c_void) {
-    debug!("timer_disarm {:?}", ptimer);
+    debug!("timer_disarm {:x}", TimerId(ptimer));
     critical_section::with(|_| unsafe {
         memory_fence();
 
@@ -71,7 +92,7 @@ pub fn compat_timer_disarm(ptimer: *mut c_types::c_void) {
 }
 
 pub fn compat_timer_done(ptimer: *mut c_types::c_void) {
-    debug!("timer_done {:?}", ptimer);
+    debug!("timer_done {:x}", TimerId(ptimer));
     critical_section::with(|_| unsafe {
         memory_fence();
 
@@ -98,7 +119,12 @@ pub fn compat_timer_setfn(
     pfunction: *mut c_types::c_void,
     parg: *mut c_types::c_void,
 ) {
-    trace!("timer_setfn {:?} {:?} {:?}", ptimer, pfunction, parg);
+    trace!(
+        "timer_setfn {:x} {:?} {:?}",
+        TimerId(ptimer),
+        pfunction,
+        parg
+    );
 
     critical_section::with(|_| unsafe {
         memory_fence();

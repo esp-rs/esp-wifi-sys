@@ -2,7 +2,11 @@ use core::mem;
 
 use crate::{
     binary::c_types,
-    compat::{self, queue::SimpleQueue, timer_compat::TIMERS},
+    compat::{
+        self,
+        queue::SimpleQueue,
+        timer_compat::{TimerId, TIMERS},
+    },
     memory_fence::memory_fence,
     preempt::preempt::task_create,
     timer::{get_systimer_count, yield_task},
@@ -41,7 +45,7 @@ pub extern "C" fn worker_task2() {
             for i in 0..TIMERS.len() {
                 if let Some(ref mut timer) = TIMERS[i] {
                     if timer.active && current_timestamp >= timer.expire {
-                        debug!("timer is due.... {:?}", timer.ptimer);
+                        debug!("timer is due.... {:x}", TimerId(timer.ptimer));
                         let fnctn: fn(*mut c_types::c_void) = mem::transmute(timer.timer_ptr);
 
                         _ = to_run.enqueue((fnctn, timer.arg_ptr));
