@@ -5,21 +5,13 @@ use critical_section::Mutex;
 use crate::ble::btdm::ble_os_adapter_chip_specific::G_OSI_FUNCS;
 use crate::ble::HciOutCollector;
 use crate::ble::HCI_OUT_COLLECTOR;
+use crate::hal::macros::ram;
 use crate::{
     binary::include::*,
     compat::{common::str_from_c, queue::SimpleQueue, work_queue::queue_work},
     memory_fence::memory_fence,
     timer::yield_task,
 };
-
-#[cfg(esp32)]
-use esp32_hal as hal;
-#[cfg(esp32c3)]
-use esp32c3_hal as hal;
-#[cfg(esp32s3)]
-use esp32s3_hal as hal;
-
-use hal::macros::ram;
 
 #[cfg_attr(esp32c3, path = "os_adapter_esp32c3.rs")]
 #[cfg_attr(esp32s3, path = "os_adapter_esp32s3.rs")]
