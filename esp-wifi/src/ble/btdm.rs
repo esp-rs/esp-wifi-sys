@@ -218,8 +218,7 @@ unsafe extern "C" fn queue_recv(queue: *const (), item: *const (), block_time_ms
         block_time_ms
     );
 
-    // is this ticks or millis?
-    let end_time =
+    let end_time_ticks =
         crate::timer::get_systimer_count() + crate::timer::millis_to_ticks(block_time_ms as u64);
 
     // handle the BT_QUEUE
@@ -249,7 +248,7 @@ unsafe extern "C" fn queue_recv(queue: *const (), item: *const (), block_time_ms
             }
 
             if block_time_ms != OSI_FUNCS_TIME_BLOCKING
-                && crate::timer::get_systimer_count() > end_time
+                && crate::timer::get_systimer_count() > end_time_ticks
             {
                 trace!("queue_recv returns with timeout");
                 return -1;
