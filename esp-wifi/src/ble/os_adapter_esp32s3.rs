@@ -178,9 +178,7 @@ pub(crate) fn create_ble_config() -> esp_bt_controller_config_t {
 
 pub(crate) unsafe extern "C" fn interrupt_on(intr_num: i32) {
     trace!("interrupt_on {}", intr_num);
-    unsafe {
-        esp32s3_hal::xtensa_lx::interrupt::enable_mask(1 << 1);
-    }
+    unsafe { crate::hal::xtensa_lx::interrupt::enable_mask(1 << 1) };
 }
 
 pub(crate) unsafe extern "C" fn interrupt_off(_intr_num: i32) {

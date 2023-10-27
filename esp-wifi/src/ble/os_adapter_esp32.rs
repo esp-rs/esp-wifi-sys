@@ -540,7 +540,7 @@ pub(crate) unsafe extern "C" fn set_isr(n: i32, f: unsafe extern "C" fn(), arg: 
 
 pub(crate) unsafe extern "C" fn ints_on(mask: u32) {
     trace!("chip_ints_on esp32 {:b}", mask);
-    hal::xtensa_lx::interrupt::enable_mask(mask);
+    crate::hal::xtensa_lx::interrupt::enable_mask(mask);
 }
 
 #[cfg(coex)]
