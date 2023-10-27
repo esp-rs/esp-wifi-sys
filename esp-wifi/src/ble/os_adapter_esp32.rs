@@ -571,15 +571,9 @@ fn async_wakeup_request(event: i32) -> bool {
     let mut do_wakeup_request = false;
 
     match event {
-        BTDM_ASYNC_WAKEUP_REQ_HCI => {
-            request_lock = true;
-        }
-        BTDM_ASYNC_WAKEUP_REQ_COEX => {
-            request_lock = false;
-        }
-        _ => {
-            return false;
-        }
+        e if e == BTDM_ASYNC_WAKEUP_REQ_HCI => request_lock = true,
+        e if e == BTDM_ASYNC_WAKEUP_REQ_COEX => request_lock = false,
+        _ => return false,
     }
 
     extern "C" {
@@ -614,15 +608,9 @@ fn async_wakeup_request_end(event: i32) {
     let request_lock: bool;
 
     match event {
-        BTDM_ASYNC_WAKEUP_REQ_HCI => {
-            request_lock = true;
-        }
-        BTDM_ASYNC_WAKEUP_REQ_COEX => {
-            request_lock = false;
-        }
-        _ => {
-            return;
-        }
+        e if e == BTDM_ASYNC_WAKEUP_REQ_HCI => request_lock = true,
+        e if e == BTDM_ASYNC_WAKEUP_REQ_COEX => request_lock = false,
+        _ => return,
     }
 
     extern "C" {

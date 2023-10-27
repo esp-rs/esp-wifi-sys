@@ -1455,7 +1455,6 @@ pub unsafe extern "C" fn get_time(
  *   None
  *
  ****************************************************************************/
-#[allow(unreachable_code)]
 pub unsafe extern "C" fn log_write(
     level: u32,
     _tag: *const crate::binary::c_types::c_char,
