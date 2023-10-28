@@ -786,14 +786,16 @@ pub struct ScanConfig<'a> {
     pub scan_type: ScanTypeConfig,
 }
 
-pub fn wifi_start_scan(block: bool, config: ScanConfig<'_>) -> i32 {
-    let ScanConfig {
+pub fn wifi_start_scan(
+    block: bool,
+    ScanConfig {
         ssid,
         mut bssid,
         channel,
         show_hidden,
         scan_type,
-    } = config;
+    }: ScanConfig<'_>,
+) -> i32 {
     let (scan_time, scan_type) = match scan_type {
         ScanTypeConfig::Active { min, max } => (
             wifi_scan_time_t {
