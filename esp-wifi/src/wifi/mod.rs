@@ -23,16 +23,6 @@ use embedded_svc::wifi::{
 
 use enumset::EnumSet;
 use enumset::EnumSetType;
-use esp_wifi_sys::include::{
-    esp_interface_t_ESP_IF_WIFI_AP, esp_wifi_disconnect, esp_wifi_get_mode, esp_wifi_set_protocol,
-    wifi_ap_config_t, wifi_auth_mode_t_WIFI_AUTH_WAPI_PSK, wifi_auth_mode_t_WIFI_AUTH_WEP,
-    wifi_auth_mode_t_WIFI_AUTH_WPA2_ENTERPRISE, wifi_auth_mode_t_WIFI_AUTH_WPA2_PSK,
-    wifi_auth_mode_t_WIFI_AUTH_WPA2_WPA3_PSK, wifi_auth_mode_t_WIFI_AUTH_WPA3_PSK,
-    wifi_auth_mode_t_WIFI_AUTH_WPA_PSK, wifi_auth_mode_t_WIFI_AUTH_WPA_WPA2_PSK,
-    wifi_cipher_type_t_WIFI_CIPHER_TYPE_TKIP, wifi_interface_t_WIFI_IF_AP,
-    wifi_mode_t_WIFI_MODE_AP, wifi_mode_t_WIFI_MODE_APSTA, wifi_mode_t_WIFI_MODE_NULL,
-    wifi_scan_type_t_WIFI_SCAN_TYPE_PASSIVE,
-};
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
 
@@ -69,9 +59,9 @@ use crate::{
             wifi_interface_t_WIFI_IF_STA, wifi_mode_t, wifi_mode_t_WIFI_MODE_AP,
             wifi_mode_t_WIFI_MODE_NULL, wifi_mode_t_WIFI_MODE_STA, wifi_osi_funcs_t,
             wifi_pmf_config_t, wifi_scan_config_t, wifi_scan_threshold_t, wifi_scan_time_t,
-            wifi_scan_type_t_WIFI_SCAN_TYPE_ACTIVE, wifi_sort_method_t_WIFI_CONNECT_AP_BY_SIGNAL,
-            wifi_sta_config_t, wpa_crypto_funcs_t, ESP_WIFI_OS_ADAPTER_MAGIC,
-            ESP_WIFI_OS_ADAPTER_VERSION, WIFI_INIT_CONFIG_MAGIC,
+            wifi_scan_type_t_WIFI_SCAN_TYPE_ACTIVE, wifi_scan_type_t_WIFI_SCAN_TYPE_PASSIVE,
+            wifi_sort_method_t_WIFI_CONNECT_AP_BY_SIGNAL, wifi_sta_config_t, wpa_crypto_funcs_t,
+            ESP_WIFI_OS_ADAPTER_MAGIC, ESP_WIFI_OS_ADAPTER_VERSION, WIFI_INIT_CONFIG_MAGIC,
         },
     },
     compat::queue::SimpleQueue,
@@ -762,9 +752,40 @@ unsafe extern "C" fn coex_register_start_cb(
     0
 }
 
-#[derive(Clone, Copy)]
+/// Configuration for active or passive scan. For details see the [WIFI Alliance FAQ](https://www.wi-fi.org/knowledge-center/faq/what-are-passive-and-active-scanning).
+///
+/// # Comparison of active and passive scan
+///
+///|                                      | **Active** | **Passive** |
+///|--------------------------------------|------------|-------------|
+///| **Power consumption**                |    High    |     Low     |
+///| **Time required (typical behavior)** |     Low    |     High    |
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub enum ScanTypeConfig {
-    Active { min: Duration, max: Duration },
+    /// Active scan with min and max scan time per channel. This is the default and recommended if
+    /// you are unsure.
+    ///
+    /// # Procedure
+    /// 1. Send probe request on each channel.
+    /// 2. Wait for probe response. Wait at least `min` time, but if no response is received, wait up to `max` time.
+    /// 3. Switch channel.
+    /// 4. Repeat from 1.
+    Active {
+        /// Minimum scan time per channel. Defaults to 10ms.
+        min: Duration,
+        /// Maximum scan time per channel. Defaults to 20ms.
+        max: Duration,
+    },
+    /// Passive scan
+    ///
+    /// # Procedure
+    /// 1. Wait for beacon for given duration.
+    /// 2. Switch channel.
+    /// 3. Repeat from 1.
+    ///
+    /// # Note
+    /// It is recommended to avoid duration longer thean 1500ms, as it may cause a station to
+    /// disconnect from the AP.
     Passive(Duration),
 }
 
@@ -777,12 +798,35 @@ impl Default for ScanTypeConfig {
     }
 }
 
-#[derive(Clone, Copy, Default)]
+impl ScanTypeConfig {
+    fn validate(&self) {
+        if matches!(self, Self::Passive(dur) if *dur > Duration::from_millis(1500)) {
+            #[cfg(feature = "log")]
+            log::warn!("Passive scan duration longer than 1500ms may cause a station to disconnect from the AP");
+            #[cfg(feature = "defmt")]
+            defmt::warn!("Passive scan duration longer than 1500ms may cause a station to disconnect from the AP");
+        }
+    }
+}
+
+/// Scan configuration
+#[derive(Clone, Copy, Default, PartialEq, Eq)]
 pub struct ScanConfig<'a> {
+    /// SSID to filter for.
+    /// If [`None`] is passed, all SSIDs will be returned.
+    /// If [`Some`] is passed, only the APs matching the given SSID will be returned.
     pub ssid: Option<&'a str>,
+    /// BSSID to filter for.
+    /// If [`None`] is passed, all BSSIDs will be returned.
+    /// If [`Some`] is passed, only the APs matching the given BSSID will be returned.
     pub bssid: Option<[u8; 6]>,
+    /// Channel to filter for.
+    /// If [`None`] is passed, all channels will be returned.
+    /// If [`Some`] is passed, only the APs on the given channel will be returned.
     pub channel: Option<u8>,
+    /// Whether to show hidden networks.
     pub show_hidden: bool,
+    /// Scan type, active or passive.
     pub scan_type: ScanTypeConfig,
 }
 
@@ -796,6 +840,7 @@ pub fn wifi_start_scan(
         scan_type,
     }: ScanConfig<'_>,
 ) -> i32 {
+    scan_type.validate();
     let (scan_time, scan_type) = match scan_type {
         ScanTypeConfig::Active { min, max } => (
             wifi_scan_time_t {
