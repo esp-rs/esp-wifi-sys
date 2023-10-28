@@ -17,25 +17,15 @@ use critical_section::Mutex;
 use embedded_svc::wifi::{AccessPointInfo, AuthMethod, Protocol, SecondaryChannel, Wifi};
 use enumset::EnumSet;
 use enumset::EnumSetType;
-use esp_wifi_sys::include::esp_wifi_disconnect;
-use esp_wifi_sys::include::esp_wifi_get_mode;
-use esp_wifi_sys::include::esp_wifi_set_protocol;
-use esp_wifi_sys::include::wifi_ap_config_t;
-use esp_wifi_sys::include::wifi_auth_mode_t_WIFI_AUTH_WAPI_PSK;
-use esp_wifi_sys::include::wifi_auth_mode_t_WIFI_AUTH_WEP;
-use esp_wifi_sys::include::wifi_auth_mode_t_WIFI_AUTH_WPA2_ENTERPRISE;
-use esp_wifi_sys::include::wifi_auth_mode_t_WIFI_AUTH_WPA2_PSK;
-use esp_wifi_sys::include::wifi_auth_mode_t_WIFI_AUTH_WPA2_WPA3_PSK;
-use esp_wifi_sys::include::wifi_auth_mode_t_WIFI_AUTH_WPA3_PSK;
-use esp_wifi_sys::include::wifi_auth_mode_t_WIFI_AUTH_WPA_PSK;
-use esp_wifi_sys::include::wifi_auth_mode_t_WIFI_AUTH_WPA_WPA2_PSK;
-use esp_wifi_sys::include::wifi_cipher_type_t_WIFI_CIPHER_TYPE_TKIP;
-use esp_wifi_sys::include::wifi_interface_t_WIFI_IF_AP;
-use esp_wifi_sys::include::wifi_mode_t_WIFI_MODE_AP;
-use esp_wifi_sys::include::wifi_mode_t_WIFI_MODE_APSTA;
-use esp_wifi_sys::include::wifi_mode_t_WIFI_MODE_NULL;
 use esp_wifi_sys::include::{
-    esp_interface_t_ESP_IF_WIFI_AP, wifi_scan_type_t_WIFI_SCAN_TYPE_PASSIVE,
+    esp_interface_t_ESP_IF_WIFI_AP, esp_wifi_disconnect, esp_wifi_get_mode, esp_wifi_set_protocol,
+    wifi_ap_config_t, wifi_auth_mode_t_WIFI_AUTH_WAPI_PSK, wifi_auth_mode_t_WIFI_AUTH_WEP,
+    wifi_auth_mode_t_WIFI_AUTH_WPA2_ENTERPRISE, wifi_auth_mode_t_WIFI_AUTH_WPA2_PSK,
+    wifi_auth_mode_t_WIFI_AUTH_WPA2_WPA3_PSK, wifi_auth_mode_t_WIFI_AUTH_WPA3_PSK,
+    wifi_auth_mode_t_WIFI_AUTH_WPA_PSK, wifi_auth_mode_t_WIFI_AUTH_WPA_WPA2_PSK,
+    wifi_cipher_type_t_WIFI_CIPHER_TYPE_TKIP, wifi_interface_t_WIFI_IF_AP,
+    wifi_mode_t_WIFI_MODE_AP, wifi_mode_t_WIFI_MODE_APSTA, wifi_mode_t_WIFI_MODE_NULL,
+    wifi_scan_type_t_WIFI_SCAN_TYPE_PASSIVE,
 };
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
