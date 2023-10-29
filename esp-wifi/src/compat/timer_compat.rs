@@ -11,9 +11,10 @@ static ESP_FAKE_TIMER: () = ();
 #[derive(Debug, Clone, Copy)]
 pub struct Timer {
     pub ptimer: *mut c_types::c_void,
-    pub expire: u64,
-    pub period: u64,
+    pub started: u64,
+    pub timeout: u64,
     pub active: bool,
+    pub periodic: bool,
     pub timer_ptr: *mut c_types::c_void,
     pub arg_ptr: *mut c_types::c_void,
 }
@@ -25,12 +26,12 @@ pub fn compat_timer_arm(ptimer: *mut c_types::c_void, tmout: u32, repeat: bool) 
 }
 
 pub fn compat_timer_arm_us(ptimer: *mut c_types::c_void, us: u32, repeat: bool) {
-    let systick = crate::timer::get_systimer_count();
-
+    let now = crate::timer::get_systimer_count();
     let ticks = crate::timer::micros_to_ticks(us as u64);
+
     debug!(
-        "timer_arm_us {:x} current: {} ticks: {} repeat: {}",
-        ptimer as usize, systick, ticks, repeat
+        "timer_arm_us {:x} now: {} ticks: {} repeat: {}",
+        ptimer as usize, now, ticks, repeat
     );
     critical_section::with(|_| unsafe {
         memory_fence();
@@ -39,9 +40,10 @@ pub fn compat_timer_arm_us(ptimer: *mut c_types::c_void, us: u32, repeat: bool) 
             if let Some(ref mut timer) = TIMERS[i] {
                 if timer.ptimer == ptimer {
                     trace!("found timer ...");
-                    timer.expire = ticks + systick;
+                    timer.started = now;
                     timer.active = true;
-                    timer.period = if repeat { ticks } else { 0 };
+                    timer.timeout = ticks;
+                    timer.periodic = repeat;
                     break;
                 }
             }
@@ -132,9 +134,10 @@ pub fn compat_timer_setfn(
                 if TIMERS[i].is_none() {
                     TIMERS[i] = Some(Timer {
                         ptimer,
-                        expire: 0,
-                        period: 0,
+                        started: 0,
+                        timeout: 0,
                         active: false,
+                        periodic: false,
                         timer_ptr: pfunction,
                         arg_ptr: parg,
                     });
@@ -167,9 +170,10 @@ pub fn compat_esp_timer_create(
             if TIMERS[i].is_none() {
                 TIMERS[i] = Some(Timer {
                     ptimer: &ESP_FAKE_TIMER as *const _ as *mut c_types::c_void,
-                    expire: 0,
-                    period: 0,
+                    started: 0,
+                    timeout: 0,
                     active: false,
+                    periodic: false,
                     timer_ptr: core::mem::transmute(unwrap!((*args).callback)),
                     arg_ptr: (*args).arg,
                 });

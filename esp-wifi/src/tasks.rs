@@ -40,19 +40,16 @@ pub extern "C" fn worker_task2() {
             memory_fence();
             for i in 0..TIMERS.len() {
                 if let Some(ref mut timer) = TIMERS[i] {
-                    if timer.active && current_timestamp >= timer.expire {
+                    if timer.active
+                        && crate::timer::time_diff(timer.started, current_timestamp)
+                            >= timer.timeout
+                    {
                         debug!("timer is due.... {:x}", timer.ptimer as usize);
                         let fnctn: fn(*mut c_types::c_void) = mem::transmute(timer.timer_ptr);
 
                         _ = to_run.enqueue((fnctn, timer.arg_ptr));
 
-                        if timer.period != 0 {
-                            timer.expire = current_timestamp + timer.period;
-                            timer.active = timer.active;
-                        } else {
-                            timer.expire = 0;
-                            timer.active = false;
-                        };
+                        timer.active = timer.periodic;
                     }
                 };
             }
