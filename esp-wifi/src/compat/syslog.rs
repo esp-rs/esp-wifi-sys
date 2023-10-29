@@ -167,6 +167,10 @@ pub(crate) unsafe fn vsnprintf(
                     }
                 }
 
+                '%' => {
+                    res_str.append_char('%');
+                }
+
                 _ => {
                     write!(res_str, "<UNKNOWN{}>", format_char).ok();
                 }
