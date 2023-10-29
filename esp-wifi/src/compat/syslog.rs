@@ -97,7 +97,7 @@ pub(crate) unsafe fn vsnprintf(
     let s = str_from_c(format);
 
     let mut format_char = ' ';
-    let mut is_long = false;
+    let mut is_long = 0;
     let mut found = false;
     for c in s.chars().into_iter() {
         if !found {
@@ -111,7 +111,7 @@ pub(crate) unsafe fn vsnprintf(
         } else {
             if c.is_numeric() || c == '-' || c == 'l' {
                 if c == 'l' {
-                    is_long = true;
+                    is_long = is_long + 1;
                 }
                 // ignore
             } else {
@@ -124,19 +124,23 @@ pub(crate) unsafe fn vsnprintf(
             // have to format an arg
             match format_char {
                 'd' => {
-                    // FIXME: This is sus - both branches have the same impl
-                    if is_long {
+                    if is_long < 2 {
                         let v = args.arg::<i32>();
                         write!(res_str, "{}", v).ok();
                     } else {
-                        let v = args.arg::<i32>();
+                        let v = args.arg::<i64>();
                         write!(res_str, "{}", v).ok();
                     }
                 }
 
                 'u' => {
-                    let v = args.arg::<u32>();
-                    write!(res_str, "{}", v).ok();
+                    if is_long < 2 {
+                        let v = args.arg::<u32>();
+                        write!(res_str, "{}", v).ok();
+                    } else {
+                        let v = args.arg::<u64>();
+                        write!(res_str, "{}", v).ok();
+                    }
                 }
 
                 'p' => {
@@ -146,7 +150,7 @@ pub(crate) unsafe fn vsnprintf(
 
                 'X' => {
                     let v = args.arg::<u32>();
-                    write!(res_str, "{:02x}", (v & 0xff000000) >> 24).ok();
+                    write!(res_str, "{:02X}", v).ok();
                 }
 
                 'x' => {
@@ -155,7 +159,7 @@ pub(crate) unsafe fn vsnprintf(
                 }
 
                 's' => {
-                    let v = args.arg::<u32>() as *const u8;
+                    let v = args.arg::<*const u8>();
                     let vbuf = str_from_c(v);
                     res_str.append(vbuf);
                 }
@@ -178,7 +182,7 @@ pub(crate) unsafe fn vsnprintf(
 
             format_char = ' ';
             found = false;
-            is_long = false;
+            is_long = 0;
         }
     }
 
