@@ -183,7 +183,7 @@ pub enum EspWifiInitialization {
     Wifi(EspWifiInitializationInternal),
     #[cfg(feature = "ble")]
     Ble(EspWifiInitializationInternal),
-    #[cfg(all(feature = "wifi", feature = "ble"))]
+    #[cfg(all(feature = "wifi", feature = "ble", coex))]
     WifiBle(EspWifiInitializationInternal),
 }
 
@@ -215,7 +215,7 @@ pub enum EspWifiInitFor {
     Wifi,
     #[cfg(feature = "ble")]
     Ble,
-    #[cfg(all(feature = "wifi", feature = "ble"))]
+    #[cfg(all(feature = "wifi", feature = "ble", coex))]
     WifiBle,
 }
 
@@ -247,11 +247,6 @@ pub fn initialize(
     radio_clocks: hal::system::RadioClockControl,
     clocks: &Clocks,
 ) -> Result<EspWifiInitialization, InitializationError> {
-    #[cfg(all(not(coex), feature = "wifi", feature = "ble"))]
-    if init_for == EspWifiInitFor::WifiBle {
-        panic!("Trying to use Wifi and BLE without COEX feature");
-    }
-
     #[cfg(any(esp32, esp32s3, esp32s2))]
     const MAX_CLOCK: u32 = 240;
 
@@ -317,7 +312,7 @@ pub fn initialize(
         EspWifiInitFor::Wifi => Ok(EspWifiInitialization::Wifi(EspWifiInitializationInternal)),
         #[cfg(feature = "ble")]
         EspWifiInitFor::Ble => Ok(EspWifiInitialization::Ble(EspWifiInitializationInternal)),
-        #[cfg(all(feature = "wifi", feature = "ble"))]
+        #[cfg(all(feature = "wifi", feature = "ble", coex))]
         EspWifiInitFor::WifiBle => Ok(EspWifiInitialization::WifiBle(
             EspWifiInitializationInternal,
         )),
