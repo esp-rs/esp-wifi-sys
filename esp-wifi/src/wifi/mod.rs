@@ -801,10 +801,7 @@ impl Default for ScanTypeConfig {
 impl ScanTypeConfig {
     fn validate(&self) {
         if matches!(self, Self::Passive(dur) if *dur > Duration::from_millis(1500)) {
-            #[cfg(feature = "log")]
-            log::warn!("Passive scan duration longer than 1500ms may cause a station to disconnect from the AP");
-            #[cfg(feature = "defmt")]
-            defmt::warn!("Passive scan duration longer than 1500ms may cause a station to disconnect from the AP");
+            warn!("Passive scan duration longer than 1500ms may cause a station to disconnect from the AP");
         }
     }
 }
