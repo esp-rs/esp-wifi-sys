@@ -85,16 +85,14 @@ fn Timer0(_level: u32) {
 }
 
 fn do_task_switch(context: &mut TrapFrame) {
-    task_switch(context);
-
     critical_section::with(|cs| {
-        crate::memory_fence::memory_fence();
-
         let mut timer = TIMER1.borrow_ref_mut(cs);
         let timer = unwrap!(timer.as_mut());
         timer.clear_interrupt();
         timer.start(TIMER_DELAY.into_duration());
     });
+
+    task_switch(context);
 }
 
 #[interrupt]
