@@ -341,10 +341,11 @@ impl From<WifiError> for InitializationError {
 pub fn wifi_set_log_verbose() {
     #[cfg(feature = "wifi-logs")]
     unsafe {
-        use crate::binary::include::{esp_wifi_internal_set_log_level, wifi_log_level_t};
+        use crate::binary::include::{
+            esp_wifi_internal_set_log_level, wifi_log_level_t_WIFI_LOG_VERBOSE,
+        };
 
-        let level: wifi_log_level_t = crate::binary::include::wifi_log_level_t_WIFI_LOG_VERBOSE;
-        esp_wifi_internal_set_log_level(level);
+        esp_wifi_internal_set_log_level(wifi_log_level_t_WIFI_LOG_VERBOSE);
     }
 }
 
