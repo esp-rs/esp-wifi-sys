@@ -298,32 +298,25 @@ pub fn initialize(
     init_clocks();
 
     #[cfg(coex)]
-    {
-        debug!("coex init");
-        let res = crate::wifi::coex_initialize();
-        if res != 0 {
-            return Err(InitializationError::General(res));
-        }
+    match crate::wifi::coex_initialize() {
+        0 => {}
+        error => return Err(InitializationError::General(error)),
     }
 
     #[cfg(feature = "wifi")]
-    {
-        if init_for.is_wifi() {
-            debug!("wifi init");
-            // wifi init
-            crate::wifi::wifi_init()?;
-        }
+    if init_for.is_wifi() {
+        debug!("wifi init");
+        // wifi init
+        crate::wifi::wifi_init()?;
     }
 
     #[cfg(feature = "ble")]
-    {
-        if init_for.is_ble() {
-            // ble init
-            // for some reason things don't work when initializing things the other way around
-            // while the original implementation in NuttX does it like that
-            debug!("ble init");
-            crate::ble::ble_init();
-        }
+    if init_for.is_ble() {
+        // ble init
+        // for some reason things don't work when initializing things the other way around
+        // while the original implementation in NuttX does it like that
+        debug!("ble init");
+        crate::ble::ble_init();
     }
 
     match init_for {
