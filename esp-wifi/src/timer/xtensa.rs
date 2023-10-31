@@ -26,7 +26,8 @@ const TIMESLICE_FREQUENCY: fugit::HertzU32 = fugit::HertzU32::from_raw(crate::CO
 
 static TIMER_OVERFLOWS: AtomicU32 = AtomicU32::new(0);
 pub const CPU_CLOCK: u64 = 240_000_000; // ESP32, ESP32-S2 and ESP32-S3 all have 240MHz CPU clocks.
-pub const TICKS_PER_SECOND: u64 = 40_000_000;
+pub const CLOCK_CYCLES_PER_TICK: u64 = 8;
+pub const TICKS_PER_SECOND: u64 = CPU_CLOCK / CLOCK_CYCLES_PER_TICK;
 
 /// This function must not be called in a critical section. Doing so may return an incorrect value.
 pub fn get_systimer_count() -> u64 {
@@ -43,9 +44,7 @@ pub fn get_systimer_count() -> u64 {
         overflow = TIMER_OVERFLOWS.load(Ordering::Relaxed);
     }
 
-    // We have to precompute the divider to avoid overflow when multiplying.
-    const DIVIDER: u64 = CPU_CLOCK / TICKS_PER_SECOND;
-    (((overflow as u64) << 32) + counter_after as u64) / DIVIDER
+    (((overflow as u64) << 32) + counter_after as u64) / CLOCK_CYCLES_PER_TICK
 }
 
 pub fn setup_timer(mut timer1: TimeBase) {
