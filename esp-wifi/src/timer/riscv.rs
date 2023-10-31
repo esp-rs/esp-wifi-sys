@@ -28,8 +28,17 @@ const TIMER_DELAY: fugit::HertzU32 = fugit::HertzU32::from_raw(crate::CONFIG.tic
 static ALARM0: Mutex<RefCell<Option<Alarm<Periodic, 0>>>> = Mutex::new(RefCell::new(None));
 
 pub fn setup_timer(systimer: TimeBase) {
+    unsafe {
+        riscv::interrupt::disable();
+    }
+
     let alarm0 = systimer.into_periodic();
     alarm0.set_period(TIMER_DELAY.into());
+    // make sure the period is loaded and reset - should be done in esp-hal ultimately
+    unsafe {
+        let t = crate::hal::peripherals::SYSTIMER::steal();
+        t.comp0_load.write(|w| w.timer_comp0_load().set_bit());
+    }
     alarm0.clear_interrupt();
     alarm0.interrupt_enable(true);
 
@@ -78,6 +87,11 @@ fn FROM_CPU_INTR3(trap_frame: &mut TrapFrame) {
         let alarm0 = unwrap!(alarm0.as_mut());
 
         alarm0.set_period(TIMER_DELAY.into());
+        // make sure the period is loaded and reset - should be done in esp-hal ultimately
+        unsafe {
+            let t = crate::hal::peripherals::SYSTIMER::steal();
+            t.comp0_load.write(|w| w.timer_comp0_load().set_bit());
+        }
         alarm0.clear_interrupt();
     });
 
