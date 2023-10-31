@@ -41,7 +41,16 @@ fn main() -> Result<(), String> {
     println!("cargo:rustc-cfg=esp32s3");
 
     #[cfg(feature = "coex")]
-    println!("cargo:rustc-cfg=coex");
+    {
+        #[cfg(all(feature = "wifi", feature = "ble"))]
+        println!("cargo:rustc-cfg=coex");
+
+        #[cfg(not(feature = "wifi"))]
+        println!("cargo:warning=coex is enabled but wifi is not");
+
+        #[cfg(not(feature = "ble"))]
+        println!("cargo:warning=coex is enabled but wifi is not");
+    }
 
     let version_output = std::process::Command::new(
         std::env::var_os("RUSTC").unwrap_or_else(|| std::ffi::OsString::from("rustc")),

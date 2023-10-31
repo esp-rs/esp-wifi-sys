@@ -183,7 +183,7 @@ pub enum EspWifiInitialization {
     Wifi(EspWifiInitializationInternal),
     #[cfg(feature = "ble")]
     Ble(EspWifiInitializationInternal),
-    #[cfg(all(feature = "wifi", feature = "ble", coex))]
+    #[cfg(coex)]
     WifiBle(EspWifiInitializationInternal),
 }
 
@@ -215,7 +215,7 @@ pub enum EspWifiInitFor {
     Wifi,
     #[cfg(feature = "ble")]
     Ble,
-    #[cfg(all(feature = "wifi", feature = "ble", coex))]
+    #[cfg(coex)]
     WifiBle,
 }
 
@@ -312,7 +312,7 @@ pub fn initialize(
         EspWifiInitFor::Wifi => Ok(EspWifiInitialization::Wifi(EspWifiInitializationInternal)),
         #[cfg(feature = "ble")]
         EspWifiInitFor::Ble => Ok(EspWifiInitialization::Ble(EspWifiInitializationInternal)),
-        #[cfg(all(feature = "wifi", feature = "ble", coex))]
+        #[cfg(coex)]
         EspWifiInitFor::WifiBle => Ok(EspWifiInitialization::WifiBle(
             EspWifiInitializationInternal,
         )),
