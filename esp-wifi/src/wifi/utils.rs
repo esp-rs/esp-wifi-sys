@@ -1,3 +1,4 @@
+use crate::hal::peripherals::WIFI as WifiRadio;
 use smoltcp::{
     iface::{Config, Interface, SocketSet, SocketStorage},
     socket::dhcpv4::Socket as Dhcpv4Socket,
@@ -14,7 +15,7 @@ use super::{WifiController, WifiDevice, WifiError, WifiMode};
 /// You can use the provided macros to create and pass a suitable backing storage.
 pub fn create_network_interface<'a, 'd>(
     inited: &EspWifiInitialization,
-    device: impl crate::hal::peripheral::Peripheral<P = crate::hal::radio::Wifi> + 'd,
+    device: impl crate::hal::peripheral::Peripheral<P = WifiRadio> + 'd,
     mode: WifiMode,
     storage: &'a mut [SocketStorage<'a>],
 ) -> Result<(Interface, WifiDevice<'d>, WifiController<'d>, SocketSet<'a>), WifiError> {

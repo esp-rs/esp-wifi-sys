@@ -11,6 +11,7 @@ use crate::esp_wifi_result;
 use crate::hal::macros::ram;
 use crate::hal::peripheral::Peripheral;
 use crate::hal::peripheral::PeripheralRef;
+use crate::hal::peripherals::WIFI as WifiRadio;
 use crate::EspWifiInitialization;
 
 use critical_section::Mutex;
@@ -780,7 +781,7 @@ pub fn wifi_start_scan(block: bool) -> i32 {
 
 pub fn new_with_config<'d>(
     inited: &EspWifiInitialization,
-    device: impl Peripheral<P = crate::hal::radio::Wifi> + 'd,
+    device: impl Peripheral<P = WifiRadio> + 'd,
     config: embedded_svc::wifi::Configuration,
 ) -> Result<(WifiDevice<'d>, WifiController<'d>), WifiError> {
     if !inited.is_wifi() {
@@ -797,7 +798,7 @@ pub fn new_with_config<'d>(
 
 pub fn new_with_mode<'d>(
     inited: &EspWifiInitialization,
-    device: impl Peripheral<P = crate::hal::radio::Wifi> + 'd,
+    device: impl Peripheral<P = WifiRadio> + 'd,
     mode: WifiMode,
 ) -> Result<(WifiDevice<'d>, WifiController<'d>), WifiError> {
     new_with_config(
@@ -812,11 +813,11 @@ pub fn new_with_mode<'d>(
 
 /// A wifi device implementing smoltcp's Device trait.
 pub struct WifiDevice<'d> {
-    _device: PeripheralRef<'d, crate::hal::radio::Wifi>,
+    _device: PeripheralRef<'d, WifiRadio>,
 }
 
 impl<'d> WifiDevice<'d> {
-    pub(crate) fn new(_device: PeripheralRef<'d, crate::hal::radio::Wifi>) -> WifiDevice {
+    pub(crate) fn new(_device: PeripheralRef<'d, WifiRadio>) -> WifiDevice {
         Self { _device }
     }
 
@@ -854,13 +855,13 @@ fn convert_ap_info(record: &include::wifi_ap_record_t) -> AccessPointInfo {
 
 /// A wifi controller implementing embedded_svc::Wifi traits
 pub struct WifiController<'d> {
-    _device: PeripheralRef<'d, crate::hal::radio::Wifi>,
+    _device: PeripheralRef<'d, WifiRadio>,
     config: embedded_svc::wifi::Configuration,
 }
 
 impl<'d> WifiController<'d> {
     pub(crate) fn new_with_config(
-        _device: PeripheralRef<'d, crate::hal::radio::Wifi>,
+        _device: PeripheralRef<'d, WifiRadio>,
         config: embedded_svc::wifi::Configuration,
     ) -> Result<Self, WifiError> {
         // We set up the controller with the default config because we need to call
