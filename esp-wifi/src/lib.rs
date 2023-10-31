@@ -253,22 +253,15 @@ pub fn initialize(
     }
 
     #[cfg(any(esp32, esp32s3, esp32s2))]
-    if clocks.cpu_clock != MegahertzU32::MHz(240) {
-        return Err(InitializationError::WrongClockConfig);
-    }
+    const MAX_CLOCK: u32 = 240;
 
-    #[cfg(esp32c6)]
-    if clocks.cpu_clock != MegahertzU32::MHz(160) {
-        return Err(InitializationError::WrongClockConfig);
-    }
-
-    #[cfg(esp32c3)]
-    if clocks.cpu_clock != MegahertzU32::MHz(160) {
-        return Err(InitializationError::WrongClockConfig);
-    }
+    #[cfg(any(esp32c3, esp32c6))]
+    const MAX_CLOCK: u32 = 160;
 
     #[cfg(esp32c2)]
-    if clocks.cpu_clock != MegahertzU32::MHz(120) {
+    const MAX_CLOCK: u32 = 120;
+
+    if clocks.cpu_clock != MegahertzU32::MHz(MAX_CLOCK) {
         return Err(InitializationError::WrongClockConfig);
     }
 
