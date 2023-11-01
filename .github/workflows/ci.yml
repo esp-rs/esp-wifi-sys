@@ -15,6 +15,7 @@ env:
   PASSWORD: ""
   STATIC_IP: ""
   GATEWAY_IP: ""
+  HOST_IP: ""
   DEFMT_LOG: "trace"
 
 # Cancel any currently running workflows from the same PR, branch, or
