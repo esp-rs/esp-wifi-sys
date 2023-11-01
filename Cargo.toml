@@ -5,6 +5,7 @@ members = [
     "xtask",
 ]
 exclude = [
+    "extras/bench-server",
     "extras/esp-wifishark",
 ]
 resolver = "2"
