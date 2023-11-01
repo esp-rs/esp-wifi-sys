@@ -121,7 +121,7 @@ fn main() -> ! {
     let mut socket = wifi_stack.get_socket(&mut rx_buffer, &mut tx_buffer);
 
     let delay = hal::Delay::new(&clocks);
-    
+
     loop {
         test_download(server_address, &mut socket);
         delay.delay(3_000_000);
@@ -135,14 +135,16 @@ fn main() -> ! {
     }
 }
 
-fn test_download<'a>(server_address: Ipv4Address, socket: &mut esp_wifi::wifi_interface::Socket<'a, 'a>) {
+fn test_download<'a>(
+    server_address: Ipv4Address,
+    socket: &mut esp_wifi::wifi_interface::Socket<'a, 'a>,
+) {
     println!("Testing download...");
     socket.work();
 
     socket
         .open(IpAddress::Ipv4(server_address), DOWNLOAD_PORT)
         .unwrap();
-
 
     let mut buf = [0; IO_BUFFER_SIZE];
 
@@ -167,14 +169,16 @@ fn test_download<'a>(server_address: Ipv4Address, socket: &mut esp_wifi::wifi_in
     socket.disconnect();
 }
 
-fn test_upload<'a>(server_address: Ipv4Address, socket: &mut esp_wifi::wifi_interface::Socket<'a, 'a>) {
+fn test_upload<'a>(
+    server_address: Ipv4Address,
+    socket: &mut esp_wifi::wifi_interface::Socket<'a, 'a>,
+) {
     println!("Testing upload...");
     socket.work();
 
     socket
         .open(IpAddress::Ipv4(server_address), UPLOAD_PORT)
         .unwrap();
-
 
     let buf = [0; IO_BUFFER_SIZE];
 
@@ -199,14 +203,16 @@ fn test_upload<'a>(server_address: Ipv4Address, socket: &mut esp_wifi::wifi_inte
     socket.disconnect();
 }
 
-fn test_upload_download<'a>(server_address: Ipv4Address, socket: &mut esp_wifi::wifi_interface::Socket<'a, 'a>) {
+fn test_upload_download<'a>(
+    server_address: Ipv4Address,
+    socket: &mut esp_wifi::wifi_interface::Socket<'a, 'a>,
+) {
     println!("Testing upload+download...");
     socket.work();
 
     socket
         .open(IpAddress::Ipv4(server_address), UPLOAD_DOWNLOAD_PORT)
         .unwrap();
-
 
     let tx_buf = [0; IO_BUFFER_SIZE];
     let mut rx_buf = [0; IO_BUFFER_SIZE];
@@ -220,7 +226,7 @@ fn test_upload_download<'a>(server_address: Ipv4Address, socket: &mut esp_wifi::
         }
 
         socket.work();
-        
+
         if let Ok(len) = socket.read(&mut rx_buf) {
             total += len;
         } else {

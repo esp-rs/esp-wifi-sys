@@ -150,10 +150,7 @@ async fn net_task(stack: &'static Stack<WifiDevice<'static>>) {
     stack.run().await
 }
 
-async fn test_download(
-    server_address: Ipv4Address,
-    socket: &mut TcpSocket<'_>,
-) -> usize {
+async fn test_download(server_address: Ipv4Address, socket: &mut TcpSocket<'_>) -> usize {
     println!("Testing download...");
 
     socket.abort();
@@ -191,10 +188,7 @@ async fn test_download(
     kbps
 }
 
-async fn test_upload(
-    server_address: Ipv4Address,
-    socket: &mut TcpSocket<'_>,
-) -> usize {
+async fn test_upload(server_address: Ipv4Address, socket: &mut TcpSocket<'_>) -> usize {
     println!("Testing upload...");
     socket.abort();
     socket.set_timeout(Some(Duration::from_secs(10)));
@@ -231,10 +225,7 @@ async fn test_upload(
     kbps
 }
 
-async fn test_upload_download(
-    server_address: Ipv4Address,
-    socket: &mut TcpSocket<'_>,
-) -> usize {
+async fn test_upload_download(server_address: Ipv4Address, socket: &mut TcpSocket<'_>) -> usize {
     println!("Testing upload+download...");
 
     socket.abort();
