@@ -36,8 +36,8 @@ const UPLOAD_DOWNLOAD_PORT: u16 = 4323;
 
 #[entry]
 fn main() -> ! {
-    // #[cfg(feature = "log")]
-    // esp_println::logger::init_logger(log::LevelFilter::Info);
+    #[cfg(feature = "log")]
+    esp_println::logger::init_logger(log::LevelFilter::Info);
 
     let peripherals = Peripherals::take();
 

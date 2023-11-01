@@ -96,3 +96,25 @@ cargo esp32c3 --release ...
 - on Android you might need to choose _Keep Accesspoint_ when it tells you the WiFi has no internet connection, Chrome might not want to load the URL - you can use a shell and try `curl` and `ping`
 
 `cargo $CHIP --example embassy_access_point --release --features "async,embedded-svc,wifi,embassy-net"`
+
+## Benchmarking
+
+A prerequisite to running the benchmark examples is to run the benchmark server on your local machine. Simply run the following commands to do so.
+
+```
+cd extras/bench-server
+cargo run --release
+```
+
+### bench
+
+- Run a test of download, upload and download+upload in a blocking fashion.
+- Ensure you have set the IP of your local machine in the `HOST_IP` env variable. E.g `HOST_IP="192.168.0.24"`
+
+`cargo $CHIP --example bench --release --features "wifi"`
+
+### embassy_bench
+
+- Run a test of download, upload and download+upload in a async fashion.
+
+`cargo $CHIP --example embassy_bench --release --features "wifi,embassy-net"`
