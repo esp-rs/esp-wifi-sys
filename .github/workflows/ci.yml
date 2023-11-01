@@ -40,10 +40,10 @@ jobs:
       - name: check-fmt
         run: cargo fmt --check
 
-  checks-xtensa:
+  builds:
     strategy:
       matrix:
-        chip: ["esp32", "esp32s2", "esp32s3"]
+        chip: ["esp32", "esp32s2", "esp32s3", "esp32c2", "esp32c3", "esp32c6"]
 
     runs-on: ubuntu-latest
     steps:
@@ -51,91 +51,42 @@ jobs:
       - uses: esp-rs/xtensa-toolchain@v1.5
         with:
           default: true
-          buildtargets: ${{ matrix.chip }}
           ldproxy: false
       - uses: Swatinem/rust-cache@v1
 
-      - name: check
-        run: cd examples-${{ matrix.chip }} && cargo check
-      - name: check (common features)
-        run: cd examples-${{ matrix.chip }} && cargo check --features=async,wifi,esp-now,embassy-net,log
-      - name: check (common features + defmt)
-        run: cd examples-${{ matrix.chip }} && cargo check --no-default-features --features=${{ matrix.chip }},async,wifi,esp-now,embassy-net,defmt
-      - name: check (dhcp)
-        run: cd examples-${{ matrix.chip }} && cargo build --release --example=dhcp --features=wifi
-      - name: check (static_ip)
-        run: cd examples-${{ matrix.chip }} && cargo build --release --example=static_ip --features=wifi
-      - name: check (esp_now)
-        run: cd examples-${{ matrix.chip }} && cargo build --release --example=esp_now --features=esp-now
-      - name: check (embassy_esp_now)
-        run: cd examples-${{ matrix.chip }} && cargo build --release --example=embassy_esp_now --features=async,esp-now
-      - name: check (embassy_esp_now_duplex)
-        run: cd examples-${{ matrix.chip }} && cargo build --release --example=embassy_esp_now_duplex --features=async,esp-now
-      - name: check (embassy_dhcp)
-        run: cd examples-${{ matrix.chip }} && cargo build --release --example=embassy_dhcp --features=async,wifi,embassy-net
-      - name: check (embassy_access_point)
-        run: cd examples-${{ matrix.chip }} && cargo build --release --example=embassy_access_point --features=async,wifi,embassy-net
+      - name: build
+        run: cd esp-wifi && cargo b${{ matrix.chip }}
+      - name: build (common features)
+        run: cd esp-wifi && cargo b${{ matrix.chip }} --features=async,wifi,esp-now,embassy-net,log,${{ matrix.chip }}-hal/embassy-time-timg0
+      - name: build (common features + defmt)
+        run: cd esp-wifi && cargo b${{ matrix.chip }} --no-default-features --features=async,wifi,esp-now,embassy-net,defmt,${{ matrix.chip }}-hal/embassy-time-timg0
+      - name: build (dhcp)
+        run: cd esp-wifi && cargo b${{ matrix.chip }} --release --example=dhcp --features=wifi
+      - name: build (static_ip)
+        run: cd esp-wifi && cargo b${{ matrix.chip }} --release --example=static_ip --features=wifi
+      - name: build (esp_now)
+        run: cd esp-wifi && cargo b${{ matrix.chip }} --release --example=esp_now --features=esp-now
+      - name: build (embassy_esp_now)
+        run: cd esp-wifi && cargo b${{ matrix.chip }} --release --example=embassy_esp_now --features=async,esp-now,${{ matrix.chip }}-hal/embassy-time-timg0
+      - name: build (embassy_esp_now_duplex)
+        run: cd esp-wifi && cargo b${{ matrix.chip }} --release --example=embassy_esp_now_duplex --features=async,esp-now,${{ matrix.chip }}-hal/embassy-time-timg0
+      - name: build (embassy_dhcp)
+        run: cd esp-wifi && cargo b${{ matrix.chip }} --release --example=embassy_dhcp --features=async,wifi,embassy-net,${{ matrix.chip }}-hal/embassy-time-timg0
+      - name: build (embassy_access_point)
+        run: cd esp-wifi && cargo b${{ matrix.chip }} --release --example=embassy_access_point --features=async,wifi,embassy-net,${{ matrix.chip }}-hal/embassy-time-timg0
 
-      - name: check (common features + ble)
-        if: ${{ matrix.chip == 'esp32' || matrix.chip == 'esp32s3' }}
-        run: cd examples-${{ matrix.chip }} && cargo check --features=async,wifi,ble,esp-now,embassy-net,log
-      - name: check (common features + ble + defmt)
-        if: ${{ matrix.chip == 'esp32' || matrix.chip == 'esp32s3' }}
-        run: cd examples-${{ matrix.chip }} && cargo check --no-default-features --features=${{ matrix.chip }},async,wifi,ble,esp-now,embassy-net,defmt
-      - name: check (ble)
-        if: ${{ matrix.chip == 'esp32' || matrix.chip == 'esp32s3' }}
-        run: cd examples-${{ matrix.chip }} && cargo build --release --example=ble --features=ble
-      - name: check (async_ble)
-        if: ${{ matrix.chip == 'esp32' || matrix.chip == 'esp32s3' }}
-        run: cd examples-${{ matrix.chip }} && cargo build --release --example=async_ble --features=async,ble
-      - name: check (coex)
-        if: ${{ matrix.chip == 'esp32' || matrix.chip == 'esp32s3' }}
-        run: cd examples-${{ matrix.chip }} && cargo build --release --example=coex --features=wifi,ble,coex
-
-  checks-riscv:
-    strategy:
-      matrix:
-        chip: ["esp32c2", "esp32c3", "esp32c6"]
-
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: dtolnay/rust-toolchain@v1
-        with:
-          target: riscv32imc-unknown-none-elf
-          toolchain: nightly-2023-05-16
-          components: rust-src,rustfmt
-      - uses: Swatinem/rust-cache@v1
-
-      - name: check
-        run: cd examples-${{ matrix.chip }} && cargo +nightly-2023-05-16 check
-      - name: check (common features)
-        run: cd examples-${{ matrix.chip }} && cargo +nightly-2023-05-16 check --features=async,wifi,esp-now,embassy-net,log
-      - name: check (common features + defmt)
-        run: cd examples-${{ matrix.chip }} && cargo +nightly-2023-05-16 check --no-default-features --features=${{ matrix.chip }},async,wifi,esp-now,embassy-net,defmt
-      - name: check (dhcp)
-        run: cd examples-${{ matrix.chip }} && cargo +nightly-2023-05-16 build --release --example=dhcp --features=wifi
-      - name: check (static_ip)
-        run: cd examples-${{ matrix.chip }} && cargo +nightly-2023-05-16 build --release --example=static_ip --features=wifi
-      - name: check (esp_now)
-        run: cd examples-${{ matrix.chip }} && cargo +nightly-2023-05-16 build --release --example=esp_now --features=esp-now
-      - name: check (embassy_esp_now)
-        run: cd examples-${{ matrix.chip }} && cargo +nightly-2023-05-16 build --release --example=embassy_esp_now --features=async,esp-now
-      - name: check (embassy_esp_now_duplex)
-        run: cd examples-${{ matrix.chip }} && cargo +nightly-2023-05-16 build --release --example=embassy_esp_now_duplex --features=async,esp-now
-      - name: check (embassy_dhcp)
-        run: cd examples-${{ matrix.chip }} && cargo +nightly-2023-05-16 build --release --example=embassy_dhcp --features=async,wifi,embassy-net
-      - name: check (embassy_access_point)
-        run: cd examples-${{ matrix.chip }} && cargo +nightly-2023-05-16 build --release --example=embassy_access_point --features=async,wifi,embassy-net
-
-      - name: check (common features + ble)
-        run: cd examples-${{ matrix.chip }} && cargo +nightly-2023-05-16 check --features=async,wifi,ble,esp-now,embassy-net,log
-      - name: check (common features + ble + defmt)
-        run: cd examples-${{ matrix.chip }} && cargo +nightly-2023-05-16 check --no-default-features --features=${{ matrix.chip }},async,wifi,ble,esp-now,embassy-net,defmt
-      - name: check (ble)
-        run: cd examples-${{ matrix.chip }} && cargo +nightly-2023-05-16 build --release --example=ble --features=ble
-      - name: check (async_ble)
-        run: cd examples-${{ matrix.chip }} && cargo +nightly-2023-05-16 build --release --example=async_ble --features=async,ble
-      - name: check (coex)
-        if: ${{ matrix.chip == 'esp32c3' }}
-        run: cd examples-${{ matrix.chip }} && cargo +nightly-2023-05-16 build --release --example=coex --features=wifi,ble,coex
+      - name: build (common features + ble)
+        if: ${{ matrix.chip != 'esp32s2' }}
+        run: cd esp-wifi && cargo b${{ matrix.chip }} --features=async,wifi,ble,esp-now,embassy-net,log,${{ matrix.chip }}-hal/embassy-time-timg0
+      - name: build (common features + ble + defmt)
+        if: ${{ matrix.chip != 'esp32s2' }}
+        run: cd esp-wifi && cargo b${{ matrix.chip }} --no-default-features --features=async,wifi,ble,esp-now,embassy-net,defmt,${{ matrix.chip }}-hal/embassy-time-timg0
+      - name: build (ble)
+        if: ${{ matrix.chip != 'esp32s2' }}
+        run: cd esp-wifi && cargo b${{ matrix.chip }} --release --example=ble --features=ble
+      - name: build (embassy_ble)
+        if: ${{ matrix.chip != 'esp32s2' }}
+        run: cd esp-wifi && cargo b${{ matrix.chip }} --release --example=embassy_ble --features=async,ble,${{ matrix.chip }}-hal/embassy-time-timg0
+      - name: build (coex)
+        if: ${{ matrix.chip == 'esp32' || matrix.chip == 'esp32s3' || matrix.chip == 'esp32c3' }}
+        run: cd esp-wifi && cargo b${{ matrix.chip }} --release --example=coex --features=wifi,ble,coex
