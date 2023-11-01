@@ -15,6 +15,7 @@ env:
   PASSWORD: ""
   STATIC_IP: ""
   GATEWAY_IP: ""
+  HOST_IP: ""
   DEFMT_LOG: "trace"
 
 # Cancel any currently running workflows from the same PR, branch, or
@@ -62,6 +63,8 @@ jobs:
         run: cd esp-wifi && cargo b${{ matrix.chip }} --no-default-features --features=async,wifi,esp-now,embassy-net,defmt,${{ matrix.chip }}-hal/embassy-time-timg0
       - name: build (dhcp)
         run: cd esp-wifi && cargo b${{ matrix.chip }} --release --example=dhcp --features=wifi
+      - name: build (bench)
+        run: cd esp-wifi && cargo b${{ matrix.chip }} --release --example=bench --features=wifi
       - name: build (static_ip)
         run: cd esp-wifi && cargo b${{ matrix.chip }} --release --example=static_ip --features=wifi
       - name: build (esp_now)
@@ -72,6 +75,8 @@ jobs:
         run: cd esp-wifi && cargo b${{ matrix.chip }} --release --example=embassy_esp_now_duplex --features=async,esp-now,${{ matrix.chip }}-hal/embassy-time-timg0
       - name: build (embassy_dhcp)
         run: cd esp-wifi && cargo b${{ matrix.chip }} --release --example=embassy_dhcp --features=async,wifi,embassy-net,${{ matrix.chip }}-hal/embassy-time-timg0
+      - name: build (embassy_bench)
+        run: cd esp-wifi && cargo b${{ matrix.chip }} --release --example=embassy_bench --features=async,wifi,embassy-net,${{ matrix.chip }}-hal/embassy-time-timg0
       - name: build (embassy_access_point)
         run: cd esp-wifi && cargo b${{ matrix.chip }} --release --example=embassy_access_point --features=async,wifi,embassy-net,${{ matrix.chip }}-hal/embassy-time-timg0
 
