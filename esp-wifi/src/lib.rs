@@ -109,7 +109,7 @@ const DEFAULT_TICK_RATE_HZ: u32 = 100;
 struct Config {
     #[default(5)]
     rx_queue_size: usize,
-    #[default(3)]
+    #[default(10)]
     tx_queue_size: usize,
     #[default(10)]
     static_rx_buf_num: usize,
