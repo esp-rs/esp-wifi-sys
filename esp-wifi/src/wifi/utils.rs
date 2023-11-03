@@ -71,10 +71,9 @@ pub struct ApStaInterface<'a, 'd> {
     pub sta_socket_set: SocketSet<'a>,
 }
 
-pub fn create_ap_sta_network_interface<'a, 'd, MODE: WifiDeviceMode>(
+pub fn create_ap_sta_network_interface<'a, 'd>(
     inited: &EspWifiInitialization,
     device: impl crate::hal::peripheral::Peripheral<P = crate::hal::peripherals::WIFI> + 'd,
-    _mode: MODE,
     ap_storage: &'a mut [SocketStorage<'a>],
     sta_storage: &'a mut [SocketStorage<'a>],
 ) -> Result<ApStaInterface<'a, 'd>, WifiError> {

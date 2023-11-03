@@ -91,6 +91,17 @@ cargo esp32c3 --release ...
 
 `cargo $CHIP --example access_point --release --features "embedded-svc,wifi"`
 
+### access_point_with_sta
+
+- set SSID and PASSWORD env variable
+- gets an ip address via DHCP
+- creates an open access-point with SSID `esp-wifi`
+- you can connect to it using a static IP in range 192.168.2.2 .. 192.168.2.255, gateway 192.168.2.1
+- open http://192.168.2.1:8080/ in your browser - the example will perform an HTTP get request to some "random" server
+- on Android you might need to choose _Keep Accesspoint_ when it tells you the WiFi has no internet connection, Chrome might not want to load the URL - you can use a shell and try `curl` and `ping`
+
+`cargo $CHIP --example access_point_with_sta --release --features "embedded-svc,wifi"`
+
 ### embassy_access_point
 
 - creates an open access-point with SSID `esp-wifi`
@@ -99,6 +110,17 @@ cargo esp32c3 --release ...
 - on Android you might need to choose _Keep Accesspoint_ when it tells you the WiFi has no internet connection, Chrome might not want to load the URL - you can use a shell and try `curl` and `ping`
 
 `cargo $CHIP --example embassy_access_point --release --features "async,embedded-svc,wifi,embassy-net"`
+
+### embassy_access_point_with_sta
+
+- set SSID and PASSWORD env variable
+- gets an ip address via DHCP
+- creates an open access-point with SSID `esp-wifi`
+- you can connect to it using a static IP in range 192.168.2.2 .. 192.168.2.255, gateway 192.168.2.1
+- open http://192.168.2.1:8080/ in your browser - the example will perform an HTTP get request to some "random" server
+- on Android you might need to choose _Keep Accesspoint_ when it tells you the WiFi has no internet connection, Chrome might not want to load the URL - you can use a shell and try `curl` and `ping`
+
+`cargo $CHIP --example embassy_access_point_with_sta --release --features "async,embedded-svc,wifi,embassy-net"`
 
 ## Benchmarking
 

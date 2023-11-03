@@ -71,8 +71,8 @@ async fn main(spawner: Spawner) -> ! {
     spawner.spawn(connection(controller)).ok();
     spawner.spawn(net_task(&stack)).ok();
 
-    let mut rx_buffer = [0; 4096];
-    let mut tx_buffer = [0; 4096];
+    let mut rx_buffer = [0; 1536];
+    let mut tx_buffer = [0; 1536];
 
     loop {
         if stack.is_link_up() {
