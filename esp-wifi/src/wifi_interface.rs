@@ -16,7 +16,9 @@ use crate::wifi::{get_ap_mac, get_sta_mac, WifiDevice, WifiMode};
 
 use core::borrow::BorrowMut;
 
-/// A TCP stack
+/// Non-async TCP/IP network stack
+/// 
+/// Mostly a convenience wrapper for `smoltcp`
 pub struct WifiStack<'a> {
     device: RefCell<WifiDevice<'static>>, // TODO allow non static lifetime
     network_interface: RefCell<Interface>,
