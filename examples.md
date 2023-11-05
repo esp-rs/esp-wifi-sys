@@ -1,6 +1,9 @@
 ## Examples
 
-To build these ensure you are in the `esp-wifi` and you are using the right chip name invocation. For example, to build for the `esp32c3`, please run 
+ > The following instructions assume you have the [Xtensa toolchain](https://esp-rs.github.io/book/installation/riscv-and-xtensa.html) set up. In case you are building for a RISC-V target and would use
+the mainline Rust compiler, you'll need to edit or remove the `rust-toolchain.toml` file.
+
+To build these ensure you are in the `esp-wifi` directory (the inner one, which has `examples` inside) and you are using the right chip name invocation. For example, to build for the `esp32c3`, please run 
 
 ```
 cargo esp32c3 --release ...
