@@ -63,6 +63,10 @@ jobs:
         run: cd esp-wifi && cargo b${{ matrix.chip }} --features=async,wifi,esp-now,embassy-net,log,${{ matrix.chip }}-hal/embassy-time-timg0
       - name: build (common features + defmt)
         run: cd esp-wifi && cargo b${{ matrix.chip }} --no-default-features --features=async,wifi,esp-now,embassy-net,defmt,${{ matrix.chip }}-hal/embassy-time-timg0
+      - name: build (access_point)
+        run: cd esp-wifi && cargo b${{ matrix.chip }} --release --example=access_point --features=wifi
+      - name: build (access_point_with_sta)
+        run: cd esp-wifi && cargo b${{ matrix.chip }} --release --example=access_point_with_sta --features=wifi
       - name: build (dhcp)
         run: cd esp-wifi && cargo b${{ matrix.chip }} --release --example=dhcp --features=wifi
       - name: build (bench)
@@ -81,6 +85,8 @@ jobs:
         run: cd esp-wifi && cargo b${{ matrix.chip }} --release --example=embassy_bench --features=async,wifi,embassy-net,${{ matrix.chip }}-hal/embassy-time-timg0
       - name: build (embassy_access_point)
         run: cd esp-wifi && cargo b${{ matrix.chip }} --release --example=embassy_access_point --features=async,wifi,embassy-net,${{ matrix.chip }}-hal/embassy-time-timg0
+      - name: build (embassy_access_point_with_sta)
+        run: cd esp-wifi && cargo b${{ matrix.chip }} --release --example=embassy_access_point_with_sta --features=async,wifi,embassy-net,${{ matrix.chip }}-hal/embassy-time-timg0
 
       - name: build (common features + ble)
         if: ${{ matrix.chip != 'esp32s2' }}
