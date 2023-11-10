@@ -19,7 +19,7 @@ fn main() -> Result<(), String> {
     }
     #[cfg(all(
         feature = "coex",
-        any(feature = "esp32s2", feature = "esp32c2", feature = "esp32c6")
+        any(feature = "esp32s2", feature = "esp32c2")
     ))]
     {
         panic!(
