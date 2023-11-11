@@ -74,24 +74,29 @@ Don't use this feature if your are _not_ using USB-SERIAL-JTAG since it might re
 
 ## Features
 
-| Feature        | Meaning                                                                                             |
-| -------------- | --------------------------------------------------------------------------------------------------- |
-| wifi-logs      | logs the WiFi logs from the driver at log level info                                                |
-| dump-packets   | dumps packet info at log level info                                                                 |
-| utils          | Provide utilities for smoltcp initialization, this is a default feature                             |
-| embedded-svc   | Provides a (very limited) implementation of the `embedded-svc` WiFi trait, includes `utils` feature |
-| ble            | Enable BLE support                                                                                  |
-| wifi           | Enable WiFi support                                                                                 |
-| esp-now        | Enable esp-now support                                                                              |
-| coex           | Enable coex support                                                                                 |
-| mtu-XXX        | Set MTU to XXX, XXX can be 746, 1492, 1500, 1514. Defaults to 1492                                  |
-| big-heap       | Reserve more heap memory for the drivers                                                            |
-| ipv6           | IPv6 support                                                                                        |
-| phy-enable-usb | See _USB-SERIAL-JTAG_ below                                                                         |
-| ps-min-modem   | Enable minimum modem sleep. Only for STA mode                                                       |
-| ps-max-modem   | Enable maximum modem sleep. Only for STA mode                                                       |
-| log            | Route log output to the `log` crate                                                                 |
-| defmt          | Add `defmt::Format` implementation                                                                  |
+| Feature        | Meaning                                                                                              |
+| -------------- | ---------------------------------------------------------------------------------------------------- |
+| wifi-logs      | logs the WiFi logs from the driver at log level info                                                 |
+| dump-packets   | dumps packet info at log level info                                                                  |
+| utils          | Provide utilities for smoltcp initialization; adds `smoltcp` dependency                              |
+| embedded-svc   | Provides a (very limited) implementation of the `embedded-svc` WiFi trait                            |        
+| ble            | Enable BLE support                                                                                   |
+| wifi           | Enable WiFi support                                                                                  |
+| esp-now        | Enable esp-now support                                                                               |
+| coex           | Enable coex support                                                                                  |
+| big-heap       | Reserve more heap memory for the drivers                                                             |
+| ipv4           | IPv4 support: includes `utils` feature                                                               |
+| ipv6           | IPv6 support: includes `utils` feature                                                               |
+| tcp            | TCP socket support: includes `ipv4` feature                                                          |
+| udp            | UDP socket support: includes `ipv4` feature                                                          |
+| igmp           | IGMP (multicast) support: includes `ipv4` feature                                                    |
+| dns            | DNS support: includes `udp` feature                                                                  |
+| dhcpv4         | DHCPv4 support, both creating sockets and autoconfiguring network settings: includes `utils` feature |
+| phy-enable-usb | See _USB-SERIAL-JTAG_ below                                                                          |
+| ps-min-modem   | Enable minimum modem sleep. Only for STA mode                                                        |
+| ps-max-modem   | Enable maximum modem sleep. Only for STA mode                                                        |
+| log            | Route log output to the `log` crate                                                                  |
+| defmt          | Add `defmt::Format` implementation                                                                   |
 
 When using the `dump-packets` feature you can use the extcap in `extras/esp-wifishark` to analyze the frames in Wireshark.
 For more information see [extras/esp-wifishark/README.md](extras/esp-wifishark/README.md)
