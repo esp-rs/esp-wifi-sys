@@ -28,7 +28,7 @@ esp32c6-hal = { version = "0.6.0",  default-features = false }
 esp32-hal   = { version = "0.16.0", default-features = false }
 esp32s3-hal = { version = "0.13.0", default-features = false }
 esp32s2-hal = { version = "0.13.0", default-features = false }
-smoltcp = { version = "0.10.0", default-features = false, features = ["proto-igmp", "proto-ipv4", "proto-dns", "socket-tcp", "socket-icmp", "socket-udp", "socket-dns", "medium-ethernet", "proto-dhcpv4", "socket-raw", "socket-dhcpv4"] }
+smoltcp = { version = "0.10.0", default-features=false, features = ["medium-ethernet", "socket-raw"] }
 critical-section = "1.1.1"
 atomic-polyfill = "1.0.2"
 atomic_enum = "0.2.0" # uses core atomic types which should be fine as long as only load and store is used on them
