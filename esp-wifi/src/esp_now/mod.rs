@@ -10,7 +10,7 @@ use core::marker::PhantomData;
 use core::sync::atomic::Ordering;
 use core::{cell::RefCell, fmt::Debug};
 
-use atomic_polyfill::{AtomicBool, AtomicU8};
+use portable_atomic::{AtomicBool, AtomicU8};
 
 use critical_section::Mutex;
 

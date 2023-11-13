@@ -38,8 +38,8 @@ linked_list_allocator = { workspace = true }
 embedded-io.workspace = true
 embedded-io-async = { workspace = true, optional = true }
 fugit.workspace = true
-heapless = { workspace = true, default-features = false }
-num-derive = { workspace = true, features = ["full-syntax"] }
+heapless = { workspace = true, default-features = false, features = ["portable-atomic"] }
+num-derive = { workspace = true }
 num-traits = { workspace = true, default-features = false }
 esp-wifi-sys = { version = "0.1.0", path = "../esp-wifi-sys" }
 embassy-sync = { workspace = true, optional = true }
@@ -48,8 +48,11 @@ embassy-net = { workspace = true, optional = true }
 toml-cfg.workspace = true
 libm.workspace = true
 cfg-if.workspace = true
-atomic-polyfill.workspace = true
-atomic_enum.workspace = true
+portable-atomic.workspace = true
+portable_atomic_enum.workspace = true
+
+# We don't use it directly but we need to enable portable-atomic on it
+futures-util.workspace = true
 
 [build-dependencies]
 toml-cfg.workspace = true
@@ -64,6 +67,7 @@ bleps = { workspace = true, features = ["async"] }
 embedded-hal-async.workspace = true
 log.workspace = true
 static_cell.workspace = true
+portable-atomic = { workspace = true, features = ["critical-section"] }
 
 [features]
 default = [ "log", "ipv4", "tcp", "udp", "icmp", "igmp", "dns", "dhcpv4" ]

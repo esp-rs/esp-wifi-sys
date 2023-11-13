@@ -3,7 +3,6 @@
 pub(crate) mod os_adapter;
 pub(crate) mod state;
 
-use atomic_polyfill::AtomicUsize;
 use core::ptr::addr_of;
 use core::sync::atomic::Ordering;
 use core::time::Duration;
@@ -11,6 +10,7 @@ use core::{
     cell::{RefCell, RefMut},
     mem::MaybeUninit,
 };
+use portable_atomic::AtomicUsize;
 
 use crate::common_adapter::*;
 use crate::esp_wifi_result;
