@@ -66,28 +66,29 @@ Don't use this feature if your are _not_ using USB-SERIAL-JTAG as it might reduc
 
 ## Features
 
-| Feature        | Meaning                                                                                              |
-| -------------- | ---------------------------------------------------------------------------------------------------- |
-| wifi-logs      | logs the WiFi logs from the driver at log level `info`                                               |
-| dump-packets   | dumps packet info at log level `info`                                                                |
-| smoltcp        | Provide implementations of `smoltcp` traits                                                          |
-| utils          | Provide utilities for smoltcp initialization. Adds `smoltcp` dependency                              |
-| ble            | Enable BLE support                                                                                   |
-| wifi           | Enable WiFi support                                                                                  |
-| esp-now        | Enable [esp-now](https://www.espressif.com/en/solutions/low-power-solutions/esp-now) support         |
-| coex           | Enable WiFi-BLE coexistence support                                                                  |
-| ipv4           | IPv4 support. Includes `utils` feature                                                               |
-| ipv6           | IPv6 support. Includes `utils` feature                                                               |
-| tcp            | TCP socket support. Includes `ipv4` feature                                                          |
-| udp            | UDP socket support. Includes `ipv4` feature                                                          |
-| igmp           | IGMP (multicast) support. Includes `ipv4` feature                                                    |
-| dns            | DNS support. Includes `udp` feature                                                                  |
-| dhcpv4         | DHCPv4 support, both creating sockets and autoconfiguring network settings. Includes `utils` feature |
-| phy-enable-usb | See [USB-SERIAL-JTAG](#usb-serial-jtag) above                                                        |
-| ps-min-modem   | Enable minimum modem sleep. Only affects STA mode                                                    |
-| ps-max-modem   | Enable maximum modem sleep. Only affects STA mode                                                    |
-| log            | Route log output to the `log` crate                                                                  |
-| defmt          | Add `defmt::Format` implementation and output logs via `defmt`                                       |
+| Feature         | Meaning                                                                                              |
+| --------------- | ---------------------------------------------------------------------------------------------------- |
+| wifi-logs       | logs the WiFi logs from the driver at log level `info`                                               |
+| dump-packets    | dumps packet info at log level `info`                                                                |
+| smoltcp         | Provide implementations of `smoltcp` traits                                                          |
+| utils           | Provide utilities for smoltcp initialization. Adds `smoltcp` dependency                              |
+| ble             | Enable BLE support                                                                                   |
+| wifi            | Enable WiFi support                                                                                  |
+| esp-now         | Enable [esp-now](https://www.espressif.com/en/solutions/low-power-solutions/esp-now) support         |
+| coex            | Enable WiFi-BLE coexistence support                                                                  |
+| ipv4            | IPv4 support. Includes `utils` feature                                                               |
+| ipv6            | IPv6 support. Includes `utils` feature                                                               |
+| tcp             | TCP socket support. Includes `ipv4` feature                                                          |
+| udp             | UDP socket support. Includes `ipv4` feature                                                          |
+| igmp            | IGMP (multicast) support. Includes `ipv4` feature                                                    |
+| dns             | DNS support. Includes `udp` feature                                                                  |
+| dhcpv4          | DHCPv4 support, both creating sockets and autoconfiguring network settings. Includes `utils` feature |
+| phy-enable-usb  | See [USB-SERIAL-JTAG](#usb-serial-jtag) above                                                        |
+| ps-min-modem    | Enable minimum modem sleep. Only affects STA mode                                                    |
+| ps-max-modem    | Enable maximum modem sleep. Only affects STA mode                                                    |
+| log             | Route log output to the `log` crate                                                                  |
+| defmt           | Add `defmt::Format` implementation and output logs via `defmt`                                       |
+| portable-atomic | Enables polyfilling using `portable-atomic`. Disable if you use atomic emulation trap                |
 
 Note that not all features are available on every MCU. For example, `ble` (and thus, `coex`) is not available on ESP32-S2.
 

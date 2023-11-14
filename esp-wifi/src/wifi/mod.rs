@@ -4,13 +4,19 @@ pub(crate) mod os_adapter;
 pub(crate) mod state;
 
 use core::ptr::addr_of;
-use core::sync::atomic::Ordering;
 use core::time::Duration;
 use core::{
     cell::{RefCell, RefMut},
     mem::MaybeUninit,
 };
-use portable_atomic::AtomicUsize;
+
+#[cfg(not(feature = "portable-atomic"))]
+use core::sync::atomic;
+
+#[cfg(feature = "portable-atomic")]
+use portable_atomic as atomic;
+
+use atomic::{AtomicUsize, Ordering};
 
 use crate::common_adapter::*;
 use crate::esp_wifi_result;

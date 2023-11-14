@@ -25,7 +25,7 @@ esp32s2-hal = { version = "0.13.0", default-features = false }
 smoltcp = { version = "0.10.0", default-features=false, features = ["medium-ethernet", "socket-raw"] }
 critical-section = "1.1.1"
 portable-atomic = { version = "1.5", default-features = false }
-portable_atomic_enum = "0.2.0"
+portable_atomic_enum = "0.3.0"
 log = "0.4.20"
 embedded-svc = { version = "0.26.1", default-features = false, features = [] }
 enumset = { version = "1", default-features = false }
@@ -52,7 +52,7 @@ esp-backtrace = { version = "0.9.0", features = ["panic-handler", "exception-han
 embedded-hal-async = { version = "1.0.0-rc.1" }
 embedded-io-async = { version = "0.6.0" }
 
-futures-util = { version = "0.3.28", default-features = false, features = ["portable-atomic"] } # need this to activate portable-atomic on futures-util's AtomicWaker even though we don't use it
+futures-util = { version = "0.3.28", default-features = false } # need this to activate portable-atomic on AtomicWaker even though we don't use it
 
 [patch.crates-io]
 esp32-hal = { git = "https://github.com/esp-rs/esp-hal.git", rev = "957b232" }
