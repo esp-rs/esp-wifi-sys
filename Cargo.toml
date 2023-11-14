@@ -47,7 +47,6 @@ embassy-net = { version = "0.2.1", features = ["nightly", "tcp", "udp", "dhcpv4"
 bleps = { git = "https://github.com/bjoernQ/bleps", package = "bleps", rev = "0db8fcb", features = ["macros"] }
 embassy-executor = { version = "0.3.3", package = "embassy-executor", features = ["nightly", "executor-thread", "integrated-timers"] }
 embassy-time = { version = "0.1.3", features = ["nightly"] }
-futures-util = { version = "0.3.28", default-features = false }
 esp-println = { version = "0.7.0" }
 esp-backtrace = { version = "0.9.0", features = ["panic-handler", "exception-handler", "print-uart"] }
 embedded-hal-async = { version = "1.0.0-rc.1" }

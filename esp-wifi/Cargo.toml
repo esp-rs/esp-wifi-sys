@@ -62,7 +62,6 @@ esp-println = { workspace = true, features = ["log"] }
 esp-backtrace.workspace = true
 embassy-executor.workspace = true
 embassy-time.workspace = true
-futures-util.workspace = true
 bleps = { workspace = true, features = ["async"] }
 embedded-hal-async.workspace = true
 log.workspace = true
