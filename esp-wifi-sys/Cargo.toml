@@ -2,6 +2,24 @@
 name    = "esp-wifi-sys"
 version = "0.1.0"
 edition = "2021"
+authors = [
+    "The ESP-RS team",
+]
+description  = "Bindings to Espressif's WiFi and Bluetooth low-level drivers"
+repository   = "https://github.com/esp-rs/esp-wifi"
+license      = "MIT OR Apache-2.0"
+
+keywords = [
+    "wifi",
+    "bluetooth",
+    "esp",
+    "no-std",
+]
+categories = [
+    "embedded",
+    "hardware-support",
+    "no-std",
+]
 
 [dependencies]
 
@@ -18,3 +36,6 @@ esp32c3 = []
 esp32c6 = []
 esp32s2 = []
 esp32s3 = []
+
+[package.metadata.docs.rs]
+features = ["esp32c3"]
