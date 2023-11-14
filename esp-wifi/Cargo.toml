@@ -61,7 +61,7 @@ embedded-svc.workspace = true
 embassy-executor.workspace = true
 embassy-time.workspace = true
 futures-util.workspace = true
-bleps.workspace = true
+bleps = { workspace = true, features = ["async"] }
 embedded-hal-async.workspace = true
 log.workspace = true
 smoltcp.workspace = true
@@ -95,7 +95,6 @@ async = [
   "esp32-hal?/async",
   "esp32s2-hal?/async",
   "esp32s3-hal?/async",
-  "bleps/async"
 ]
 
 embassy-net = ["dep:embassy-net", "async"]
