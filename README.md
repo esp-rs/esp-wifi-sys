@@ -12,8 +12,8 @@ If a cell contains am em dash (&mdash;) this means that the particular feature i
 | ESP32-S2 |                          ✓                           |                       &mdash;                       |                       &mdash;                        |    ✓    |
 | ESP32-S3 |                          ✓                           |                          ✓                          |                          ✓                           |    ✓    |
 | ESP32-C3 |                          ✓                           |                          ✓                          |                          ✓                           |    ✓    |
-| ESP32-C2 |                          ✓                           |                          ✓                          |                                                      |    ✓    |
-| ESP32-C6 |                          ✓                           |                          ✓                          |                                                      |    ✓    |
+| ESP32-C2 |                          ✓                           |                          ✓                          |                          ✓                           |    ✓    |
+| ESP32-C6 |                          ✓                           |                          ✓                          |                          ✓                           |    ✓    |
 
 Minimum supported Rust compiler version: 1.72.0.0
 
@@ -117,7 +117,6 @@ See [Examples] for details.
 
 - Make CoEx work on ESP32 (it kind of works when commenting out setting the country in wifi_start, probably some mis-compilation since it then crashes in a totally different code path)
 - Support for non-open SoftAP
-- Direct-boot mode isn't supported
 
 ## Directory Structure
 
