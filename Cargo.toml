@@ -51,7 +51,7 @@ static_cell = { version = "=1.2", features = ["nightly"] }
 
 embassy-net = { version = "0.2.1", features = ["nightly", "tcp", "udp", "dhcpv4", "medium-ethernet"] }
 bleps = { git = "https://github.com/bjoernQ/bleps", package = "bleps", rev = "0db8fcb", features = ["macros"] }
-embassy-executor = { version = "0.3.0", package = "embassy-executor", features = ["nightly", "executor-thread", "integrated-timers"] }
+embassy-executor = { version = "=0.3.2", package = "embassy-executor", features = ["nightly", "executor-thread", "integrated-timers"] } # temporarily pin because we aren't ready for portable-atomic yet
 embassy-time = { version = "0.1.3", features = ["nightly"] }
 futures-util = { version = "0.3.28", default-features = false }
 esp-println = { version = "0.6.0" }
