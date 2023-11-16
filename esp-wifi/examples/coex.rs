@@ -74,23 +74,6 @@ fn main() -> ! {
 
     controller.start().unwrap();
     println!("is wifi started: {:?}", controller.is_started());
-
-    #[cfg(not(esp32c2))]
-    {
-        // on ESP32-C2 this will consume too much stack memory making the example crash
-        use embedded_svc::wifi::AccessPointInfo;
-        use esp_wifi::wifi::WifiError;
-
-        println!("Start Wifi Scan");
-        let res: Result<(heapless::Vec<AccessPointInfo, 10>, usize), WifiError> =
-            controller.scan_n();
-        if let Ok((res, _count)) = res {
-            for ap in res {
-                println!("{:?}", ap);
-            }
-        }
-    }
-
     println!("{:?}", controller.get_capabilities());
     println!("wifi_connect {:?}", controller.connect());
 
