@@ -46,7 +46,7 @@ jobs:
   builds:
     strategy:
       matrix:
-        chip: ["esp32", "esp32s2", "esp32s3", "esp32c2", "esp32c3", "esp32c6"]
+        chip: ["esp32", "esp32s2", "esp32s3", "esp32c2", "esp32c3", "esp32c6", "esp32h2"]
 
     runs-on: ubuntu-latest
     steps:
@@ -58,36 +58,52 @@ jobs:
       - uses: Swatinem/rust-cache@v2
 
       - name: build
+        if: ${{ matrix.chip != 'esp32h2' }}
         run: cd esp-wifi && cargo b${{ matrix.chip }}
       - name: build (common features)
+        if: ${{ matrix.chip != 'esp32h2' }}
         run: cd esp-wifi && cargo b${{ matrix.chip }} --features=async,wifi,esp-now,embassy-net,log,${{ matrix.chip }}-hal/embassy-time-timg0
       - name: build (common features + defmt)
+        if: ${{ matrix.chip != 'esp32h2' }}
         run: cd esp-wifi && cargo b${{ matrix.chip }} --no-default-features --features=async,wifi,esp-now,embassy-net,defmt,${{ matrix.chip }}-hal/embassy-time-timg0
       - name: build (all possible network options)
+        if: ${{ matrix.chip != 'esp32h2' }}
         run: cd esp-wifi && for combo in {ipv4,},{ipv6,},{tcp,},{udp,},{igmp,},{dhcpv4,} ; do cargo b${{ matrix.chip }} --release --no-default-features --features=wifi,wifi-logs,$combo ; done
       - name: build (access_point)
+        if: ${{ matrix.chip != 'esp32h2' }}
         run: cd esp-wifi && cargo b${{ matrix.chip }} --release --example=access_point --features=wifi
       - name: build (access_point_with_sta)
+        if: ${{ matrix.chip != 'esp32h2' }}
         run: cd esp-wifi && cargo b${{ matrix.chip }} --release --example=access_point_with_sta --features=wifi
       - name: build (dhcp)
+        if: ${{ matrix.chip != 'esp32h2' }}
         run: cd esp-wifi && cargo b${{ matrix.chip }} --release --example=dhcp --features=wifi
       - name: build (bench)
+        if: ${{ matrix.chip != 'esp32h2' }}
         run: cd esp-wifi && cargo b${{ matrix.chip }} --release --example=bench --features=wifi
       - name: build (static_ip)
+        if: ${{ matrix.chip != 'esp32h2' }}
         run: cd esp-wifi && cargo b${{ matrix.chip }} --release --example=static_ip --features=wifi
       - name: build (esp_now)
+        if: ${{ matrix.chip != 'esp32h2' }}
         run: cd esp-wifi && cargo b${{ matrix.chip }} --release --example=esp_now --features=esp-now
       - name: build (embassy_esp_now)
+        if: ${{ matrix.chip != 'esp32h2' }}
         run: cd esp-wifi && cargo b${{ matrix.chip }} --release --example=embassy_esp_now --features=async,esp-now,${{ matrix.chip }}-hal/embassy-time-timg0
       - name: build (embassy_esp_now_duplex)
+        if: ${{ matrix.chip != 'esp32h2' }}
         run: cd esp-wifi && cargo b${{ matrix.chip }} --release --example=embassy_esp_now_duplex --features=async,esp-now,${{ matrix.chip }}-hal/embassy-time-timg0
       - name: build (embassy_dhcp)
+        if: ${{ matrix.chip != 'esp32h2' }}
         run: cd esp-wifi && cargo b${{ matrix.chip }} --release --example=embassy_dhcp --features=async,wifi,embassy-net,${{ matrix.chip }}-hal/embassy-time-timg0
       - name: build (embassy_bench)
+        if: ${{ matrix.chip != 'esp32h2' }}
         run: cd esp-wifi && cargo b${{ matrix.chip }} --release --example=embassy_bench --features=async,wifi,embassy-net,${{ matrix.chip }}-hal/embassy-time-timg0
       - name: build (embassy_access_point)
+        if: ${{ matrix.chip != 'esp32h2' }}
         run: cd esp-wifi && cargo b${{ matrix.chip }} --release --example=embassy_access_point --features=async,wifi,embassy-net,${{ matrix.chip }}-hal/embassy-time-timg0
       - name: build (embassy_access_point_with_sta)
+        if: ${{ matrix.chip != 'esp32h2' }}
         run: cd esp-wifi && cargo b${{ matrix.chip }} --release --example=embassy_access_point_with_sta --features=async,wifi,embassy-net,${{ matrix.chip }}-hal/embassy-time-timg0
 
       - name: build (common features + ble)

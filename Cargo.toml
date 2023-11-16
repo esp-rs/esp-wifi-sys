@@ -19,10 +19,11 @@ defmt = "=0.3.5"
 esp32c3-hal = { version = "0.13.0", default-features = false }
 esp32c2-hal = { version = "0.11.0", default-features = false }
 esp32c6-hal = { version = "0.6.0",  default-features = false }
+esp32h2-hal = { git = "https://github.com/esp-rs/esp-hal.git", package = "esp32h2-hal", default-features = false }
 esp32-hal   = { version = "0.16.0", default-features = false }
 esp32s3-hal = { version = "0.13.0", default-features = false }
 esp32s2-hal = { version = "0.13.0", default-features = false }
-smoltcp = { version = "0.10.0", default-features=false, features = ["medium-ethernet", "socket-raw"] }
+smoltcp = { version = "0.10.0", default-features = false, features = ["proto-igmp", "proto-ipv4", "proto-dns", "socket-tcp", "socket-icmp", "socket-udp", "socket-dns", "medium-ethernet", "proto-dhcpv4", "socket-raw", "socket-dhcpv4"] }
 critical-section = "1.1.1"
 portable-atomic = { version = "1.5", default-features = false }
 portable_atomic_enum = { version = "0.3.0", features = ["portable-atomic"] }
