@@ -1336,7 +1336,7 @@ impl<'d> WifiController<'d> {
     }
 
     /// A blocking wifi network scan with caller-provided scanning options.
-    pub fn scan_with_config<const N: usize>(
+    pub fn scan_with_config_sync<const N: usize>(
         &mut self,
         config: ScanConfig<'_>,
     ) -> Result<(heapless::Vec<AccessPointInfo, N>, usize), WifiError> {
@@ -1614,7 +1614,7 @@ impl Wifi for WifiController<'_> {
     fn scan_n<const N: usize>(
         &mut self,
     ) -> Result<(heapless::Vec<AccessPointInfo, N>, usize), Self::Error> {
-        self.scan_with_config(Default::default())
+        self.scan_with_config_sync(Default::default())
     }
 
     /// Get the currently used configuration.
