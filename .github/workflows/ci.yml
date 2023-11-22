@@ -114,10 +114,10 @@ jobs:
         run: cd esp-wifi && cargo b${{ matrix.chip }} --no-default-features --features=async,wifi,ble,esp-now,embassy-net,defmt,${{ matrix.chip }}-hal/embassy-time-timg0
       - name: build (ble)
         if: ${{ matrix.chip != 'esp32s2' }}
-        run: cd esp-wifi && cargo b${{ matrix.chip }} --release --example=ble --features=ble
+        run: cd esp-wifi && cargo b${{ matrix.chip }} --release --example=ble --no-default-features --features=ble
       - name: build (embassy_ble)
         if: ${{ matrix.chip != 'esp32s2' }}
-        run: cd esp-wifi && cargo b${{ matrix.chip }} --release --example=embassy_ble --features=async,ble,${{ matrix.chip }}-hal/embassy-time-timg0
+        run: cd esp-wifi && cargo b${{ matrix.chip }} --release --example=embassy_ble --no-default-features --features=async,ble,${{ matrix.chip }}-hal/embassy-time-timg0
       - name: build (coex)
         if: ${{ matrix.chip == 'esp32' || matrix.chip == 'esp32s3' || matrix.chip == 'esp32c3' }}
         run: cd esp-wifi && cargo b${{ matrix.chip }} --release --example=coex --features=wifi,ble,coex
