@@ -32,7 +32,7 @@ enumset = { version = "1", default-features = false }
 linked_list_allocator = { version = "0.10.5", default-features = false, features = ["const_mut_refs"] }
 embedded-io = "0.6.1"
 fugit = "0.3.7"
-heapless = { version = "0.8.0", default-features = false }
+heapless = { version = "0.7.16", default-features = false }
 num-derive = { version = "0.4" }
 num-traits = { version = "0.2", default-features = false }
 esp-wifi-sys = { version = "0.1.0", path = "../esp-wifi-sys" }
@@ -53,6 +53,7 @@ embedded-hal-async = { version = "1.0.0-rc.1" }
 embedded-io-async = { version = "0.6.0" }
 
 futures-util = { version = "0.3.28", default-features = false } # need this to activate portable-atomic on AtomicWaker even though we don't use it
+atomic-waker = { version = "1.1.2", default-features = false } # need this to activate portable-atomic on AtomicWaker used by embedded-svc even though we don't use it
 
 [patch.crates-io]
 esp32-hal = { git = "https://github.com/esp-rs/esp-hal.git", rev = "957b232" }
@@ -62,11 +63,3 @@ esp32c6-hal = { git = "https://github.com/esp-rs/esp-hal.git", rev = "957b232" }
 esp32s2-hal = { git = "https://github.com/esp-rs/esp-hal.git", rev = "957b232" }
 esp32s3-hal = { git = "https://github.com/esp-rs/esp-hal.git", rev = "957b232" }
 esp-hal-common = { git = "https://github.com/esp-rs/esp-hal.git", rev = "957b232" }
-embedded-svc = { git = "https://github.com/esp-rs/embedded-svc.git" }
-
-embassy-sync = { git = "https://github.com/embassy-rs/embassy.git", rev = "7e5deae" }
-embassy-time = { git = "https://github.com/embassy-rs/embassy.git", rev = "7e5deae" }
-embassy-net = { git = "https://github.com/embassy-rs/embassy.git", rev = "7e5deae" }
-embassy-net-driver = { git = "https://github.com/embassy-rs/embassy.git", rev = "7e5deae" }
-
-smoltcp = { git = "https://github.com/smoltcp-rs/smoltcp.git", rev = "b57e2f9e70e82a13f31d5ea17e55232c11cc2b2d" }

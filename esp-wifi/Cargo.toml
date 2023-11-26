@@ -51,8 +51,9 @@ cfg-if.workspace = true
 portable-atomic = { workspace = true, optional = true }
 portable_atomic_enum.workspace = true
 
-# We don't use it directly but we need to enable portable-atomic on it
+# We don't use these directly but we need to enable portable-atomic on them
 futures-util.workspace = true
+atomic-waker.workspace = true
 
 [build-dependencies]
 toml-cfg.workspace = true
@@ -141,7 +142,7 @@ log = [
   "esp32s3-hal?/log",
 ]
 
-portable-atomic = ["dep:portable-atomic", "portable_atomic_enum/portable-atomic", "futures-util/portable-atomic", "heapless/portable-atomic"]
+portable-atomic = ["dep:portable-atomic", "portable_atomic_enum/portable-atomic", "futures-util/portable-atomic", "atomic-waker/portable-atomic"]
 
 [package.metadata.docs.rs]
 features = ["esp32c3", "wifi", "ble", "async", "embassy-net", "esp32c3-hal/embassy-time-systick", "esp32c3-hal/default"]
