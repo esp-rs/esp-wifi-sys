@@ -58,8 +58,3 @@ esp-println = { version = "0.6.0" }
 esp-backtrace = { version = "0.8.0", features = ["panic-handler", "exception-handler", "print-uart"] }
 embedded-hal-async = { version = "1.0.0-rc.1" }
 embedded-io-async = { version = "0.6.0" }
-
-# required until https://github.com/esp-rs/esp-hal/pull/891 is released
-[patch.crates-io]
-esp32c3-hal = { git = "https://github.com/esp-rs/esp-hal.git", rev = "8eddb9e737a1bfe0a36f90f54103e9167114813a" }
-esp-hal-common = {  git = "https://github.com/esp-rs/esp-hal.git", rev = "8eddb9e737a1bfe0a36f90f54103e9167114813a" }
