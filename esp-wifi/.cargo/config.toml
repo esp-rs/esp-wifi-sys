@@ -7,8 +7,8 @@
 esp32 =   "run --features   esp32 --target xtensa-esp32-none-elf        --features esp32-hal/default,esp32-hal/embassy-time-timg0,esp32-hal/embassy-executor-thread"
 esp32s2 = "run --features esp32s2 --target xtensa-esp32s2-none-elf      --features esp32s2-hal/default,esp32s2-hal/embassy-time-timg0,esp32s2-hal/embassy-executor-thread"
 esp32s3 = "run --features esp32s3 --target xtensa-esp32s3-none-elf      --features esp32s3-hal/default,esp32s3-hal/embassy-time-timg0,esp32s3-hal/embassy-executor-thread"
-esp32c2 = "run --features esp32c2 --target riscv32imc-unknown-none-elf  --features esp32c2-hal/default,esp32c2-hal/embassy-time-timg0,portable-atomic/critical-section"
-esp32c3 = "run --features esp32c3 --target riscv32imc-unknown-none-elf  --features esp32c3-hal/default,esp32c3-hal/embassy-time-timg0,portable-atomic/critical-section"
+esp32c2 = "run --features esp32c2 --target riscv32imc-unknown-none-elf  --features esp32c2-hal/default,esp32c2-hal/embassy-time-timg0"
+esp32c3 = "run --features esp32c3 --target riscv32imc-unknown-none-elf  --features esp32c3-hal/default,esp32c3-hal/embassy-time-timg0"
 esp32c6 = "run --features esp32c6 --target riscv32imac-unknown-none-elf --features esp32c6-hal/default,esp32c6-hal/embassy-time-timg0"
 
 besp32 =   "build --features   esp32 --target xtensa-esp32-none-elf        --features esp32-hal/default,esp32-hal/embassy-time-timg0,esp32-hal/embassy-executor-thread"
