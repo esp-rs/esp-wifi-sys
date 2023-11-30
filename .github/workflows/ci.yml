@@ -38,7 +38,7 @@ jobs:
           default: true
           buildtargets: esp32
           ldproxy: false
-      - uses: Swatinem/rust-cache@v1
+      - uses: Swatinem/rust-cache@v2
 
       - name: check-fmt
         run: cargo fmt --check
@@ -55,7 +55,7 @@ jobs:
         with:
           default: true
           ldproxy: false
-      - uses: Swatinem/rust-cache@v1
+      - uses: Swatinem/rust-cache@v2
 
       - name: build
         run: cd esp-wifi && cargo b${{ matrix.chip }}
