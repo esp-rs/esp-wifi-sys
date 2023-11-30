@@ -5,13 +5,7 @@ use crate::compat::common::str_from_c;
 use crate::hal::system::RadioClockController;
 use crate::hal::system::RadioPeripherals;
 
-#[cfg(not(feature = "portable-atomic"))]
-use core::sync::atomic;
-
-#[cfg(feature = "portable-atomic")]
-use portable_atomic as atomic;
-
-use atomic::{AtomicU32, Ordering};
+use portable_atomic::{AtomicU32, Ordering};
 
 const SOC_PHY_DIG_REGS_MEM_SIZE: usize = 21 * 4;
 

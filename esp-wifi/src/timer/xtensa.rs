@@ -1,12 +1,6 @@
 use core::cell::RefCell;
 
-#[cfg(not(feature = "portable-atomic"))]
-use core::sync::atomic;
-
-#[cfg(feature = "portable-atomic")]
-use portable_atomic as atomic;
-
-use atomic::{AtomicU32, Ordering};
+use portable_atomic::{AtomicU32, Ordering};
 
 use critical_section::Mutex;
 

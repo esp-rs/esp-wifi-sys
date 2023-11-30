@@ -10,13 +10,7 @@ use core::{
     mem::MaybeUninit,
 };
 
-#[cfg(not(feature = "portable-atomic"))]
-use core::sync::atomic;
-
-#[cfg(feature = "portable-atomic")]
-use portable_atomic as atomic;
-
-use atomic::{AtomicUsize, Ordering};
+use portable_atomic::{AtomicUsize, Ordering};
 
 use crate::common_adapter::*;
 use crate::esp_wifi_result;

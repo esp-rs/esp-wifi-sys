@@ -5,13 +5,7 @@ use crate::compat::common::str_from_c;
 use crate::hal::system::RadioClockController;
 use crate::hal::system::RadioPeripherals;
 
-#[cfg(not(feature = "portable-atomic"))]
-use core::sync::atomic;
-
-#[cfg(feature = "portable-atomic")]
-use portable_atomic as atomic;
-
-use atomic::{AtomicU32, Ordering};
+use portable_atomic::{AtomicU32, Ordering};
 
 const SOC_PHY_DIG_REGS_MEM_SIZE: usize = 21 * 4;
 
@@ -45,18 +39,18 @@ pub(crate) fn enable_wifi_power_domain() {
         let syscon = &*crate::hal::peripherals::APB_CTRL::ptr();
 
         rtc_cntl
-            .dig_pwc
+            .dig_pwc()
             .modify(|_, w| w.wifi_force_pd().clear_bit());
 
         syscon
-            .wifi_rst_en
+            .wifi_rst_en()
             .modify(|r, w| w.bits(r.bits() | MODEM_RESET_FIELD_WHEN_PU));
         syscon
-            .wifi_rst_en
+            .wifi_rst_en()
             .modify(|r, w| w.bits(r.bits() & !MODEM_RESET_FIELD_WHEN_PU));
 
         rtc_cntl
-            .dig_iso
+            .dig_iso()
             .modify(|_, w| w.wifi_force_iso().clear_bit());
     }
 }

@@ -9,13 +9,7 @@
 use core::marker::PhantomData;
 use core::{cell::RefCell, fmt::Debug};
 
-#[cfg(not(feature = "portable-atomic"))]
-use core::sync::atomic;
-
-#[cfg(feature = "portable-atomic")]
-use portable_atomic as atomic;
-
-use atomic::{AtomicBool, AtomicU8, Ordering};
+use portable_atomic::{AtomicBool, AtomicU8, Ordering};
 
 use critical_section::Mutex;
 

@@ -5,13 +5,7 @@ use crate::hal::prelude::ram;
 use crate::hal::system::RadioClockController;
 use crate::hal::system::RadioPeripherals;
 
-#[cfg(not(feature = "portable-atomic"))]
-use core::sync::atomic;
-
-#[cfg(feature = "portable-atomic")]
-use portable_atomic as atomic;
-
-use atomic::{AtomicU32, Ordering};
+use portable_atomic::{AtomicU32, Ordering};
 
 const SOC_PHY_DIG_REGS_MEM_SIZE: usize = 21 * 4;
 
@@ -27,11 +21,11 @@ pub(crate) fn enable_wifi_power_domain() {
         let rtc_cntl = &*crate::hal::peripherals::RTC_CNTL::ptr();
 
         rtc_cntl
-            .dig_pwc
+            .dig_pwc()
             .modify(|_, w| w.wifi_force_pd().clear_bit());
 
         rtc_cntl
-            .dig_iso
+            .dig_iso()
             .modify(|_, w| w.wifi_force_iso().clear_bit());
     }
 }
@@ -210,8 +204,9 @@ unsafe extern "C" fn phy_exit_critical(level: u32) {
 #[ram]
 #[no_mangle]
 unsafe extern "C" fn rtc_get_xtal() -> u32 {
-    trace!("rtc_get_xtal - just hardcoded value 40 for now");
-    40
+    use crate::hal::clock::Clock;
+    let xtal = crate::hal::rtc_cntl::RtcClock::get_xtal_freq();
+    xtal.mhz()
 }
 
 #[no_mangle]

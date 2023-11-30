@@ -25,10 +25,10 @@ esp32s2-hal = { version = "0.13.0", default-features = false }
 smoltcp = { version = "0.10.0", default-features=false, features = ["medium-ethernet", "socket-raw"] }
 critical-section = "1.1.1"
 portable-atomic = { version = "1.5", default-features = false }
-portable_atomic_enum = "0.3.0"
+portable_atomic_enum = { version = "0.3.0", features = ["portable-atomic"] }
 log = "0.4.20"
 embedded-svc = { version = "0.26.1", default-features = false, features = [] }
-enumset = { version = "1", default-features = false }
+enumset = { version = "1.1.3", default-features = false }
 linked_list_allocator = { version = "0.10.5", default-features = false, features = ["const_mut_refs"] }
 embedded-io = "0.6.1"
 fugit = "0.3.7"
@@ -45,22 +45,22 @@ static_cell = { version = "2.0", features = ["nightly"] }
 
 embassy-net = { version = "0.2.1", features = ["nightly", "tcp", "udp", "dhcpv4", "medium-ethernet"] }
 bleps = { git = "https://github.com/bjoernQ/bleps", package = "bleps", rev = "0db8fcb", features = ["macros"] }
-embassy-executor = { version = "0.3.3", package = "embassy-executor", features = ["nightly", "executor-thread", "integrated-timers"] }
+embassy-executor = { version = "0.3.3", package = "embassy-executor", features = ["nightly", "integrated-timers"] }
 embassy-time = { version = "0.1.3", features = ["nightly"] }
 esp-println = { version = "0.7.0" }
 esp-backtrace = { version = "0.9.0", features = ["panic-handler", "exception-handler", "print-uart"] }
 embedded-hal-async = { version = "1.0.0-rc.1" }
 embedded-io-async = { version = "0.6.0" }
 
-futures-util = { version = "0.3.28", default-features = false } # need this to activate portable-atomic on AtomicWaker even though we don't use it
-atomic-waker = { version = "1.1.2", default-features = false } # need this to activate portable-atomic on AtomicWaker used by embedded-svc even though we don't use it
+futures-util = { version = "0.3.28", default-features = false, features = ["portable-atomic"] } # need this to activate portable-atomic on AtomicWaker even though we don't use it
+atomic-waker = { version = "1.1.2", default-features = false, features = ["portable-atomic"] } # need this to activate portable-atomic on AtomicWaker used by embedded-svc even though we don't use it
 
 # portable-atomic compatible esp-hal revisions
 [patch.crates-io]
-esp32-hal = { git = "https://github.com/esp-rs/esp-hal.git", rev = "7084a380" }
-esp32c2-hal = { git = "https://github.com/esp-rs/esp-hal.git", rev = "7084a380" }
-esp32c3-hal = { git = "https://github.com/esp-rs/esp-hal.git", rev = "7084a380" }
-esp32c6-hal = { git = "https://github.com/esp-rs/esp-hal.git", rev = "7084a380" }
-esp32s2-hal = { git = "https://github.com/esp-rs/esp-hal.git", rev = "7084a380" }
-esp32s3-hal = { git = "https://github.com/esp-rs/esp-hal.git", rev = "7084a380" }
-esp-hal-common = { git = "https://github.com/esp-rs/esp-hal.git", rev = "7084a380" }
+esp32-hal = { git = "https://github.com/esp-rs/esp-hal.git", rev = "22f14fd" }
+esp32c2-hal = { git = "https://github.com/esp-rs/esp-hal.git", rev = "22f14fd" }
+esp32c3-hal = { git = "https://github.com/esp-rs/esp-hal.git", rev = "22f14fd" }
+esp32c6-hal = { git = "https://github.com/esp-rs/esp-hal.git", rev = "22f14fd" }
+esp32s2-hal = { git = "https://github.com/esp-rs/esp-hal.git", rev = "22f14fd" }
+esp32s3-hal = { git = "https://github.com/esp-rs/esp-hal.git", rev = "22f14fd" }
+esp-hal-common = { git = "https://github.com/esp-rs/esp-hal.git", rev = "22f14fd" }
