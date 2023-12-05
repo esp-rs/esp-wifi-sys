@@ -19,7 +19,7 @@ defmt = "=0.3.5"
 esp32c3-hal = { version = "0.13.0", default-features = false }
 esp32c2-hal = { version = "0.11.0", default-features = false }
 esp32c6-hal = { version = "0.6.0",  default-features = false }
-esp32h2-hal = { git = "https://github.com/esp-rs/esp-hal.git", package = "esp32h2-hal", default-features = false }
+esp32h2-hal = { version = "0.4.0", default-features = false }
 esp32-hal   = { version = "0.16.0", default-features = false }
 esp32s3-hal = { version = "0.13.0", default-features = false }
 esp32s2-hal = { version = "0.13.0", default-features = false }
@@ -62,6 +62,7 @@ esp32-hal = { git = "https://github.com/esp-rs/esp-hal.git", rev = "22f14fd" }
 esp32c2-hal = { git = "https://github.com/esp-rs/esp-hal.git", rev = "22f14fd" }
 esp32c3-hal = { git = "https://github.com/esp-rs/esp-hal.git", rev = "22f14fd" }
 esp32c6-hal = { git = "https://github.com/esp-rs/esp-hal.git", rev = "22f14fd" }
+esp32h2-hal = { git = "https://github.com/esp-rs/esp-hal.git", rev = "22f14fd" }
 esp32s2-hal = { git = "https://github.com/esp-rs/esp-hal.git", rev = "22f14fd" }
 esp32s3-hal = { git = "https://github.com/esp-rs/esp-hal.git", rev = "22f14fd" }
 esp-hal-common = { git = "https://github.com/esp-rs/esp-hal.git", rev = "22f14fd" }
