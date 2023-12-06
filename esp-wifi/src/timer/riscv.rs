@@ -77,8 +77,8 @@ fn FROM_CPU_INTR3(trap_frame: &mut TrapFrame) {
             .modify(|_, w| w.cpu_intr_from_cpu_3().clear_bit());
         #[cfg(not(feature = "esp32c2"))]
         (&*SystemPeripheral::PTR)
-        .cpu_intr_from_cpu_3
-        .modify(|_, w| w.cpu_intr_from_cpu_3().clear_bit());
+            .cpu_intr_from_cpu_3
+            .modify(|_, w| w.cpu_intr_from_cpu_3().clear_bit());
     }
 
     critical_section::with(|cs| {
