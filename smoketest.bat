@@ -99,3 +99,10 @@ cargo +nightly esp32c6 --example esp_now --release --features "esp-now"
 cargo +nightly esp32c6 --example embassy_esp_now --release --features "async,esp-now"
 cargo +nightly esp32c6 --example access_point --release --features "wifi"
 cargo +nightly esp32c6 --example embassy_access_point --release --features "async,wifi,embassy-net"
+
+set CARGO_PROFILE_RELEASE_OPT_LEVEL=3
+echo.
+echo Connect ESP32-H2
+pause
+cargo +nightly esp32h2 --example ble --release --no-default-features --features "ble"
+cargo +nightly esp32h2 --example embassy_ble --release --no-default-features  --features "async,ble"
