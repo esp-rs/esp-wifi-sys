@@ -71,9 +71,14 @@ fn SYSTIMER_TARGET0(trap_frame: &mut TrapFrame) {
 fn FROM_CPU_INTR3(trap_frame: &mut TrapFrame) {
     unsafe {
         // clear FROM_CPU_INTR3
+        #[cfg(feature = "esp32c2")]
         (&*SystemPeripheral::PTR)
-            .cpu_intr_from_cpu_3
+            .cpu_intr_from_cpu_3()
             .modify(|_, w| w.cpu_intr_from_cpu_3().clear_bit());
+        #[cfg(feature = "esp32c3")]
+        (&*SystemPeripheral::PTR)
+        .cpu_intr_from_cpu_3
+        .modify(|_, w| w.cpu_intr_from_cpu_3().clear_bit());
     }
 
     critical_section::with(|cs| {
@@ -89,6 +94,11 @@ fn FROM_CPU_INTR3(trap_frame: &mut TrapFrame) {
 
 pub fn yield_task() {
     unsafe {
+        #[cfg(feature = "esp32c2")]
+        (&*SystemPeripheral::PTR)
+            .cpu_intr_from_cpu_3()
+            .modify(|_, w| w.cpu_intr_from_cpu_3().set_bit());
+        #[cfg(feature = "esp32c3")]
         (&*SystemPeripheral::PTR)
             .cpu_intr_from_cpu_3
             .modify(|_, w| w.cpu_intr_from_cpu_3().set_bit());
