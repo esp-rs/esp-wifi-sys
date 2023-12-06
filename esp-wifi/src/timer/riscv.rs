@@ -75,7 +75,7 @@ fn FROM_CPU_INTR3(trap_frame: &mut TrapFrame) {
         (&*SystemPeripheral::PTR)
             .cpu_intr_from_cpu_3()
             .modify(|_, w| w.cpu_intr_from_cpu_3().clear_bit());
-        #[cfg(feature = "esp32c3")]
+        #[cfg(not(feature = "esp32c2"))]
         (&*SystemPeripheral::PTR)
         .cpu_intr_from_cpu_3
         .modify(|_, w| w.cpu_intr_from_cpu_3().clear_bit());
@@ -98,7 +98,7 @@ pub fn yield_task() {
         (&*SystemPeripheral::PTR)
             .cpu_intr_from_cpu_3()
             .modify(|_, w| w.cpu_intr_from_cpu_3().set_bit());
-        #[cfg(feature = "esp32c3")]
+        #[cfg(not(feature = "esp32c2"))]
         (&*SystemPeripheral::PTR)
             .cpu_intr_from_cpu_3
             .modify(|_, w| w.cpu_intr_from_cpu_3().set_bit());
