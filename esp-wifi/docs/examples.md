@@ -9,7 +9,9 @@ To build these ensure you are in the `esp-wifi` directory (the inner one, which 
 cargo esp32c3 --release ...
 ```
 if you want to use wifi as STA mode, don't forget to add **env** variable in the front.
-`SSID=xxx PASSWORD=xxx cargo esp32c3 --example dhcp --release --features "wifi"`
+```
+SSID=xxx PASSWORD=xxx cargo esp32c3 --example dhcp --release --features "wifi"
+```
 
 ### dhcp
 
