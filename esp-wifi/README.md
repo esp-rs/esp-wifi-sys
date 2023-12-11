@@ -9,11 +9,12 @@ If a cell contains am em dash (&mdash;) this means that the particular feature i
 |          | [Wifi](https://github.com/esp-rs/esp-wifi/issues/94) | [BLE](https://github.com/esp-rs/esp-wifi/issues/93) | [Coex](https://github.com/esp-rs/esp-wifi/issues/92) | ESP-NOW |
 | :------: | :--------------------------------------------------: | :-------------------------------------------------: | :--------------------------------------------------: | :-----: |
 |  ESP32   |                          ✓                           |                          ✓                          |                          ✓                           |    ✓    |
+| ESP32-C2 |                          ✓                           |                          ✓                          |                          ✓                           |    ✓    |
+| ESP32-C3 |                          ✓                           |                          ✓                          |                          ✓                           |    ✓    |
+| ESP32-C6 |                          ✓                           |                          ✓                          |                          ✓                           |    ✓    |
+| ESP32-H2 |                       &mdash;                        |                          ✓                          |                       &mdash;                        | &mdash; |
 | ESP32-S2 |                          ✓                           |                       &mdash;                       |                       &mdash;                        |    ✓    |
 | ESP32-S3 |                          ✓                           |                          ✓                          |                          ✓                           |    ✓    |
-| ESP32-C3 |                          ✓                           |                          ✓                          |                          ✓                           |    ✓    |
-| ESP32-C2 |                          ✓                           |                          ✓                          |                          ✓                           |    ✓    |
-| ESP32-C6 |                          ✓                           |                          ✓                          |                          ✓                           |    ✓    |
 
 Minimum supported Rust compiler version: 1.72.0.0
 
