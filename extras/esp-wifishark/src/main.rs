@@ -144,7 +144,7 @@ fn main() {
                             let end = line.find("]").unwrap();
                             let line = line[start..end].to_string();
                             for hex in line.split(", ") {
-                                let byte = u8::from_str_radix(hex, 16).unwrap();
+                                let byte = u8::from_str_radix(hex, 10).unwrap();
                                 packet.push(byte);
                             }
                         }

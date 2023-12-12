@@ -2,7 +2,7 @@
 
 This is an extcap to be used with esp-wifi and the `dump-packets` feature.
 
-To use it build via `cargo --release` and copy the resulting executable to the Wireshark's `extcap` folder.
+To use it build via `cargo build --release` and copy the resulting executable to the Wireshark's `extcap` folder.
 
 Then you should see two new capture interfaces in Wireshark
 - esp-wifi HCI capture (for Bluetooth HCI)
