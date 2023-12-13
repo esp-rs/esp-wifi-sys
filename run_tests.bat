@@ -5,6 +5,7 @@ mkdir tmp\esp32s3
 mkdir tmp\esp32c2
 mkdir tmp\esp32c3
 mkdir tmp\esp32c6
+mkdir tmp\esp32h2
 
 cd esp-wifi
 cargo +esp build --release --example esp_now_broadcaster --target xtensa-esp32-none-elf --features esp32,esp32-hal/default,esp32-hal/embassy-time-timg0,esp32-hal/embassy-executor-thread,wifi,esp-now
@@ -75,13 +76,17 @@ cargo +nightly build --release --example test_ble --target riscv32imac-unknown-n
 copy ..\target\riscv32imac-unknown-none-elf\release\examples\test_ble ..\tmp\esp32h2
 
 cd ..\tmp
-echo "Connect ESP32, ESP32-C2, ESP32-C3, ESP32-C6, ESP32-H2"
+echo "Connect ESP32, ESP32-C2, ESP32-C3, ESP32-C6"
 pause
 esp-testrun --esp32=esp32 --esp32c2=esp32c2 --esp32c3=esp32c3 --esp32c6=esp32c6
 
 echo "Connect ESP32, ESP32-S2, ESP32-S3, ESP32-C3"
 pause
 esp-testrun --esp32=esp32 --esp32s2=esp32s2 --esp32s3=esp32s3 --esp32c3=esp32c3
+
+echo "Connect ESP32-H2"
+pause
+esp-testrun --esp32h2=esp32h2
 
 cd ..
 rd /q /s tmp
