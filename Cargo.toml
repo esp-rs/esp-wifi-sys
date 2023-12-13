@@ -59,3 +59,7 @@ atomic-waker = { version = "1.1.2", default-features = false, features = ["porta
 [patch.crates-io]
 embassy-net = { git = "https://github.com/embassy-rs/embassy.git", package = "embassy-net", rev = "14f41a71b6ea9dedb4ee5b9c741fe10575772c7d"}
 embassy-time = { git = "https://github.com/embassy-rs/embassy.git", package = "embassy-time", rev = "14f41a71b6ea9dedb4ee5b9c741fe10575772c7d"}
+embassy-executor = { git = "https://github.com/embassy-rs/embassy.git", package = "embassy-executor", rev = "14f41a71b6ea9dedb4ee5b9c741fe10575772c7d"}
+embassy-executor-macros = { git = "https://github.com/embassy-rs/embassy.git", package = "embassy-executor-macros", rev = "14f41a71b6ea9dedb4ee5b9c741fe10575772c7d"}
+embassy-sync = { git = "https://github.com/embassy-rs/embassy.git", package = "embassy-sync", rev = "14f41a71b6ea9dedb4ee5b9c741fe10575772c7d"}
+embassy-futures = { git = "https://github.com/embassy-rs/embassy.git", package = "embassy-futures", rev = "14f41a71b6ea9dedb4ee5b9c741fe10575772c7d"}
