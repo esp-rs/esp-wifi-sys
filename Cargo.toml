@@ -48,8 +48,10 @@ embassy-net = { version = "0.2.1", features = ["nightly", "tcp", "udp", "dhcpv4"
 bleps = { git = "https://github.com/bjoernQ/bleps", package = "bleps", rev = "0db8fcb", features = ["macros"] }
 embassy-executor = { version = "0.3.3", package = "embassy-executor", features = ["nightly", "integrated-timers"] }
 embassy-time = { version = "0.1.3", features = ["nightly"] }
-esp-println = { version = "0.7.0" }
-esp-backtrace = { version = "0.9.0", features = ["panic-handler", "exception-handler", "print-uart"] }
+# esp-println = { version = "0.7.0", default-features = false, features = ["defmt"] }
+# esp-backtrace = { version = "0.9.0", features = ["panic-handler", "exception-handler", "print-rtt"] }
+esp-println = { version = "0.7.0", default-features = false, features = ["jtag_serial"] }
+esp-backtrace = { version = "0.9.0", features = ["panic-handler", "exception-handler", "print-jtag-serial"] }
 embedded-hal-async = { version = "1.0.0-rc.1" }
 embedded-io-async = { version = "0.6.0" }
 
@@ -66,3 +68,21 @@ esp32h2-hal = { git = "https://github.com/esp-rs/esp-hal.git", rev = "22f14fd" }
 esp32s2-hal = { git = "https://github.com/esp-rs/esp-hal.git", rev = "22f14fd" }
 esp32s3-hal = { git = "https://github.com/esp-rs/esp-hal.git", rev = "22f14fd" }
 esp-hal-common = { git = "https://github.com/esp-rs/esp-hal.git", rev = "22f14fd" }
+
+# esp32-hal = { git = "https://github.com/bjoernq/esp-hal.git", rev = "166692231c7b337f15d11b47e9d660c56bbc9caf" }
+# esp32c2-hal = { git = "https://github.com/bjoernq/esp-hal.git", rev = "166692231c7b337f15d11b47e9d660c56bbc9caf" }
+# esp32c3-hal = { git = "https://github.com/bjoernq/esp-hal.git", rev = "166692231c7b337f15d11b47e9d660c56bbc9caf" }
+# esp32c6-hal = { git = "https://github.com/bjoernq/esp-hal.git", rev = "166692231c7b337f15d11b47e9d660c56bbc9caf" }
+# esp32h2-hal = { git = "https://github.com/bjoernq/esp-hal.git", rev = "166692231c7b337f15d11b47e9d660c56bbc9caf" }
+# esp32s2-hal = { git = "https://github.com/bjoernq/esp-hal.git", rev = "166692231c7b337f15d11b47e9d660c56bbc9caf" }
+# esp32s3-hal = { git = "https://github.com/bjoernq/esp-hal.git", rev = "166692231c7b337f15d11b47e9d660c56bbc9caf" }
+# esp-hal-common = { git = "https://github.com/bjoernq/esp-hal.git", rev = "166692231c7b337f15d11b47e9d660c56bbc9caf" }
+
+# esp32-hal = { path = "/home/mabez/development/rust/embedded/hal/esp-hal/esp32-hal"      }
+# esp32c2-hal = { path = "/home/mabez/development/rust/embedded/hal/esp-hal/esp32c2-hal"    }
+# esp32c3-hal = { path = "/home/mabez/development/rust/embedded/hal/esp-hal/esp32c3-hal"    }
+# esp32c6-hal = { path = "/home/mabez/development/rust/embedded/hal/esp-hal/esp32c6-hal"    }
+# esp32h2-hal = { path = "/home/mabez/development/rust/embedded/hal/esp-hal/esp32h2-hal"    }
+# esp32s2-hal = { path = "/home/mabez/development/rust/embedded/hal/esp-hal/esp32s2-hal"    }
+# esp32s3-hal = { path = "/home/mabez/development/rust/embedded/hal/esp-hal/esp32s3-hal"    }
+# esp-hal-common = { path = "/home/mabez/development/rust/embedded/hal/esp-hal/esp-hal-common" }

@@ -33,6 +33,15 @@ async fn main(spawner: Spawner) -> ! {
     let system = peripherals.SYSTEM.split();
     let clocks = ClockControl::max(system.clock_control).freeze();
 
+    // Reset the modem subsystem?
+    let pcr = unsafe { &*esp32c6::PCR::PTR };
+    pcr.modem_apb_conf().modify(|_, w| w.modem_rst_en().set_bit());
+    pcr.modem_apb_conf()
+        .modify(|_, w| w.modem_rst_en().clear_bit());
+    let hp = unsafe { &*esp32c6::HP_SYS::PTR };
+    // disabling hangs the chip?
+    // hp.modem_peri_timeout_conf().modify(|_, w| w.modem_peri_timeout_protect_en().clear_bit());
+
     #[cfg(target_arch = "xtensa")]
     let timer = hal::timer::TimerGroup::new(peripherals.TIMG1, &clocks).timer0;
     #[cfg(target_arch = "riscv32")]

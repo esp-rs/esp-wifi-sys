@@ -56,6 +56,7 @@ pub(crate) unsafe extern "C" fn set_intr(
     _intr_num: u32,
     _intr_prio: i32,
 ) {
+    info!("set_intr mapping CPU intr {} to {:?}", _intr_num, esp32c6::Interrupt::try_from(_intr_source as u8).unwrap());
     // this gets called with
     // INFO - set_intr 0 2 1 1 (WIFI_PWR)
     // INFO - set_intr 0 0 1 1 (WIFI_MAC)

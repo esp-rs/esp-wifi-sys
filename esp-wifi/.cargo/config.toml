@@ -21,7 +21,8 @@ besp32c6 = "build --features esp32c6 --target riscv32imac-unknown-none-elf --fea
 besp32h2 = "build --features esp32h2 --target riscv32imac-unknown-none-elf --features esp32h2-hal/default,esp32h2-hal/embassy-time-timg0,esp32h2-hal/embassy-executor-thread"
 
 [target.riscv32imc-unknown-none-elf]
-runner = "espflash flash --monitor"
+# runner = "espflash flash --monitor"
+runner = "probe-rs run --chip esp32c3 --always-print-stacktrace"
 rustflags = [
     "-C", "link-arg=-Tlinkall.x",
     "-C", "link-arg=-Trom_functions.x",
@@ -29,7 +30,8 @@ rustflags = [
 ]
 
 [target.riscv32imac-unknown-none-elf]
-runner = "espflash flash --monitor"
+# runner = "espflash flash --monitor"
+runner = "probe-rs run --chip esp32c6 --always-print-stacktrace"
 rustflags = [
     "-C", "link-arg=-Tlinkall.x",
     "-C", "link-arg=-Trom_functions.x",

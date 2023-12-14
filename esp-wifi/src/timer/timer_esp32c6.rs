@@ -4,9 +4,14 @@ use crate::{
     hal::{interrupt, macros::interrupt, peripherals::Interrupt},
 };
 
-use crate::hal::peripherals;
-
 pub fn setup_radio_isr() {
+    // make sure to disable WIFI_BB/MODEM_PERI_TIMEOUT by mapping it to CPU interrupt 31 which is masked by default
+    // for some reason for this interrupt, mapping it to 0 doesn't deactivate it
+    let interrupt_core0 = unsafe { &*esp32c6::INTERRUPT_CORE0::PTR };
+    interrupt_core0
+        .wifi_bb_intr_map()
+        .write(|w| w.wifi_bb_intr_map().variant(31));
+
     #[cfg(feature = "wifi")]
     {
         unwrap!(interrupt::enable(
@@ -17,17 +22,11 @@ pub fn setup_radio_isr() {
             Interrupt::WIFI_PWR,
             interrupt::Priority::Priority1
         ));
+        // unwrap!(interrupt::enable(
+        //     Interrupt::MODEM_PERI_TIMEOUT,
+        //     interrupt::Priority::Priority1
+        // ));
     }
-
-    // make sure to disable WIFI_BB/MODEM_PERI_TIMEOUT by mapping it to CPU interrupt 31 which is masked by default
-    // for some reason for this interrupt, mapping it to 0 doesn't deactivate it
-    let interrupt_core0 = unsafe { &*peripherals::INTERRUPT_CORE0::PTR };
-    interrupt_core0
-        .wifi_bb_intr_map()
-        .write(|w| w.wifi_bb_intr_map().variant(31));
-    interrupt_core0
-        .modem_peri_timeout_intr_map()
-        .write(|w| w.modem_peri_timeout_intr_map().variant(31));
 
     #[cfg(feature = "ble")]
     {
@@ -40,6 +39,14 @@ pub fn setup_radio_isr() {
             interrupt::Priority::Priority1
         ));
     }
+}
+
+#[cfg(feature = "wifi")]
+#[interrupt]
+fn MODEM_PERI_TIMEOUT() {
+    warn!("MODEM_PERI_TIMEOUT fired");
+    let hp = unsafe { &*esp32c6::HP_SYS::PTR };
+    hp.modem_peri_timeout_conf().modify(|_, w| w.modem_peri_timeout_int_clear().set_bit());
 }
 
 #[cfg(feature = "wifi")]
