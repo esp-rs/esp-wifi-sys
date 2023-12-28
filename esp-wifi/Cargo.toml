@@ -146,6 +146,7 @@ log = [
   "esp32s2-hal?/log",
   "esp32s3-hal?/log",
 ]
+rs-supplicant = [ "esp-wifi-sys/no-supplicant" ]
 
 [package.metadata.docs.rs]
 features = ["esp32c3", "wifi", "ble", "async", "embassy-net", "esp32c3-hal/embassy-time-systick", "esp32c3-hal/default"]
