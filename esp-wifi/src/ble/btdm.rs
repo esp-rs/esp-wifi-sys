@@ -596,8 +596,7 @@ pub fn send_hci(data: &[u8]) {
             }
 
             // make sure the packet buffer doesn't get touched until sent
-            while !PACKET_SENT.load(Ordering::Relaxed) {
-            }
+            while !PACKET_SENT.load(Ordering::Relaxed) {}
         }
 
         hci_out.reset();
