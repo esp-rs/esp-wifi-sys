@@ -70,9 +70,7 @@ embassy-executor = { git = "https://github.com/embassy-rs/embassy.git", package 
 embassy-executor-macros = { git = "https://github.com/embassy-rs/embassy.git", package = "embassy-executor-macros", rev = "14f41a71b6ea9dedb4ee5b9c741fe10575772c7d"}
 embassy-sync = { git = "https://github.com/embassy-rs/embassy.git", package = "embassy-sync", rev = "14f41a71b6ea9dedb4ee5b9c741fe10575772c7d"}
 embassy-futures = { git = "https://github.com/embassy-rs/embassy.git", package = "embassy-futures", rev = "14f41a71b6ea9dedb4ee5b9c741fe10575772c7d"}
-edge-dhcp = { git = "https://github.com/reitermarkus/edge-net", package = "edge-dhcp", branch = "dhcp" }
-edge-captive = { git = "https://github.com/reitermarkus/edge-net", package = "edge-captive", branch = "dns" }
+edge-dhcp = { git = "https://github.com/ivmarkov/edge-net", package = "edge-dhcp", branch = "master" }
+edge-captive = { git = "https://github.com/ivmarkov/edge-net", package = "edge-captive", branch = "master" }
 # edge-dhcp = { path = "edge-net/edge-dhcp" }
 # edge-captive = { path = "edge-net/edge-captive" }
-domain = { git = "https://github.com/reitermarkus/domain", branch = "no-std" }
-octseq = { git = "https://github.com/reitermarkus/octseq" }

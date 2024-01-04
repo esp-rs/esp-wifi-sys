@@ -214,7 +214,7 @@ async fn dhcp_server(stack: &'static Stack<WifiDevice<'static, WifiApDevice>>) {
         gateways: &[edge_dhcp::Ipv4Addr::new(192, 168, 2, 1)],
         subnet: Some(edge_dhcp::Ipv4Addr::new(255, 255, 255, 0)),
         dns: &[edge_dhcp::Ipv4Addr::new(192, 168, 2, 1)],
-        lease_duration: Duration::from_secs(7776000),
+        lease_duration_secs: 7200,
     };
 
     loop {
