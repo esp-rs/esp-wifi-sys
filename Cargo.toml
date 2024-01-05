@@ -44,7 +44,8 @@ libm = "0.2.7"
 cfg-if = "1.0.0"
 static_cell = { version = "2.0", features = ["nightly"] }
 
-embassy-net = { version = "0.2.1", features = ["tcp", "udp", "dhcpv4", "medium-ethernet"] }
+embassy-net-driver = { version = "0.2" }
+embassy-net = { version = "0.3", features = ["tcp", "udp", "dhcpv4", "medium-ethernet"] }
 bleps = { git = "https://github.com/bjoernQ/bleps", package = "bleps", rev = "0db8fcb", features = ["macros"] }
 embassy-executor = { version = "0.4.0", package = "embassy-executor", features = ["nightly", "integrated-timers"] }
 embassy-time = { version = "0.2.0" }
@@ -55,11 +56,3 @@ embedded-io-async = { version = "0.6.0" }
 
 futures-util = { version = "0.3.28", default-features = false, features = ["portable-atomic"] } # need this to activate portable-atomic on AtomicWaker even though we don't use it
 atomic-waker = { version = "1.1.2", default-features = false, features = ["portable-atomic"] } # need this to activate portable-atomic on AtomicWaker used by embedded-svc even though we don't use it
-
-[patch.crates-io]
-embassy-net = { git = "https://github.com/embassy-rs/embassy.git", package = "embassy-net", rev = "14f41a71b6ea9dedb4ee5b9c741fe10575772c7d"}
-embassy-time = { git = "https://github.com/embassy-rs/embassy.git", package = "embassy-time", rev = "14f41a71b6ea9dedb4ee5b9c741fe10575772c7d"}
-embassy-executor = { git = "https://github.com/embassy-rs/embassy.git", package = "embassy-executor", rev = "14f41a71b6ea9dedb4ee5b9c741fe10575772c7d"}
-embassy-executor-macros = { git = "https://github.com/embassy-rs/embassy.git", package = "embassy-executor-macros", rev = "14f41a71b6ea9dedb4ee5b9c741fe10575772c7d"}
-embassy-sync = { git = "https://github.com/embassy-rs/embassy.git", package = "embassy-sync", rev = "14f41a71b6ea9dedb4ee5b9c741fe10575772c7d"}
-embassy-futures = { git = "https://github.com/embassy-rs/embassy.git", package = "embassy-futures", rev = "14f41a71b6ea9dedb4ee5b9c741fe10575772c7d"}
