@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2015-2022 Espressif Systems (Shanghai) CO LTD
+ * SPDX-FileCopyrightText: 2015-2023 Espressif Systems (Shanghai) CO LTD
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -130,7 +130,7 @@ void esp_wifi_internal_free_rx_buffer(void* buffer);
   * @return
   *    - ESP_OK  : Successfully transmit the buffer to wifi driver
   *    - ESP_ERR_NO_MEM: out of memory
-  *    - ESP_ERR_WIFI_ARG: invalid argument
+  *    - ESP_ERR_INVALID_ARG: invalid argument
   *    - ESP_ERR_WIFI_IF : WiFi interface is invalid
   *    - ESP_ERR_WIFI_CONN : WiFi interface is not created, e.g. send the data to STA while WiFi mode is AP mode
   *    - ESP_ERR_WIFI_NOT_STARTED : WiFi is not started
@@ -169,7 +169,7 @@ typedef void (*wifi_netstack_buf_free_cb_t)(void *netstack_buf);
   * @return
   *    - ESP_OK  : Successfully transmit the buffer to wifi driver
   *    - ESP_ERR_NO_MEM: out of memory
-  *    - ESP_ERR_WIFI_ARG: invalid argument
+  *    - ESP_ERR_INVALID_ARG: invalid argument
   *    - ESP_ERR_WIFI_IF : WiFi interface is invalid
   *    - ESP_ERR_WIFI_CONN : WiFi interface is not created, e.g. send the data to STA while WiFi mode is AP mode
   *    - ESP_ERR_WIFI_NOT_STARTED : WiFi is not started
@@ -437,7 +437,7 @@ esp_err_t esp_wifi_internal_set_log_level(wifi_log_level_t level);
   * @return
   *    - ESP_OK: succeed
   *    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init
-  *    - ESP_ERR_WIFI_ARG: invalid argument
+  *    - ESP_ERR_INVALID_ARG: invalid argument
   */
 esp_err_t esp_wifi_internal_set_log_mod(wifi_log_module_t module, uint32_t submodule, bool enable);
 
@@ -627,15 +627,23 @@ void esp_wifi_set_keep_alive_time(uint32_t keep_alive_time);
 void esp_wifi_beacon_monitor_configure(wifi_beacon_monitor_config_t *config);
 
 /**
- * @brief   Require WiFi to enable or disable Advanced DTIM sleep function
+ * @brief   Set modem state mode to require WiFi to enable or disable Advanced DTIM sleep function
  *
- * @param   light_sleep_enable: true for light sleep mode is enabled, false for light sleep mode is disabled.
- * @param   modem_state_enable: true for require WiFi to enable Advanced DTIM sleep function,
+ * @param   require_modem_state: true for require WiFi to enable Advanced DTIM sleep function,
  *                              false for require WiFi to disable Advanced DTIM sleep function.
  * @return
  *    - ESP_OK: succeed
  */
-void esp_wifi_internal_mac_sleep_configure(bool light_sleep_enable, bool modem_state_enable);
+void esp_wifi_internal_modem_state_configure(bool require_modem_state);
+
+/**
+ * @brief   Set light sleep mode to require WiFi to enable or disable Advanced DTIM sleep function
+ *
+ * @param   light_sleep_enable: true for light sleep mode is enabled, false for light sleep mode is disabled.
+ * @return
+ *    - ESP_OK: succeed
+ */
+void esp_wifi_internal_light_sleep_configure(bool light_sleep_enable);
 
 /**
   * @brief      Start Publishing a service in the NAN cluster

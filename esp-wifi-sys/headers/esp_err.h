@@ -34,6 +34,7 @@ typedef int esp_err_t;
 #define ESP_ERR_INVALID_VERSION     0x10A   /*!< Version was invalid */
 #define ESP_ERR_INVALID_MAC         0x10B   /*!< MAC address was invalid */
 #define ESP_ERR_NOT_FINISHED        0x10C   /*!< There are items remained to retrieve */
+#define ESP_ERR_ROC_IN_PROGRESS     0x10E   /*!< ROC Operation is in progress */
 
 
 #define ESP_ERR_WIFI_BASE           0x3000  /*!< Starting number of WiFi error codes */
@@ -78,7 +79,6 @@ const char *esp_err_to_name_r(esp_err_t code, char *buf, size_t buflen);
 /** @cond */
 void _esp_error_check_failed(esp_err_t rc, const char *file, int line, const char *function, const char *expression) __attribute__((__noreturn__));
 
-/** @cond */
 void _esp_error_check_failed_without_abort(esp_err_t rc, const char *file, int line, const char *function, const char *expression);
 
 #ifndef __ASSERT_FUNC

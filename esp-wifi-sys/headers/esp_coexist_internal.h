@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2018-2022 Espressif Systems (Shanghai) CO LTD
+ * SPDX-FileCopyrightText: 2018-2023 Espressif Systems (Shanghai) CO LTD
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -76,6 +76,14 @@ void coex_disable(void);
 const char *coex_version_get(void);
 
 /**
+ * @brief Get software coexist version value
+ *        extern function for internal use.
+ * @param ptr_version : points to version structure
+ * @return : ESP_OK - success, other - failed
+ */
+esp_err_t coex_version_get_value(coex_version_t* ptr_version);
+
+/**
  * @brief Coexist performance preference set from libbt.a
  *        extern function for internal use.
  *
@@ -89,12 +97,6 @@ esp_err_t coex_preference_set(coex_prefer_t prefer);
  * @return : software coexist status
  */
 uint32_t coex_status_get(void);
-
-/**
- * @brief Set software coexist condition.
- * @return : software coexist condition
- */
-void coex_condition_set(uint32_t type, bool dissatisfy);
 
 /**
  * @brief WiFi requests coexistence.
@@ -171,7 +173,6 @@ int coex_register_bt_cb(coex_func_cb_t callback);
  * @brief To acquire the spin-lock used in resetting Bluetooth baseband.
  *        This function is only used to workaround ESP32 hardware issue.
  *
- *  @param callback: callback function registered to coexistence module
  *  @return : value of the spinlock to be restored
  */
 uint32_t coex_bb_reset_lock(void);
@@ -266,7 +267,7 @@ void * coex_schm_curr_phase_get(void);
 /**
  * @brief Set current coexistence scheme phase index.
  *
- *  @param interval : Coexistence scheme phase index
+ *  @param idx : Coexistence scheme phase index
  *  @return : 0 - success, other - failed
  */
 int coex_schm_curr_phase_idx_set(int idx);
@@ -312,26 +313,15 @@ esp_err_t esp_coex_adapter_register(coex_adapter_funcs_t *funcs);
 
 #if CONFIG_EXTERNAL_COEX_ENABLE
 /**
-  * @brief     Force RX Anttena only in external coex situation.
-  */
-extern void phy_coex_force_rx_ant(void);
-
-/**
-  * @brief     Dismiss RX Anttena only in external coex situation.
-  */
-extern void phy_coex_dismiss_rx_ant(void);
-
-/**
-  * @brief     Set external coexistence advanced informations, like working mode and grant mode in which level.
+  * @brief     Set external coexistence advanced informations, like working mode.
   *
-  * @param     outpti1    Only for slave mode, external coex output priority in level1.
-  * @param     output2    Only for slave mode, external coex output priority in level2.
+  * @param     out_pti1    This parameter no longer works, will be deprecated and later removed in future releases.
+  * @param     out_pti2    This parameter no longer works, will be deprecated and later removed in future releases.
   *
   * @return
   *    - ESP_OK: succeed
   */
-esp_err_t esp_coex_external_params(esp_external_coex_advance_t coex_info,
-         uint32_t out_pti1, uint32_t out_pti2);
+esp_err_t esp_coex_external_params(esp_external_coex_advance_t coex_info, uint32_t out_pti1, uint32_t out_pti2);
 
 /**
   * @brief     Set external coexistence pti level and enable it.
@@ -353,6 +343,26 @@ esp_err_t esp_coex_external_set(esp_coex_pti_level_t level1,
   *    - ESP_OK: succeed
   */
 void esp_coex_external_stop(void);
+
+/**
+ * @brief Set external coexistence wire type.
+ *
+ * @param wire_type Set external coexistence wire type.
+ *
+ */
+void esp_coex_external_set_wire_type(external_coex_wire_t wire_type);
+
+#if SOC_EXTERNAL_COEX_LEADER_TX_LINE
+/**
+  * @brief     Enable external coexist tx line
+  *
+  * @param     en    Enable external coex tx line
+  *
+  * @return
+  *    - ESP_OK: succeed
+  */
+void esp_coex_external_set_txline(bool en);
+#endif    /*SOC_EXTERNAL_COEX_LEADER_TX_LINE*/
 #endif    /*External Coex*/
 
 /**
