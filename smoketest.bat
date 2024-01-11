@@ -17,7 +17,10 @@ cargo +nightly esp32c3 --example embassy_ble --release --features "async,ble"
 cargo +nightly esp32c3 --example dhcp --release --features "wifi"
 cargo +nightly esp32c3 --example static_ip --release --features "wifi"
 cargo +nightly esp32c3 --example embassy_dhcp --release --features "async,wifi,embassy-net"
+echo [esp-wifi] >..\cfg.toml
+echo heap_size = 70000 >>..\cfg.toml
 cargo +nightly esp32c3 --example coex --release --features "wifi,ble,coex"
+del /q ..\cfg.toml
 cargo +nightly esp32c3 --example esp_now --release --features "esp-now"
 cargo +nightly esp32c3 --example embassy_esp_now --release --features "async,esp-now"
 cargo +nightly esp32c3 --example access_point --release --features "wifi"
@@ -78,7 +81,10 @@ cargo +nightly esp32c2 --example embassy_ble --release --features "async,ble"
 cargo +nightly esp32c2 --example dhcp --release --features "wifi"
 cargo +nightly esp32c2 --example static_ip --release --features "wifi"
 cargo +nightly esp32c2 --example embassy_dhcp --release --features "async,wifi,embassy-net"
-cargo +nightly esp32c2 --example coex --release --features "wifi,ble,coex,big-heap"
+echo [esp-wifi] >..\cfg.toml
+echo heap_size = 70000 >>..\cfg.toml
+cargo +nightly esp32c2 --example coex --release --features "wifi,ble,coex"
+del /q ..\cfg.toml
 cargo +nightly esp32c2 --example esp_now --release --features "esp-now"
 cargo +nightly esp32c2 --example embassy_esp_now --release --features "async,esp-now"
 cargo +nightly esp32c2 --example access_point --release --features "wifi"
@@ -94,7 +100,11 @@ cargo +nightly esp32c6 --example embassy_ble --release --features "async,ble"
 cargo +nightly esp32c6 --example dhcp --release --features "wifi"
 cargo +nightly esp32c6 --example static_ip --release --features "wifi"
 cargo +nightly esp32c6 --example embassy_dhcp --release --features "async,wifi,embassy-net"
-cargo +nightly esp32c6 --example coex --release --features "wifi,ble,coex,big-heap"
+echo [esp-wifi] >..\cfg.toml
+echo heap_size = 80000 >>..\cfg.toml
+echo tx_queue_size = 10 >>..\cfg.toml
+cargo +nightly esp32c6 --example coex --release --features "wifi,ble,coex"
+del /q ..\cfg.toml
 cargo +nightly esp32c6 --example esp_now --release --features "esp-now"
 cargo +nightly esp32c6 --example embassy_esp_now --release --features "async,esp-now"
 cargo +nightly esp32c6 --example access_point --release --features "wifi"

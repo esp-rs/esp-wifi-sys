@@ -1,3 +1,5 @@
+typedef int _lock_t;
+
 #define SOC_COEX_HW_PTI 1
 
 #include "espidf_types.h"

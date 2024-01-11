@@ -97,7 +97,7 @@ jobs:
         if: ${{ matrix.chip != 'esp32h2' }}
         run: cd esp-wifi && cargo b${{ matrix.chip }} --release --example=embassy_dhcp --features=async,wifi,embassy-net,${{ matrix.chip }}-hal/embassy-time-timg0
       - name: build (embassy_bench)
-        if: ${{ matrix.chip != 'esp32h2' }}
+        if: ${{ matrix.chip != 'esp32h2'  && matrix.chip != 'esp32s2' }}
         run: cd esp-wifi && cargo b${{ matrix.chip }} --release --example=embassy_bench --features=async,wifi,embassy-net,${{ matrix.chip }}-hal/embassy-time-timg0
       - name: build (embassy_access_point)
         if: ${{ matrix.chip != 'esp32h2' }}

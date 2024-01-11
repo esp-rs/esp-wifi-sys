@@ -56,3 +56,14 @@ embedded-io-async = { version = "0.6.0" }
 
 futures-util = { version = "0.3.28", default-features = false, features = ["portable-atomic"] } # need this to activate portable-atomic on AtomicWaker even though we don't use it
 atomic-waker = { version = "1.1.2", default-features = false, features = ["portable-atomic"] } # need this to activate portable-atomic on AtomicWaker used by embedded-svc even though we don't use it
+
+[patch.crates-io]
+esp-hal-common = { git = "https://github.com/esp-rs/esp-hal", rev = "df1374dd1a2f93619d4899358e2d309ee5913bc1", package = "esp-hal-common" }
+esp32c2-hal = { git = "https://github.com/esp-rs/esp-hal", rev = "df1374dd1a2f93619d4899358e2d309ee5913bc1", package = "esp32c2-hal" }
+esp32c3-hal = { git = "https://github.com/esp-rs/esp-hal", rev = "df1374dd1a2f93619d4899358e2d309ee5913bc1", package = "esp32c3-hal" }
+esp32c6-hal = { git = "https://github.com/esp-rs/esp-hal", rev = "df1374dd1a2f93619d4899358e2d309ee5913bc1", package = "esp32c6-hal" }
+esp32h2-hal = { git = "https://github.com/esp-rs/esp-hal", rev = "df1374dd1a2f93619d4899358e2d309ee5913bc1", package = "esp32h2-hal" }
+esp32-hal = { git = "https://github.com/esp-rs/esp-hal", rev = "df1374dd1a2f93619d4899358e2d309ee5913bc1", package = "esp32-hal" }
+esp32s3-hal = { git = "https://github.com/esp-rs/esp-hal", rev = "df1374dd1a2f93619d4899358e2d309ee5913bc1", package = "esp32s3-hal" }
+esp32s2-hal = { git = "https://github.com/esp-rs/esp-hal", rev = "df1374dd1a2f93619d4899358e2d309ee5913bc1", package = "esp32s2-hal" }
+

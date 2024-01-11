@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2015-2022 Espressif Systems (Shanghai) CO LTD
+ * SPDX-FileCopyrightText: 2015-2023 Espressif Systems (Shanghai) CO LTD
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -128,6 +128,52 @@ void phy_bbpll_en_usb(bool en);
 void phy_eco_version_sel(uint8_t chip_ver);
 #endif
 
+#if CONFIG_ESP_PHY_IMPROVE_RX_11B
+/**
+ * @brief Improve Wi-Fi receive 11b pkts when modules with high interference.
+ *
+ * @attention 1.This is a workaround to improve Wi-Fi receive 11b pkts for some modules using AC-DC power supply with high interference.
+ * @attention 2.Enable this will sacrifice Wi-Fi OFDM receive performance. But to guarantee 11b receive performance serves as a bottom line in this case.
+ *
+ * @param     enable  Enable or disable.
+ */
+void phy_improve_rx_special(bool enable);
+#endif
+
+/**
+ * @brief Enable phy track pll
+ *
+ */
+void phy_track_pll_init(void);
+
+/**
+ * @brief Disable phy track pll
+ *
+ */
+void phy_track_pll_deinit(void);
+
+/**
+ * @brief Set the flag recorded which modem has already enabled phy
+ *
+ */
+void phy_set_modem_flag(esp_phy_modem_t modem);
+
+/**
+ * @brief Clear the flag to record which modem calls phy disenable
+ */
+void phy_clr_modem_flag(esp_phy_modem_t modem);
+
+/**
+ * @brief Get the flag recorded which modem has already enabled phy
+ *
+ */
+esp_phy_modem_t phy_get_modem_flag(void);
+
+/**
+ * @brief Get the PHY lock, only used in esp_phy, the user should not use this function.
+ *
+ */
+_lock_t phy_get_lock(void);
 #ifdef __cplusplus
 }
 #endif

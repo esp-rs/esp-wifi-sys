@@ -1967,3 +1967,13 @@ PROVIDE ( __bswapsi2 = 0x4006499c );
 PROVIDE ( __popcountsi2 = 0x40002ed0 );
 
 PROVIDE ( esp_rom_crc32_le = crc32_le );
+
+PROVIDE ( ld_acl_sniff_exit = 0x400312b4 );
+PROVIDE ( ld_acl_sniff_trans_sched = 0x40033734 );
+PROVIDE ( lm_sync_conf = 0x3ffb8348 );
+PROVIDE ( lm_nb_sync_active = 0x3ffb8346 );
+PROVIDE ( lm_sync_nego = 0x3ffb8345 );
+PROVIDE ( lm_nego_cnt = 0x3ffb8344 );
+PROVIDE ( lm_nego_cntl = 0x3ffb8342 );
+PROVIDE ( lm_nego_max_cnt = 0x3ffb8343 );
+PROVIDE ( lm_nego_pkt_used = 0x3ffb8340 );

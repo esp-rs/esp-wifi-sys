@@ -90,6 +90,17 @@ typedef struct esp_now_recv_info {
 } esp_now_recv_info_t;
 
 /**
+ * @brief ESPNOW rate config
+ *
+ */
+typedef struct esp_now_rate_config {
+    wifi_phy_mode_t phymode;                 /**< ESPNOW phymode of specified interface */
+    wifi_phy_rate_t rate;                    /**< ESPNOW rate of specified interface*/
+    bool ersu;                               /**< ESPNOW using ersu send frame*/
+    bool dcm;                                /**< ESPNOW using dcm rate to send frame*/
+} esp_now_rate_config_t;
+
+/**
   * @brief     Callback function of receiving ESPNOW data
   * @param     esp_now_info received ESPNOW packet information
   * @param     data received data
@@ -242,7 +253,10 @@ esp_err_t esp_now_mod_peer(const esp_now_peer_info_t *peer);
 /**
   * @brief      Config ESPNOW rate of specified interface
   *
+  * @deprecated please use esp_now_set_peer_rate_config() instead.
+  *
   * @attention  1. This API should be called after esp_wifi_start().
+  * @attention  2. This API only work when not use Wi-Fi 6 and esp_now_set_peer_rate_config() not called.
   *
   * @param      ifx  Interface to be configured.
   * @param      rate Phy rate to be configured.
@@ -251,7 +265,25 @@ esp_err_t esp_now_mod_peer(const esp_now_peer_info_t *peer);
   *    - ESP_OK: succeed
   *    - others: failed
   */
-esp_err_t esp_wifi_config_espnow_rate(wifi_interface_t ifx, wifi_phy_rate_t rate);
+esp_err_t esp_wifi_config_espnow_rate(wifi_interface_t ifx, wifi_phy_rate_t rate)
+      __attribute__((deprecated("This API can be only used when rate is non-HE rate, \
+                                please use esp_now_set_peer_rate_config if you want full support of the rate.")));
+
+/**
+  * @brief      Set ESPNOW rate config for each peer
+  *
+  * @attention  1. This API should be called after esp_wifi_start() and esp_now_init().
+  *
+  * @param      peer_addr  peer MAC address
+  * @param      config rate config to be configured.
+  *
+  * @return
+  *          - ESP_OK : succeed
+  *          - ESP_ERR_ESPNOW_NOT_INIT : ESPNOW is not initialized
+  *          - ESP_ERR_ESPNOW_ARG : invalid argument
+  *          - ESP_ERR_ESPNOW_INTERNAL : internal error
+  */
+esp_err_t esp_now_set_peer_rate_config(const uint8_t *peer_addr, esp_now_rate_config_t *config);
 
 /**
   * @brief     Get a peer whose MAC address matches peer_addr from peer list

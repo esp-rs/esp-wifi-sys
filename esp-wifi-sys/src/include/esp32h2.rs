@@ -333,6 +333,10 @@ pub const CONFIG_SOC_SECURE_BOOT_SUPPORTED: u32 = 1;
 pub const CONFIG_SOC_BOD_SUPPORTED: u32 = 1;
 pub const CONFIG_SOC_APM_SUPPORTED: u32 = 1;
 pub const CONFIG_SOC_PMU_SUPPORTED: u32 = 1;
+pub const CONFIG_SOC_LP_TIMER_SUPPORTED: u32 = 1;
+pub const CONFIG_SOC_LP_AON_SUPPORTED: u32 = 1;
+pub const CONFIG_SOC_PAU_SUPPORTED: u32 = 1;
+pub const CONFIG_SOC_CLK_TREE_SUPPORTED: u32 = 1;
 pub const CONFIG_SOC_XTAL_SUPPORT_32M: u32 = 1;
 pub const CONFIG_SOC_AES_SUPPORT_DMA: u32 = 1;
 pub const CONFIG_SOC_AES_GDMA: u32 = 1;
@@ -357,6 +361,9 @@ pub const CONFIG_SOC_ADC_SAMPLE_FREQ_THRES_HIGH: u32 = 83333;
 pub const CONFIG_SOC_ADC_SAMPLE_FREQ_THRES_LOW: u32 = 611;
 pub const CONFIG_SOC_ADC_RTC_MIN_BITWIDTH: u32 = 12;
 pub const CONFIG_SOC_ADC_RTC_MAX_BITWIDTH: u32 = 12;
+pub const CONFIG_SOC_ADC_CALIBRATION_V1_SUPPORTED: u32 = 1;
+pub const CONFIG_SOC_ADC_SELF_HW_CALI_SUPPORTED: u32 = 1;
+pub const CONFIG_SOC_ADC_CALIB_CHAN_COMPENS_SUPPORTED: u32 = 1;
 pub const CONFIG_SOC_ADC_TEMPERATURE_SHARE_INTR: u32 = 1;
 pub const CONFIG_SOC_BROWNOUT_RESET_SUPPORTED: u32 = 1;
 pub const CONFIG_SOC_SHARED_IDCACHE_SUPPORTED: u32 = 1;
@@ -367,7 +374,7 @@ pub const CONFIG_SOC_CPU_HAS_FLEXIBLE_INTC: u32 = 1;
 pub const CONFIG_SOC_INT_PLIC_SUPPORTED: u32 = 1;
 pub const CONFIG_SOC_CPU_BREAKPOINTS_NUM: u32 = 4;
 pub const CONFIG_SOC_CPU_WATCHPOINTS_NUM: u32 = 4;
-pub const CONFIG_SOC_CPU_WATCHPOINT_SIZE: u32 = 2147483648;
+pub const CONFIG_SOC_CPU_WATCHPOINT_MAX_REGION_SIZE: u32 = 2147483648;
 pub const CONFIG_SOC_CPU_HAS_PMA: u32 = 1;
 pub const CONFIG_SOC_CPU_IDRAM_SPLIT_USING_PMP: u32 = 1;
 pub const CONFIG_SOC_MMU_PAGE_SIZE_CONFIGURABLE: u32 = 1;
@@ -390,17 +397,19 @@ pub const CONFIG_SOC_GPIO_FLEX_GLITCH_FILTER_NUM: u32 = 8;
 pub const CONFIG_SOC_GPIO_SUPPORT_ETM: u32 = 1;
 pub const CONFIG_SOC_GPIO_ETM_EVENTS_PER_GROUP: u32 = 8;
 pub const CONFIG_SOC_GPIO_ETM_TASKS_PER_GROUP: u32 = 8;
-pub const CONFIG_SOC_GPIO_SUPPORT_DEEPSLEEP_WAKEUP: u32 = 1;
-pub const CONFIG_SOC_GPIO_DEEP_SLEEP_WAKE_VALID_GPIO_MASK: u32 = 0;
+pub const CONFIG_SOC_GPIO_SUPPORT_RTC_INDEPENDENT: u32 = 1;
 pub const CONFIG_SOC_GPIO_VALID_DIGITAL_IO_PAD_MASK: u32 = 268402815;
 pub const CONFIG_SOC_GPIO_SUPPORT_FORCE_HOLD: u32 = 1;
 pub const CONFIG_SOC_GPIO_SUPPORT_HOLD_SINGLE_IO_IN_DSLP: u32 = 1;
+pub const CONFIG_SOC_RTCIO_PIN_COUNT: u32 = 8;
+pub const CONFIG_SOC_RTCIO_HOLD_SUPPORTED: u32 = 1;
 pub const CONFIG_SOC_DEDIC_GPIO_OUT_CHANNELS_NUM: u32 = 8;
 pub const CONFIG_SOC_DEDIC_GPIO_IN_CHANNELS_NUM: u32 = 8;
 pub const CONFIG_SOC_DEDIC_PERIPH_ALWAYS_ENABLE: u32 = 1;
 pub const CONFIG_SOC_ANA_CMPR_NUM: u32 = 1;
 pub const CONFIG_SOC_I2C_NUM: u32 = 2;
 pub const CONFIG_SOC_I2C_FIFO_LEN: u32 = 32;
+pub const CONFIG_SOC_I2C_CMD_REG_NUM: u32 = 8;
 pub const CONFIG_SOC_I2C_SUPPORT_SLAVE: u32 = 1;
 pub const CONFIG_SOC_I2C_SUPPORT_HW_CLR_BUS: u32 = 1;
 pub const CONFIG_SOC_I2C_SUPPORT_XTAL: u32 = 1;
@@ -465,9 +474,6 @@ pub const CONFIG_SOC_PARLIO_TX_UNIT_MAX_DATA_WIDTH: u32 = 8;
 pub const CONFIG_SOC_PARLIO_RX_UNIT_MAX_DATA_WIDTH: u32 = 8;
 pub const CONFIG_SOC_PARLIO_TX_CLK_SUPPORT_GATING: u32 = 1;
 pub const CONFIG_SOC_PARLIO_TRANS_BIT_ALIGN: u32 = 1;
-pub const CONFIG_SOC_RTC_CNTL_CPU_PD_DMA_BUS_WIDTH: u32 = 128;
-pub const CONFIG_SOC_RTC_CNTL_CPU_PD_REG_FILE_NUM: u32 = 108;
-pub const CONFIG_SOC_RTCIO_PIN_COUNT: u32 = 0;
 pub const CONFIG_SOC_RSA_MAX_BIT_LEN: u32 = 3072;
 pub const CONFIG_SOC_SHA_DMA_MAX_BUFFER_SIZE: u32 = 3968;
 pub const CONFIG_SOC_SHA_SUPPORT_DMA: u32 = 1;
@@ -513,6 +519,8 @@ pub const CONFIG_SOC_SYSTIMER_SUPPORT_RC_FAST: u32 = 1;
 pub const CONFIG_SOC_SYSTIMER_INT_LEVEL: u32 = 1;
 pub const CONFIG_SOC_SYSTIMER_ALARM_MISS_COMPENSATE: u32 = 1;
 pub const CONFIG_SOC_SYSTIMER_SUPPORT_ETM: u32 = 1;
+pub const CONFIG_SOC_LP_TIMER_BIT_WIDTH_LO: u32 = 32;
+pub const CONFIG_SOC_LP_TIMER_BIT_WIDTH_HI: u32 = 16;
 pub const CONFIG_SOC_TIMER_GROUPS: u32 = 2;
 pub const CONFIG_SOC_TIMER_GROUP_TIMERS_PER_GROUP: u32 = 1;
 pub const CONFIG_SOC_TIMER_GROUP_COUNTER_BIT_WIDTH: u32 = 54;
@@ -520,6 +528,7 @@ pub const CONFIG_SOC_TIMER_GROUP_SUPPORT_XTAL: u32 = 1;
 pub const CONFIG_SOC_TIMER_GROUP_SUPPORT_RC_FAST: u32 = 1;
 pub const CONFIG_SOC_TIMER_GROUP_TOTAL_TIMERS: u32 = 2;
 pub const CONFIG_SOC_TIMER_SUPPORT_ETM: u32 = 1;
+pub const CONFIG_SOC_MWDT_SUPPORT_XTAL: u32 = 1;
 pub const CONFIG_SOC_TWAI_CONTROLLER_NUM: u32 = 1;
 pub const CONFIG_SOC_TWAI_CLK_SUPPORT_XTAL: u32 = 1;
 pub const CONFIG_SOC_TWAI_BRP_MIN: u32 = 2;
@@ -531,6 +540,7 @@ pub const CONFIG_SOC_EFUSE_DIS_DIRECT_BOOT: u32 = 1;
 pub const CONFIG_SOC_EFUSE_SOFT_DIS_JTAG: u32 = 1;
 pub const CONFIG_SOC_EFUSE_DIS_ICACHE: u32 = 1;
 pub const CONFIG_SOC_EFUSE_BLOCK9_KEY_PURPOSE_QUIRK: u32 = 1;
+pub const CONFIG_SOC_EFUSE_ECDSA_USE_HARDWARE_K: u32 = 1;
 pub const CONFIG_SOC_SECURE_BOOT_V2_RSA: u32 = 1;
 pub const CONFIG_SOC_SECURE_BOOT_V2_ECC: u32 = 1;
 pub const CONFIG_SOC_EFUSE_SECURE_BOOT_KEY_DIGESTS: u32 = 3;
@@ -539,24 +549,32 @@ pub const CONFIG_SOC_SUPPORT_SECURE_BOOT_REVOKE_KEY: u32 = 1;
 pub const CONFIG_SOC_FLASH_ENCRYPTED_XTS_AES_BLOCK_MAX: u32 = 32;
 pub const CONFIG_SOC_FLASH_ENCRYPTION_XTS_AES: u32 = 1;
 pub const CONFIG_SOC_FLASH_ENCRYPTION_XTS_AES_128: u32 = 1;
+pub const CONFIG_SOC_CRYPTO_DPA_PROTECTION_SUPPORTED: u32 = 1;
 pub const CONFIG_SOC_UART_NUM: u32 = 2;
 pub const CONFIG_SOC_UART_FIFO_LEN: u32 = 128;
 pub const CONFIG_SOC_UART_BITRATE_MAX: u32 = 5000000;
 pub const CONFIG_SOC_UART_SUPPORT_RTC_CLK: u32 = 1;
 pub const CONFIG_SOC_UART_SUPPORT_XTAL_CLK: u32 = 1;
+pub const CONFIG_SOC_UART_SUPPORT_WAKEUP_INT: u32 = 1;
 pub const CONFIG_SOC_UART_SUPPORT_FSM_TX_WAIT_SEND: u32 = 1;
 pub const CONFIG_SOC_COEX_HW_PTI: u32 = 1;
+pub const CONFIG_SOC_EXTERNAL_COEX_ADVANCE: u32 = 1;
 pub const CONFIG_SOC_PHY_DIG_REGS_MEM_SIZE: u32 = 21;
-pub const CONFIG_SOC_PM_SUPPORT_WIFI_WAKEUP: u32 = 1;
 pub const CONFIG_SOC_PM_SUPPORT_BT_WAKEUP: u32 = 1;
+pub const CONFIG_SOC_PM_SUPPORT_EXT1_WAKEUP: u32 = 1;
+pub const CONFIG_SOC_PM_SUPPORT_EXT1_WAKEUP_MODE_PER_PIN: u32 = 1;
 pub const CONFIG_SOC_PM_SUPPORT_CPU_PD: u32 = 1;
-pub const CONFIG_SOC_PM_SUPPORT_BT_PD: u32 = 1;
+pub const CONFIG_SOC_PM_SUPPORT_MODEM_PD: u32 = 1;
 pub const CONFIG_SOC_PM_SUPPORT_XTAL32K_PD: u32 = 1;
 pub const CONFIG_SOC_PM_SUPPORT_RC32K_PD: u32 = 1;
 pub const CONFIG_SOC_PM_SUPPORT_RC_FAST_PD: u32 = 1;
 pub const CONFIG_SOC_PM_SUPPORT_VDDSDIO_PD: u32 = 1;
-pub const CONFIG_SOC_PM_CPU_RETENTION_BY_RTCCNTL: u32 = 1;
+pub const CONFIG_SOC_PM_SUPPORT_TOP_PD: u32 = 1;
+pub const CONFIG_SOC_PM_PAU_LINK_NUM: u32 = 4;
+pub const CONFIG_SOC_PM_CPU_RETENTION_BY_SW: u32 = 1;
+pub const CONFIG_SOC_PM_MODEM_RETENTION_BY_REGDMA: u32 = 1;
 pub const CONFIG_SOC_PM_SUPPORT_DEEPSLEEP_CHECK_STUB_ONLY: u32 = 1;
+pub const CONFIG_SOC_PM_RETENTION_SW_TRIGGER_REGDMA: u32 = 1;
 pub const CONFIG_SOC_CLK_RC_FAST_SUPPORT_CALIBRATION: u32 = 1;
 pub const CONFIG_SOC_CLK_XTAL32K_SUPPORTED: u32 = 1;
 pub const CONFIG_SOC_CLK_OSC_SLOW_SUPPORTED: u32 = 1;
@@ -572,6 +590,8 @@ pub const CONFIG_SOC_ESP_NIMBLE_CONTROLLER: u32 = 1;
 pub const CONFIG_SOC_BLE_50_SUPPORTED: u32 = 1;
 pub const CONFIG_SOC_BLE_DEVICE_PRIVACY_SUPPORTED: u32 = 1;
 pub const CONFIG_SOC_BLE_POWER_CONTROL_SUPPORTED: u32 = 1;
+pub const CONFIG_SOC_BLE_MULTI_CONN_OPTIMIZATION: u32 = 1;
+pub const CONFIG_SOC_BLE_PERIODIC_ADV_ENH_SUPPORTED: u32 = 1;
 pub const CONFIG_IDF_CMAKE: u32 = 1;
 pub const CONFIG_IDF_TARGET_ARCH_RISCV: u32 = 1;
 pub const CONFIG_IDF_TARGET_ARCH: &[u8; 6] = b"riscv\0";
@@ -606,6 +626,7 @@ pub const CONFIG_ESP_ROM_GET_CLK_FREQ: u32 = 1;
 pub const CONFIG_ESP_ROM_HAS_HAL_WDT: u32 = 1;
 pub const CONFIG_ESP_ROM_HAS_HAL_SYSTIMER: u32 = 1;
 pub const CONFIG_ESP_ROM_HAS_HEAP_TLSF: u32 = 1;
+pub const CONFIG_ESP_ROM_TLSF_CHECK_PATCH: u32 = 1;
 pub const CONFIG_ESP_ROM_HAS_LAYOUT_TABLE: u32 = 1;
 pub const CONFIG_ESP_ROM_HAS_SPI_FLASH: u32 = 1;
 pub const CONFIG_ESP_ROM_WITHOUT_REGI2C: u32 = 1;
@@ -655,6 +676,7 @@ pub const CONFIG_BT_GATTS_SEND_SERVICE_CHANGE_AUTO: u32 = 1;
 pub const CONFIG_BT_GATTS_SEND_SERVICE_CHANGE_MODE: u32 = 0;
 pub const CONFIG_BT_GATTC_ENABLE: u32 = 1;
 pub const CONFIG_BT_GATTC_MAX_CACHE_CHAR: u32 = 40;
+pub const CONFIG_BT_GATTC_NOTIF_REG_MAX: u32 = 5;
 pub const CONFIG_BT_GATTC_CONNECT_RETRY_COUNT: u32 = 3;
 pub const CONFIG_BT_BLE_SMP_ENABLE: u32 = 1;
 pub const CONFIG_BT_LOG_HCI_TRACE_LEVEL_WARNING: u32 = 1;
@@ -740,9 +762,20 @@ pub const CONFIG_BT_LE_LL_SCA: u32 = 60;
 pub const CONFIG_BT_LE_MAX_CONNECTIONS: u32 = 3;
 pub const CONFIG_BT_LE_COEX_PHY_CODED_TX_RX_TLIM_DIS: u32 = 1;
 pub const CONFIG_BT_LE_COEX_PHY_CODED_TX_RX_TLIM_EFF: u32 = 0;
+pub const CONFIG_BT_LE_LP_CLK_SRC_MAIN_XTAL: u32 = 1;
 pub const CONFIG_BT_LE_USE_ESP_TIMER: u32 = 1;
+pub const CONFIG_BT_CTRL_BLE_ADV_REPORT_FLOW_CTRL_SUPP: u32 = 1;
+pub const CONFIG_BT_CTRL_BLE_ADV_REPORT_FLOW_CTRL_NUM: u32 = 100;
+pub const CONFIG_BT_CTRL_BLE_ADV_REPORT_DISCARD_THRSHOLD: u32 = 20;
+pub const CONFIG_BT_LE_SCAN_DUPL: u32 = 1;
+pub const CONFIG_BT_LE_SCAN_DUPL_TYPE_DEVICE: u32 = 1;
+pub const CONFIG_BT_LE_SCAN_DUPL_TYPE: u32 = 0;
+pub const CONFIG_BT_LE_SCAN_DUPL_CACHE_SIZE: u32 = 100;
+pub const CONFIG_BT_LE_SCAN_DUPL_CACHE_REFRESH_PERIOD: u32 = 0;
+pub const CONFIG_BT_LE_MSYS_INIT_IN_CONTROLLER: u32 = 1;
 pub const CONFIG_SPI_MASTER_ISR_IN_IRAM: u32 = 1;
 pub const CONFIG_SPI_SLAVE_ISR_IN_IRAM: u32 = 1;
+pub const CONFIG_GPTIMER_ISR_HANDLER_IN_IRAM: u32 = 1;
 pub const CONFIG_EFUSE_MAX_BLK_LEN: u32 = 256;
 pub const CONFIG_ESP_TLS_USING_MBEDTLS: u32 = 1;
 pub const CONFIG_ESP_TLS_USE_DS_PERIPHERAL: u32 = 1;
@@ -768,11 +801,17 @@ pub const CONFIG_ESP_MAC_UNIVERSAL_MAC_ADDRESSES_TWO: u32 = 1;
 pub const CONFIG_ESP32H2_UNIVERSAL_MAC_ADDRESSES_TWO: u32 = 1;
 pub const CONFIG_ESP32H2_UNIVERSAL_MAC_ADDRESSES: u32 = 2;
 pub const CONFIG_ESP_SLEEP_FLASH_LEAKAGE_WORKAROUND: u32 = 1;
+pub const CONFIG_ESP_SLEEP_GPIO_RESET_WORKAROUND: u32 = 1;
+pub const CONFIG_ESP_SLEEP_WAIT_FLASH_READY_EXTRA_DELAY: u32 = 0;
+pub const CONFIG_ESP_SLEEP_GPIO_ENABLE_INTERNAL_RESISTORS: u32 = 1;
 pub const CONFIG_RTC_CLK_SRC_INT_RC: u32 = 1;
 pub const CONFIG_RTC_CLK_CAL_CYCLES: u32 = 1024;
 pub const CONFIG_PERIPH_CTRL_FUNC_IN_IRAM: u32 = 1;
 pub const CONFIG_XTAL_FREQ_32: u32 = 1;
 pub const CONFIG_XTAL_FREQ: u32 = 32;
+pub const CONFIG_ESP_CRYPTO_DPA_PROTECTION_AT_STARTUP: u32 = 1;
+pub const CONFIG_ESP_CRYPTO_DPA_PROTECTION_LEVEL_LOW: u32 = 1;
+pub const CONFIG_ESP_CRYPTO_DPA_PROTECTION_LEVEL: u32 = 1;
 pub const CONFIG_LCD_PANEL_IO_FORMAT_BUF_SIZE: u32 = 32;
 pub const CONFIG_ESP_NETIF_IP_LOST_TIMER_INTERVAL: u32 = 120;
 pub const CONFIG_ESP_NETIF_TCPIP_LWIP: u32 = 1;
@@ -782,6 +821,7 @@ pub const CONFIG_ESP_PHY_MAX_WIFI_TX_POWER: u32 = 20;
 pub const CONFIG_ESP_PHY_MAX_TX_POWER: u32 = 20;
 pub const CONFIG_ESP_PHY_RF_CAL_PARTIAL: u32 = 1;
 pub const CONFIG_ESP_PHY_CALIBRATION_MODE: u32 = 0;
+pub const CONFIG_PM_POWER_DOWN_CPU_IN_LIGHT_SLEEP: u32 = 1;
 pub const CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ_96: u32 = 1;
 pub const CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ: u32 = 96;
 pub const CONFIG_ESP_SYSTEM_PANIC_PRINT_REBOOT: u32 = 1;
@@ -827,6 +867,9 @@ pub const CONFIG_ESP_WIFI_DYNAMIC_RX_BUFFER_NUM: u32 = 32;
 pub const CONFIG_ESP_WIFI_DYNAMIC_TX_BUFFER: u32 = 1;
 pub const CONFIG_ESP_WIFI_TX_BUFFER_TYPE: u32 = 1;
 pub const CONFIG_ESP_WIFI_DYNAMIC_TX_BUFFER_NUM: u32 = 32;
+pub const CONFIG_ESP_WIFI_STATIC_RX_MGMT_BUFFER: u32 = 1;
+pub const CONFIG_ESP_WIFI_DYNAMIC_RX_MGMT_BUF: u32 = 0;
+pub const CONFIG_ESP_WIFI_RX_MGMT_BUF_NUM_DEF: u32 = 5;
 pub const CONFIG_ESP_WIFI_AMPDU_TX_ENABLED: u32 = 1;
 pub const CONFIG_ESP_WIFI_TX_BA_WIN: u32 = 6;
 pub const CONFIG_ESP_WIFI_AMPDU_RX_ENABLED: u32 = 1;
@@ -845,6 +888,7 @@ pub const CONFIG_ESP_WIFI_SOFTAP_SUPPORT: u32 = 1;
 pub const CONFIG_ESP_WIFI_ESPNOW_MAX_ENCRYPT_NUM: u32 = 7;
 pub const CONFIG_ESP_WIFI_MBEDTLS_CRYPTO: u32 = 1;
 pub const CONFIG_ESP_WIFI_MBEDTLS_TLS_CLIENT: u32 = 1;
+pub const CONFIG_ESP_WIFI_ENTERPRISE_SUPPORT: u32 = 1;
 pub const CONFIG_ESP_COREDUMP_ENABLE_TO_NONE: u32 = 1;
 pub const CONFIG_FATFS_VOLUME_COUNT: u32 = 2;
 pub const CONFIG_FATFS_LFN_NONE: u32 = 1;
@@ -900,8 +944,10 @@ pub const CONFIG_LOG_MAXIMUM_LEVEL: u32 = 3;
 pub const CONFIG_LOG_COLORS: u32 = 1;
 pub const CONFIG_LOG_TIMESTAMP_SOURCE_RTOS: u32 = 1;
 pub const CONFIG_LWIP_LOCAL_HOSTNAME: &[u8; 10] = b"espressif\0";
+pub const CONFIG_LWIP_TCPIP_TASK_PRIO: u32 = 18;
 pub const CONFIG_LWIP_DNS_SUPPORT_MDNS_QUERIES: u32 = 1;
 pub const CONFIG_LWIP_TIMERS_ONDEMAND: u32 = 1;
+pub const CONFIG_LWIP_ND6: u32 = 1;
 pub const CONFIG_LWIP_MAX_SOCKETS: u32 = 10;
 pub const CONFIG_LWIP_SO_REUSE: u32 = 1;
 pub const CONFIG_LWIP_SO_REUSE_RXTOALL: u32 = 1;
@@ -935,10 +981,12 @@ pub const CONFIG_LWIP_TCP_MSS: u32 = 1440;
 pub const CONFIG_LWIP_TCP_TMR_INTERVAL: u32 = 250;
 pub const CONFIG_LWIP_TCP_MSL: u32 = 60000;
 pub const CONFIG_LWIP_TCP_FIN_WAIT_TIMEOUT: u32 = 20000;
-pub const CONFIG_LWIP_TCP_SND_BUF_DEFAULT: u32 = 5744;
-pub const CONFIG_LWIP_TCP_WND_DEFAULT: u32 = 5744;
+pub const CONFIG_LWIP_TCP_SND_BUF_DEFAULT: u32 = 5760;
+pub const CONFIG_LWIP_TCP_WND_DEFAULT: u32 = 5760;
 pub const CONFIG_LWIP_TCP_RECVMBOX_SIZE: u32 = 6;
 pub const CONFIG_LWIP_TCP_QUEUE_OOSEQ: u32 = 1;
+pub const CONFIG_LWIP_TCP_OOSEQ_TIMEOUT: u32 = 6;
+pub const CONFIG_LWIP_TCP_OOSEQ_MAX_PBUFS: u32 = 4;
 pub const CONFIG_LWIP_TCP_OVERSIZE_MSS: u32 = 1;
 pub const CONFIG_LWIP_TCP_RTO_TIME: u32 = 1500;
 pub const CONFIG_LWIP_MAX_UDP_PCBS: u32 = 16;
@@ -958,6 +1006,7 @@ pub const CONFIG_LWIP_ESP_LWIP_ASSERT: u32 = 1;
 pub const CONFIG_LWIP_HOOK_TCP_ISN_DEFAULT: u32 = 1;
 pub const CONFIG_LWIP_HOOK_IP6_ROUTE_NONE: u32 = 1;
 pub const CONFIG_LWIP_HOOK_ND6_GET_GW_NONE: u32 = 1;
+pub const CONFIG_LWIP_HOOK_IP6_SELECT_SRC_ADDR_NONE: u32 = 1;
 pub const CONFIG_LWIP_HOOK_NETCONN_EXT_RESOLVE_NONE: u32 = 1;
 pub const CONFIG_LWIP_HOOK_IP6_INPUT_NONE: u32 = 1;
 pub const CONFIG_MBEDTLS_INTERNAL_MEM_ALLOC: u32 = 1;
@@ -1022,6 +1071,7 @@ pub const CONFIG_MBEDTLS_ECP_DP_BP384R1_ENABLED: u32 = 1;
 pub const CONFIG_MBEDTLS_ECP_DP_BP512R1_ENABLED: u32 = 1;
 pub const CONFIG_MBEDTLS_ECP_DP_CURVE25519_ENABLED: u32 = 1;
 pub const CONFIG_MBEDTLS_ECP_NIST_OPTIM: u32 = 1;
+pub const CONFIG_MBEDTLS_ECP_FIXED_POINT_OPTIM: u32 = 1;
 pub const CONFIG_MBEDTLS_LARGE_KEY_SOFTWARE_MPI: u32 = 1;
 pub const CONFIG_MQTT_PROTOCOL_311: u32 = 1;
 pub const CONFIG_MQTT_TRANSPORT_SSL: u32 = 1;
@@ -1030,6 +1080,14 @@ pub const CONFIG_MQTT_TRANSPORT_WEBSOCKET_SECURE: u32 = 1;
 pub const CONFIG_NEWLIB_STDOUT_LINE_ENDING_CRLF: u32 = 1;
 pub const CONFIG_NEWLIB_STDIN_LINE_ENDING_CR: u32 = 1;
 pub const CONFIG_NEWLIB_TIME_SYSCALL_USE_RTC_HRT: u32 = 1;
+pub const CONFIG_OPENTHREAD_NETWORK_NAME: &[u8; 15] = b"OpenThread-ESP\0";
+pub const CONFIG_OPENTHREAD_MESH_LOCAL_PREFIX: &[u8; 19] = b"fd00:db8:a0:0::/64\0";
+pub const CONFIG_OPENTHREAD_NETWORK_CHANNEL: u32 = 15;
+pub const CONFIG_OPENTHREAD_NETWORK_PANID: u32 = 4660;
+pub const CONFIG_OPENTHREAD_NETWORK_EXTPANID: &[u8; 17] = b"dead00beef00cafe\0";
+pub const CONFIG_OPENTHREAD_NETWORK_MASTERKEY: &[u8; 33] = b"00112233445566778899aabbccddeeff\0";
+pub const CONFIG_OPENTHREAD_NETWORK_PSKC: &[u8; 33] = b"104810e2315100afd6bc9215a6bfac53\0";
+pub const CONFIG_OPENTHREAD_XTAL_ACCURACY: u32 = 130;
 pub const CONFIG_ESP_PROTOCOMM_SUPPORT_SECURITY_VERSION_0: u32 = 1;
 pub const CONFIG_ESP_PROTOCOMM_SUPPORT_SECURITY_VERSION_1: u32 = 1;
 pub const CONFIG_ESP_PROTOCOMM_SUPPORT_SECURITY_VERSION_2: u32 = 1;
@@ -1071,6 +1129,7 @@ pub const CONFIG_VFS_SUPPORT_DIR: u32 = 1;
 pub const CONFIG_VFS_SUPPORT_SELECT: u32 = 1;
 pub const CONFIG_VFS_SUPPRESS_SELECT_DEBUG_OUTPUT: u32 = 1;
 pub const CONFIG_VFS_SUPPORT_TERMIOS: u32 = 1;
+pub const CONFIG_VFS_MAX_COUNT: u32 = 8;
 pub const CONFIG_VFS_SEMIHOSTFS_MAX_MOUNT_POINTS: u32 = 1;
 pub const CONFIG_WL_SECTOR_SIZE_4096: u32 = 1;
 pub const CONFIG_WL_SECTOR_SIZE: u32 = 4096;
@@ -1106,6 +1165,7 @@ pub const CONFIG_BTIF_TRACE_LEVEL_WARNING: u32 = 1;
 pub const CONFIG_BTM_INITIAL_TRACE_LEVEL: u32 = 2;
 pub const CONFIG_BTM_TRACE_LEVEL_WARNING: u32 = 1;
 pub const CONFIG_BTU_TASK_STACK_SIZE: u32 = 4096;
+pub const CONFIG_BT_NIMBLE_COEX_PHY_CODED_TX_RX_TLIM_DIS: u32 = 1;
 pub const CONFIG_COMPILER_OPTIMIZATION_LEVEL_RELEASE: u32 = 1;
 pub const CONFIG_CONSOLE_UART: u32 = 1;
 pub const CONFIG_CONSOLE_UART_BAUDRATE: u32 = 115200;
@@ -1139,6 +1199,7 @@ pub const CONFIG_ESP32_WIFI_SW_COEXIST_ENABLE: u32 = 1;
 pub const CONFIG_ESP32_WIFI_TX_BA_WIN: u32 = 6;
 pub const CONFIG_ESP32_WIFI_TX_BUFFER_TYPE: u32 = 1;
 pub const CONFIG_ESP_GRATUITOUS_ARP: u32 = 1;
+pub const CONFIG_ESP_SYSTEM_PM_POWER_DOWN_CPU: u32 = 1;
 pub const CONFIG_ESP_TASK_WDT: u32 = 1;
 pub const CONFIG_ESP_WIFI_SW_COEXIST_ENABLE: u32 = 1;
 pub const CONFIG_FLASHMODE_DIO: u32 = 1;
@@ -1202,9 +1263,9 @@ pub const CONFIG_TCP_MSS: u32 = 1440;
 pub const CONFIG_TCP_OVERSIZE_MSS: u32 = 1;
 pub const CONFIG_TCP_QUEUE_OOSEQ: u32 = 1;
 pub const CONFIG_TCP_RECVMBOX_SIZE: u32 = 6;
-pub const CONFIG_TCP_SND_BUF_DEFAULT: u32 = 5744;
+pub const CONFIG_TCP_SND_BUF_DEFAULT: u32 = 5760;
 pub const CONFIG_TCP_SYNMAXRTX: u32 = 12;
-pub const CONFIG_TCP_WND_DEFAULT: u32 = 5744;
+pub const CONFIG_TCP_WND_DEFAULT: u32 = 5760;
 pub const CONFIG_TIMER_QUEUE_LENGTH: u32 = 10;
 pub const CONFIG_TIMER_TASK_PRIORITY: u32 = 1;
 pub const CONFIG_TIMER_TASK_STACK_DEPTH: u32 = 2048;
@@ -1226,6 +1287,7 @@ pub const ESP_ERR_INVALID_CRC: u32 = 265;
 pub const ESP_ERR_INVALID_VERSION: u32 = 266;
 pub const ESP_ERR_INVALID_MAC: u32 = 267;
 pub const ESP_ERR_NOT_FINISHED: u32 = 268;
+pub const ESP_ERR_ROC_IN_PROGRESS: u32 = 270;
 pub const ESP_ERR_WIFI_BASE: u32 = 12288;
 pub const ESP_ERR_MESH_BASE: u32 = 16384;
 pub const ESP_ERR_FLASH_BASE: u32 = 24576;
@@ -1309,9 +1371,13 @@ pub const ESP_ERR_WIFI_NOT_ASSOC: u32 = 12309;
 pub const ESP_ERR_WIFI_TX_DISALLOW: u32 = 12310;
 pub const ESP_ERR_WIFI_TWT_FULL: u32 = 12311;
 pub const ESP_ERR_WIFI_TWT_SETUP_TIMEOUT: u32 = 12312;
+pub const ESP_ERR_WIFI_TWT_SETUP_TXFAIL: u32 = 12313;
+pub const ESP_ERR_WIFI_TWT_SETUP_REJECT: u32 = 12314;
+pub const ESP_ERR_WIFI_DISCARD: u32 = 12315;
 pub const WIFI_STATIC_TX_BUFFER_NUM: u32 = 0;
 pub const WIFI_CACHE_TX_BUFFER_NUM: u32 = 0;
 pub const WIFI_DYNAMIC_TX_BUFFER_NUM: u32 = 32;
+pub const WIFI_RX_MGMT_BUF_NUM_DEF: u32 = 5;
 pub const WIFI_CSI_ENABLED: u32 = 0;
 pub const WIFI_AMPDU_RX_ENABLED: u32 = 1;
 pub const WIFI_AMPDU_TX_ENABLED: u32 = 1;
@@ -1324,10 +1390,15 @@ pub const WIFI_TASK_CORE_ID: u32 = 0;
 pub const WIFI_SOFTAP_BEACON_MAX_LEN: u32 = 752;
 pub const WIFI_MGMT_SBUF_NUM: u32 = 32;
 pub const WIFI_STA_DISCONNECTED_PM_ENABLED: u32 = 1;
+pub const WIFI_ENABLE_WPA3_SAE: u32 = 1;
+pub const WIFI_ENABLE_SPIRAM: u32 = 0;
+pub const WIFI_FTM_INITIATOR: u32 = 0;
+pub const WIFI_FTM_RESPONDER: u32 = 0;
 pub const CONFIG_FEATURE_WPA3_SAE_BIT: u32 = 1;
 pub const CONFIG_FEATURE_CACHE_TX_BUF_BIT: u32 = 2;
 pub const CONFIG_FEATURE_FTM_INITIATOR_BIT: u32 = 4;
 pub const CONFIG_FEATURE_FTM_RESPONDER_BIT: u32 = 8;
+pub const WIFI_FEATURE_CAPS: u32 = 1;
 pub const ESP_WIFI_CONNECTIONLESS_INTERVAL_DEFAULT_MODE: u32 = 0;
 pub const WIFI_LOG_SUBMODULE_ALL: u32 = 0;
 pub const WIFI_LOG_SUBMODULE_INIT: u32 = 1;
@@ -1336,8 +1407,12 @@ pub const WIFI_LOG_SUBMODULE_CONN: u32 = 4;
 pub const WIFI_LOG_SUBMODULE_SCAN: u32 = 8;
 pub const ESP_CAL_DATA_CHECK_FAIL: u32 = 1;
 pub const BLE_NPL_OS_ALIGNMENT: u32 = 4;
-pub const CONFIG_VERSION: u32 = 539164947;
+pub const CONFIG_VERSION: u32 = 539169060;
 pub const CONFIG_MAGIC: u32 = 1515890085;
+pub const EXTERNAL_COEXIST_WIRE_1: u32 = 0;
+pub const EXTERNAL_COEXIST_WIRE_2: u32 = 1;
+pub const EXTERNAL_COEXIST_WIRE_3: u32 = 2;
+pub const EXTERNAL_COEXIST_WIRE_4: u32 = 3;
 pub const ESP_COEX_BLE_ST_MESH_CONFIG: u32 = 8;
 pub const ESP_COEX_BLE_ST_MESH_TRAFFIC: u32 = 16;
 pub const ESP_COEX_BLE_ST_MESH_STANDBY: u32 = 32;
@@ -1360,6 +1435,7 @@ pub const ESP_NOW_KEY_LEN: u32 = 16;
 pub const ESP_NOW_MAX_TOTAL_PEER_NUM: u32 = 20;
 pub const ESP_NOW_MAX_ENCRYPT_PEER_NUM: u32 = 6;
 pub const ESP_NOW_MAX_DATA_LEN: u32 = 250;
+pub type _lock_t = crate::c_types::c_int;
 pub type __int8_t = crate::c_types::c_schar;
 pub type __uint8_t = crate::c_types::c_uchar;
 pub type __int16_t = crate::c_types::c_short;
@@ -3716,7 +3792,6 @@ extern "C" {
     ) -> !;
 }
 extern "C" {
-    #[doc = " @cond"]
     pub fn _esp_error_check_failed_without_abort(
         rc: esp_err_t,
         file: *const crate::c_types::c_char,
@@ -3792,7 +3867,9 @@ pub const wifi_auth_mode_t_WIFI_AUTH_WPA_PSK: wifi_auth_mode_t = 2;
 pub const wifi_auth_mode_t_WIFI_AUTH_WPA2_PSK: wifi_auth_mode_t = 3;
 #[doc = "< authenticate mode : WPA_WPA2_PSK"]
 pub const wifi_auth_mode_t_WIFI_AUTH_WPA_WPA2_PSK: wifi_auth_mode_t = 4;
-#[doc = "< authenticate mode : WPA2_ENTERPRISE"]
+#[doc = "< authenticate mode : WiFi EAP security"]
+pub const wifi_auth_mode_t_WIFI_AUTH_ENTERPRISE: wifi_auth_mode_t = 5;
+#[doc = "< authenticate mode : WiFi EAP security"]
 pub const wifi_auth_mode_t_WIFI_AUTH_WPA2_ENTERPRISE: wifi_auth_mode_t = 5;
 #[doc = "< authenticate mode : WPA3_PSK"]
 pub const wifi_auth_mode_t_WIFI_AUTH_WPA3_PSK: wifi_auth_mode_t = 6;
@@ -3802,7 +3879,9 @@ pub const wifi_auth_mode_t_WIFI_AUTH_WPA2_WPA3_PSK: wifi_auth_mode_t = 7;
 pub const wifi_auth_mode_t_WIFI_AUTH_WAPI_PSK: wifi_auth_mode_t = 8;
 #[doc = "< authenticate mode : OWE"]
 pub const wifi_auth_mode_t_WIFI_AUTH_OWE: wifi_auth_mode_t = 9;
-pub const wifi_auth_mode_t_WIFI_AUTH_MAX: wifi_auth_mode_t = 10;
+#[doc = "< authenticate mode : WPA3_ENT_SUITE_B_192_BIT"]
+pub const wifi_auth_mode_t_WIFI_AUTH_WPA3_ENT_192: wifi_auth_mode_t = 10;
+pub const wifi_auth_mode_t_WIFI_AUTH_MAX: wifi_auth_mode_t = 11;
 pub type wifi_auth_mode_t = crate::c_types::c_uint;
 pub const wifi_err_reason_t_WIFI_REASON_UNSPECIFIED: wifi_err_reason_t = 1;
 pub const wifi_err_reason_t_WIFI_REASON_AUTH_EXPIRE: wifi_err_reason_t = 2;
@@ -3908,6 +3987,8 @@ pub struct wifi_scan_config_t {
     pub scan_type: wifi_scan_type_t,
     #[doc = "< scan time per channel"]
     pub scan_time: wifi_scan_time_t,
+    #[doc = "< time spent at home channel between scanning consecutive channels."]
+    pub home_chan_dwell_time: u8,
 }
 #[doc = "< the cipher type is none"]
 pub const wifi_cipher_type_t_WIFI_CIPHER_TYPE_NONE: wifi_cipher_type_t = 0;
@@ -4021,7 +4102,7 @@ pub struct wifi_ap_record_t {
     pub primary: u8,
     #[doc = "< secondary channel of AP"]
     pub second: wifi_second_chan_t,
-    #[doc = "< signal strength of AP"]
+    #[doc = "< signal strength of AP. Note that in some rare cases where signal strength is very strong, rssi values can be slightly positive"]
     pub rssi: i8,
     #[doc = "< authmode of AP"]
     pub authmode: wifi_auth_mode_t,
@@ -4288,7 +4369,7 @@ pub struct wifi_sta_config_t {
     pub listen_interval: u16,
     #[doc = "< sort the connect AP in the list by rssi or security mode"]
     pub sort_method: wifi_sort_method_t,
-    #[doc = "< When sort_method is set, only APs which have an auth mode that is more secure than the selected auth mode and a signal stronger than the minimum RSSI will be used."]
+    #[doc = "< When scan_threshold is set, only APs which have an auth mode that is more secure than the selected auth mode and a signal stronger than the minimum RSSI will be used."]
     pub threshold: wifi_scan_threshold_t,
     #[doc = "< Configuration for Protected Management Frame. Will be advertised in RSN Capabilities in RSN IE."]
     pub pmf_cfg: wifi_pmf_config_t,
@@ -5136,6 +5217,8 @@ pub struct wifi_csi_config_t {
     pub manu_scale: bool,
     #[doc = "< manually left shift bits of the scale of the CSI data. The range of the left shift bits is 0~15"]
     pub shift: u8,
+    #[doc = "< enable to dump 802.11 ACK frame, default disabled"]
+    pub dump_ack_en: bool,
 }
 #[doc = " @brief CSI data type\n"]
 #[repr(C)]
@@ -5147,12 +5230,18 @@ pub struct wifi_csi_info_t {
     pub mac: [u8; 6usize],
     #[doc = "< destination MAC address of the CSI data"]
     pub dmac: [u8; 6usize],
-    #[doc = "< first four bytes of the CSI data is invalid or not"]
+    #[doc = "< first four bytes of the CSI data is invalid or not, true indicates the first four bytes is invalid due to hardware limition"]
     pub first_word_invalid: bool,
-    #[doc = "< buffer of CSI data"]
+    #[doc = "< valid buffer of CSI data"]
     pub buf: *mut i8,
-    #[doc = "< length of CSI data"]
+    #[doc = "< valid length of CSI data"]
     pub len: u16,
+    #[doc = "< header of the wifi packet"]
+    pub hdr: *mut u8,
+    #[doc = "< payload of the wifi packet"]
+    pub payload: *mut u8,
+    #[doc = "< payload len of the wifi packet"]
+    pub payload_len: u16,
 }
 #[doc = " @brief WiFi GPIO configuration for antenna selection\n"]
 #[repr(C, packed)]
@@ -5767,6 +5856,8 @@ pub struct wifi_event_ap_stadisconnected_t {
     pub aid: u8,
     #[doc = "< flag to identify mesh child"]
     pub is_mesh_child: bool,
+    #[doc = "< reason of disconnection"]
+    pub reason: u8,
 }
 #[doc = " Argument structure for WIFI_EVENT_AP_PROBEREQRECVED event"]
 #[repr(C)]
@@ -5895,6 +5986,8 @@ pub struct wifi_event_nan_svc_match_t {
     pub publish_id: u8,
     #[doc = "< NAN Interface MAC of the Publisher"]
     pub pub_if_mac: [u8; 6usize],
+    #[doc = "< Indicates whether publisher's service ID needs to be updated"]
+    pub update_pub_id: bool,
 }
 #[doc = " Argument structure for WIFI_EVENT_NAN_REPLIED event"]
 #[repr(C)]
@@ -5990,7 +6083,7 @@ extern "C" {
     pub fn esp_event_loop_delete(event_loop: esp_event_loop_handle_t) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief Create default event loop\n\n @return\n  - ESP_OK: Success\n  - ESP_ERR_NO_MEM: Cannot allocate memory for event loops list\n  - ESP_FAIL: Failed to create task loop\n  - Others: Fail"]
+    #[doc = " @brief Create default event loop\n\n @return\n  - ESP_OK: Success\n  - ESP_ERR_NO_MEM: Cannot allocate memory for event loops list\n  - ESP_ERR_INVALID_STATE: Default event loop has already been created\n  - ESP_FAIL: Failed to create task loop\n  - Others: Fail"]
     pub fn esp_event_loop_create_default() -> esp_err_t;
 }
 extern "C" {
@@ -6150,7 +6243,7 @@ pub struct crypto_cipher {
     _unused: [u8; 0],
 }
 pub type esp_crypto_cipher_t = crypto_cipher;
-#[doc = " @brief The AES callback function when do WPS connect.\n\n @param key  Encryption key.\n @param iv  Encryption IV for CBC mode (16 bytes).\n @param data  Data to encrypt in-place.\n @param data_len  Length of data in bytes (must be divisible by 16)"]
+#[doc = " @brief The AES 128 encrypt callback function used by esp_wifi.\n\n @param key  Encryption key.\n @param iv  Encryption IV for CBC mode (16 bytes).\n @param data  Data to encrypt in-place.\n @param data_len  Length of data in bytes (must be divisible by 16)"]
 pub type esp_aes_128_encrypt_t = ::core::option::Option<
     unsafe extern "C" fn(
         key: *const crate::c_types::c_uchar,
@@ -6159,7 +6252,7 @@ pub type esp_aes_128_encrypt_t = ::core::option::Option<
         data_len: crate::c_types::c_int,
     ) -> crate::c_types::c_int,
 >;
-#[doc = " @brief The AES callback function when do WPS connect.\n\n @param key  Decryption key.\n @param iv  Decryption IV for CBC mode (16 bytes).\n @param data  Data to decrypt in-place.\n @param data_len  Length of data in bytes (must be divisible by 16)\n"]
+#[doc = " @brief The AES 128 decrypt callback function used by esp_wifi.\n\n @param key  Decryption key.\n @param iv  Decryption IV for CBC mode (16 bytes).\n @param data  Data to decrypt in-place.\n @param data_len  Length of data in bytes (must be divisible by 16)\n"]
 pub type esp_aes_128_decrypt_t = ::core::option::Option<
     unsafe extern "C" fn(
         key: *const crate::c_types::c_uchar,
@@ -6168,7 +6261,7 @@ pub type esp_aes_128_decrypt_t = ::core::option::Option<
         data_len: crate::c_types::c_int,
     ) -> crate::c_types::c_int,
 >;
-#[doc = " @brief The AES callback function when do STA connect.\n\n @param kek  16-octet Key encryption key (KEK).\n @param n  Length of the plaintext key in 64-bit units;\n @param plain  Plaintext key to be wrapped, n * 64 bits\n @param cipher  Wrapped key, (n + 1) * 64 bits\n"]
+#[doc = " @brief The AES wrap callback function used by esp_wifi.\n\n @param kek  16-octet Key encryption key (KEK).\n @param n  Length of the plaintext key in 64-bit units;\n @param plain  Plaintext key to be wrapped, n * 64 bits\n @param cipher  Wrapped key, (n + 1) * 64 bits\n"]
 pub type esp_aes_wrap_t = ::core::option::Option<
     unsafe extern "C" fn(
         kek: *const crate::c_types::c_uchar,
@@ -6177,7 +6270,7 @@ pub type esp_aes_wrap_t = ::core::option::Option<
         cipher: *mut crate::c_types::c_uchar,
     ) -> crate::c_types::c_int,
 >;
-#[doc = " @brief The AES callback function when do STA connect.\n\n @param kek  16-octet Key decryption key (KEK).\n @param n  Length of the plaintext key in 64-bit units;\n @param cipher  Wrapped key to be unwrapped, (n + 1) * 64 bits\n @param plain  Plaintext key, n * 64 bits\n"]
+#[doc = " @brief The AES unwrap callback function used by esp_wifi.\n\n @param kek  16-octet Key decryption key (KEK).\n @param n  Length of the plaintext key in 64-bit units;\n @param cipher  Wrapped key to be unwrapped, (n + 1) * 64 bits\n @param plain  Plaintext key, n * 64 bits\n"]
 pub type esp_aes_unwrap_t = ::core::option::Option<
     unsafe extern "C" fn(
         kek: *const crate::c_types::c_uchar,
@@ -6186,7 +6279,7 @@ pub type esp_aes_unwrap_t = ::core::option::Option<
         plain: *mut crate::c_types::c_uchar,
     ) -> crate::c_types::c_int,
 >;
-#[doc = " @brief The SHA256 callback function when do WPS connect.\n\n @param key  Key for HMAC operations.\n @param key_len  Length of the key in bytes.\n @param num_elem  Number of elements in the data vector.\n @param addr  Pointers to the data areas.\n @param len  Lengths of the data blocks.\n @param mac  Buffer for the hash (32 bytes).\n"]
+#[doc = " @brief The SHA256 callback function used by esp_wifi.\n\n @param key  Key for HMAC operations.\n @param key_len  Length of the key in bytes.\n @param num_elem  Number of elements in the data vector.\n @param addr  Pointers to the data areas.\n @param len  Lengths of the data blocks.\n @param mac  Buffer for the hash (32 bytes).\n"]
 pub type esp_hmac_sha256_vector_t = ::core::option::Option<
     unsafe extern "C" fn(
         key: *const crate::c_types::c_uchar,
@@ -6197,7 +6290,7 @@ pub type esp_hmac_sha256_vector_t = ::core::option::Option<
         mac: *mut crate::c_types::c_uchar,
     ) -> crate::c_types::c_int,
 >;
-#[doc = " @brief The AES callback function when do STA connect.\n\n @param key  Key for PRF.\n @param key_len  Length of the key in bytes.\n @param label  A unique label for each purpose of the PRF.\n @param data  Extra data to bind into the key.\n @param data_len  Length of the data.\n @param buf  Buffer for the generated pseudo-random key.\n @param buf_len  Number of bytes of key to generate.\n"]
+#[doc = " @brief The SHA256 PRF callback function used by esp_wifi.\n\n @param key  Key for PRF.\n @param key_len  Length of the key in bytes.\n @param label  A unique label for each purpose of the PRF.\n @param data  Extra data to bind into the key.\n @param data_len  Length of the data.\n @param buf  Buffer for the generated pseudo-random key.\n @param buf_len  Number of bytes of key to generate.\n"]
 pub type esp_sha256_prf_t = ::core::option::Option<
     unsafe extern "C" fn(
         key: *const crate::c_types::c_uchar,
@@ -6209,7 +6302,7 @@ pub type esp_sha256_prf_t = ::core::option::Option<
         buf_len: crate::c_types::c_int,
     ) -> crate::c_types::c_int,
 >;
-#[doc = " @brief HMAC-MD5 over data buffer (RFC 2104)'\n\n @key: Key for HMAC operations\n @key_len: Length of the key in bytes\n @data: Pointers to the data area\n @data_len: Length of the data area\n @mac: Buffer for the hash (16 bytes)\n Returns: 0 on success, -1 on failure"]
+#[doc = " @brief HMAC-MD5 callback function over data buffer (RFC 2104)'\n\n @param key Key for HMAC operations\n @param key_len Length of the key in bytes\n @param data Pointers to the data area\n @param data_len Length of the data area\n @param mac Buffer for the hash (16 bytes)\n Returns: 0 on success, -1 on failure"]
 pub type esp_hmac_md5_t = ::core::option::Option<
     unsafe extern "C" fn(
         key: *const crate::c_types::c_uchar,
@@ -6219,7 +6312,7 @@ pub type esp_hmac_md5_t = ::core::option::Option<
         mac: *mut crate::c_types::c_uchar,
     ) -> crate::c_types::c_int,
 >;
-#[doc = " @brief HMAC-MD5 over data vector (RFC 2104)\n\n @key: Key for HMAC operations\n @key_len: Length of the key in bytes\n @num_elem: Number of elements in the data vector\n @addr: Pointers to the data areas\n @len: Lengths of the data blocks\n @mac: Buffer for the hash (16 bytes)\n Returns: 0 on success, -1 on failure"]
+#[doc = " @brief HMAC-MD5 callback function over data vector (RFC 2104)\n\n @param key Key for HMAC operations\n @param key_len Length of the key in bytes\n @param num_elem Number of elements in the data vector\n @param addr Pointers to the data areas\n @param len Lengths of the data blocks\n @param mac Buffer for the hash (16 bytes)\n Returns: 0 on success, -1 on failure"]
 pub type esp_hmac_md5_vector_t = ::core::option::Option<
     unsafe extern "C" fn(
         key: *const crate::c_types::c_uchar,
@@ -6230,7 +6323,7 @@ pub type esp_hmac_md5_vector_t = ::core::option::Option<
         mac: *mut crate::c_types::c_uchar,
     ) -> crate::c_types::c_int,
 >;
-#[doc = " @brief HMAC-SHA1 over data buffer (RFC 2104)\n\n @key: Key for HMAC operations\n @key_len: Length of the key in bytes\n @data: Pointers to the data area\n @data_len: Length of the data area\n @mac: Buffer for the hash (20 bytes)\n Returns: 0 on success, -1 of failure"]
+#[doc = " @brief HMAC-SHA1 callback function over data buffer (RFC 2104)\n\n @param key Key for HMAC operations\n @param key_len Length of the key in bytes\n @param data Pointers to the data area\n @param data_len Length of the data area\n @param mac Buffer for the hash (20 bytes)\n Returns: 0 on success, -1 of failure"]
 pub type esp_hmac_sha1_t = ::core::option::Option<
     unsafe extern "C" fn(
         key: *const crate::c_types::c_uchar,
@@ -6240,7 +6333,7 @@ pub type esp_hmac_sha1_t = ::core::option::Option<
         mac: *mut crate::c_types::c_uchar,
     ) -> crate::c_types::c_int,
 >;
-#[doc = " @brief HMAC-SHA1 over data vector (RFC 2104)\n\n @key: Key for HMAC operations\n @key_len: Length of the key in bytes\n @num_elem: Number of elements in the data vector\n @addr: Pointers to the data areas\n @len: Lengths of the data blocks\n @mac: Buffer for the hash (20 bytes)\n Returns: 0 on success, -1 on failure"]
+#[doc = " @brief HMAC-SHA1 callback function over data vector (RFC 2104)\n\n @param key Key for HMAC operations\n @param key_len Length of the key in bytes\n @param num_elem Number of elements in the data vector\n @param addr Pointers to the data areas\n @param len Lengths of the data blocks\n @param mac Buffer for the hash (20 bytes)\n Returns: 0 on success, -1 on failure"]
 pub type esp_hmac_sha1_vector_t = ::core::option::Option<
     unsafe extern "C" fn(
         key: *const crate::c_types::c_uchar,
@@ -6251,7 +6344,7 @@ pub type esp_hmac_sha1_vector_t = ::core::option::Option<
         mac: *mut crate::c_types::c_uchar,
     ) -> crate::c_types::c_int,
 >;
-#[doc = " @brief SHA1-based Pseudo-Random Function (PRF) (IEEE 802.11i, 8.5.1.1)\n\n @key: Key for PRF\n @key_len: Length of the key in bytes\n @label: A unique label for each purpose of the PRF\n @data: Extra data to bind into the key\n @data_len: Length of the data\n @buf: Buffer for the generated pseudo-random key\n @buf_len: Number of bytes of key to generate\n Returns: 0 on success, -1 of failure\n\n This function is used to derive new, cryptographically separate keys from a\n given key (e.g., PMK in IEEE 802.11i)."]
+#[doc = " @brief SHA1-based Pseudo-Random Function (PRF) (IEEE 802.11i, 8.5.1.1) callback function\n\n @param key Key for PRF\n @param key_len Length of the key in bytes\n @param label A unique label for each purpose of the PRF\n @param data Extra data to bind into the key\n @param data_len Length of the data\n @param buf Buffer for the generated pseudo-random key\n @param buf_len Number of bytes of key to generate\n Returns: 0 on success, -1 of failure\n\n This function is used to derive new, cryptographically separate keys from a\n given key (e.g., PMK in IEEE 802.11i)."]
 pub type esp_sha1_prf_t = ::core::option::Option<
     unsafe extern "C" fn(
         key: *const crate::c_types::c_uchar,
@@ -6263,7 +6356,7 @@ pub type esp_sha1_prf_t = ::core::option::Option<
         buf_len: crate::c_types::c_uint,
     ) -> crate::c_types::c_int,
 >;
-#[doc = " @brief SHA-1 hash for data vector\n\n @num_elem: Number of elements in the data vector\n @addr: Pointers to the data areas\n @len: Lengths of the data blocks\n @mac: Buffer for the hash\n Returns: 0 on success, -1 on failure"]
+#[doc = " @brief SHA-1 hash callback function for data vector\n\n @param num_elem Number of elements in the data vector\n @param addr Pointers to the data areas\n @param len Lengths of the data blocks\n @param mac Buffer for the hash\n Returns: 0 on success, -1 on failure"]
 pub type esp_sha1_vector_t = ::core::option::Option<
     unsafe extern "C" fn(
         num_elem: crate::c_types::c_uint,
@@ -6272,7 +6365,7 @@ pub type esp_sha1_vector_t = ::core::option::Option<
         mac: *mut crate::c_types::c_uchar,
     ) -> crate::c_types::c_int,
 >;
-#[doc = " @brief SHA1-based key derivation function (PBKDF2) for IEEE 802.11i\n\n @passphrase: ASCII passphrase\n @ssid: SSID\n @ssid_len: SSID length in bytes\n @iterations: Number of iterations to run\n @buf: Buffer for the generated key\n @buflen: Length of the buffer in bytes\n Returns: 0 on success, -1 of failure\n\n This function is used to derive PSK for WPA-PSK. For this protocol,\n iterations is set to 4096 and buflen to 32. This function is described in\n IEEE Std 802.11-2004, Clause H.4. The main construction is from PKCS#5 v2.0."]
+#[doc = " @brief SHA1-based key derivation function (PBKDF2) callback function for IEEE 802.11i\n\n @param passphrase ASCII passphrase\n @param ssid SSID\n @param ssid_len SSID length in bytes\n @param iterations Number of iterations to run\n @param buf Buffer for the generated key\n @param buflen Length of the buffer in bytes\n Returns: 0 on success, -1 of failure\n\n This function is used to derive PSK for WPA-PSK. For this protocol,\n iterations is set to 4096 and buflen to 32. This function is described in\n IEEE Std 802.11-2004, Clause H.4. The main construction is from PKCS#5 v2.0."]
 pub type esp_pbkdf2_sha1_t = ::core::option::Option<
     unsafe extern "C" fn(
         passphrase: *const crate::c_types::c_char,
@@ -6283,7 +6376,7 @@ pub type esp_pbkdf2_sha1_t = ::core::option::Option<
         buflen: crate::c_types::c_uint,
     ) -> crate::c_types::c_int,
 >;
-#[doc = " @brief XOR RC4 stream to given data with skip-stream-start\n\n @key: RC4 key\n @keylen: RC4 key length\n @skip: number of bytes to skip from the beginning of the RC4 stream\n @data: data to be XOR'ed with RC4 stream\n @data_len: buf length\n Returns: 0 on success, -1 on failure\n\n Generate RC4 pseudo random stream for the given key, skip beginning of the\n stream, and XOR the end result with the data buffer to perform RC4\n encryption/decryption."]
+#[doc = " @brief XOR RC4 stream callback function to given data with skip-stream-start\n\n @param key RC4 key\n @param keylen RC4 key length\n @param skip number of bytes to skip from the beginning of the RC4 stream\n @param data data to be XOR'ed with RC4 stream\n @param data_len buf length\n Returns: 0 on success, -1 on failure\n\n Generate RC4 pseudo random stream for the given key, skip beginning of the\n stream, and XOR the end result with the data buffer to perform RC4\n encryption/decryption."]
 pub type esp_rc4_skip_t = ::core::option::Option<
     unsafe extern "C" fn(
         key: *const crate::c_types::c_uchar,
@@ -6293,7 +6386,7 @@ pub type esp_rc4_skip_t = ::core::option::Option<
         data_len: crate::c_types::c_uint,
     ) -> crate::c_types::c_int,
 >;
-#[doc = " @brief MD5 hash for data vector\n\n @num_elem: Number of elements in the data vector\n @addr: Pointers to the data areas\n @len: Lengths of the data blocks\n @mac: Buffer for the hash\n Returns: 0 on success, -1 on failure"]
+#[doc = " @brief MD5 hash callback function for data vector\n\n @param num_elem Number of elements in the data vector\n @param addr Pointers to the data areas\n @param len Lengths of the data blocks\n @param mac Buffer for the hash\n Returns: 0 on success, -1 on failure"]
 pub type esp_md5_vector_t = ::core::option::Option<
     unsafe extern "C" fn(
         num_elem: crate::c_types::c_uint,
@@ -6302,7 +6395,7 @@ pub type esp_md5_vector_t = ::core::option::Option<
         mac: *mut crate::c_types::c_uchar,
     ) -> crate::c_types::c_int,
 >;
-#[doc = " @brief Encrypt one AES block\n\n @ctx: Context pointer from aes_encrypt_init()\n @plain: Plaintext data to be encrypted (16 bytes)\n @crypt: Buffer for the encrypted data (16 bytes)"]
+#[doc = " @brief Encrypt one AES block callback function\n\n @param ctx Context pointer from aes_encrypt_init()\n @param plain Plaintext data to be encrypted (16 bytes)\n @param crypt Buffer for the encrypted data (16 bytes)"]
 pub type esp_aes_encrypt_t = ::core::option::Option<
     unsafe extern "C" fn(
         ctx: *mut crate::c_types::c_void,
@@ -6310,17 +6403,17 @@ pub type esp_aes_encrypt_t = ::core::option::Option<
         crypt: *mut crate::c_types::c_uchar,
     ),
 >;
-#[doc = " @brief Initialize AES for encryption\n\n @key: Encryption key\n @len: Key length in bytes (usually 16, i.e., 128 bits)\n Returns: Pointer to context data or %NULL on failure"]
+#[doc = " @brief Initialize AES callback function for encryption\n\n @param key Encryption key\n @param len Key length in bytes (usually 16, i.e., 128 bits)\n Returns: Pointer to context data or %NULL on failure"]
 pub type esp_aes_encrypt_init_t = ::core::option::Option<
     unsafe extern "C" fn(
         key: *const crate::c_types::c_uchar,
         len: crate::c_types::c_uint,
     ) -> *mut crate::c_types::c_void,
 >;
-#[doc = " @brief Deinitialize AES encryption\n\n @ctx: Context pointer from aes_encrypt_init()"]
+#[doc = " @brief Deinitialize AES encryption callback function\n\n @param ctx Context pointer from aes_encrypt_init()"]
 pub type esp_aes_encrypt_deinit_t =
     ::core::option::Option<unsafe extern "C" fn(ctx: *mut crate::c_types::c_void)>;
-#[doc = " @brief Decrypt one AES block\n\n @ctx: Context pointer from aes_encrypt_init()\n @crypt: Encrypted data (16 bytes)\n @plain: Buffer for the decrypted data (16 bytes)"]
+#[doc = " @brief Decrypt one AES block callback function\n\n @param ctx Context pointer from aes_encrypt_init()\n @param crypt Encrypted data (16 bytes)\n @param plain Buffer for the decrypted data (16 bytes)"]
 pub type esp_aes_decrypt_t = ::core::option::Option<
     unsafe extern "C" fn(
         ctx: *mut crate::c_types::c_void,
@@ -6328,17 +6421,17 @@ pub type esp_aes_decrypt_t = ::core::option::Option<
         plain: *mut crate::c_types::c_uchar,
     ),
 >;
-#[doc = " @brief Initialize AES for decryption\n\n @key: Decryption key\n @len: Key length in bytes (usually 16, i.e., 128 bits)\n Returns: Pointer to context data or %NULL on failure"]
+#[doc = " @brief Initialize AES callback function for decryption\n\n @param key Decryption key\n @param len Key length in bytes (usually 16, i.e., 128 bits)\n Returns: Pointer to context data or %NULL on failure"]
 pub type esp_aes_decrypt_init_t = ::core::option::Option<
     unsafe extern "C" fn(
         key: *const crate::c_types::c_uchar,
         len: crate::c_types::c_uint,
     ) -> *mut crate::c_types::c_void,
 >;
-#[doc = " @brief Deinitialize AES decryption\n\n @ctx: Context pointer from aes_encrypt_init()"]
+#[doc = " @brief Deinitialize AES decryption callback function\n\n @param ctx Context pointer from aes_encrypt_init()"]
 pub type esp_aes_decrypt_deinit_t =
     ::core::option::Option<unsafe extern "C" fn(ctx: *mut crate::c_types::c_void)>;
-#[doc = " @brief One-Key CBC MAC (OMAC1) hash with AES-128 for MIC computation\n\n @key: 128-bit key for the hash operation\n @data: Data buffer for which a MIC is computed\n @data_len: Length of data buffer in bytes\n @mic: Buffer for MIC (128 bits, i.e., 16 bytes)\n Returns: 0 on success, -1 on failure"]
+#[doc = " @brief One-Key CBC MAC (OMAC1) hash with AES-128 callback function for MIC computation\n\n @param key 128-bit key for the hash operation\n @param data Data buffer for which a MIC is computed\n @param data_len Length of data buffer in bytes\n @param mic Buffer for MIC (128 bits, i.e., 16 bytes)\n Returns: 0 on success, -1 on failure"]
 pub type esp_omac1_aes_128_t = ::core::option::Option<
     unsafe extern "C" fn(
         key: *const u8,
@@ -6347,7 +6440,7 @@ pub type esp_omac1_aes_128_t = ::core::option::Option<
         mic: *mut u8,
     ) -> crate::c_types::c_int,
 >;
-#[doc = " @brief Decrypt data using CCMP (Counter Mode CBC-MAC Protocol OR\n        Counter Mode Cipher Block Chaining Message Authentication\n        Code Protocol) which is used in IEEE 802.11i RSN standard.\n @tk: 128-bit Temporal Key for obtained during 4-way handshake\n @hdr: Pointer to IEEE802.11 frame headeri needed for AAD\n @data: Pointer to encrypted data buffer\n @data_len: Encrypted data length in bytes\n @decrypted_len: Length of decrypted data\n @espnow_pkt: Indicates if it's an ESPNOW packet\n Returns: Pointer to decrypted data on success, NULL on failure"]
+#[doc = " @brief Decrypt data callback function using CCMP (Counter Mode CBC-MAC Protocol OR\n        Counter Mode Cipher Block Chaining Message Authentication\n        Code Protocol) which is used in IEEE 802.11i RSN standard.\n @param tk 128-bit Temporal Key for obtained during 4-way handshake\n @param ieee80211_hdr Pointer to IEEE802.11 frame headeri needed for AAD\n @param data Pointer to encrypted data buffer\n @param data_len Encrypted data length in bytes\n @param decrypted_len Length of decrypted data\n @param espnow_pkt Indicates if it's an ESPNOW packet\n Returns: Pointer to decrypted data on success, NULL on failure"]
 pub type esp_ccmp_decrypt_t = ::core::option::Option<
     unsafe extern "C" fn(
         tk: *const u8,
@@ -6358,7 +6451,7 @@ pub type esp_ccmp_decrypt_t = ::core::option::Option<
         espnow_pkt: bool,
     ) -> *mut u8,
 >;
-#[doc = " @brief Encrypt data using CCMP (Counter Mode CBC-MAC Protocol OR\n        Counter Mode Cipher Block Chaining Message Authentication\n        Code Protocol) which is used in IEEE 802.11i RSN standard.\n @tk: 128-bit Temporal Key for obtained during 4-way handshake\n @frame: Pointer to IEEE802.11 frame including header\n @len: Length of the frame including header\n @hdrlen: Length of the header\n @pn: Packet Number counter\n @keyid: Key ID to be mentioned in CCMP Vector\n @encrypted_len: Length of the encrypted frame including header"]
+#[doc = " @brief Encrypt data callback function using CCMP (Counter Mode CBC-MAC Protocol OR\n        Counter Mode Cipher Block Chaining Message Authentication\n        Code Protocol) which is used in IEEE 802.11i RSN standard.\n @param tk 128-bit Temporal Key for obtained during 4-way handshake\n @param frame Pointer to IEEE802.11 frame including header\n @param len Length of the frame including header\n @param hdrlen Length of the header\n @param pn Packet Number counter\n @param keyid Key ID to be mentioned in CCMP Vector\n @param encrypted_len Length of the encrypted frame including header"]
 pub type esp_ccmp_encrypt_t = ::core::option::Option<
     unsafe extern "C" fn(
         tk: *const u8,
@@ -6370,7 +6463,7 @@ pub type esp_ccmp_encrypt_t = ::core::option::Option<
         encrypted_len: *mut usize,
     ) -> *mut u8,
 >;
-#[doc = " @brief One-Key GMAC hash with AES for MIC computation\n\n @key: key for the hash operation\n @keylen: key length\n @iv: initialization vector\n @iv_len: initialization vector length\n @aad: aad\n @aad_len: aad length\n @mic: Buffer for MIC (128 bits, i.e., 16 bytes)\n Returns: 0 on success, -1 on failure"]
+#[doc = " @brief One-Key GMAC hash callback function with AES for MIC computation\n\n @param key key for the hash operation\n @param keylen key length\n @param iv initialization vector\n @param iv_len initialization vector length\n @param aad aad\n @param aad_len aad length\n @param mic Buffer for MIC (128 bits, i.e., 16 bytes)\n Returns: 0 on success, -1 on failure"]
 pub type esp_aes_gmac_t = ::core::option::Option<
     unsafe extern "C" fn(
         key: *const u8,
@@ -6382,7 +6475,7 @@ pub type esp_aes_gmac_t = ::core::option::Option<
         mic: *mut u8,
     ) -> crate::c_types::c_int,
 >;
-#[doc = " @brief SHA256 hash for data vector\n @num_elem: Number of elements in the data vector\n @addr: Pointers to the data areas\n @len: Lengths of the data blocks\n @mac: Buffer for the hash\n Returns: 0 on success, -1 on failure"]
+#[doc = " @brief SHA256 hash callback function for data vector\n @param num_elem Number of elements in the data vector\n @param addr Pointers to the data areas\n @param len Lengths of the data blocks\n @param buf Buffer for the hash\n Returns: 0 on success, -1 on failure"]
 pub type esp_sha256_vector_t = ::core::option::Option<
     unsafe extern "C" fn(
         num_elem: usize,
@@ -6391,54 +6484,79 @@ pub type esp_sha256_vector_t = ::core::option::Option<
         buf: *mut u8,
     ) -> crate::c_types::c_int,
 >;
-#[doc = " @brief CRC32 value in little endian.\n\n @param crc: Initial CRC value (result of last calculation or 0 for the first time)\n @param buf: Data buffer that used to calculate the CRC value\n @param len: Length of the data buffer\n @return CRC32 value"]
+#[doc = " @brief CRC32 value callback function in little endian.\n\n @param crc Initial CRC value (result of last calculation or 0 for the first time)\n @param buf Data buffer that used to calculate the CRC value\n @param len Length of the data buffer\n @return CRC32 value"]
 pub type esp_crc32_le_t =
     ::core::option::Option<unsafe extern "C" fn(crc: u32, buf: *const u8, len: u32) -> u32>;
-#[doc = " @brief The crypto callback function structure used when do station security connect.\n        The structure can be set as software crypto or the crypto optimized by device's\n        hardware."]
+#[doc = " @brief The crypto callback function structure used by esp_wifi.\n        The structure can be set as software crypto or the crypto optimized by device's\n        hardware."]
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct wpa_crypto_funcs_t {
+    #[doc = "< The crypto callback function structure size"]
     pub size: u32,
+    #[doc = "< The crypto callback function structure version"]
     pub version: u32,
-    #[doc = "< station connect function used when send EAPOL frame"]
+    #[doc = "< The AES wrap callback function used by esp_wifi"]
     pub aes_wrap: esp_aes_wrap_t,
-    #[doc = "< station connect function used when decrypt key data"]
+    #[doc = "< The AES unwrap callback function used by esp_wifi"]
     pub aes_unwrap: esp_aes_unwrap_t,
-    #[doc = "< station connect function used when check MIC"]
+    #[doc = "< The SHA256 callback function used by esp_wifi"]
     pub hmac_sha256_vector: esp_hmac_sha256_vector_t,
-    #[doc = "< station connect function used when check MIC"]
+    #[doc = "< The SHA256 PRF callback function used by esp_wifi"]
     pub sha256_prf: esp_sha256_prf_t,
+    #[doc = "< HMAC-MD5 callback function over data buffer (RFC 2104)"]
     pub hmac_md5: esp_hmac_md5_t,
+    #[doc = "< HMAC-MD5 callback function over data vector (RFC 2104)"]
     pub hamc_md5_vector: esp_hmac_md5_vector_t,
+    #[doc = "< HMAC-SHA1 callback function over data buffer (RFC 2104)"]
     pub hmac_sha1: esp_hmac_sha1_t,
+    #[doc = "< HMAC-SHA1 callback function over data vector (RFC 2104)"]
     pub hmac_sha1_vector: esp_hmac_sha1_vector_t,
+    #[doc = "< SHA1-based Pseudo-Random Function (PRF) (IEEE 802.11i, 8.5.1.1) callback function"]
     pub sha1_prf: esp_sha1_prf_t,
+    #[doc = "< SHA-1 hash callback function for data vector"]
     pub sha1_vector: esp_sha1_vector_t,
+    #[doc = "< SHA1-based key derivation function (PBKDF2) callback function for IEEE 802.11i"]
     pub pbkdf2_sha1: esp_pbkdf2_sha1_t,
+    #[doc = "< XOR RC4 stream callback function to given data with skip-stream-start"]
     pub rc4_skip: esp_rc4_skip_t,
+    #[doc = "< MD5 hash callback function for data vector"]
     pub md5_vector: esp_md5_vector_t,
+    #[doc = "< Encrypt one AES block callback function"]
     pub aes_encrypt: esp_aes_encrypt_t,
+    #[doc = "< Initialize AES callback function for encryption"]
     pub aes_encrypt_init: esp_aes_encrypt_init_t,
+    #[doc = "< Deinitialize AES encryption callback function"]
     pub aes_encrypt_deinit: esp_aes_encrypt_deinit_t,
+    #[doc = "< Decrypt one AES block callback function"]
     pub aes_decrypt: esp_aes_decrypt_t,
+    #[doc = "< Initialize AES callback function for decryption"]
     pub aes_decrypt_init: esp_aes_decrypt_init_t,
+    #[doc = "< Deinitialize AES decryption callback function"]
     pub aes_decrypt_deinit: esp_aes_decrypt_deinit_t,
+    #[doc = "< The AES 128 encrypt callback function used by esp_wifi"]
     pub aes_128_encrypt: esp_aes_128_encrypt_t,
+    #[doc = "< The AES 128 decrypt callback function used by esp_wifi"]
     pub aes_128_decrypt: esp_aes_128_decrypt_t,
+    #[doc = "< One-Key CBC MAC (OMAC1) hash with AES-128 callback function for MIC computation"]
     pub omac1_aes_128: esp_omac1_aes_128_t,
+    #[doc = "< Decrypt data callback function using CCMP"]
     pub ccmp_decrypt: esp_ccmp_decrypt_t,
+    #[doc = "< Encrypt data callback function using CCMP"]
     pub ccmp_encrypt: esp_ccmp_encrypt_t,
+    #[doc = "< One-Key GMAC hash callback function with AES for MIC computation"]
     pub aes_gmac: esp_aes_gmac_t,
+    #[doc = "< SHA256 hash callback function for data vector"]
     pub sha256_vector: esp_sha256_vector_t,
+    #[doc = "< CRC32 value callback function in little endian"]
     pub crc32: esp_crc32_le_t,
 }
 #[doc = " @brief The crypto callback function structure used in mesh vendor IE encryption. The\n        structure can be set as software crypto or the crypto optimized by device's\n        hardware."]
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct mesh_crypto_funcs_t {
-    #[doc = "< function used in mesh vendor IE encryption"]
+    #[doc = "< Callback function used in mesh vendor IE encryption"]
     pub aes_128_encrypt: esp_aes_128_encrypt_t,
-    #[doc = "< function used in mesh vendor IE decryption"]
+    #[doc = "< Callback function used in mesh vendor IE decryption"]
     pub aes_128_decrypt: esp_aes_128_decrypt_t,
 }
 #[repr(C)]
@@ -6842,15 +6960,15 @@ extern "C" {
     ) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief Creates default WIFI AP. In case of any init error this API aborts.\n\n @note The API creates esp_netif object with default WiFi access point config,\n attaches the netif to wifi and registers default wifi handlers.\n\n @return pointer to esp-netif instance"]
+    #[doc = " @brief Creates default WIFI AP. In case of any init error this API aborts.\n\n @note The API creates esp_netif object with default WiFi access point config,\n attaches the netif to wifi and registers wifi handlers to the default event loop.\n This API uses assert() to check for potential errors, so it could abort the program.\n (Note that the default event loop needs to be created prior to calling this API)\n\n @return pointer to esp-netif instance"]
     pub fn esp_netif_create_default_wifi_ap() -> *mut esp_netif_t;
 }
 extern "C" {
-    #[doc = " @brief Creates default WIFI STA. In case of any init error this API aborts.\n\n @note The API creates esp_netif object with default WiFi station config,\n attaches the netif to wifi and registers default wifi handlers.\n\n @return pointer to esp-netif instance"]
+    #[doc = " @brief Creates default WIFI STA. In case of any init error this API aborts.\n\n @note The API creates esp_netif object with default WiFi station config,\n attaches the netif to wifi and registers wifi handlers to the default event loop.\n This API uses assert() to check for potential errors, so it could abort the program.\n (Note that the default event loop needs to be created prior to calling this API)\n\n @return pointer to esp-netif instance"]
     pub fn esp_netif_create_default_wifi_sta() -> *mut esp_netif_t;
 }
 extern "C" {
-    #[doc = " @brief Creates default WIFI NAN. In case of any init error this API aborts.\n\n @note The API creates esp_netif object with default WiFi station config,\n attaches the netif to wifi and registers default wifi handlers.\n\n @return pointer to esp-netif instance"]
+    #[doc = " @brief Creates default WIFI NAN. In case of any init error this API aborts.\n\n @note The API creates esp_netif object with default WiFi station config,\n attaches the netif to wifi and registers wifi handlers to the default event loop.\n (Note that the default event loop needs to be created prior to calling this API)\n\n @return pointer to esp-netif instance"]
     pub fn esp_netif_create_default_wifi_nan() -> *mut esp_netif_t;
 }
 extern "C" {
@@ -6889,6 +7007,10 @@ pub struct wifi_init_config_t {
     pub static_tx_buf_num: crate::c_types::c_int,
     #[doc = "< WiFi dynamic TX buffer number"]
     pub dynamic_tx_buf_num: crate::c_types::c_int,
+    #[doc = "< WiFi RX MGMT buffer type"]
+    pub rx_mgmt_buf_type: crate::c_types::c_int,
+    #[doc = "< WiFi RX MGMT buffer number"]
+    pub rx_mgmt_buf_num: crate::c_types::c_int,
     #[doc = "< WiFi TX cache buffer number"]
     pub cache_tx_buf_num: crate::c_types::c_int,
     #[doc = "< WiFi channel state information enable flag"]
@@ -6925,9 +7047,6 @@ extern "C" {
     pub static g_wifi_default_wpa_crypto_funcs: wpa_crypto_funcs_t;
 }
 extern "C" {
-    pub static mut g_wifi_feature_caps: u64;
-}
-extern "C" {
     #[doc = " @brief  Initialize WiFi\n         Allocate resource for WiFi driver, such as WiFi control structure, RX/TX buffer,\n         WiFi NVS structure etc. This WiFi also starts WiFi task\n\n @attention 1. This API must be called before all other WiFi API can be called\n @attention 2. Always use WIFI_INIT_CONFIG_DEFAULT macro to initialize the configuration to default values, this can\n               guarantee all the fields get correct value when more fields are added into wifi_init_config_t\n               in future release. If you want to set your own initial values, overwrite the default values\n               which are set by WIFI_INIT_CONFIG_DEFAULT. Please be notified that the field 'magic' of\n               wifi_init_config_t should always be WIFI_INIT_CONFIG_MAGIC!\n\n @param  config pointer to WiFi initialized configuration structure; can point to a temporary variable.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_NO_MEM: out of memory\n    - others: refer to error code esp_err.h"]
     pub fn esp_wifi_init(config: *const wifi_init_config_t) -> esp_err_t;
 }
@@ -6956,7 +7075,7 @@ extern "C" {
     pub fn esp_wifi_restore() -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief     Connect WiFi station to the AP.\n\n @attention 1. This API only impact WIFI_MODE_STA or WIFI_MODE_APSTA mode\n @attention 2. If station interface is connected to an AP, call esp_wifi_disconnect to disconnect.\n @attention 3. The scanning triggered by esp_wifi_scan_start() will not be effective until connection between device and the AP is established.\n               If device is scanning and connecting at the same time, it will abort scanning and return a warning message and error\n               number ESP_ERR_WIFI_STATE.\n               If you want to do reconnection after device received disconnect event, remember to add the maximum retry time, otherwise the called\n               scan will not work. This is especially true when the AP doesn't exist, and you still try reconnection after device received disconnect\n               event with the reason code WIFI_REASON_NO_AP_FOUND.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_WIFI_CONN: WiFi internal error, station or soft-AP control block wrong\n    - ESP_ERR_WIFI_SSID: SSID of AP which station connects is invalid"]
+    #[doc = " @brief     Connect WiFi station to the AP.\n\n @attention 1. This API only impact WIFI_MODE_STA or WIFI_MODE_APSTA mode\n @attention 2. If station interface is connected to an AP, call esp_wifi_disconnect to disconnect.\n @attention 3. The scanning triggered by esp_wifi_scan_start() will not be effective until connection between device and the AP is established.\n               If device is scanning and connecting at the same time, it will abort scanning and return a warning message and error\n               number ESP_ERR_WIFI_STATE.\n @attention 4. This API attempts to connect to an Access Point (AP) only once. To enable reconnection in case of a connection failure, please use\n               the 'failure_retry_cnt' feature in the 'wifi_sta_config_t'. Users are suggested to implement reconnection logic in their application\n               for scenarios where the specified AP does not exist, or reconnection is desired after the device has received a disconnect event.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_WIFI_CONN: WiFi internal error, station or soft-AP control block wrong\n    - ESP_ERR_WIFI_SSID: SSID of AP which station connects is invalid"]
     pub fn esp_wifi_connect() -> esp_err_t;
 }
 extern "C" {
@@ -6972,7 +7091,7 @@ extern "C" {
     pub fn esp_wifi_deauth_sta(aid: u16) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief     Scan all available APs.\n\n @attention If this API is called, the found APs are stored in WiFi driver dynamic allocated memory and the\n            will be freed in esp_wifi_scan_get_ap_records, so generally, call esp_wifi_scan_get_ap_records to cause\n            the memory to be freed once the scan is done\n @attention The values of maximum active scan time and passive scan time per channel are limited to 1500 milliseconds.\n            Values above 1500ms may cause station to disconnect from AP and are not recommended.\n\n @param     config  configuration of scanning\n @param     block if block is true, this API will block the caller until the scan is done, otherwise\n                         it will return immediately\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi was not started by esp_wifi_start\n    - ESP_ERR_WIFI_TIMEOUT: blocking scan is timeout\n    - ESP_ERR_WIFI_STATE: wifi still connecting when invoke esp_wifi_scan_start\n    - others: refer to error code in esp_err.h"]
+    #[doc = " @brief     Scan all available APs.\n\n @attention If this API is called, the found APs are stored in WiFi driver dynamic allocated memory. And then\n            can be freed in esp_wifi_scan_get_ap_records(), esp_wifi_scan_get_ap_record() or esp_wifi_clear_ap_list(),\n            so call any one to free the memory once the scan is done.\n @attention The values of maximum active scan time and passive scan time per channel are limited to 1500 milliseconds.\n            Values above 1500ms may cause station to disconnect from AP and are not recommended.\n\n @param     config  configuration settings for scanning, if set to NULL default settings will be used\n                    of which default values are show_hidden:false, scan_type:active, scan_time.active.min:0,\n                    scan_time.active.max:120 miliseconds, scan_time.passive:360 miliseconds\n\n @param     block if block is true, this API will block the caller until the scan is done, otherwise\n                         it will return immediately\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi was not started by esp_wifi_start\n    - ESP_ERR_WIFI_TIMEOUT: blocking scan is timeout\n    - ESP_ERR_WIFI_STATE: wifi still connecting when invoke esp_wifi_scan_start\n    - others: refer to error code in esp_err.h"]
     pub fn esp_wifi_scan_start(config: *const wifi_scan_config_t, block: bool) -> esp_err_t;
 }
 extern "C" {
@@ -6980,18 +7099,22 @@ extern "C" {
     pub fn esp_wifi_scan_stop() -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief     Get number of APs found in last scan\n\n @param[out] number  store number of APIs found in last scan\n\n @attention This API can only be called when the scan is completed, otherwise it may get wrong value.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_INVALID_ARG: invalid argument"]
+    #[doc = " @brief     Get number of APs found in last scan\n\n @param[out] number  store number of APs found in last scan\n\n @attention This API can only be called when the scan is completed, otherwise it may get wrong value.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_INVALID_ARG: invalid argument"]
     pub fn esp_wifi_scan_get_ap_num(number: *mut u16) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief     Get AP list found in last scan\n\n @param[inout]  number As input param, it stores max AP number ap_records can hold.\n                As output param, it receives the actual AP number this API returns.\n @param         ap_records  wifi_ap_record_t array to hold the found APs\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_INVALID_ARG: invalid argument\n    - ESP_ERR_NO_MEM: out of memory"]
+    #[doc = " @brief     Get AP list found in last scan.\n\n @attention  This API will free all memory occupied by scanned AP list.\n\n @param[inout]  number As input param, it stores max AP number ap_records can hold.\n                As output param, it receives the actual AP number this API returns.\n @param         ap_records  wifi_ap_record_t array to hold the found APs\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_INVALID_ARG: invalid argument\n    - ESP_ERR_NO_MEM: out of memory"]
     pub fn esp_wifi_scan_get_ap_records(
         number: *mut u16,
         ap_records: *mut wifi_ap_record_t,
     ) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief     Clear AP list found in last scan\n\n @attention When the obtained ap list fails,bss info must be cleared,otherwise it may cause memory leakage.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_WIFI_MODE: WiFi mode is wrong\n    - ESP_ERR_INVALID_ARG: invalid argument"]
+    #[doc = " @brief      Get one AP record from the scanned AP list.\n\n @attention  Different from esp_wifi_scan_get_ap_records(), this API only gets one AP record\n             from the scanned AP list each time. This API will free the memory of one AP record,\n             if the user doesn't get all records in the scannned AP list, then needs to call esp_wifi_clear_ap_list()\n             to free the remaining memory.\n\n @param[out] ap_record  pointer to one AP record\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_INVALID_ARG: invalid argument\n    - ESP_FAIL: scan APs is NULL, means all AP records fetched or no AP found"]
+    pub fn esp_wifi_scan_get_ap_record(ap_record: *mut wifi_ap_record_t) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief     Clear AP list found in last scan\n\n @attention This API will free all memory occupied by scanned AP list.\n            When the obtained AP list fails, AP records must be cleared,otherwise it may cause memory leakage.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_WIFI_MODE: WiFi mode is wrong\n    - ESP_ERR_INVALID_ARG: invalid argument"]
     pub fn esp_wifi_clear_ap_list() -> esp_err_t;
 }
 extern "C" {
@@ -7023,7 +7146,7 @@ extern "C" {
     pub fn esp_wifi_get_bandwidth(ifx: wifi_interface_t, bw: *mut wifi_bandwidth_t) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief     Set primary/secondary channel of device\n\n @attention 1. This API should be called after esp_wifi_start()\n @attention 2. When device is in STA mode, this API should not be called when STA is scanning or connecting to an external AP\n @attention 3. When device is in softAP mode, this API should not be called when softAP has connected to external STAs\n @attention 4. When device is in STA+softAP mode, this API should not be called when in the scenarios described above\n @attention 5. The channel info set by this API will not be stored in NVS. So If you want to remeber the channel used before wifi stop,\n               you need to call this API again after wifi start, or you can call `esp_wifi_set_config()` to store the channel info in NVS.\n\n @param     primary  for HT20, primary is the channel number, for HT40, primary is the primary channel\n @param     second   for HT20, second is ignored, for HT40, second is the second channel\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_IF: invalid interface\n    - ESP_ERR_INVALID_ARG: invalid argument"]
+    #[doc = " @brief     Set primary/secondary channel of device\n\n @attention 1. This API should be called after esp_wifi_start() and before esp_wifi_stop()\n @attention 2. When device is in STA mode, this API should not be called when STA is scanning or connecting to an external AP\n @attention 3. When device is in softAP mode, this API should not be called when softAP has connected to external STAs\n @attention 4. When device is in STA+softAP mode, this API should not be called when in the scenarios described above\n @attention 5. The channel info set by this API will not be stored in NVS. So If you want to remeber the channel used before wifi stop,\n               you need to call this API again after wifi start, or you can call `esp_wifi_set_config()` to store the channel info in NVS.\n\n @param     primary  for HT20, primary is the channel number, for HT40, primary is the primary channel\n @param     second   for HT20, second is ignored, for HT40, second is the second channel\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_IF: invalid interface\n    - ESP_ERR_INVALID_ARG: invalid argument\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start"]
     pub fn esp_wifi_set_channel(primary: u8, second: wifi_second_chan_t) -> esp_err_t;
 }
 extern "C" {
@@ -7031,7 +7154,7 @@ extern "C" {
     pub fn esp_wifi_get_channel(primary: *mut u8, second: *mut wifi_second_chan_t) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief     configure country info\n\n @attention 1. It is discouraged to call this API since this doesn't validate the per-country rules,\n               it's up to the user to fill in all fields according to local regulations.\n               Please use esp_wifi_set_country_code instead.\n @attention 2. The default country is \"01\" (world safe mode) {.cc=\"01\", .schan=1, .nchan=11, .policy=WIFI_COUNTRY_POLICY_AUTO}.\n @attention 3. The third octect of country code string is one of the following: ' ', 'O', 'I', 'X', otherwise it is considered as ' '.\n @attention 4. When the country policy is WIFI_COUNTRY_POLICY_AUTO, the country info of the AP to which\n               the station is connected is used. E.g. if the configured country info is {.cc=\"US\", .schan=1, .nchan=11}\n               and the country info of the AP to which the station is connected is {.cc=\"JP\", .schan=1, .nchan=14}\n               then the country info that will be used is {.cc=\"JP\", .schan=1, .nchan=14}. If the station disconnected\n               from the AP the country info is set back to the country info of the station automatically,\n               {.cc=\"US\", .schan=1, .nchan=11} in the example.\n @attention 5. When the country policy is WIFI_COUNTRY_POLICY_MANUAL, then the configured country info is used always.\n @attention 6. When the country info is changed because of configuration or because the station connects to a different\n               external AP, the country IE in probe response/beacon of the soft-AP is also changed.\n @attention 7. The country configuration is stored into flash.\n @attention 8. When this API is called, the PHY init data will switch to the PHY init data type corresponding to the\n               country info.\n\n @param     country   the configured country info\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_INVALID_ARG: invalid argument"]
+    #[doc = " @brief     configure country info\n\n @attention 1. It is discouraged to call this API since this doesn't validate the per-country rules,\n               it's up to the user to fill in all fields according to local regulations.\n               Please use esp_wifi_set_country_code instead.\n @attention 2. The default country is \"01\" (world safe mode) {.cc=\"01\", .schan=1, .nchan=11, .policy=WIFI_COUNTRY_POLICY_AUTO}.\n @attention 3. The third octet of country code string is one of the following: ' ', 'O', 'I', 'X', otherwise it is considered as ' '.\n @attention 4. When the country policy is WIFI_COUNTRY_POLICY_AUTO, the country info of the AP to which\n               the station is connected is used. E.g. if the configured country info is {.cc=\"US\", .schan=1, .nchan=11}\n               and the country info of the AP to which the station is connected is {.cc=\"JP\", .schan=1, .nchan=14}\n               then the country info that will be used is {.cc=\"JP\", .schan=1, .nchan=14}. If the station disconnected\n               from the AP the country info is set back to the country info of the station automatically,\n               {.cc=\"US\", .schan=1, .nchan=11} in the example.\n @attention 5. When the country policy is WIFI_COUNTRY_POLICY_MANUAL, then the configured country info is used always.\n @attention 6. When the country info is changed because of configuration or because the station connects to a different\n               external AP, the country IE in probe response/beacon of the soft-AP is also changed.\n @attention 7. The country configuration is stored into flash.\n @attention 8. When this API is called, the PHY init data will switch to the PHY init data type corresponding to the\n               country info.\n\n @param     country   the configured country info\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_INVALID_ARG: invalid argument"]
     pub fn esp_wifi_set_country(country: *const wifi_country_t) -> esp_err_t;
 }
 extern "C" {
@@ -7077,13 +7200,13 @@ extern "C" {
     ) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief     Get the subtype filter of the control packet in promiscuous mode.\n\n @param[out] filter  store the current status of subtype filter of the control packet in promiscuous mode\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_ARG: invalid argument"]
+    #[doc = " @brief     Get the subtype filter of the control packet in promiscuous mode.\n\n @param[out] filter  store the current status of subtype filter of the control packet in promiscuous mode\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_INVALID_ARG: invalid argument"]
     pub fn esp_wifi_get_promiscuous_ctrl_filter(
         filter: *mut wifi_promiscuous_filter_t,
     ) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief     Set the configuration of the STA, AP or NAN\n\n @attention 1. This API can be called only when specified interface is enabled, otherwise, API fail\n @attention 2. For station configuration, bssid_set needs to be 0; and it needs to be 1 only when users need to check the MAC address of the AP.\n @attention 3. ESP devices are limited to only one channel, so when in the soft-AP+station mode, the soft-AP will adjust its channel automatically to be the same as\n               the channel of the station.\n @attention 4. The configuration will be stored in NVS for station and soft-AP\n\n @param     interface  interface\n @param     conf  station, soft-AP or NAN configuration\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_INVALID_ARG: invalid argument\n    - ESP_ERR_WIFI_IF: invalid interface\n    - ESP_ERR_WIFI_MODE: invalid mode\n    - ESP_ERR_WIFI_PASSWORD: invalid password\n    - ESP_ERR_WIFI_NVS: WiFi internal NVS error\n    - others: refer to the erro code in esp_err.h"]
+    #[doc = " @brief     Set the configuration of the STA, AP or NAN\n\n @attention 1. This API can be called only when specified interface is enabled, otherwise, API fail\n @attention 2. For station configuration, bssid_set needs to be 0; and it needs to be 1 only when users need to check the MAC address of the AP.\n @attention 3. ESP devices are limited to only one channel, so when in the soft-AP+station mode, the soft-AP will adjust its channel automatically to be the same as\n               the channel of the station.\n @attention 4. The configuration will be stored in NVS for station and soft-AP\n\n @param     interface  interface\n @param     conf  station, soft-AP or NAN configuration\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_INVALID_ARG: invalid argument\n    - ESP_ERR_WIFI_IF: invalid interface\n    - ESP_ERR_WIFI_MODE: invalid mode\n    - ESP_ERR_WIFI_PASSWORD: invalid password\n    - ESP_ERR_WIFI_NVS: WiFi internal NVS error\n    - others: refer to the error code in esp_err.h"]
     pub fn esp_wifi_set_config(interface: wifi_interface_t, conf: *mut wifi_config_t) -> esp_err_t;
 }
 extern "C" {
@@ -7129,11 +7252,11 @@ extern "C" {
     ) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief     Set maximum transmitting power after WiFi start.\n\n @attention 1. Maximum power before wifi startup is limited by PHY init data bin.\n @attention 2. The value set by this API will be mapped to the max_tx_power of the structure wifi_country_t variable.\n @attention 3. Mapping Table {Power, max_tx_power} = {{8,   2}, {20,  5}, {28,  7}, {34,  8}, {44, 11},\n                                                      {52, 13}, {56, 14}, {60, 15}, {66, 16}, {72, 18}, {80, 20}}.\n @attention 4. Param power unit is 0.25dBm, range is [8, 84] corresponding to 2dBm - 20dBm.\n @attention 5. Relationship between set value and actual value. As follows: {set value range, actual value} = {{[8,  19],8}, {[20, 27],20}, {[28, 33],28}, {[34, 43],34}, {[44, 51],44}, {[52, 55],52}, {[56, 59],56}, {[60, 65],60}, {[66, 71],66}, {[72, 79],72}, {[80, 84],80}}.\n\n @param     power  Maximum WiFi transmitting power.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_WIFI_ARG: invalid argument, e.g. parameter is out of range"]
+    #[doc = " @brief     Set maximum transmitting power after WiFi start.\n\n @attention 1. Maximum power before wifi startup is limited by PHY init data bin.\n @attention 2. The value set by this API will be mapped to the max_tx_power of the structure wifi_country_t variable.\n @attention 3. Mapping Table {Power, max_tx_power} = {{8,   2}, {20,  5}, {28,  7}, {34,  8}, {44, 11},\n                                                      {52, 13}, {56, 14}, {60, 15}, {66, 16}, {72, 18}, {80, 20}}.\n @attention 4. Param power unit is 0.25dBm, range is [8, 84] corresponding to 2dBm - 20dBm.\n @attention 5. Relationship between set value and actual value. As follows: {set value range, actual value} = {{[8,  19],8}, {[20, 27],20}, {[28, 33],28}, {[34, 43],34}, {[44, 51],44}, {[52, 55],52}, {[56, 59],56}, {[60, 65],60}, {[66, 71],66}, {[72, 79],72}, {[80, 84],80}}.\n\n @param     power  Maximum WiFi transmitting power.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_INVALID_ARG: invalid argument, e.g. parameter is out of range"]
     pub fn esp_wifi_set_max_tx_power(power: i8) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief     Get maximum transmiting power after WiFi start\n\n @param     power Maximum WiFi transmitting power, unit is 0.25dBm.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_WIFI_ARG: invalid argument"]
+    #[doc = " @brief     Get maximum transmiting power after WiFi start\n\n @param     power Maximum WiFi transmitting power, unit is 0.25dBm.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_INVALID_ARG: invalid argument"]
     pub fn esp_wifi_get_max_tx_power(power: *mut i8) -> esp_err_t;
 }
 extern "C" {
@@ -7141,11 +7264,11 @@ extern "C" {
     pub fn esp_wifi_set_event_mask(mask: u32) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief     Get mask of WiFi events\n\n @param     mask  WiFi event mask.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_ARG: invalid argument"]
+    #[doc = " @brief     Get mask of WiFi events\n\n @param     mask  WiFi event mask.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_INVALID_ARG: invalid argument"]
     pub fn esp_wifi_get_event_mask(mask: *mut u32) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief     Send raw ieee80211 data\n\n @attention Currently only support for sending beacon/probe request/probe response/action and non-QoS\n            data frame\n\n @param     ifx interface if the Wi-Fi mode is Station, the ifx should be WIFI_IF_STA. If the Wi-Fi\n            mode is SoftAP, the ifx should be WIFI_IF_AP. If the Wi-Fi mode is Station+SoftAP, the\n            ifx should be WIFI_IF_STA or WIFI_IF_AP. If the ifx is wrong, the API returns ESP_ERR_WIFI_IF.\n @param     buffer raw ieee80211 buffer\n @param     len the length of raw buffer, the len must be <= 1500 Bytes and >= 24 Bytes\n @param     en_sys_seq indicate whether use the internal sequence number. If en_sys_seq is false, the\n            sequence in raw buffer is unchanged, otherwise it will be overwritten by WiFi driver with\n            the system sequence number.\n            Generally, if esp_wifi_80211_tx is called before the Wi-Fi connection has been set up, both\n            en_sys_seq==true and en_sys_seq==false are fine. However, if the API is called after the Wi-Fi\n            connection has been set up, en_sys_seq must be true, otherwise ESP_ERR_WIFI_ARG is returned.\n\n @return\n    - ESP_OK: success\n    - ESP_ERR_WIFI_IF: Invalid interface\n    - ESP_ERR_INVALID_ARG: Invalid parameter\n    - ESP_ERR_WIFI_NO_MEM: out of memory"]
+    #[doc = " @brief     Send raw ieee80211 data\n\n @attention Currently only support for sending beacon/probe request/probe response/action and non-QoS\n            data frame\n\n @param     ifx interface if the Wi-Fi mode is Station, the ifx should be WIFI_IF_STA. If the Wi-Fi\n            mode is SoftAP, the ifx should be WIFI_IF_AP. If the Wi-Fi mode is Station+SoftAP, the\n            ifx should be WIFI_IF_STA or WIFI_IF_AP. If the ifx is wrong, the API returns ESP_ERR_WIFI_IF.\n @param     buffer raw ieee80211 buffer\n @param     len the length of raw buffer, the len must be <= 1500 Bytes and >= 24 Bytes\n @param     en_sys_seq indicate whether use the internal sequence number. If en_sys_seq is false, the\n            sequence in raw buffer is unchanged, otherwise it will be overwritten by WiFi driver with\n            the system sequence number.\n            Generally, if esp_wifi_80211_tx is called before the Wi-Fi connection has been set up, both\n            en_sys_seq==true and en_sys_seq==false are fine. However, if the API is called after the Wi-Fi\n            connection has been set up, en_sys_seq must be true, otherwise ESP_ERR_INVALID_ARG is returned.\n\n @return\n    - ESP_OK: success\n    - ESP_ERR_WIFI_IF: Invalid interface\n    - ESP_ERR_INVALID_ARG: Invalid parameter\n    - ESP_ERR_WIFI_NO_MEM: out of memory"]
     pub fn esp_wifi_80211_tx(
         ifx: wifi_interface_t,
         buffer: *const crate::c_types::c_void,
@@ -7171,19 +7294,19 @@ extern "C" {
     pub fn esp_wifi_set_csi(en: bool) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief     Set antenna GPIO configuration\n\n @param     config  Antenna GPIO configuration.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_ARG: Invalid argument, e.g. parameter is NULL, invalid GPIO number etc"]
+    #[doc = " @brief     Set antenna GPIO configuration\n\n @param     config  Antenna GPIO configuration.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_INVALID_ARG: Invalid argument, e.g. parameter is NULL, invalid GPIO number etc"]
     pub fn esp_wifi_set_ant_gpio(config: *const wifi_ant_gpio_config_t) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief     Get current antenna GPIO configuration\n\n @param     config  Antenna GPIO configuration.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_ARG: invalid argument, e.g. parameter is NULL"]
+    #[doc = " @brief     Get current antenna GPIO configuration\n\n @param     config  Antenna GPIO configuration.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_INVALID_ARG: invalid argument, e.g. parameter is NULL"]
     pub fn esp_wifi_get_ant_gpio(config: *mut wifi_ant_gpio_config_t) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief     Set antenna configuration\n\n @param     config  Antenna configuration.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_ARG: Invalid argument, e.g. parameter is NULL, invalid antenna mode or invalid GPIO number"]
+    #[doc = " @brief     Set antenna configuration\n\n @param     config  Antenna configuration.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_INVALID_ARG: Invalid argument, e.g. parameter is NULL, invalid antenna mode or invalid GPIO number"]
     pub fn esp_wifi_set_ant(config: *const wifi_ant_config_t) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief     Get current antenna configuration\n\n @param     config  Antenna configuration.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_ARG: invalid argument, e.g. parameter is NULL"]
+    #[doc = " @brief     Get current antenna configuration\n\n @param     config  Antenna configuration.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_INVALID_ARG: invalid argument, e.g. parameter is NULL"]
     pub fn esp_wifi_get_ant(config: *mut wifi_ant_config_t) -> esp_err_t;
 }
 extern "C" {
@@ -7191,11 +7314,11 @@ extern "C" {
     pub fn esp_wifi_get_tsf_time(interface: wifi_interface_t) -> i64;
 }
 extern "C" {
-    #[doc = " @brief     Set the inactive time of the STA or AP\n\n @attention 1. For Station, If the station does not receive a beacon frame from the connected SoftAP during the inactive time,\n               disconnect from SoftAP. Default 6s.\n @attention 2. For SoftAP, If the softAP doesn't receive any data from the connected STA during inactive time,\n               the softAP will force deauth the STA. Default is 300s.\n @attention 3. The inactive time configuration is not stored into flash\n\n @param     ifx  interface to be configured.\n @param     sec  Inactive time. Unit seconds.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_WIFI_ARG: invalid argument, For Station, if sec is less than 3. For SoftAP, if sec is less than 10."]
+    #[doc = " @brief     Set the inactive time of the STA or AP\n\n @attention 1. For Station, If the station does not receive a beacon frame from the connected SoftAP during the inactive time,\n               disconnect from SoftAP. Default 6s.\n @attention 2. For SoftAP, If the softAP doesn't receive any data from the connected STA during inactive time,\n               the softAP will force deauth the STA. Default is 300s.\n @attention 3. The inactive time configuration is not stored into flash\n\n @param     ifx  interface to be configured.\n @param     sec  Inactive time. Unit seconds.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_INVALID_ARG: invalid argument, For Station, if sec is less than 3. For SoftAP, if sec is less than 10."]
     pub fn esp_wifi_set_inactive_time(ifx: wifi_interface_t, sec: u16) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief     Get inactive time of specified interface\n\n @param     ifx  Interface to be configured.\n @param     sec  Inactive time. Unit seconds.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_WIFI_ARG: invalid argument"]
+    #[doc = " @brief     Get inactive time of specified interface\n\n @param     ifx  Interface to be configured.\n @param     sec  Inactive time. Unit seconds.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_INVALID_ARG: invalid argument"]
     pub fn esp_wifi_get_inactive_time(ifx: wifi_interface_t, sec: *mut u16) -> esp_err_t;
 }
 extern "C" {
@@ -7203,7 +7326,7 @@ extern "C" {
     pub fn esp_wifi_statis_dump(modules: u32) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief      Set RSSI threshold below which APP will get an event\n\n @attention  This API needs to be called every time after WIFI_EVENT_STA_BSS_RSSI_LOW event is received.\n\n @param      rssi threshold value in dbm between -100 to 0\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_ARG: invalid argument"]
+    #[doc = " @brief      Set RSSI threshold, if average rssi gets lower than threshold, WiFi task will post event WIFI_EVENT_STA_BSS_RSSI_LOW.\n\n @attention  If the user wants to receive another WIFI_EVENT_STA_BSS_RSSI_LOW event after receiving one, this API needs to be\n             called again with an updated/same RSSI threshold.\n\n @param      rssi threshold value in dbm between -100 to 10\n             Note that in some rare cases where signal strength is very strong, rssi values can be slightly positive.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_INVALID_ARG: invalid argument"]
     pub fn esp_wifi_set_rssi_threshold(rssi: i32) -> esp_err_t;
 }
 extern "C" {
@@ -7227,7 +7350,15 @@ extern "C" {
     pub fn esp_wifi_connectionless_module_set_wake_interval(wake_interval: u16) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief     configure country\n\n @attention 1. When ieee80211d_enabled, the country info of the AP to which\n               the station is connected is used. E.g. if the configured country is US\n               and the country info of the AP to which the station is connected is JP\n               then the country info that will be used is JP. If the station disconnected\n               from the AP the country info is set back to the country info of the station automatically,\n               US in the example.\n @attention 2. When ieee80211d_enabled is disabled, then the configured country info is used always.\n @attention 3. When the country info is changed because of configuration or because the station connects to a different\n               external AP, the country IE in probe response/beacon of the soft-AP is also changed.\n @attention 4. The country configuration is stored into flash.\n @attention 5. When this API is called, the PHY init data will switch to the PHY init data type corresponding to the\n               country info.\n @attention 6. Supported country codes are \"01\"(world safe mode) \"AT\",\"AU\",\"BE\",\"BG\",\"BR\",\n               \"CA\",\"CH\",\"CN\",\"CY\",\"CZ\",\"DE\",\"DK\",\"EE\",\"ES\",\"FI\",\"FR\",\"GB\",\"GR\",\"HK\",\"HR\",\"HU\",\n               \"IE\",\"IN\",\"IS\",\"IT\",\"JP\",\"KR\",\"LI\",\"LT\",\"LU\",\"LV\",\"MT\",\"MX\",\"NL\",\"NO\",\"NZ\",\"PL\",\"PT\",\n               \"RO\",\"SE\",\"SI\",\"SK\",\"TW\",\"US\"\n\n @attention 7. When country code \"01\" (world safe mode) is set, SoftAP mode won't contain country IE.\n @attention 8. The default country is \"01\" (world safe mode) and ieee80211d_enabled is TRUE.\n @attention 9. The third octect of country code string is one of the following: ' ', 'O', 'I', 'X', otherwise it is considered as ' '.\n\n @param     country   the configured country ISO code\n @param     ieee80211d_enabled   802.11d is enabled or not\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_INVALID_ARG: invalid argument"]
+    #[doc = " @brief      Request extra reference of Wi-Fi radio.\n             Wi-Fi keep active state(RF opened) to be able to receive packets.\n\n @attention  Please pair the use of `esp_wifi_force_wakeup_acquire` with `esp_wifi_force_wakeup_release`.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start"]
+    pub fn esp_wifi_force_wakeup_acquire() -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief      Release extra reference of Wi-Fi radio.\n             Wi-Fi go to sleep state(RF closed) if no more use of radio.\n\n @attention  Please pair the use of `esp_wifi_force_wakeup_acquire` with `esp_wifi_force_wakeup_release`.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start"]
+    pub fn esp_wifi_force_wakeup_release() -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief     configure country\n\n @attention 1. When ieee80211d_enabled, the country info of the AP to which\n               the station is connected is used. E.g. if the configured country is US\n               and the country info of the AP to which the station is connected is JP\n               then the country info that will be used is JP. If the station disconnected\n               from the AP the country info is set back to the country info of the station automatically,\n               US in the example.\n @attention 2. When ieee80211d_enabled is disabled, then the configured country info is used always.\n @attention 3. When the country info is changed because of configuration or because the station connects to a different\n               external AP, the country IE in probe response/beacon of the soft-AP is also changed.\n @attention 4. The country configuration is stored into flash.\n @attention 5. When this API is called, the PHY init data will switch to the PHY init data type corresponding to the\n               country info.\n @attention 6. Supported country codes are \"01\"(world safe mode) \"AT\",\"AU\",\"BE\",\"BG\",\"BR\",\n               \"CA\",\"CH\",\"CN\",\"CY\",\"CZ\",\"DE\",\"DK\",\"EE\",\"ES\",\"FI\",\"FR\",\"GB\",\"GR\",\"HK\",\"HR\",\"HU\",\n               \"IE\",\"IN\",\"IS\",\"IT\",\"JP\",\"KR\",\"LI\",\"LT\",\"LU\",\"LV\",\"MT\",\"MX\",\"NL\",\"NO\",\"NZ\",\"PL\",\"PT\",\n               \"RO\",\"SE\",\"SI\",\"SK\",\"TW\",\"US\"\n\n @attention 7. When country code \"01\" (world safe mode) is set, SoftAP mode won't contain country IE.\n @attention 8. The default country is \"01\" (world safe mode) and ieee80211d_enabled is TRUE.\n @attention 9. The third octet of country code string is one of the following: ' ', 'O', 'I', 'X', otherwise it is considered as ' '.\n\n @param     country   the configured country ISO code\n @param     ieee80211d_enabled   802.11d is enabled or not\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_INVALID_ARG: invalid argument"]
     pub fn esp_wifi_set_country_code(
         country: *const crate::c_types::c_char,
         ieee80211d_enabled: bool,
@@ -7251,12 +7382,16 @@ extern "C" {
     pub fn esp_wifi_sta_get_aid(aid: *mut u16) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief     Get the negotiated phymode after connection.\n\n @param[out] phymode  store the negotiated phymode.\n\n @attention Operation phy mode, BIT[5]: indicate whether LR enabled, BIT[0-4]: wifi_phy_mode_t\n\n @return\n    - ESP_OK: succeed"]
+    #[doc = " @brief     Get the negotiated phymode after connection.\n\n @param[out] phymode  store the negotiated phymode.\n\n @return\n    - ESP_OK: succeed"]
     pub fn esp_wifi_sta_get_negotiated_phymode(phymode: *mut wifi_phy_mode_t) -> esp_err_t;
 }
 extern "C" {
     #[doc = " @brief      Config dynamic carrier sense\n\n @attention  This API should be called after esp_wifi_start().\n\n @param      enabled Dynamic carrier sense is enabled or not.\n\n @return\n    - ESP_OK: succeed\n    - others: failed"]
     pub fn esp_wifi_set_dynamic_cs(enabled: bool) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief      Get the rssi info after station connected to AP\n\n @attention  This API should be called after station connected to AP.\n\n @param      rssi store the rssi info received from last beacon.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_INVALID_ARG: invalid argument\n    - ESP_FAIL: failed"]
+    pub fn esp_wifi_sta_get_rssi(rssi: *mut crate::c_types::c_int) -> esp_err_t;
 }
 #[doc = "< protocol: ESPTouch"]
 pub const smartconfig_type_t_SC_TYPE_ESPTOUCH: smartconfig_type_t = 0;
@@ -7400,7 +7535,7 @@ extern "C" {
     pub fn esp_wifi_internal_free_rx_buffer(buffer: *mut crate::c_types::c_void);
 }
 extern "C" {
-    #[doc = " @brief  transmit the buffer via wifi driver\n\n This API makes a copy of the input buffer and then forwards the buffer\n copy to WiFi driver.\n\n @param  wifi_interface_t wifi_if : wifi interface id\n @param  void *buffer : the buffer to be transmit\n @param  uint16_t len : the length of buffer\n\n @return\n    - ESP_OK  : Successfully transmit the buffer to wifi driver\n    - ESP_ERR_NO_MEM: out of memory\n    - ESP_ERR_WIFI_ARG: invalid argument\n    - ESP_ERR_WIFI_IF : WiFi interface is invalid\n    - ESP_ERR_WIFI_CONN : WiFi interface is not created, e.g. send the data to STA while WiFi mode is AP mode\n    - ESP_ERR_WIFI_NOT_STARTED : WiFi is not started\n    - ESP_ERR_WIFI_STATE : WiFi internal state is not ready, e.g. WiFi is not started\n    - ESP_ERR_WIFI_NOT_ASSOC : WiFi is not associated\n    - ESP_ERR_WIFI_TX_DISALLOW : WiFi TX is disallowed, e.g. WiFi hasn't pass the authentication\n    - ESP_ERR_WIFI_POST : caller fails to post event to WiFi task"]
+    #[doc = " @brief  transmit the buffer via wifi driver\n\n This API makes a copy of the input buffer and then forwards the buffer\n copy to WiFi driver.\n\n @param  wifi_interface_t wifi_if : wifi interface id\n @param  void *buffer : the buffer to be transmit\n @param  uint16_t len : the length of buffer\n\n @return\n    - ESP_OK  : Successfully transmit the buffer to wifi driver\n    - ESP_ERR_NO_MEM: out of memory\n    - ESP_ERR_INVALID_ARG: invalid argument\n    - ESP_ERR_WIFI_IF : WiFi interface is invalid\n    - ESP_ERR_WIFI_CONN : WiFi interface is not created, e.g. send the data to STA while WiFi mode is AP mode\n    - ESP_ERR_WIFI_NOT_STARTED : WiFi is not started\n    - ESP_ERR_WIFI_STATE : WiFi internal state is not ready, e.g. WiFi is not started\n    - ESP_ERR_WIFI_NOT_ASSOC : WiFi is not associated\n    - ESP_ERR_WIFI_TX_DISALLOW : WiFi TX is disallowed, e.g. WiFi hasn't pass the authentication\n    - ESP_ERR_WIFI_POST : caller fails to post event to WiFi task"]
     pub fn esp_wifi_internal_tx(
         wifi_if: wifi_interface_t,
         buffer: *mut crate::c_types::c_void,
@@ -7414,7 +7549,7 @@ pub type wifi_netstack_buf_ref_cb_t =
 pub type wifi_netstack_buf_free_cb_t =
     ::core::option::Option<unsafe extern "C" fn(netstack_buf: *mut crate::c_types::c_void)>;
 extern "C" {
-    #[doc = " @brief  transmit the buffer by reference via wifi driver\n\n This API firstly increases the reference counter of the input buffer and\n then forwards the buffer to WiFi driver. The WiFi driver will free the buffer\n after processing it. Use esp_wifi_internal_tx() if the uplayer buffer doesn't\n supports reference counter.\n\n @param  wifi_if : wifi interface id\n @param  buffer : the buffer to be tansmit\n @param  len : the length of buffer\n @param  netstack_buf : the netstack buffer related to bufffer\n\n @return\n    - ESP_OK  : Successfully transmit the buffer to wifi driver\n    - ESP_ERR_NO_MEM: out of memory\n    - ESP_ERR_WIFI_ARG: invalid argument\n    - ESP_ERR_WIFI_IF : WiFi interface is invalid\n    - ESP_ERR_WIFI_CONN : WiFi interface is not created, e.g. send the data to STA while WiFi mode is AP mode\n    - ESP_ERR_WIFI_NOT_STARTED : WiFi is not started\n    - ESP_ERR_WIFI_STATE : WiFi internal state is not ready, e.g. WiFi is not started\n    - ESP_ERR_WIFI_NOT_ASSOC : WiFi is not associated\n    - ESP_ERR_WIFI_TX_DISALLOW : WiFi TX is disallowed, e.g. WiFi hasn't pass the authentication\n    - ESP_ERR_WIFI_POST : caller fails to post event to WiFi task"]
+    #[doc = " @brief  transmit the buffer by reference via wifi driver\n\n This API firstly increases the reference counter of the input buffer and\n then forwards the buffer to WiFi driver. The WiFi driver will free the buffer\n after processing it. Use esp_wifi_internal_tx() if the uplayer buffer doesn't\n supports reference counter.\n\n @param  wifi_if : wifi interface id\n @param  buffer : the buffer to be tansmit\n @param  len : the length of buffer\n @param  netstack_buf : the netstack buffer related to bufffer\n\n @return\n    - ESP_OK  : Successfully transmit the buffer to wifi driver\n    - ESP_ERR_NO_MEM: out of memory\n    - ESP_ERR_INVALID_ARG: invalid argument\n    - ESP_ERR_WIFI_IF : WiFi interface is invalid\n    - ESP_ERR_WIFI_CONN : WiFi interface is not created, e.g. send the data to STA while WiFi mode is AP mode\n    - ESP_ERR_WIFI_NOT_STARTED : WiFi is not started\n    - ESP_ERR_WIFI_STATE : WiFi internal state is not ready, e.g. WiFi is not started\n    - ESP_ERR_WIFI_NOT_ASSOC : WiFi is not associated\n    - ESP_ERR_WIFI_TX_DISALLOW : WiFi TX is disallowed, e.g. WiFi hasn't pass the authentication\n    - ESP_ERR_WIFI_POST : caller fails to post event to WiFi task"]
     pub fn esp_wifi_internal_tx_by_ref(
         ifx: wifi_interface_t,
         buffer: *mut crate::c_types::c_void,
@@ -7525,7 +7660,7 @@ extern "C" {
     pub fn esp_wifi_internal_set_log_level(level: wifi_log_level_t) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief     Set current log module and submodule\n\n @param     module      Log module\n @param     submodule   Log submodule\n @param     enable      enable or disable\n            If module == 0 && enable == 0, all log modules are disabled.\n            If module == 0 && enable == 1, all log modules are enabled.\n            If submodule == 0 && enable == 0, all log submodules are disabled.\n            If submodule == 0 && enable == 1, all log submodules are enabled.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_ARG: invalid argument"]
+    #[doc = " @brief     Set current log module and submodule\n\n @param     module      Log module\n @param     submodule   Log submodule\n @param     enable      enable or disable\n            If module == 0 && enable == 0, all log modules are disabled.\n            If module == 0 && enable == 1, all log modules are enabled.\n            If submodule == 0 && enable == 0, all log submodules are disabled.\n            If submodule == 0 && enable == 1, all log submodules are enabled.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_INVALID_ARG: invalid argument"]
     pub fn esp_wifi_internal_set_log_mod(
         module: wifi_log_module_t,
         submodule: u32,
@@ -7615,11 +7750,12 @@ extern "C" {
     pub fn esp_wifi_beacon_monitor_configure(config: *mut wifi_beacon_monitor_config_t);
 }
 extern "C" {
-    #[doc = " @brief   Require WiFi to enable or disable Advanced DTIM sleep function\n\n @param   light_sleep_enable: true for light sleep mode is enabled, false for light sleep mode is disabled.\n @param   modem_state_enable: true for require WiFi to enable Advanced DTIM sleep function,\n                              false for require WiFi to disable Advanced DTIM sleep function.\n @return\n    - ESP_OK: succeed"]
-    pub fn esp_wifi_internal_mac_sleep_configure(
-        light_sleep_enable: bool,
-        modem_state_enable: bool,
-    );
+    #[doc = " @brief   Set modem state mode to require WiFi to enable or disable Advanced DTIM sleep function\n\n @param   require_modem_state: true for require WiFi to enable Advanced DTIM sleep function,\n                              false for require WiFi to disable Advanced DTIM sleep function.\n @return\n    - ESP_OK: succeed"]
+    pub fn esp_wifi_internal_modem_state_configure(require_modem_state: bool);
+}
+extern "C" {
+    #[doc = " @brief   Set light sleep mode to require WiFi to enable or disable Advanced DTIM sleep function\n\n @param   light_sleep_enable: true for light sleep mode is enabled, false for light sleep mode is disabled.\n @return\n    - ESP_OK: succeed"]
+    pub fn esp_wifi_internal_light_sleep_configure(light_sleep_enable: bool);
 }
 extern "C" {
     #[doc = " @brief      Start Publishing a service in the NAN cluster\n\n @attention  This API should be called after esp_wifi_start() in NAN Mode.\n\n @param      publish_cfg  Configuration parameters for publishing a service.\n @param      id  Identifier for the Publish service.\n @param      cancel  Cancel the service identified by the id.\n\n @return\n    - ESP_OK: succeed\n    - others: failed"]
@@ -7676,6 +7812,14 @@ pub struct esp_phy_init_data_t {
     #[doc = "< opaque PHY initialization parameters"]
     pub params: [u8; 128usize],
 }
+#[doc = "< PHY modem WIFI"]
+pub const esp_phy_modem_t_PHY_MODEM_WIFI: esp_phy_modem_t = 1;
+#[doc = "< PHY modem BT"]
+pub const esp_phy_modem_t_PHY_MODEM_BT: esp_phy_modem_t = 2;
+#[doc = "< PHY modem IEEE802154"]
+pub const esp_phy_modem_t_PHY_MODEM_IEEE802154: esp_phy_modem_t = 4;
+#[doc = " @brief PHY enable or disable modem"]
+pub type esp_phy_modem_t = crate::c_types::c_uint;
 #[doc = " @brief Opaque PHY calibration data"]
 #[repr(C)]
 #[derive(Copy, Clone)]
@@ -7704,13 +7848,13 @@ extern "C" {
     pub fn esp_phy_release_init_data(data: *const esp_phy_init_data_t);
 }
 extern "C" {
-    #[doc = " @brief Function called by esp_phy_init to load PHY calibration data\n\n This is a convenience function which can be used to load PHY calibration\n data from NVS. Data can be stored to NVS using esp_phy_store_cal_data_to_nvs\n function.\n\n If calibration data is not present in the NVS, or\n data is not valid (was obtained for a chip with a different MAC address,\n or obtained for a different version of software), this function will\n return an error.\n\n If \"Initialize PHY in startup code\" option is set in menuconfig, this\n function will be used to load calibration data. To provide a different\n mechanism for loading calibration data, disable\n \"Initialize PHY in startup code\" option in menuconfig and call esp_phy_init\n function from the application. For an example usage of esp_phy_init and\n this function, see esp_phy_store_cal_data_to_nvs function in cpu_start.c\n\n @param out_cal_data pointer to calibration data structure to be filled with\n                     loaded data.\n @return ESP_OK on success"]
+    #[doc = " @brief Function called by esp_phy_load_cal_and_init to load PHY calibration data\n\n This is a convenience function which can be used to load PHY calibration\n data from NVS. Data can be stored to NVS using esp_phy_store_cal_data_to_nvs\n function.\n\n If calibration data is not present in the NVS, or\n data is not valid (was obtained for a chip with a different MAC address,\n or obtained for a different version of software), this function will\n return an error.\n\n @param out_cal_data pointer to calibration data structure to be filled with\n                     loaded data.\n @return ESP_OK on success"]
     pub fn esp_phy_load_cal_data_from_nvs(
         out_cal_data: *mut esp_phy_calibration_data_t,
     ) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief Function called by esp_phy_init to store PHY calibration data\n\n This is a convenience function which can be used to store PHY calibration\n data to the NVS. Calibration data is returned by esp_phy_init function.\n Data saved using this function to the NVS can later be loaded using\n esp_phy_store_cal_data_to_nvs function.\n\n If \"Initialize PHY in startup code\" option is set in menuconfig, this\n function will be used to store calibration data. To provide a different\n mechanism for storing calibration data, disable\n \"Initialize PHY in startup code\" option in menuconfig and call esp_phy_init\n function from the application.\n\n @param cal_data pointer to calibration data which has to be saved.\n @return ESP_OK on success"]
+    #[doc = " @brief Function called by esp_phy_load_cal_and_init to store PHY calibration data\n\n This is a convenience function which can be used to store PHY calibration\n data to the NVS. Calibration data is returned by esp_phy_load_cal_and_init function.\n Data saved using this function to the NVS can later be loaded using\n esp_phy_store_cal_data_to_nvs function.\n\n @param cal_data pointer to calibration data which has to be saved.\n @return ESP_OK on success"]
     pub fn esp_phy_store_cal_data_to_nvs(cal_data: *const esp_phy_calibration_data_t) -> esp_err_t;
 }
 extern "C" {
@@ -7718,12 +7862,12 @@ extern "C" {
     pub fn esp_phy_erase_cal_data_in_nvs() -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief Enable PHY and RF module\n\n PHY and RF module should be enabled in order to use WiFi or BT.\n Now PHY and RF enabling job is done automatically when start WiFi or BT. Users should not\n call this API in their application.\n"]
-    pub fn esp_phy_enable();
+    #[doc = " @brief Enable PHY and RF module\n\n PHY and RF module should be enabled in order to use WiFi or BT.\n Now PHY and RF enabling job is done automatically when start WiFi or BT. Users should not\n call this API in their application.\n\n @param modem the modem to call the phy enable."]
+    pub fn esp_phy_enable(modem: esp_phy_modem_t);
 }
 extern "C" {
-    #[doc = " @brief Disable PHY and RF module\n\n PHY module should be disabled in order to shutdown WiFi or BT.\n Now PHY and RF disabling job is done automatically when stop WiFi or BT. Users should not\n call this API in their application.\n"]
-    pub fn esp_phy_disable();
+    #[doc = " @brief Disable PHY and RF module\n\n PHY module should be disabled in order to shutdown WiFi or BT.\n Now PHY and RF disabling job is done automatically when stop WiFi or BT. Users should not\n call this API in their application.\n\n @param modem the modem to call the phy disable."]
+    pub fn esp_phy_disable(modem: esp_phy_modem_t);
 }
 extern "C" {
     #[doc = " @brief Enable BTBB module\n\n BTBB module should be enabled in order to use IEEE802154 or BT.\n Now BTBB enabling job is done automatically when start IEEE802154 or BT. Users should not\n call this API in their application.\n"]
@@ -7764,6 +7908,14 @@ extern "C" {
 extern "C" {
     #[doc = " @brief Get PHY lib version\n @return PHY lib version."]
     pub fn get_phy_version_str() -> *mut crate::c_types::c_char;
+}
+extern "C" {
+    #[doc = " @brief Set PHY init parameters\n @param param is 1 means combo module"]
+    pub fn phy_init_param_set(param: u8);
+}
+extern "C" {
+    #[doc = " @brief Wi-Fi RX enable\n @param enable True for enable wifi receiving mode as default, false for closing wifi receiving mode as default."]
+    pub fn phy_wifi_enable_set(enable: u8);
 }
 pub const phy_i2c_master_command_type_t_PHY_I2C_MST_CMD_TYPE_OFF: phy_i2c_master_command_type_t = 0;
 pub const phy_i2c_master_command_type_t_PHY_I2C_MST_CMD_TYPE_ON: phy_i2c_master_command_type_t = 1;
@@ -7820,6 +7972,30 @@ extern "C" {
 extern "C" {
     #[doc = " @brief Store and load PHY digital registers.\n\n @param     backup_en  if backup_en is true, store PHY digital registers to memory. Otherwise load PHY digital registers from memory\n @param     mem_addr   Memory address to store and load PHY digital registers\n\n @return    memory size"]
     pub fn phy_dig_reg_backup(backup_en: bool, mem_addr: *mut u32) -> u8;
+}
+extern "C" {
+    #[doc = " @brief Enable phy track pll\n"]
+    pub fn phy_track_pll_init();
+}
+extern "C" {
+    #[doc = " @brief Disable phy track pll\n"]
+    pub fn phy_track_pll_deinit();
+}
+extern "C" {
+    #[doc = " @brief Set the flag recorded which modem has already enabled phy\n"]
+    pub fn phy_set_modem_flag(modem: esp_phy_modem_t);
+}
+extern "C" {
+    #[doc = " @brief Clear the flag to record which modem calls phy disenable"]
+    pub fn phy_clr_modem_flag(modem: esp_phy_modem_t);
+}
+extern "C" {
+    #[doc = " @brief Get the flag recorded which modem has already enabled phy\n"]
+    pub fn phy_get_modem_flag() -> esp_phy_modem_t;
+}
+extern "C" {
+    #[doc = " @brief Get the PHY lock, only used in esp_phy, the user should not use this function.\n"]
+    pub fn phy_get_lock() -> _lock_t;
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
@@ -8167,7 +8343,7 @@ pub const esp_bt_mode_t_ESP_BT_MODE_BLE: esp_bt_mode_t = 1;
 pub const esp_bt_mode_t_ESP_BT_MODE_CLASSIC_BT: esp_bt_mode_t = 2;
 #[doc = "< Run dual mode"]
 pub const esp_bt_mode_t_ESP_BT_MODE_BTDM: esp_bt_mode_t = 3;
-#[doc = " @brief Bluetooth mode for controller enable/disable"]
+#[doc = " @brief Bluetooth mode for controller enable/disable."]
 pub type esp_bt_mode_t = crate::c_types::c_uint;
 #[doc = "< Controller is in idle state"]
 pub const esp_bt_controller_status_t_ESP_BT_CONTROLLER_STATUS_IDLE: esp_bt_controller_status_t = 0;
@@ -8179,7 +8355,7 @@ pub const esp_bt_controller_status_t_ESP_BT_CONTROLLER_STATUS_ENABLED: esp_bt_co
     2;
 #[doc = "< Controller is in disabled state"]
 pub const esp_bt_controller_status_t_ESP_BT_CONTROLLER_STATUS_NUM: esp_bt_controller_status_t = 3;
-#[doc = " @brief Bluetooth controller enable/disable/initialised/de-initialised status"]
+#[doc = " @brief Bluetooth controller enable/disable/initialised/de-initialised status."]
 pub type esp_bt_controller_status_t = crate::c_types::c_uint;
 #[doc = "< For connection handle 0"]
 pub const esp_ble_power_type_t_ESP_BLE_PWR_TYPE_CONN_HDL0: esp_ble_power_type_t = 0;
@@ -8237,16 +8413,16 @@ pub const esp_power_level_t_ESP_PWR_LVL_P9: esp_power_level_t = 11;
 pub const esp_power_level_t_ESP_PWR_LVL_P12: esp_power_level_t = 12;
 #[doc = "< Corresponding to  +15dbm"]
 pub const esp_power_level_t_ESP_PWR_LVL_P15: esp_power_level_t = 13;
-#[doc = "< Corresponding to  +16dbm"]
+#[doc = "< Corresponding to  +18dbm, this enum variable has been deprecated"]
 pub const esp_power_level_t_ESP_PWR_LVL_P16: esp_power_level_t = 14;
-#[doc = "< Corresponding to  +17dbm"]
-pub const esp_power_level_t_ESP_PWR_LVL_P17: esp_power_level_t = 15;
+#[doc = "< Corresponding to  +18dbm, this enum variable has been deprecated"]
+pub const esp_power_level_t_ESP_PWR_LVL_P17: esp_power_level_t = 14;
 #[doc = "< Corresponding to  +18dbm"]
-pub const esp_power_level_t_ESP_PWR_LVL_P18: esp_power_level_t = 16;
-#[doc = "< Corresponding to  +19dbm"]
-pub const esp_power_level_t_ESP_PWR_LVL_P19: esp_power_level_t = 17;
+pub const esp_power_level_t_ESP_PWR_LVL_P18: esp_power_level_t = 14;
+#[doc = "< Corresponding to  +20dbm, this enum variable has been deprecated"]
+pub const esp_power_level_t_ESP_PWR_LVL_P19: esp_power_level_t = 15;
 #[doc = "< Corresponding to  +20dbm"]
-pub const esp_power_level_t_ESP_PWR_LVL_P20: esp_power_level_t = 18;
+pub const esp_power_level_t_ESP_PWR_LVL_P20: esp_power_level_t = 15;
 #[doc = "< Indicates an invalid value"]
 pub const esp_power_level_t_ESP_PWR_LVL_INVALID: esp_power_level_t = 255;
 #[doc = " @brief Bluetooth TX power level(index), it's just a index corresponding to power(dbm)."]
@@ -8263,13 +8439,21 @@ pub const esp_ble_enhanced_power_type_t_ESP_BLE_ENHANCED_PWR_TYPE_CONN:
     esp_ble_enhanced_power_type_t = 4;
 pub const esp_ble_enhanced_power_type_t_ESP_BLE_ENHANCED_PWR_TYPE_MAX:
     esp_ble_enhanced_power_type_t = 5;
+#[doc = " @brief The enhanced type of which tx power, could set Advertising/Connection/Default and etc."]
 pub type esp_ble_enhanced_power_type_t = crate::c_types::c_uint;
+#[doc = " @brief Address type and address value."]
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct esp_ble_addr_t {
+    #[doc = "< Type of the Bluetooth address (public, random, etc.)"]
     pub type_: u8,
+    #[doc = "< Array containing the 6-byte Bluetooth address value"]
     pub val: [u8; 6usize],
 }
+pub const esp_ble_log_buf_t_ESP_BLE_LOG_BUF_HCI: esp_ble_log_buf_t = 2;
+pub const esp_ble_log_buf_t_ESP_BLE_LOG_BUF_CONTROLLER: esp_ble_log_buf_t = 5;
+#[doc = " @brief Select buffers"]
+pub type esp_ble_log_buf_t = crate::c_types::c_uint;
 extern "C" {
     #[doc = " @brief  Set BLE TX power\n         Connection Tx power should only be set after connection created.\n @param  power_type : The type of which tx power, could set Advertising/Connection/Default and etc\n @param  power_level: Power level(index) corresponding to absolute value(dbm)\n @return              ESP_OK - success, other - failed"]
     pub fn esp_ble_tx_power_set(
@@ -8300,60 +8484,115 @@ extern "C" {
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct esp_bt_controller_config_t {
+    #[doc = "< Version number of the defined structure"]
     pub config_version: u32,
+    #[doc = "< Size of the resolvable private address list"]
     pub ble_ll_resolv_list_size: u16,
+    #[doc = "< Count of high buffers for HCI events"]
     pub ble_hci_evt_hi_buf_count: u16,
+    #[doc = "< Count of low buffers for HCI events"]
     pub ble_hci_evt_lo_buf_count: u16,
+    #[doc = "< Number of synchronization lists"]
     pub ble_ll_sync_list_cnt: u8,
+    #[doc = "< Number of synchronizations"]
     pub ble_ll_sync_cnt: u8,
+    #[doc = "< Count of duplicated lists for scan response packets"]
     pub ble_ll_rsp_dup_list_count: u16,
+    #[doc = "< Count of duplicated lists for advertising packets"]
     pub ble_ll_adv_dup_list_count: u16,
+    #[doc = "< Tx power (transmit power) in dBm"]
     pub ble_ll_tx_pwr_dbm: u8,
+    #[doc = "< Frequency of RTC (Real-Time Clock)"]
     pub rtc_freq: u64,
+    #[doc = "< Sleep Clock Accuracy (SCA) parameter"]
     pub ble_ll_sca: u16,
+    #[doc = "< Number of PHYs supported for scanning"]
     pub ble_ll_scan_phy_number: u8,
+    #[doc = "< Connection default authentication payload timeout"]
     pub ble_ll_conn_def_auth_pyld_tmo: u16,
+    #[doc = "< Jitter time in microseconds"]
     pub ble_ll_jitter_usecs: u8,
+    #[doc = "< Maximum time in microseconds for advertising PDU scheduling"]
     pub ble_ll_sched_max_adv_pdu_usecs: u16,
+    #[doc = "< Maximum time in microseconds for directed advertising scheduling"]
     pub ble_ll_sched_direct_adv_max_usecs: u16,
+    #[doc = "< Maximum time in microseconds for advertising scheduling"]
     pub ble_ll_sched_adv_max_usecs: u16,
+    #[doc = "< Maximum length of scan response data"]
     pub ble_scan_rsp_data_max_len: u16,
+    #[doc = "< Number of HCI command packets that can be queued"]
     pub ble_ll_cfg_num_hci_cmd_pkts: u8,
+    #[doc = "< Control processing timeout in milliseconds"]
     pub ble_ll_ctrl_proc_timeout_ms: u32,
+    #[doc = "< Maximum number of connections supported"]
     pub nimble_max_connections: u16,
+    #[doc = "< Size of the white list"]
     pub ble_whitelist_size: u8,
+    #[doc = "< Buffer size of ACL (Asynchronous Connection-Less) data"]
     pub ble_acl_buf_size: u16,
+    #[doc = "< Buffer count of ACL data"]
     pub ble_acl_buf_count: u16,
+    #[doc = "< Buffer size for HCI event data"]
     pub ble_hci_evt_buf_size: u16,
+    #[doc = "< Number of advertising instances"]
     pub ble_multi_adv_instances: u16,
+    #[doc = "< Maximum size of extended advertising data"]
     pub ble_ext_adv_max_size: u16,
+    #[doc = "< Size of Bluetooth controller task stack"]
     pub controller_task_stack_size: u16,
+    #[doc = "< Priority of the Bluetooth task"]
     pub controller_task_prio: u8,
+    #[doc = "< CPU number on which the Bluetooth controller task runs"]
     pub controller_run_cpu: u8,
+    #[doc = "< Enable for QA test"]
     pub enable_qa_test: u8,
+    #[doc = "< Enable for BQB test"]
     pub enable_bqb_test: u8,
+    #[doc = "< Enable UART for HCI (Host Controller Interface)"]
     pub enable_uart_hci: u8,
+    #[doc = "< Port of UART for HCI"]
     pub ble_hci_uart_port: u8,
+    #[doc = "< Baudrate of UART for HCI"]
     pub ble_hci_uart_baud: u32,
+    #[doc = "< Data bits of UART for HCI"]
     pub ble_hci_uart_data_bits: u8,
+    #[doc = "< Stop bits of UART for HCI"]
     pub ble_hci_uart_stop_bits: u8,
+    #[doc = "< Flow control of UART for HCI"]
     pub ble_hci_uart_flow_ctrl: u8,
+    #[doc = "< UART parity"]
     pub ble_hci_uart_uart_parity: u8,
+    #[doc = "< Enable Clear Channel Assessment (CCA) when transmitting"]
     pub enable_tx_cca: u8,
+    #[doc = "< RSSI threshold for CCA"]
     pub cca_rssi_thresh: u8,
+    #[doc = "< Enable sleep functionality"]
     pub sleep_en: u8,
+    #[doc = "< Coexistence PHY coded TX and RX time limit"]
     pub coex_phy_coded_tx_rx_time_limit: u8,
+    #[doc = "< Disable scan backoff"]
     pub dis_scan_backoff: u8,
+    #[doc = "< Enable classification filter for BLE scan"]
     pub ble_scan_classify_filter_enable: u8,
+    #[doc = "< CCA drop mode"]
     pub cca_drop_mode: u8,
+    #[doc = "< Low TX power setting for CCA"]
     pub cca_low_tx_pwr: i8,
+    #[doc = "< Main crystal frequency"]
     pub main_xtal_freq: u8,
+    #[doc = "< CPU frequency in megahertz"]
     pub cpu_freq_mhz: u8,
+    #[doc = "< Ignore the white list for directed advertising"]
     pub ignore_wl_for_direct_adv: u8,
+    #[doc = "< Enable power control"]
     pub enable_pcl: u8,
+    #[doc = "< Select CSA#2"]
+    pub csa2_select: u8,
+    #[doc = "< Configuration magic value"]
     pub config_magic: u32,
 }
 extern "C" {
+    #[doc = " @brief       Initialize BT controller to allocate task and other resource.\n              This function should be called only once, before any other BT functions are called.\n @param  cfg: Initial configuration of BT controller.\n @return      ESP_OK - success, other - failed"]
     pub fn esp_bt_controller_init(cfg: *mut esp_bt_controller_config_t) -> esp_err_t;
 }
 extern "C" {
@@ -8361,14 +8600,18 @@ extern "C" {
     pub fn esp_bt_controller_get_status() -> esp_bt_controller_status_t;
 }
 extern "C" {
+    #[doc = " @brief  De-initialize BT controller to free resource and delete task.\n         You should stop advertising and scanning, as well as\n         disconnect all existing connections before de-initializing BT controller.\n\n This function should be called only once, after any other BT functions are called.\n This function is not whole completed, esp_bt_controller_init cannot called after this function.\n @return  ESP_OK - success, other - failed"]
     pub fn esp_bt_controller_deinit() -> esp_err_t;
 }
 extern "C" {
+    #[doc = " @brief Enable BT controller.\n               Due to a known issue, you cannot call esp_bt_controller_enable() a second time\n               to change the controller mode dynamically. To change controller mode, call\n               esp_bt_controller_disable() and then call esp_bt_controller_enable() with the new mode.\n @param mode : the mode(BLE/BT/BTDM) to enable. For compatible of API, retain this argument.\n @return       ESP_OK - success, other - failed"]
     pub fn esp_bt_controller_enable(mode: esp_bt_mode_t) -> esp_err_t;
 }
 extern "C" {
+    #[doc = " @brief  Disable BT controller\n @return       ESP_OK - success, other - failed"]
     pub fn esp_bt_controller_disable() -> esp_err_t;
 }
+#[doc = " @brief esp_vhci_host_callback\n  used for vhci call host function to notify what host need to do"]
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct esp_vhci_host_callback {
@@ -8379,6 +8622,7 @@ pub struct esp_vhci_host_callback {
         unsafe extern "C" fn(data: *mut u8, len: u16) -> crate::c_types::c_int,
     >,
 }
+#[doc = " @brief esp_vhci_host_callback\n  used for vhci call host function to notify what host need to do"]
 pub type esp_vhci_host_callback_t = esp_vhci_host_callback;
 extern "C" {
     #[doc = " @brief esp_vhci_host_check_send_available\n  used for check actively if the host can send packet to controller or not.\n  @return true for ready to send, false means cannot send packet"]
@@ -8401,6 +8645,7 @@ extern "C" {
     pub fn esp_bt_mem_release(mode: esp_bt_mode_t) -> esp_err_t;
 }
 extern "C" {
+    #[doc = " @brief Returns random static address or -1 if not present.\n @return ESP_OK - success, other - failed"]
     pub fn esp_ble_hw_get_static_addr(addr: *mut esp_ble_addr_t) -> crate::c_types::c_int;
 }
 #[doc = "< Prefer to WiFi, WiFi will have more opportunity to use RF"]
@@ -8416,7 +8661,8 @@ pub type esp_coex_prefer_t = crate::c_types::c_uint;
 pub const external_coex_wire_t_EXTERN_COEX_WIRE_1: external_coex_wire_t = 0;
 pub const external_coex_wire_t_EXTERN_COEX_WIRE_2: external_coex_wire_t = 1;
 pub const external_coex_wire_t_EXTERN_COEX_WIRE_3: external_coex_wire_t = 2;
-pub const external_coex_wire_t_EXTERN_COEX_WIRE_NUM: external_coex_wire_t = 3;
+pub const external_coex_wire_t_EXTERN_COEX_WIRE_4: external_coex_wire_t = 3;
+pub const external_coex_wire_t_EXTERN_COEX_WIRE_NUM: external_coex_wire_t = 4;
 pub type external_coex_wire_t = crate::c_types::c_uint;
 pub const esp_coex_status_type_t_ESP_COEX_ST_TYPE_WIFI: esp_coex_status_type_t = 0;
 pub const esp_coex_status_type_t_ESP_COEX_ST_TYPE_BLE: esp_coex_status_type_t = 1;
@@ -8495,6 +8741,13 @@ pub struct coex_adapter_funcs_t {
 extern "C" {
     pub static mut g_coex_adapter_funcs: coex_adapter_funcs_t;
 }
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct coex_version_t {
+    pub major: u8,
+    pub minor: u8,
+    pub patch: u8,
+}
 pub const coex_prefer_t_COEX_PREFER_WIFI: coex_prefer_t = 0;
 pub const coex_prefer_t_COEX_PREFER_BT: coex_prefer_t = 1;
 pub const coex_prefer_t_COEX_PREFER_BALANCE: coex_prefer_t = 2;
@@ -8535,16 +8788,16 @@ extern "C" {
     pub fn coex_version_get() -> *const crate::c_types::c_char;
 }
 extern "C" {
+    #[doc = " @brief Get software coexist version value\n        extern function for internal use.\n @param ptr_version : points to version structure\n @return : ESP_OK - success, other - failed"]
+    pub fn coex_version_get_value(ptr_version: *mut coex_version_t) -> esp_err_t;
+}
+extern "C" {
     #[doc = " @brief Coexist performance preference set from libbt.a\n        extern function for internal use.\n\n  @param prefer : the prefer enumeration value\n  @return : ESP_OK - success, other - failed"]
     pub fn coex_preference_set(prefer: coex_prefer_t) -> esp_err_t;
 }
 extern "C" {
     #[doc = " @brief Get software coexist status.\n @return : software coexist status"]
     pub fn coex_status_get() -> u32;
-}
-extern "C" {
-    #[doc = " @brief Set software coexist condition.\n @return : software coexist condition"]
-    pub fn coex_condition_set(type_: u32, dissatisfy: bool);
 }
 extern "C" {
     #[doc = " @brief WiFi requests coexistence.\n\n  @param event : WiFi event\n  @param latency : WiFi will request coexistence after latency\n  @param duration : duration for WiFi to request coexistence\n  @return : 0 - success, other - failed"]
@@ -8617,7 +8870,7 @@ extern "C" {
     pub fn coex_schm_curr_phase_get() -> *mut crate::c_types::c_void;
 }
 extern "C" {
-    #[doc = " @brief Set current coexistence scheme phase index.\n\n  @param interval : Coexistence scheme phase index\n  @return : 0 - success, other - failed"]
+    #[doc = " @brief Set current coexistence scheme phase index.\n\n  @param idx : Coexistence scheme phase index\n  @return : 0 - success, other - failed"]
     pub fn coex_schm_curr_phase_idx_set(idx: crate::c_types::c_int) -> crate::c_types::c_int;
 }
 extern "C" {
@@ -8698,6 +8951,21 @@ pub struct esp_now_recv_info {
 }
 #[doc = " @brief ESPNOW packet information"]
 pub type esp_now_recv_info_t = esp_now_recv_info;
+#[doc = " @brief ESPNOW rate config\n"]
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct esp_now_rate_config {
+    #[doc = "< ESPNOW phymode of specified interface"]
+    pub phymode: wifi_phy_mode_t,
+    #[doc = "< ESPNOW rate of specified interface"]
+    pub rate: wifi_phy_rate_t,
+    #[doc = "< ESPNOW using ersu send frame"]
+    pub ersu: bool,
+    #[doc = "< ESPNOW using dcm rate to send frame"]
+    pub dcm: bool,
+}
+#[doc = " @brief ESPNOW rate config\n"]
+pub type esp_now_rate_config_t = esp_now_rate_config;
 #[doc = " @brief     Callback function of receiving ESPNOW data\n @param     esp_now_info received ESPNOW packet information\n @param     data received data\n @param     data_len length of received data\n @attention esp_now_info is a local variable，it can only be used in the callback."]
 pub type esp_now_recv_cb_t = ::core::option::Option<
     unsafe extern "C" fn(
@@ -8755,8 +9023,15 @@ extern "C" {
     pub fn esp_now_mod_peer(peer: *const esp_now_peer_info_t) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief      Config ESPNOW rate of specified interface\n\n @attention  1. This API should be called after esp_wifi_start().\n\n @param      ifx  Interface to be configured.\n @param      rate Phy rate to be configured.\n\n @return\n    - ESP_OK: succeed\n    - others: failed"]
+    #[doc = " @brief      Config ESPNOW rate of specified interface\n\n @deprecated please use esp_now_set_peer_rate_config() instead.\n\n @attention  1. This API should be called after esp_wifi_start().\n @attention  2. This API only work when not use Wi-Fi 6 and esp_now_set_peer_rate_config() not called.\n\n @param      ifx  Interface to be configured.\n @param      rate Phy rate to be configured.\n\n @return\n    - ESP_OK: succeed\n    - others: failed"]
     pub fn esp_wifi_config_espnow_rate(ifx: wifi_interface_t, rate: wifi_phy_rate_t) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief      Set ESPNOW rate config for each peer\n\n @attention  1. This API should be called after esp_wifi_start() and esp_now_init().\n\n @param      peer_addr  peer MAC address\n @param      config rate config to be configured.\n\n @return\n          - ESP_OK : succeed\n          - ESP_ERR_ESPNOW_NOT_INIT : ESPNOW is not initialized\n          - ESP_ERR_ESPNOW_ARG : invalid argument\n          - ESP_ERR_ESPNOW_INTERNAL : internal error"]
+    pub fn esp_now_set_peer_rate_config(
+        peer_addr: *const u8,
+        config: *mut esp_now_rate_config_t,
+    ) -> esp_err_t;
 }
 extern "C" {
     #[doc = " @brief     Get a peer whose MAC address matches peer_addr from peer list\n\n @param     peer_addr  peer MAC address\n @param     peer  peer information\n\n @return\n          - ESP_OK : succeed\n          - ESP_ERR_ESPNOW_NOT_INIT : ESPNOW is not initialized\n          - ESP_ERR_ESPNOW_ARG : invalid argument\n          - ESP_ERR_ESPNOW_NOT_FOUND : peer is not found"]
