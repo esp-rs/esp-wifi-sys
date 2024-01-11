@@ -79,7 +79,7 @@ jobs:
         if: ${{ matrix.chip != 'esp32h2' }}
         run: cd esp-wifi && cargo b${{ matrix.chip }} --release --example=dhcp --features=wifi
       - name: build (bench)
-        if: ${{ matrix.chip != 'esp32h2' }}
+        if: ${{ matrix.chip != 'esp32h2' && matrix.chip != 'esp32s2' }}
         run: cd esp-wifi && cargo b${{ matrix.chip }} --release --example=bench --features=wifi
       - name: build (static_ip)
         if: ${{ matrix.chip != 'esp32h2' }}
