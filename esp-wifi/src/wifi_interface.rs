@@ -443,6 +443,7 @@ impl<'a, MODE: WifiDeviceMode> WifiStack<'a, MODE> {
                     sockets,
                 )
             }) {
+                crate::timer::yield_task();
                 break;
             }
         }
@@ -713,7 +714,9 @@ impl<'s, 'n: 's, MODE: WifiDeviceMode> Read for Socket<'s, 'n, MODE> {
             use smoltcp::socket::tcp::RecvError;
 
             loop {
-                interface.poll(timestamp(), device, sockets);
+                if interface.poll(timestamp(), device, sockets) == false {
+                    crate::timer::yield_task();
+                }
                 let socket = sockets.get_mut::<TcpSocket>(self.socket_handle);
 
                 match socket.recv_slice(buf) {
@@ -733,11 +736,14 @@ impl<'s, 'n: 's, MODE: WifiDeviceMode> Write for Socket<'s, 'n, MODE> {
         loop {
             let (may_send, is_open, can_send) =
                 self.network.with_mut(|interface, device, sockets| {
-                    interface.poll(
+                    if interface.poll(
                         Instant::from_millis((self.network.current_millis_fn)() as i64),
                         device,
                         sockets,
-                    );
+                    ) == false
+                    {
+                        crate::timer::yield_task();
+                    }
 
                     let socket = sockets.get_mut::<TcpSocket>(self.socket_handle);
 
@@ -784,6 +790,7 @@ impl<'s, 'n: 's, MODE: WifiDeviceMode> Write for Socket<'s, 'n, MODE> {
             });
 
             if let false = res {
+                crate::timer::yield_task();
                 break;
             }
         }
