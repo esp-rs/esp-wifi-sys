@@ -9,13 +9,13 @@ debug = true
 
 [workspace.dependencies]
 defmt = "=0.3.5"
-esp32c3-hal = { version = "0.14.0", default-features = false }
-esp32c2-hal = { version = "0.12.0", default-features = false }
-esp32c6-hal = { version = "0.7.0", default-features = false }
-esp32h2-hal = { version = "0.5.0", default-features = false }
-esp32-hal = { version = "0.17.0", default-features = false }
-esp32s3-hal = { version = "0.14.0", default-features = false }
-esp32s2-hal = { version = "0.14.0", default-features = false }
+esp32c3-hal = { version = "0.15.0", default-features = false }
+esp32c2-hal = { version = "0.13.0", default-features = false }
+esp32c6-hal = { version = "0.8.0", default-features = false }
+esp32h2-hal = { version = "0.6.0", default-features = false }
+esp32-hal = { version = "0.18.0", default-features = false }
+esp32s3-hal = { version = "0.15.0", default-features = false }
+esp32s2-hal = { version = "0.15.0", default-features = false }
 smoltcp = { version = "0.11.0", default-features = false, features = [
     "medium-ethernet",
     "socket-raw",
@@ -31,7 +31,9 @@ linked_list_allocator = { version = "0.10.5", default-features = false, features
 ] }
 embedded-io = { version = "0.6.1", default-features = false }
 fugit = "0.3.7"
-heapless = { version = "0.8", default-features = false, features = ["portable-atomic"] }
+heapless = { version = "0.8", default-features = false, features = [
+    "portable-atomic",
+] }
 num-derive = { version = "0.4" }
 num-traits = { version = "0.2", default-features = false }
 esp-wifi-sys = { version = "0.1.0", path = "../esp-wifi-sys" }
@@ -70,12 +72,4 @@ atomic-waker = { version = "1.1.2", default-features = false, features = [
 ] } # need this to activate portable-atomic on AtomicWaker used by embedded-svc even though we don't use it
 
 [patch.crates-io]
-esp-hal-common = { git = "https://github.com/ProfFan/esp-hal", rev = "296d73114b45da7524924c7442aedc6dac479459", package = "esp-hal-common" }
-esp32c2-hal = { git = "https://github.com/ProfFan/esp-hal", rev = "296d73114b45da7524924c7442aedc6dac479459", package = "esp32c2-hal" }
-esp32c3-hal = { git = "https://github.com/ProfFan/esp-hal", rev = "296d73114b45da7524924c7442aedc6dac479459", package = "esp32c3-hal" }
-esp32c6-hal = { git = "https://github.com/ProfFan/esp-hal", rev = "296d73114b45da7524924c7442aedc6dac479459", package = "esp32c6-hal" }
-esp32h2-hal = { git = "https://github.com/ProfFan/esp-hal", rev = "296d73114b45da7524924c7442aedc6dac479459", package = "esp32h2-hal" }
-esp32-hal = { git = "https://github.com/ProfFan/esp-hal", rev = "296d73114b45da7524924c7442aedc6dac479459", package = "esp32-hal" }
-esp32s3-hal = { git = "https://github.com/ProfFan/esp-hal", rev = "296d73114b45da7524924c7442aedc6dac479459", package = "esp32s3-hal" }
-esp32s2-hal = { git = "https://github.com/ProfFan/esp-hal", rev = "296d73114b45da7524924c7442aedc6dac479459", package = "esp32s2-hal" }
 embedded-svc = { git = "https://github.com/esp-rs/embedded-svc", rev = "fb0483e4b3c2bfcada053e8eed8e2e0bde415487", package = "embedded-svc" }
