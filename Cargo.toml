@@ -70,12 +70,12 @@ atomic-waker = { version = "1.1.2", default-features = false, features = [
 ] } # need this to activate portable-atomic on AtomicWaker used by embedded-svc even though we don't use it
 
 [patch.crates-io]
-esp-hal-common = { git = "https://github.com/ProfFan/esp-hal", rev = "8641a0d93120399c64a97eb4ff112abb5a40fe7e", package = "esp-hal-common" }
-esp32c2-hal = { git = "https://github.com/ProfFan/esp-hal", rev = "8641a0d93120399c64a97eb4ff112abb5a40fe7e", package = "esp32c2-hal" }
-esp32c3-hal = { git = "https://github.com/ProfFan/esp-hal", rev = "8641a0d93120399c64a97eb4ff112abb5a40fe7e", package = "esp32c3-hal" }
-esp32c6-hal = { git = "https://github.com/ProfFan/esp-hal", rev = "8641a0d93120399c64a97eb4ff112abb5a40fe7e", package = "esp32c6-hal" }
-esp32h2-hal = { git = "https://github.com/ProfFan/esp-hal", rev = "8641a0d93120399c64a97eb4ff112abb5a40fe7e", package = "esp32h2-hal" }
-esp32-hal = { git = "https://github.com/ProfFan/esp-hal", rev = "8641a0d93120399c64a97eb4ff112abb5a40fe7e", package = "esp32-hal" }
-esp32s3-hal = { git = "https://github.com/ProfFan/esp-hal", rev = "8641a0d93120399c64a97eb4ff112abb5a40fe7e", package = "esp32s3-hal" }
-esp32s2-hal = { git = "https://github.com/ProfFan/esp-hal", rev = "8641a0d93120399c64a97eb4ff112abb5a40fe7e", package = "esp32s2-hal" }
+esp-hal-common = { git = "https://github.com/ProfFan/esp-hal", rev = "296d73114b45da7524924c7442aedc6dac479459", package = "esp-hal-common" }
+esp32c2-hal = { git = "https://github.com/ProfFan/esp-hal", rev = "296d73114b45da7524924c7442aedc6dac479459", package = "esp32c2-hal" }
+esp32c3-hal = { git = "https://github.com/ProfFan/esp-hal", rev = "296d73114b45da7524924c7442aedc6dac479459", package = "esp32c3-hal" }
+esp32c6-hal = { git = "https://github.com/ProfFan/esp-hal", rev = "296d73114b45da7524924c7442aedc6dac479459", package = "esp32c6-hal" }
+esp32h2-hal = { git = "https://github.com/ProfFan/esp-hal", rev = "296d73114b45da7524924c7442aedc6dac479459", package = "esp32h2-hal" }
+esp32-hal = { git = "https://github.com/ProfFan/esp-hal", rev = "296d73114b45da7524924c7442aedc6dac479459", package = "esp32-hal" }
+esp32s3-hal = { git = "https://github.com/ProfFan/esp-hal", rev = "296d73114b45da7524924c7442aedc6dac479459", package = "esp32s3-hal" }
+esp32s2-hal = { git = "https://github.com/ProfFan/esp-hal", rev = "296d73114b45da7524924c7442aedc6dac479459", package = "esp32s2-hal" }
 embedded-svc = { git = "https://github.com/esp-rs/embedded-svc", rev = "fb0483e4b3c2bfcada053e8eed8e2e0bde415487", package = "embedded-svc" }
