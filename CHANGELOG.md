@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Update driver blobs (#410)
+- Update dependencies to fit `embedded-hal` `1.0`
 
 ### Removed
 
