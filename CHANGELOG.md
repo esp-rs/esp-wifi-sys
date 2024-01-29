@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+
+### Added
+
+### Fixed
+
+### Changed
+
+### Removed
+
+## [0.3.0] - 2024-01-29
+
 ### Added
 
 - Include coex in list of enabled features for docs.rs (#405)
