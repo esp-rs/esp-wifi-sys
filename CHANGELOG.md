@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 ### Changed
+- Users don't need embedded-svc to control wifi anymore. The wifi trait is optionally implemented now. (#429)
 
 ### Removed
 
