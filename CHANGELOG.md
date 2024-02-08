@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Users don't need embedded-svc to control wifi anymore. The wifi trait is optionally implemented now. (#429)
+- Better network performance by forced yielding of the task when buffers are full / empty. (#430)
 
 ### Removed
 
