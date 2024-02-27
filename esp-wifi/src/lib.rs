@@ -7,7 +7,6 @@
 #![doc = include_str!("../README.md")]
 #![doc(html_logo_url = "https://avatars.githubusercontent.com/u/46717278")]
 #![allow(rustdoc::bare_urls)]
-
 // allow until num-derive doesn't generate this warning anymore
 #![allow(non_local_definitions)]
 
