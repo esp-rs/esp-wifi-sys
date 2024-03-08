@@ -8,8 +8,8 @@ opt-level = 3
 debug = true
 
 [workspace.dependencies]
-defmt = "=0.3.5"
-esp-hal = { git = "https://github.com/esp-rs/esp-hal.git", rev = "6a663f8b1a6bd273cd41d49e2096b8c4906e9da4", default-features = false }
+defmt = "=0.3.6"
+esp-hal = { version = "0.16.0", default-features = false }
 smoltcp = { version = "0.11.0", default-features = false, features = [
     "medium-ethernet",
     "socket-raw",
