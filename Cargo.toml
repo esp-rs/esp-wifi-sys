@@ -8,8 +8,8 @@ opt-level = 3
 debug = true
 
 [workspace.dependencies]
-defmt = "=0.3.6"
-esp-hal = { version = "0.16.0", default-features = false }
+defmt = "0.3.6"
+esp-hal = { version = "0.16.1", default-features = false }
 smoltcp = { version = "0.11.0", default-features = false, features = [
     "medium-ethernet",
     "socket-raw",
