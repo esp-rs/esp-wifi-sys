@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Fixed
+- Fix compile error when using smoltcp `DNS_MAX_RESULT_COUNT` values other than 1
 
 ### Changed
 
