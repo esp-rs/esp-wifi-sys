@@ -55,7 +55,7 @@ atomic-waker.workspace = true
 toml-cfg.workspace = true
 
 [dev-dependencies]
-esp-println = { workspace = true, features = ["log", "uart"] }
+esp-println = { workspace = true, features = ["log"] }
 esp-backtrace = { workspace = true, features = [
     "panic-handler",
     "exception-handler",
