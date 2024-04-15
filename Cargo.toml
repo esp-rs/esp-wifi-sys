@@ -9,7 +9,7 @@ debug = true
 
 [workspace.dependencies]
 defmt = "0.3.6"
-esp-hal = { version = "0.16.1", default-features = false }
+esp-hal = { version = "0.17.0", default-features = false }
 smoltcp = { version = "0.11.0", default-features = false, features = [
     "medium-ethernet",
     "socket-raw",
@@ -51,7 +51,7 @@ bleps = { git = "https://github.com/bjoernQ/bleps", package = "bleps", rev = "93
     "macros",
 ] }
 embassy-executor = { version = "0.5.0", package = "embassy-executor", features = [
-    "nightly",
+    "task-arena-size-12288",
     "integrated-timers",
 ] }
 embassy-time = { version = "0.3.0" }
