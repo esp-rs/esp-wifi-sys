@@ -49,6 +49,24 @@ jobs:
       - name: check-fmt
         run: cargo fmt --check
 
+  docs_rs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: remove rust-toolchain.toml
+        run: rm rust-toolchain.toml 
+      - uses: dtolnay/rust-toolchain@v1
+        with:
+          target: riscv32imc-unknown-none-elf,riscv32imac-unknown-none-elf,riscv32imafc-unknown-none-elf
+          toolchain: nightly
+          components: rust-src          
+      - uses: Swatinem/rust-cache@v2
+
+      - name: install docs-rs
+        run: cargo install cargo-docs-rs
+      - name: docs-rs
+        run: cd esp-wifi && cargo docs-rs
+
   builds:
     strategy:
       matrix:

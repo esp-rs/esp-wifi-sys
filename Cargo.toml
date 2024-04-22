@@ -32,7 +32,7 @@ heapless = { version = "0.8", default-features = false, features = [
 ] }
 num-derive = { version = "0.4" }
 num-traits = { version = "0.2", default-features = false }
-esp-wifi-sys = { version = "0.1.0", path = "../esp-wifi-sys" }
+esp-wifi-sys = { version = "0.3.0", path = "../esp-wifi-sys" }
 embassy-sync = { version = "0.5.0" }
 embassy-futures = { version = "0.1.0" }
 toml-cfg = "0.2.0"

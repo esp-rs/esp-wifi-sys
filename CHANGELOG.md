@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [0.5.1] - 2024-04-22
+
+Patch release to fix docs.rs build
 
 ## [0.5.0] - 2024-04-19
 
