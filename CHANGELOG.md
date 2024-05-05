@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Removed
+- Removed embedded-hal v0.2 dependency
 
 ## [0.5.1] - 2024-04-22
 
