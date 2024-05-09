@@ -64,6 +64,10 @@ fn configure_linker_for_chip(out: &PathBuf, chip: &str) -> Result<()> {
     if chip == "esp32c6" {
         copy_file(out, "ld/esp32c6/rom_coexist.x", "rom_coexist.x")?;
         copy_file(out, "ld/esp32c6/rom_phy.x", "rom_phy.x")?;
+    } else if chip == "esp32h2" {
+        // These linker scripts are still expected to exist, even if they're empty:
+        File::create(out.join("rom_coexist.x"))?;
+        File::create(out.join("rom_phy.x"))?;
     }
 
     Ok(())
