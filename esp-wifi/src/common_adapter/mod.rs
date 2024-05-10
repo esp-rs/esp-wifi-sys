@@ -12,8 +12,8 @@ use crate::compat::timer_compat::*;
 use crate::hal;
 
 use esp_wifi_sys::include::timespec;
+use hal::peripherals::RADIO_CLK;
 use hal::rng::Rng;
-use hal::system::RadioClockControl;
 
 use hal::macros::ram;
 
@@ -37,13 +37,13 @@ pub(crate) mod phy_init_data;
 
 pub(crate) static mut RANDOM_GENERATOR: Option<Rng> = None;
 
-pub(crate) static mut RADIO_CLOCKS: Option<RadioClockControl> = None;
+pub(crate) static mut RADIO_CLOCKS: Option<RADIO_CLK> = None;
 
 pub(crate) fn init_rng(rng: Rng) {
     unsafe { RANDOM_GENERATOR = Some(core::mem::transmute(rng)) };
 }
 
-pub(crate) fn init_radio_clock_control(rcc: RadioClockControl) {
+pub(crate) fn init_radio_clock_control(rcc: RADIO_CLK) {
     unsafe { RADIO_CLOCKS = Some(core::mem::transmute(rcc)) };
 }
 

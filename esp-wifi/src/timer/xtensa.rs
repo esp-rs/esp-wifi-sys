@@ -9,7 +9,7 @@ use crate::{
         interrupt,
         peripherals::{self, TIMG1},
         prelude::*,
-        timer::{Timer, Timer0},
+        timer::timg::{Timer, Timer0},
         trapframe::TrapFrame,
         xtensa_lx, xtensa_lx_rt,
     },

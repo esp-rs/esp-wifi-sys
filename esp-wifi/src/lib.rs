@@ -27,10 +27,10 @@ use esp_hal as hal;
 use hal::systimer::{Alarm, Target};
 
 use common_adapter::init_radio_clock_control;
-use hal::system::RadioClockController;
 
 use fugit::MegahertzU32;
 use hal::clock::Clocks;
+use hal::system::RadioClockController;
 use linked_list_allocator::Heap;
 #[cfg(feature = "wifi")]
 use wifi::WifiError;
@@ -160,7 +160,7 @@ pub(crate) type EspWifiTimer = Alarm<Target, esp_hal::Blocking, 0>;
 
 #[cfg(any(esp32, esp32s3, esp32s2))]
 pub(crate) type EspWifiTimer =
-    hal::timer::Timer<hal::timer::Timer0<hal::peripherals::TIMG1>, esp_hal::Blocking>;
+    hal::timer::timg::Timer<hal::timer::timg::Timer0<hal::peripherals::TIMG1>, esp_hal::Blocking>;
 
 #[derive(Debug, PartialEq, PartialOrd)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
@@ -237,7 +237,7 @@ pub fn initialize(
     init_for: EspWifiInitFor,
     timer: EspWifiTimer,
     rng: hal::rng::Rng,
-    radio_clocks: hal::system::RadioClockControl,
+    radio_clocks: hal::peripherals::RADIO_CLK,
     clocks: &Clocks,
 ) -> Result<EspWifiInitialization, InitializationError> {
     #[cfg(any(esp32, esp32s3, esp32s2))]
