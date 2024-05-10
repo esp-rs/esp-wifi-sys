@@ -8902,6 +8902,18 @@ extern "C" {
     #[doc = " @brief     Check the MD5 values of the coexistence adapter header files in IDF and WiFi library\n\n @attention 1. It is used for internal CI version check\n\n @return\n     - ESP_OK : succeed\n     - ESP_WIFI_INVALID_ARG : MD5 check fail"]
     pub fn esp_coex_adapter_funcs_md5_check(md5: *const crate::c_types::c_char) -> esp_err_t;
 }
+pub const ieee802154_coex_event_t_IEEE802154_HIGH: ieee802154_coex_event_t = 1;
+pub const ieee802154_coex_event_t_IEEE802154_MIDDLE: ieee802154_coex_event_t = 2;
+pub const ieee802154_coex_event_t_IEEE802154_LOW: ieee802154_coex_event_t = 3;
+pub const ieee802154_coex_event_t_IEEE802154_IDLE: ieee802154_coex_event_t = 4;
+pub const ieee802154_coex_event_t_IEEE802154_EVENT_MAX: ieee802154_coex_event_t = 5;
+pub type ieee802154_coex_event_t = crate::c_types::c_uint;
+extern "C" {
+    pub fn esp_coex_ieee802154_txrx_pti_set(event: ieee802154_coex_event_t);
+}
+extern "C" {
+    pub fn esp_coex_ieee802154_ack_pti_set(event: ieee802154_coex_event_t);
+}
 #[doc = "< Send ESPNOW data successfully"]
 pub const esp_now_send_status_t_ESP_NOW_SEND_SUCCESS: esp_now_send_status_t = 0;
 #[doc = "< Send ESPNOW data fail"]

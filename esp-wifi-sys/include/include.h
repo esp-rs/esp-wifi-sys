@@ -15,4 +15,9 @@ typedef int _lock_t;
 #include "esp_coexist_adapter.h"
 #endif
 
+#if ( defined(CONFIG_IDF_TARGET_ESP32C6) || defined(CONFIG_IDF_TARGET_ESP32H2) )
+#include "esp_coexist.h"
+#include "esp_coex_i154.h"
+#endif
+
 #include "esp_now.h"

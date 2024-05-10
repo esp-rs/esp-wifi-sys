@@ -59,7 +59,18 @@ fn configure_linker_for_chip(out: &PathBuf, chip: &str) -> Result<()> {
         out,
         &format!("ld/{chip}/rom_functions.x"),
         "rom_functions.x",
-    )
+    )?;
+
+    if chip == "esp32c6" {
+        copy_file(out, "ld/esp32c6/rom_coexist.x", "rom_coexist.x")?;
+        copy_file(out, "ld/esp32c6/rom_phy.x", "rom_phy.x")?;
+    } else if chip == "esp32h2" {
+        // These linker scripts are still expected to exist, even if they're empty:
+        File::create(out.join("rom_coexist.x"))?;
+        File::create(out.join("rom_phy.x"))?;
+    }
+
+    Ok(())
 }
 
 fn copy_file(out: &PathBuf, from: &str, to: &str) -> Result<()> {
@@ -216,6 +227,7 @@ fn copy_libraries(out: &PathBuf) -> Result<()> {
 
     println!("cargo:rustc-link-lib={}", "ble_app");
     println!("cargo:rustc-link-lib={}", "btbb");
+    println!("cargo:rustc-link-lib={}", "coexist");
     println!("cargo:rustc-link-lib={}", "phy");
     println!("cargo:rustc-link-lib={}", "wpa_supplicant");
 
