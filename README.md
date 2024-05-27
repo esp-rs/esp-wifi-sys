@@ -1,8 +1,8 @@
 # esp-wifi
 
-A WiFi, BLE and ESP-NOW driver for Espressif microcontrollers.
+This repository hosts the wireless-driver's binaries.
 
-See [esp-wifi's README.md](./esp-wifi/README.md) for more information.
+If you are looking for `esp-wifi` see [esp-wifi in esp-hal](https://github.com/esp-rs/esp-hal/tree/main/esp-wifi)
 
 ## License
 
