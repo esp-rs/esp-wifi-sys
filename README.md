@@ -1,6 +1,6 @@
-# esp-wifi
+# esp-wifi-sys
 
-This repository hosts the wireless-driver's binaries.
+This repository hosts the wireless-driver's binaries and low-level bindings.
 
 If you are looking for `esp-wifi` see [esp-wifi in esp-hal](https://github.com/esp-rs/esp-hal/tree/main/esp-wifi)
 
