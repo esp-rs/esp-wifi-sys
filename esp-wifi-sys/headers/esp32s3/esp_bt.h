@@ -11,7 +11,7 @@
 #include <stdbool.h>
 #include "esp_err.h"
 #include "sdkconfig.h"
-#include "esp_task.h"
+
 #include "esp_assert.h"
 
 #ifdef __cplusplus

@@ -219,17 +219,11 @@ fn copy_libraries(out: &PathBuf) -> Result<()> {
     copy_file(out, "libs/esp32h2/libbtbb.a", "libbtbb.a")?;
     copy_file(out, "libs/esp32h2/libcoexist.a", "libcoexist.a")?;
     copy_file(out, "libs/esp32h2/libphy.a", "libphy.a")?;
-    copy_file(
-        out,
-        "libs/esp32h2/libwpa_supplicant.a",
-        "libwpa_supplicant.a",
-    )?;
 
     println!("cargo:rustc-link-lib={}", "ble_app");
     println!("cargo:rustc-link-lib={}", "btbb");
     println!("cargo:rustc-link-lib={}", "coexist");
     println!("cargo:rustc-link-lib={}", "phy");
-    println!("cargo:rustc-link-lib={}", "wpa_supplicant");
 
     Ok(())
 }

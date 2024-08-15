@@ -1,13 +1,33 @@
+#include <stdint.h>
+
 typedef int _lock_t;
 
 #define SOC_COEX_HW_PTI 1
 
-#include "espidf_types.h"
+typedef uint32_t        TickType_t;
+typedef uint32_t        UBaseType_t;
+typedef int32_t         BaseType_t;
+
+typedef void*           QueueHandle_t;
+
+typedef void*           esp_netif_t;
+typedef void*           esp_netif_inherent_config_t;
+
+struct ets_timer
+{
+  struct timer_adpt *next;
+  uint32_t expire;
+  uint32_t period;
+  void (*func)(void *priv);
+  void *priv;
+};
+
 #include "esp_private/wifi.h"
 #include "esp_wpa.h"
 #include "esp_phy_init.h"
 #include "phy.h"
 #include "esp_timer.h"
+#include "esp_eap_client.h"
 
 #if !defined(CONFIG_IDF_TARGET_ESP32S2)
 #include "esp_bt.h"

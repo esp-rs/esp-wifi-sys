@@ -117,7 +117,6 @@ impl<T> ::core::fmt::Debug for __IncompleteArrayField<T> {
         fmt.write_str("__IncompleteArrayField")
     }
 }
-pub const SOC_COEX_HW_PTI: u32 = 1;
 pub const _NEWLIB_VERSION_H__: u32 = 1;
 pub const _NEWLIB_VERSION: &[u8; 6] = b"3.3.0\0";
 pub const __NEWLIB__: u32 = 3;
@@ -177,6 +176,7 @@ pub const __int_fast16_t_defined: u32 = 1;
 pub const __int_fast32_t_defined: u32 = 1;
 pub const __int_fast64_t_defined: u32 = 1;
 pub const WINT_MIN: u32 = 0;
+pub const SOC_COEX_HW_PTI: u32 = 1;
 pub const true_: u32 = 1;
 pub const false_: u32 = 0;
 pub const __bool_true_false_are_defined: u32 = 1;
@@ -602,6 +602,7 @@ pub const CONFIG_APP_BUILD_TYPE_APP_2NDBOOT: u32 = 1;
 pub const CONFIG_APP_BUILD_GENERATE_BINARIES: u32 = 1;
 pub const CONFIG_APP_BUILD_BOOTLOADER: u32 = 1;
 pub const CONFIG_APP_BUILD_USE_FLASH_SECTIONS: u32 = 1;
+pub const CONFIG_APP_REPRODUCIBLE_BUILD: u32 = 1;
 pub const CONFIG_BOOTLOADER_OFFSET_IN_FLASH: u32 = 0;
 pub const CONFIG_BOOTLOADER_COMPILER_OPTIMIZATION_SIZE: u32 = 1;
 pub const CONFIG_BOOTLOADER_LOG_LEVEL_INFO: u32 = 1;
@@ -653,9 +654,10 @@ pub const CONFIG_PARTITION_TABLE_FILENAME: &[u8; 25] = b"partitions_singleapp.cs
 pub const CONFIG_PARTITION_TABLE_OFFSET: u32 = 32768;
 pub const CONFIG_PARTITION_TABLE_MD5: u32 = 1;
 pub const CONFIG_COMPILER_OPTIMIZATION_SIZE: u32 = 1;
-pub const CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS_ENABLE: u32 = 1;
+pub const CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS_SILENT: u32 = 1;
 pub const CONFIG_COMPILER_FLOAT_LIB_FROM_GCCLIB: u32 = 1;
-pub const CONFIG_COMPILER_OPTIMIZATION_ASSERTION_LEVEL: u32 = 2;
+pub const CONFIG_COMPILER_OPTIMIZATION_ASSERTION_LEVEL: u32 = 1;
+pub const CONFIG_COMPILER_OPTIMIZATION_CHECKS_SILENT: u32 = 1;
 pub const CONFIG_COMPILER_HIDE_PATHS_MACROS: u32 = 1;
 pub const CONFIG_COMPILER_STACK_CHECK_MODE_NONE: u32 = 1;
 pub const CONFIG_APPTRACE_DEST_NONE: u32 = 1;
@@ -923,7 +925,7 @@ pub const CONFIG_FREERTOS_NO_AFFINITY: u32 = 2147483647;
 pub const CONFIG_FREERTOS_SUPPORT_STATIC_ALLOCATION: u32 = 1;
 pub const CONFIG_FREERTOS_DEBUG_OCDAWARE: u32 = 1;
 pub const CONFIG_HAL_ASSERTION_EQUALS_SYSTEM: u32 = 1;
-pub const CONFIG_HAL_DEFAULT_ASSERTION_LEVEL: u32 = 2;
+pub const CONFIG_HAL_DEFAULT_ASSERTION_LEVEL: u32 = 1;
 pub const CONFIG_HAL_SYSTIMER_USE_ROM_IMPL: u32 = 1;
 pub const CONFIG_HAL_WDT_USE_ROM_IMPL: u32 = 1;
 pub const CONFIG_HAL_SPI_MASTER_FUNC_IN_IRAM: u32 = 1;
@@ -1093,6 +1095,7 @@ pub const CONFIG_ESP_PROTOCOMM_SUPPORT_SECURITY_VERSION_1: u32 = 1;
 pub const CONFIG_ESP_PROTOCOMM_SUPPORT_SECURITY_VERSION_2: u32 = 1;
 pub const CONFIG_PTHREAD_TASK_PRIO_DEFAULT: u32 = 5;
 pub const CONFIG_PTHREAD_TASK_STACK_SIZE_DEFAULT: u32 = 3072;
+pub const CONFIG_PTHREAD_STACK_MIN: u32 = 768;
 pub const CONFIG_PTHREAD_TASK_CORE_DEFAULT: i32 = -1;
 pub const CONFIG_PTHREAD_TASK_NAME_DEFAULT: &[u8; 8] = b"pthread\0";
 pub const CONFIG_MMU_PAGE_SIZE_32KB: u32 = 1;
@@ -1177,6 +1180,7 @@ pub const CONFIG_ESP32_ENABLE_COREDUMP_TO_NONE: u32 = 1;
 pub const CONFIG_ESP32_PHY_CALIBRATION_AND_DATA_STORAGE: u32 = 1;
 pub const CONFIG_ESP32_PHY_MAX_TX_POWER: u32 = 20;
 pub const CONFIG_ESP32_PHY_MAX_WIFI_TX_POWER: u32 = 20;
+pub const CONFIG_ESP32_PTHREAD_STACK_MIN: u32 = 768;
 pub const CONFIG_ESP32_PTHREAD_TASK_CORE_DEFAULT: i32 = -1;
 pub const CONFIG_ESP32_PTHREAD_TASK_NAME_DEFAULT: &[u8; 8] = b"pthread\0";
 pub const CONFIG_ESP32_PTHREAD_TASK_PRIO_DEFAULT: u32 = 5;
@@ -1227,8 +1231,8 @@ pub const CONFIG_MAIN_TASK_STACK_SIZE: u32 = 3584;
 pub const CONFIG_MCA_INITIAL_TRACE_LEVEL: u32 = 2;
 pub const CONFIG_MCA_TRACE_LEVEL_WARNING: u32 = 1;
 pub const CONFIG_MONITOR_BAUD: u32 = 115200;
-pub const CONFIG_OPTIMIZATION_ASSERTIONS_ENABLED: u32 = 1;
-pub const CONFIG_OPTIMIZATION_ASSERTION_LEVEL: u32 = 2;
+pub const CONFIG_OPTIMIZATION_ASSERTIONS_SILENT: u32 = 1;
+pub const CONFIG_OPTIMIZATION_ASSERTION_LEVEL: u32 = 1;
 pub const CONFIG_OPTIMIZATION_LEVEL_RELEASE: u32 = 1;
 pub const CONFIG_OSI_INITIAL_TRACE_LEVEL: u32 = 2;
 pub const CONFIG_OSI_TRACE_LEVEL_WARNING: u32 = 1;
@@ -1435,7 +1439,6 @@ pub const ESP_NOW_KEY_LEN: u32 = 16;
 pub const ESP_NOW_MAX_TOTAL_PEER_NUM: u32 = 20;
 pub const ESP_NOW_MAX_ENCRYPT_PEER_NUM: u32 = 6;
 pub const ESP_NOW_MAX_DATA_LEN: u32 = 250;
-pub type _lock_t = crate::c_types::c_int;
 pub type __int8_t = crate::c_types::c_schar;
 pub type __uint8_t = crate::c_types::c_uchar;
 pub type __int16_t = crate::c_types::c_short;
@@ -1474,13 +1477,7 @@ pub type int_fast32_t = crate::c_types::c_int;
 pub type uint_fast32_t = crate::c_types::c_uint;
 pub type int_fast64_t = crate::c_types::c_longlong;
 pub type uint_fast64_t = crate::c_types::c_ulonglong;
-pub const esp_log_level_e_ESP_LOG_NONE: esp_log_level_e = 0;
-pub const esp_log_level_e_ESP_LOG_ERROR: esp_log_level_e = 1;
-pub const esp_log_level_e_ESP_LOG_WARN: esp_log_level_e = 2;
-pub const esp_log_level_e_ESP_LOG_INFO: esp_log_level_e = 3;
-pub const esp_log_level_e_ESP_LOG_DEBUG: esp_log_level_e = 4;
-pub const esp_log_level_e_ESP_LOG_VERBOSE: esp_log_level_e = 5;
-pub type esp_log_level_e = crate::c_types::c_uint;
+pub type _lock_t = crate::c_types::c_int;
 pub type TickType_t = u32;
 pub type UBaseType_t = u32;
 pub type BaseType_t = i32;
@@ -8163,6 +8160,138 @@ extern "C" {
     #[doc = " @brief Get the ETM event handle of esp_timer underlying alarm event\n\n @note The created ETM event object can be deleted later by calling `esp_etm_del_event`\n\n @note The ETM event is generated by the underlying hardware -- systimer,\n       therefore, if the esp_timer is not clocked by systimer, then no ETM event will be generated.\n\n @param[out] out_event Returned ETM event handle\n @return\n      - ESP_OK Success\n      - ESP_ERR_INVALID_ARG Parameter error"]
     pub fn esp_timer_new_etm_alarm_event(out_event: *mut esp_etm_event_handle_t) -> esp_err_t;
 }
+#[doc = "< EAP (Extensible Authentication Protocol)"]
+pub const esp_eap_ttls_phase2_types_ESP_EAP_TTLS_PHASE2_EAP: esp_eap_ttls_phase2_types = 0;
+#[doc = "< MS-CHAPv2 (Microsoft Challenge Handshake Authentication Protocol - Version 2)"]
+pub const esp_eap_ttls_phase2_types_ESP_EAP_TTLS_PHASE2_MSCHAPV2: esp_eap_ttls_phase2_types = 1;
+#[doc = "< MS-CHAP (Microsoft Challenge Handshake Authentication Protocol)"]
+pub const esp_eap_ttls_phase2_types_ESP_EAP_TTLS_PHASE2_MSCHAP: esp_eap_ttls_phase2_types = 2;
+#[doc = "< PAP (Password Authentication Protocol)"]
+pub const esp_eap_ttls_phase2_types_ESP_EAP_TTLS_PHASE2_PAP: esp_eap_ttls_phase2_types = 3;
+#[doc = "< CHAP (Challenge Handshake Authentication Protocol)"]
+pub const esp_eap_ttls_phase2_types_ESP_EAP_TTLS_PHASE2_CHAP: esp_eap_ttls_phase2_types = 4;
+#[doc = " @brief Enumeration of phase 2 authentication types for EAP-TTLS.\n\n This enumeration defines the supported phase 2 authentication methods\n that can be used in the EAP-TTLS (Extensible Authentication Protocol -\n Tunneled Transport Layer Security) protocol for the second authentication\n phase."]
+pub type esp_eap_ttls_phase2_types = crate::c_types::c_uint;
+#[doc = " @brief Configuration settings for EAP-FAST\n        (Extensible Authentication Protocol - Flexible Authentication via Secure Tunneling).\n\n This structure defines the configuration options that can be used to customize the behavior of the\n EAP-FAST authentication protocol, specifically for Fast Provisioning and PAC (Protected Access Credential) handling."]
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct esp_eap_fast_config {
+    #[doc = "< Enable or disable Fast Provisioning in EAP-FAST (0 = disabled, 1 = enabled)"]
+    pub fast_provisioning: crate::c_types::c_int,
+    #[doc = "< Maximum length of the PAC (Protected Access Credential) list"]
+    pub fast_max_pac_list_len: crate::c_types::c_int,
+    #[doc = "< Set to true for binary format PAC, false for ASCII format PAC"]
+    pub fast_pac_format_binary: bool,
+}
+extern "C" {
+    #[doc = " @brief Enable EAP authentication(WiFi Enterprise) for the station mode.\n\n This function enables Extensible Authentication Protocol (EAP) authentication\n for the Wi-Fi station mode. When EAP authentication is enabled, the ESP device\n will attempt to authenticate with the configured EAP credentials when connecting\n to a secure Wi-Fi network.\n\n @note Before calling this function, ensure that the Wi-Fi configuration and EAP\n credentials (such as username and password) have been properly set using the\n appropriate configuration APIs.\n\n @return\n    - ESP_OK: EAP authentication enabled successfully.\n    - ESP_ERR_NO_MEM: Failed to enable EAP authentication due to memory allocation failure."]
+    pub fn esp_wifi_sta_enterprise_enable() -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Disable EAP authentication(WiFi Enterprise) for the station mode.\n\n This function disables Extensible Authentication Protocol (EAP) authentication\n for the Wi-Fi station mode. When EAP authentication is disabled, the ESP device\n will not attempt to authenticate using EAP credentials when connecting to a\n secure Wi-Fi network.\n\n @note Disabling EAP authentication may cause the device to connect to the Wi-Fi\n network using other available authentication methods, if configured using esp_wifi_set_config().\n\n @return\n    - ESP_OK: EAP authentication disabled successfully.\n    - ESP_ERR_INVALID_STATE: EAP client is in an invalid state for disabling."]
+    pub fn esp_wifi_sta_enterprise_disable() -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Set identity for PEAP/TTLS authentication method.\n\n This function sets the identity to be used during PEAP/TTLS authentication.\n\n @param[in] identity Pointer to the identity data.\n @param[in] len      Length of the identity data (limited to 1~127 bytes).\n\n @return\n    - ESP_OK: The identity was set successfully.\n    - ESP_ERR_INVALID_ARG: Invalid argument (len <= 0 or len >= 128).\n    - ESP_ERR_NO_MEM: Memory allocation failure."]
+    pub fn esp_eap_client_set_identity(
+        identity: *const crate::c_types::c_uchar,
+        len: crate::c_types::c_int,
+    ) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Clear the previously set identity for PEAP/TTLS authentication.\n\n This function clears the identity that was previously set for the EAP client.\n After calling this function, the EAP client will no longer use the previously\n configured identity during the authentication process."]
+    pub fn esp_eap_client_clear_identity();
+}
+extern "C" {
+    #[doc = " @brief Set username for PEAP/TTLS authentication method.\n\n This function sets the username to be used during PEAP/TTLS authentication.\n\n @param[in] username Pointer to the username data.\n @param[in] len      Length of the username data (limited to 1~127 bytes).\n\n @return\n    - ESP_OK: The username was set successfully.\n    - ESP_ERR_INVALID_ARG: Failed due to an invalid argument (len <= 0 or len >= 128).\n    - ESP_ERR_NO_MEM: Failed due to memory allocation failure."]
+    pub fn esp_eap_client_set_username(
+        username: *const crate::c_types::c_uchar,
+        len: crate::c_types::c_int,
+    ) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Clear username for PEAP/TTLS method.\n\n This function clears the previously set username for the EAP client."]
+    pub fn esp_eap_client_clear_username();
+}
+extern "C" {
+    #[doc = " @brief Set password for PEAP/TTLS authentication method.\n\n This function sets the password to be used during PEAP/TTLS authentication.\n\n @param[in] password Pointer to the password data.\n @param[in] len      Length of the password data (len > 0).\n\n @return\n    - ESP_OK: The password was set successfully.\n    - ESP_ERR_INVALID_ARG: Failed due to an invalid argument (len <= 0).\n    - ESP_ERR_NO_MEM: Failed due to memory allocation failure."]
+    pub fn esp_eap_client_set_password(
+        password: *const crate::c_types::c_uchar,
+        len: crate::c_types::c_int,
+    ) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Clear password for PEAP/TTLS method.\n\n This function clears the previously set password for the EAP client."]
+    pub fn esp_eap_client_clear_password();
+}
+extern "C" {
+    #[doc = " @brief Set a new password for MSCHAPv2 authentication method.\n\n This function sets the new password to be used during MSCHAPv2 authentication.\n The new password is used to substitute the old password when an eap-mschapv2 failure request\n message with error code ERROR_PASSWD_EXPIRED is received.\n\n @param[in] new_password Pointer to the new password data.\n @param[in] len          Length of the new password data.\n\n @return\n    - ESP_OK: The new password was set successfully.\n    - ESP_ERR_INVALID_ARG: Failed due to an invalid argument (len <= 0).\n    - ESP_ERR_NO_MEM: Failed due to memory allocation failure."]
+    pub fn esp_eap_client_set_new_password(
+        new_password: *const crate::c_types::c_uchar,
+        len: crate::c_types::c_int,
+    ) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Clear new password for MSCHAPv2 method.\n\n This function clears the previously set new password for the EAP client."]
+    pub fn esp_eap_client_clear_new_password();
+}
+extern "C" {
+    #[doc = " @brief Set CA certificate for EAP authentication.\n\n This function sets the Certificate Authority (CA) certificate to be used during EAP authentication.\n The CA certificate is passed to the EAP client module through a global pointer.\n\n @param[in] ca_cert     Pointer to the CA certificate data.\n @param[in] ca_cert_len Length of the CA certificate data.\n\n @return\n    - ESP_OK: The CA certificate was set successfully."]
+    pub fn esp_eap_client_set_ca_cert(
+        ca_cert: *const crate::c_types::c_uchar,
+        ca_cert_len: crate::c_types::c_int,
+    ) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Clear the previously set Certificate Authority (CA) certificate for EAP authentication.\n\n This function clears the CA certificate that was previously set for the EAP client.\n After calling this function, the EAP client will no longer use the previously\n configured CA certificate during the authentication process."]
+    pub fn esp_eap_client_clear_ca_cert();
+}
+extern "C" {
+    #[doc = " @brief Set client certificate and private key for EAP authentication.\n\n This function sets the client certificate and private key to be used during authentication.\n Optionally, a private key password can be provided for encrypted private keys.\n\n @attention 1. The client certificate, private key, and private key password are provided as pointers\n              to the respective data arrays.\n @attention 2. The client_cert, private_key, and private_key_password should be zero-terminated.\n\n @param[in] client_cert           Pointer to the client certificate data.\n @param[in] client_cert_len       Length of the client certificate data.\n @param[in] private_key           Pointer to the private key data.\n @param[in] private_key_len       Length of the private key data (limited to 1~4096 bytes).\n @param[in] private_key_password  Pointer to the private key password data (optional).\n @param[in] private_key_passwd_len Length of the private key password data (can be 0 for no password).\n\n @return\n    - ESP_OK: The certificate, private key, and password (if provided) were set successfully."]
+    pub fn esp_eap_client_set_certificate_and_key(
+        client_cert: *const crate::c_types::c_uchar,
+        client_cert_len: crate::c_types::c_int,
+        private_key: *const crate::c_types::c_uchar,
+        private_key_len: crate::c_types::c_int,
+        private_key_password: *const crate::c_types::c_uchar,
+        private_key_passwd_len: crate::c_types::c_int,
+    ) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Clear the previously set client certificate and private key for EAP authentication.\n\n This function clears the client certificate and private key that were previously set\n for the EAP client. After calling this function, the EAP client will no longer use the\n previously configured certificate and private key during the authentication process."]
+    pub fn esp_eap_client_clear_certificate_and_key();
+}
+extern "C" {
+    #[doc = " @brief Set EAP client certificates time check (disable or not).\n\n This function enables or disables the time check for EAP client certificates.\n When disabled, the certificates' expiration time will not be checked during the authentication process.\n\n @param[in] disable True to disable EAP client certificates time check, false to enable it.\n\n @return\n    - ESP_OK: The EAP client certificates time check setting was updated successfully."]
+    pub fn esp_eap_client_set_disable_time_check(disable: bool) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Get EAP client certificates time check status.\n\n This function retrieves the current status of the EAP client certificates time check.\n\n @param[out] disable Pointer to a boolean variable to store the disable status.\n\n @return\n    - ESP_OK: The status of EAP client certificates time check was retrieved successfully."]
+    pub fn esp_eap_client_get_disable_time_check(disable: *mut bool) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Set EAP-TTLS phase 2 method.\n\n This function sets the phase 2 method to be used during EAP-TTLS authentication.\n\n @param[in] type The type of phase 2 method to be used (e.g., EAP, MSCHAPv2, MSCHAP, PAP, CHAP).\n\n @return\n    - ESP_OK: The EAP-TTLS phase 2 method was set successfully."]
+    pub fn esp_eap_client_set_ttls_phase2_method(type_: esp_eap_ttls_phase2_types) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Enable or disable Suite-B 192-bit certification checks.\n\n This function enables or disables the 192-bit Suite-B certification checks during EAP-TLS authentication.\n Suite-B is a set of cryptographic algorithms which generally are considered more secure.\n\n @param[in] enable True to enable 192-bit Suite-B certification checks, false to disable it.\n\n @return\n    - ESP_OK: The 192-bit Suite-B certification checks were set successfully."]
+    pub fn esp_eap_client_set_suiteb_192bit_certification(enable: bool) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Set the PAC (Protected Access Credential) file for EAP-FAST authentication.\n\n EAP-FAST requires a PAC file that contains the client's credentials.\n\n @attention  1. For files read from the file system, length has to be decremented by 1 byte.\n @attention  2. Disabling the ESP_WIFI_MBEDTLS_TLS_CLIENT config is required to use EAP-FAST.\n\n @param[in] pac_file     Pointer to the PAC file buffer.\n @param[in] pac_file_len Length of the PAC file buffer.\n\n @return\n    - ESP_OK: The PAC file for EAP-FAST authentication was set successfully."]
+    pub fn esp_eap_client_set_pac_file(
+        pac_file: *const crate::c_types::c_uchar,
+        pac_file_len: crate::c_types::c_int,
+    ) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Set the parameters for EAP-FAST Phase 1 authentication.\n\n EAP-FAST supports Fast Provisioning, where clients can be authenticated faster using precomputed keys (PAC).\n This function allows configuring parameters for Fast Provisioning.\n\n @attention  1. Disabling the ESP_WIFI_MBEDTLS_TLS_CLIENT config is required to use EAP-FAST.\n\n @param[in] config Configuration structure with Fast Provisioning parameters.\n\n @return\n    - ESP_OK: The parameters for EAP-FAST Phase 1 authentication were set successfully."]
+    pub fn esp_eap_client_set_fast_params(config: esp_eap_fast_config) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Use the default certificate bundle for EAP authentication.\n\n By default, the EAP client uses a built-in certificate bundle for server verification.\n Enabling this option allows the use of the default certificate bundle.\n\n @param[in] use_default_bundle True to use the default certificate bundle, false to use a custom bundle.\n\n @return\n    - ESP_OK: The option to use the default certificate bundle was set successfully."]
+    pub fn esp_eap_client_use_default_cert_bundle(use_default_bundle: bool) -> esp_err_t;
+}
 pub type ble_npl_event_fn = ::core::option::Option<unsafe extern "C" fn(ev: *mut ble_npl_event)>;
 pub const ble_npl_error_BLE_NPL_OK: ble_npl_error = 0;
 pub const ble_npl_error_BLE_NPL_ENOMEM: ble_npl_error = 1;
@@ -8913,6 +9042,9 @@ extern "C" {
 }
 extern "C" {
     pub fn esp_coex_ieee802154_ack_pti_set(event: ieee802154_coex_event_t);
+}
+extern "C" {
+    pub fn esp_coex_ieee802154_coex_break_notify();
 }
 #[doc = "< Send ESPNOW data successfully"]
 pub const esp_now_send_status_t_ESP_NOW_SEND_SUCCESS: esp_now_send_status_t = 0;
