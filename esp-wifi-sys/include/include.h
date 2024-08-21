@@ -22,6 +22,11 @@ struct ets_timer
   void *priv;
 };
 
+struct timeval {
+	uint64_t		tv_sec;		/* seconds */
+	uint32_t	tv_usec;	/* and microseconds */
+};
+
 #include "esp_private/wifi.h"
 #include "esp_wpa.h"
 #include "esp_phy_init.h"
