@@ -30,9 +30,7 @@ fn main() -> Result<()> {
         "esp32",
         Arch::Xtensa,
         &workspace,
-        tools.join(
-            "xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/xtensa-esp-elf/include/",
-        ),
+        tools.join("xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/xtensa-esp-elf/include/"),
         tools.join("xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/"),
     )?;
 
@@ -40,9 +38,7 @@ fn main() -> Result<()> {
         "esp32c2",
         Arch::RiscV,
         &workspace,
-        tools.join(
-            "riscv32-esp-elf/esp-13.2.0_20230928/riscv32-esp-elf/riscv32-esp-elf/include/",
-        ),
+        tools.join("riscv32-esp-elf/esp-13.2.0_20230928/riscv32-esp-elf/riscv32-esp-elf/include/"),
         tools.join("riscv32-esp-elf/esp-13.2.0_20230928/riscv32-esp-elf/"),
     )?;
 
@@ -50,9 +46,7 @@ fn main() -> Result<()> {
         "esp32c3",
         Arch::RiscV,
         &workspace,
-        tools.join(
-            "riscv32-esp-elf/esp-13.2.0_20230928/riscv32-esp-elf/riscv32-esp-elf/include/",
-        ),
+        tools.join("riscv32-esp-elf/esp-13.2.0_20230928/riscv32-esp-elf/riscv32-esp-elf/include/"),
         tools.join("riscv32-esp-elf/esp-13.2.0_20230928/riscv32-esp-elf/"),
     )?;
 
@@ -61,7 +55,7 @@ fn main() -> Result<()> {
         Arch::Xtensa,
         &workspace,
         tools.join("xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/xtensa-esp-elf/include/"),
-        tools.join("xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/")
+        tools.join("xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/"),
     )?;
 
     generate_bindings_for_chip(
@@ -69,16 +63,14 @@ fn main() -> Result<()> {
         Arch::Xtensa,
         &workspace,
         tools.join("xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/xtensa-esp-elf/include/"),
-        tools.join("xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/")
+        tools.join("xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/"),
     )?;
 
     generate_bindings_for_chip(
         "esp32c6",
         Arch::RiscV,
         &workspace,
-        tools.join(
-            "riscv32-esp-elf/esp-13.2.0_20230928/riscv32-esp-elf/riscv32-esp-elf/include/",
-        ),
+        tools.join("riscv32-esp-elf/esp-13.2.0_20230928/riscv32-esp-elf/riscv32-esp-elf/include/"),
         tools.join("riscv32-esp-elf/esp-13.2.0_20230928/riscv32-esp-elf/"),
     )?;
 
@@ -86,9 +78,7 @@ fn main() -> Result<()> {
         "esp32h2",
         Arch::RiscV,
         &workspace,
-        tools.join(
-            "riscv32-esp-elf/esp-13.2.0_20230928/riscv32-esp-elf/riscv32-esp-elf/include/",
-        ),
+        tools.join("riscv32-esp-elf/esp-13.2.0_20230928/riscv32-esp-elf/riscv32-esp-elf/include/"),
         tools.join("riscv32-esp-elf/esp-13.2.0_20230928/riscv32-esp-elf/"),
     )?;
 
