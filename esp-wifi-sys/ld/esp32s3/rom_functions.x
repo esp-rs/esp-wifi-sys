@@ -2284,6 +2284,7 @@ phy_param_rom = 0x3fcef81c;
 strncpy = 0x40001224;
 strcpy = 0x40001218;
 strncmp = 0x4000123c;
+strlen = 0x40001248;
 
 /* from esp32s3.rom.api.ld*/
 PROVIDE ( esp_rom_delay_us = ets_delay_us );
