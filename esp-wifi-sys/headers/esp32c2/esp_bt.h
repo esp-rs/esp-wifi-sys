@@ -12,7 +12,9 @@
 #include "esp_err.h"
 #include "sdkconfig.h"
 
+
 #include "nimble/nimble_npl.h"
+//#include "../../../../controller/esp32c2/esp_bt_cfg.h"
 #include "hal/efuse_hal.h"
 
 #ifdef CONFIG_BT_LE_HCI_INTERFACE_USE_UART

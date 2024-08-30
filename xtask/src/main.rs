@@ -30,66 +30,56 @@ fn main() -> Result<()> {
         "esp32",
         Arch::Xtensa,
         &workspace,
-        tools.join(
-            "xtensa-esp32-elf/esp-2021r2-patch5-8_4_0/xtensa-esp32-elf/xtensa-esp32-elf/include/",
-        ),
-        tools.join("xtensa-esp32-elf/esp-2021r2-patch5-8_4_0/xtensa-esp32-elf/"),
+        tools.join("xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/xtensa-esp-elf/include/"),
+        tools.join("xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/"),
     )?;
 
     generate_bindings_for_chip(
         "esp32c2",
         Arch::RiscV,
         &workspace,
-        tools.join(
-            "riscv32-esp-elf/esp-2021r2-patch5-8_4_0/riscv32-esp-elf/riscv32-esp-elf/include/",
-        ),
-        tools.join("riscv32-esp-elf/esp-2021r2-patch5-8_4_0/riscv32-esp-elf/"),
+        tools.join("riscv32-esp-elf/esp-13.2.0_20230928/riscv32-esp-elf/riscv32-esp-elf/include/"),
+        tools.join("riscv32-esp-elf/esp-13.2.0_20230928/riscv32-esp-elf/"),
     )?;
 
     generate_bindings_for_chip(
         "esp32c3",
         Arch::RiscV,
         &workspace,
-        tools.join(
-            "riscv32-esp-elf/esp-2021r2-patch5-8_4_0/riscv32-esp-elf/riscv32-esp-elf/include/",
-        ),
-        tools.join("riscv32-esp-elf/esp-2021r2-patch5-8_4_0/riscv32-esp-elf/"),
+        tools.join("riscv32-esp-elf/esp-13.2.0_20230928/riscv32-esp-elf/riscv32-esp-elf/include/"),
+        tools.join("riscv32-esp-elf/esp-13.2.0_20230928/riscv32-esp-elf/"),
     )?;
 
     generate_bindings_for_chip(
         "esp32s2",
         Arch::Xtensa,
         &workspace,
-        tools.join("xtensa-esp32s2-elf/esp-2021r2-patch5-8_4_0/xtensa-esp32s2-elf/xtensa-esp32s2-elf/include/"),
-        tools.join("xtensa-esp32s2-elf/esp-2021r2-patch5-8_4_0/xtensa-esp32s2-elf/")
+        tools.join("xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/xtensa-esp-elf/include/"),
+        tools.join("xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/"),
     )?;
 
     generate_bindings_for_chip(
         "esp32s3",
         Arch::Xtensa,
         &workspace,
-        tools.join("xtensa-esp32s3-elf/esp-2021r2-patch5-8_4_0/xtensa-esp32s3-elf/xtensa-esp32s3-elf/include/"),
-        tools.join("xtensa-esp32s3-elf/esp-2021r2-patch5-8_4_0/xtensa-esp32s3-elf/")
+        tools.join("xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/xtensa-esp-elf/include/"),
+        tools.join("xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/"),
     )?;
 
     generate_bindings_for_chip(
         "esp32c6",
         Arch::RiscV,
         &workspace,
-        tools.join(
-            "riscv32-esp-elf/esp-2021r2-patch5-8_4_0/riscv32-esp-elf/riscv32-esp-elf/include/",
-        ),
-        tools.join("riscv32-esp-elf/esp-2021r2-patch5-8_4_0/riscv32-esp-elf/"),
+        tools.join("riscv32-esp-elf/esp-13.2.0_20230928/riscv32-esp-elf/riscv32-esp-elf/include/"),
+        tools.join("riscv32-esp-elf/esp-13.2.0_20230928/riscv32-esp-elf/"),
     )?;
 
     generate_bindings_for_chip(
         "esp32h2",
         Arch::RiscV,
         &workspace,
-        tools.join(
-            "riscv32-esp-elf/esp-2021r2-patch5-8_4_0/riscv32-esp-elf/riscv32-esp-elf/include/",
-        ),
-        tools.join("riscv32-esp-elf/esp-2021r2-patch5-8_4_0/riscv32-esp-elf/"),
+        tools.join("riscv32-esp-elf/esp-13.2.0_20230928/riscv32-esp-elf/riscv32-esp-elf/include/"),
+        tools.join("riscv32-esp-elf/esp-13.2.0_20230928/riscv32-esp-elf/"),
     )?;
 
     Ok(())

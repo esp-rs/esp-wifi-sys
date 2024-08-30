@@ -95,6 +95,7 @@ fn copy_libraries(out: &PathBuf) -> Result<()> {
     copy_file(out, "libs/esp32/libsmartconfig.a", "libsmartconfig.a")?;
     copy_file(out, "libs/esp32/libwapi.a", "libwapi.a")?;
     copy_file(out, "libs/esp32/libwpa_supplicant.a", "libwpa_supplicant.a")?;
+    copy_file(out, "libs/esp32/libprintf.a", "libprintf.a")?;
 
     println!("cargo:rustc-link-lib={}", "btdm_app");
     println!("cargo:rustc-link-lib={}", "coexist");
@@ -108,6 +109,7 @@ fn copy_libraries(out: &PathBuf) -> Result<()> {
     println!("cargo:rustc-link-lib={}", "smartconfig");
     println!("cargo:rustc-link-lib={}", "wapi");
     println!("cargo:rustc-link-lib={}", "wpa_supplicant");
+    println!("cargo:rustc-link-lib={}", "printf");
 
     Ok(())
 }
@@ -128,6 +130,7 @@ fn copy_libraries(out: &PathBuf) -> Result<()> {
         "libs/esp32c2/libwpa_supplicant.a",
         "libwpa_supplicant.a",
     )?;
+    copy_file(out, "libs/esp32c2/libprintf.a", "libprintf.a")?;
 
     println!("cargo:rustc-link-lib={}", "ble_app");
     println!("cargo:rustc-link-lib={}", "btbb");
@@ -139,6 +142,7 @@ fn copy_libraries(out: &PathBuf) -> Result<()> {
     println!("cargo:rustc-link-lib={}", "pp");
     println!("cargo:rustc-link-lib={}", "smartconfig");
     println!("cargo:rustc-link-lib={}", "wpa_supplicant");
+    println!("cargo:rustc-link-lib={}", "printf");
 
     Ok(())
 }
@@ -161,6 +165,7 @@ fn copy_libraries(out: &PathBuf) -> Result<()> {
         "libs/esp32c3/libwpa_supplicant.a",
         "libwpa_supplicant.a",
     )?;
+    copy_file(out, "libs/esp32c3/libprintf.a", "libprintf.a")?;
 
     println!("cargo:rustc-link-lib={}", "btbb");
     println!("cargo:rustc-link-lib={}", "btdm_app");
@@ -174,6 +179,7 @@ fn copy_libraries(out: &PathBuf) -> Result<()> {
     println!("cargo:rustc-link-lib={}", "smartconfig");
     println!("cargo:rustc-link-lib={}", "wapi");
     println!("cargo:rustc-link-lib={}", "wpa_supplicant");
+    println!("cargo:rustc-link-lib={}", "printf");
 
     Ok(())
 }
@@ -196,6 +202,7 @@ fn copy_libraries(out: &PathBuf) -> Result<()> {
         "libs/esp32c6/libwpa_supplicant.a",
         "libwpa_supplicant.a",
     )?;
+    copy_file(out, "libs/esp32c6/libprintf.a", "libprintf.a")?;
 
     println!("cargo:rustc-link-lib={}", "ble_app");
     println!("cargo:rustc-link-lib={}", "btbb");
@@ -209,6 +216,7 @@ fn copy_libraries(out: &PathBuf) -> Result<()> {
     println!("cargo:rustc-link-lib={}", "smartconfig");
     println!("cargo:rustc-link-lib={}", "wapi");
     println!("cargo:rustc-link-lib={}", "wpa_supplicant");
+    println!("cargo:rustc-link-lib={}", "printf");
 
     Ok(())
 }
@@ -219,17 +227,13 @@ fn copy_libraries(out: &PathBuf) -> Result<()> {
     copy_file(out, "libs/esp32h2/libbtbb.a", "libbtbb.a")?;
     copy_file(out, "libs/esp32h2/libcoexist.a", "libcoexist.a")?;
     copy_file(out, "libs/esp32h2/libphy.a", "libphy.a")?;
-    copy_file(
-        out,
-        "libs/esp32h2/libwpa_supplicant.a",
-        "libwpa_supplicant.a",
-    )?;
+    copy_file(out, "libs/esp32h2/libprintf.a", "libprintf.a")?;
 
     println!("cargo:rustc-link-lib={}", "ble_app");
     println!("cargo:rustc-link-lib={}", "btbb");
     println!("cargo:rustc-link-lib={}", "coexist");
     println!("cargo:rustc-link-lib={}", "phy");
-    println!("cargo:rustc-link-lib={}", "wpa_supplicant");
+    println!("cargo:rustc-link-lib={}", "printf");
 
     Ok(())
 }
@@ -251,6 +255,7 @@ fn copy_libraries(out: &PathBuf) -> Result<()> {
         "libs/esp32s2/libwpa_supplicant.a",
         "libwpa_supplicant.a",
     )?;
+    copy_file(out, "libs/esp32s2/libprintf.a", "libprintf.a")?;
 
     println!("cargo:rustc-link-lib={}", "coexist");
     println!("cargo:rustc-link-lib={}", "core");
@@ -262,6 +267,7 @@ fn copy_libraries(out: &PathBuf) -> Result<()> {
     println!("cargo:rustc-link-lib={}", "smartconfig");
     println!("cargo:rustc-link-lib={}", "wapi");
     println!("cargo:rustc-link-lib={}", "wpa_supplicant");
+    println!("cargo:rustc-link-lib={}", "printf");
 
     Ok(())
 }
@@ -285,6 +291,7 @@ fn copy_libraries(out: &PathBuf) -> Result<()> {
         "libs/esp32s3/libwpa_supplicant.a",
         "libwpa_supplicant.a",
     )?;
+    copy_file(out, "libs/esp32s3/libprintf.a", "libprintf.a")?;
 
     println!("cargo:rustc-link-lib={}", "btbb");
     println!("cargo:rustc-link-lib={}", "btdm_app");
@@ -298,6 +305,7 @@ fn copy_libraries(out: &PathBuf) -> Result<()> {
     println!("cargo:rustc-link-lib={}", "smartconfig");
     println!("cargo:rustc-link-lib={}", "wapi");
     println!("cargo:rustc-link-lib={}", "wpa_supplicant");
+    println!("cargo:rustc-link-lib={}", "printf");
 
     Ok(())
 }

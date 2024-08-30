@@ -117,10 +117,9 @@ impl<T> ::core::fmt::Debug for __IncompleteArrayField<T> {
         fmt.write_str("__IncompleteArrayField")
     }
 }
-pub const SOC_COEX_HW_PTI: u32 = 1;
 pub const _NEWLIB_VERSION_H__: u32 = 1;
-pub const _NEWLIB_VERSION: &[u8; 6] = b"3.3.0\0";
-pub const __NEWLIB__: u32 = 3;
+pub const _NEWLIB_VERSION: &[u8; 6] = b"4.3.0\0";
+pub const __NEWLIB__: u32 = 4;
 pub const __NEWLIB_MINOR__: u32 = 3;
 pub const __NEWLIB_PATCHLEVEL__: u32 = 0;
 pub const _DEFAULT_SOURCE: u32 = 1;
@@ -177,12 +176,12 @@ pub const __int_fast16_t_defined: u32 = 1;
 pub const __int_fast32_t_defined: u32 = 1;
 pub const __int_fast64_t_defined: u32 = 1;
 pub const WINT_MIN: u32 = 0;
+pub const SOC_COEX_HW_PTI: u32 = 1;
 pub const true_: u32 = 1;
 pub const false_: u32 = 0;
 pub const __bool_true_false_are_defined: u32 = 1;
 pub const __GNUCLIKE_ASM: u32 = 3;
 pub const __GNUCLIKE___TYPEOF: u32 = 1;
-pub const __GNUCLIKE___OFFSETOF: u32 = 1;
 pub const __GNUCLIKE___SECTION: u32 = 1;
 pub const __GNUCLIKE_CTOR_SECTION_HANDLING: u32 = 1;
 pub const __GNUCLIKE_BUILTIN_CONSTANT_P: u32 = 1;
@@ -200,437 +199,27 @@ pub const __CC_SUPPORTS_WARNING: u32 = 1;
 pub const __CC_SUPPORTS_VARADIC_XXX: u32 = 1;
 pub const __CC_SUPPORTS_DYNAMIC_ARRAY_INIT: u32 = 1;
 pub const __NEWLIB_H__: u32 = 1;
+pub const _ATEXIT_DYNAMIC_ALLOC: u32 = 1;
+pub const _FSEEK_OPTIMIZATION: u32 = 1;
+pub const _FVWRITE_IN_STREAMIO: u32 = 1;
+pub const _HAVE_CC_INHIBIT_LOOP_TO_LIBCALL: u32 = 1;
+pub const _HAVE_INITFINI_ARRAY: u32 = 1;
+pub const _HAVE_LONG_DOUBLE: u32 = 1;
+pub const _ICONV_ENABLED: u32 = 1;
+pub const _LDBL_EQ_DBL: u32 = 1;
+pub const _MB_LEN_MAX: u32 = 1;
+pub const _NANO_MALLOC: u32 = 1;
+pub const _REENT_CHECK_VERIFY: u32 = 1;
+pub const _RETARGETABLE_LOCKING: u32 = 1;
+pub const _UNBUF_STREAM_OPT: u32 = 1;
 pub const _WANT_IO_C99_FORMATS: u32 = 1;
 pub const _WANT_IO_LONG_LONG: u32 = 1;
 pub const _WANT_IO_POS_ARGS: u32 = 1;
+pub const _WANT_REENT_BACKWARD_BINARY_COMPAT: u32 = 1;
 pub const _WANT_REENT_SMALL: u32 = 1;
-pub const _REENT_CHECK_VERIFY: u32 = 1;
-pub const _MB_LEN_MAX: u32 = 1;
-pub const HAVE_INITFINI_ARRAY: u32 = 1;
-pub const _ATEXIT_DYNAMIC_ALLOC: u32 = 1;
-pub const _HAVE_LONG_DOUBLE: u32 = 1;
-pub const _HAVE_CC_INHIBIT_LOOP_TO_LIBCALL: u32 = 1;
-pub const _LDBL_EQ_DBL: u32 = 1;
-pub const _FVWRITE_IN_STREAMIO: u32 = 1;
-pub const _FSEEK_OPTIMIZATION: u32 = 1;
-pub const _UNBUF_STREAM_OPT: u32 = 1;
-pub const _RETARGETABLE_LOCKING: u32 = 1;
-pub const _WANT_USE_LONG_TIME_T: u32 = 1;
+pub const _WANT_USE_GDTOA: u32 = 1;
 pub const __OBSOLETE_MATH_DEFAULT: u32 = 1;
 pub const __OBSOLETE_MATH: u32 = 1;
-pub const XCHAL_HAVE_BE: u32 = 0;
-pub const XCHAL_HAVE_WINDOWED: u32 = 1;
-pub const XCHAL_NUM_AREGS: u32 = 64;
-pub const XCHAL_NUM_AREGS_LOG2: u32 = 6;
-pub const XCHAL_MAX_INSTRUCTION_SIZE: u32 = 3;
-pub const XCHAL_HAVE_DEBUG: u32 = 1;
-pub const XCHAL_HAVE_DENSITY: u32 = 1;
-pub const XCHAL_HAVE_LOOPS: u32 = 1;
-pub const XCHAL_LOOP_BUFFER_SIZE: u32 = 256;
-pub const XCHAL_HAVE_NSA: u32 = 1;
-pub const XCHAL_HAVE_MINMAX: u32 = 1;
-pub const XCHAL_HAVE_SEXT: u32 = 1;
-pub const XCHAL_HAVE_DEPBITS: u32 = 0;
-pub const XCHAL_HAVE_CLAMPS: u32 = 1;
-pub const XCHAL_HAVE_MUL16: u32 = 1;
-pub const XCHAL_HAVE_MUL32: u32 = 1;
-pub const XCHAL_HAVE_MUL32_HIGH: u32 = 1;
-pub const XCHAL_HAVE_DIV32: u32 = 1;
-pub const XCHAL_HAVE_L32R: u32 = 1;
-pub const XCHAL_HAVE_ABSOLUTE_LITERALS: u32 = 0;
-pub const XCHAL_HAVE_CONST16: u32 = 0;
-pub const XCHAL_HAVE_ADDX: u32 = 1;
-pub const XCHAL_HAVE_WIDE_BRANCHES: u32 = 0;
-pub const XCHAL_HAVE_PREDICTED_BRANCHES: u32 = 0;
-pub const XCHAL_HAVE_CALL4AND12: u32 = 1;
-pub const XCHAL_HAVE_ABS: u32 = 1;
-pub const XCHAL_HAVE_RELEASE_SYNC: u32 = 1;
-pub const XCHAL_HAVE_S32C1I: u32 = 1;
-pub const XCHAL_HAVE_SPECULATION: u32 = 0;
-pub const XCHAL_HAVE_FULL_RESET: u32 = 1;
-pub const XCHAL_NUM_CONTEXTS: u32 = 1;
-pub const XCHAL_NUM_MISC_REGS: u32 = 4;
-pub const XCHAL_HAVE_TAP_MASTER: u32 = 0;
-pub const XCHAL_HAVE_PRID: u32 = 1;
-pub const XCHAL_HAVE_EXTERN_REGS: u32 = 1;
-pub const XCHAL_HAVE_MX: u32 = 0;
-pub const XCHAL_HAVE_MP_INTERRUPTS: u32 = 0;
-pub const XCHAL_HAVE_MP_RUNSTALL: u32 = 0;
-pub const XCHAL_HAVE_PSO: u32 = 0;
-pub const XCHAL_HAVE_PSO_CDM: u32 = 0;
-pub const XCHAL_HAVE_PSO_FULL_RETENTION: u32 = 0;
-pub const XCHAL_HAVE_THREADPTR: u32 = 1;
-pub const XCHAL_HAVE_BOOLEANS: u32 = 1;
-pub const XCHAL_HAVE_CP: u32 = 1;
-pub const XCHAL_CP_MAXCFG: u32 = 8;
-pub const XCHAL_HAVE_MAC16: u32 = 1;
-pub const XCHAL_HAVE_FUSION: u32 = 0;
-pub const XCHAL_HAVE_FUSION_FP: u32 = 0;
-pub const XCHAL_HAVE_FUSION_LOW_POWER: u32 = 0;
-pub const XCHAL_HAVE_FUSION_AES: u32 = 0;
-pub const XCHAL_HAVE_FUSION_CONVENC: u32 = 0;
-pub const XCHAL_HAVE_FUSION_LFSR_CRC: u32 = 0;
-pub const XCHAL_HAVE_FUSION_BITOPS: u32 = 0;
-pub const XCHAL_HAVE_FUSION_AVS: u32 = 0;
-pub const XCHAL_HAVE_FUSION_16BIT_BASEBAND: u32 = 0;
-pub const XCHAL_HAVE_FUSION_VITERBI: u32 = 0;
-pub const XCHAL_HAVE_FUSION_SOFTDEMAP: u32 = 0;
-pub const XCHAL_HAVE_HIFIPRO: u32 = 0;
-pub const XCHAL_HAVE_HIFI4: u32 = 0;
-pub const XCHAL_HAVE_HIFI4_VFPU: u32 = 0;
-pub const XCHAL_HAVE_HIFI3: u32 = 0;
-pub const XCHAL_HAVE_HIFI3_VFPU: u32 = 0;
-pub const XCHAL_HAVE_HIFI2: u32 = 0;
-pub const XCHAL_HAVE_HIFI2EP: u32 = 0;
-pub const XCHAL_HAVE_HIFI_MINI: u32 = 0;
-pub const XCHAL_HAVE_VECTORFPU2005: u32 = 0;
-pub const XCHAL_HAVE_USER_DPFPU: u32 = 0;
-pub const XCHAL_HAVE_USER_SPFPU: u32 = 0;
-pub const XCHAL_HAVE_FP: u32 = 1;
-pub const XCHAL_HAVE_FP_DIV: u32 = 1;
-pub const XCHAL_HAVE_FP_RECIP: u32 = 1;
-pub const XCHAL_HAVE_FP_SQRT: u32 = 1;
-pub const XCHAL_HAVE_FP_RSQRT: u32 = 1;
-pub const XCHAL_HAVE_DFP: u32 = 0;
-pub const XCHAL_HAVE_DFP_DIV: u32 = 0;
-pub const XCHAL_HAVE_DFP_RECIP: u32 = 0;
-pub const XCHAL_HAVE_DFP_SQRT: u32 = 0;
-pub const XCHAL_HAVE_DFP_RSQRT: u32 = 0;
-pub const XCHAL_HAVE_DFP_ACCEL: u32 = 1;
-pub const XCHAL_HAVE_DFP_accel: u32 = 1;
-pub const XCHAL_HAVE_DFPU_SINGLE_ONLY: u32 = 1;
-pub const XCHAL_HAVE_DFPU_SINGLE_DOUBLE: u32 = 0;
-pub const XCHAL_HAVE_VECTRA1: u32 = 0;
-pub const XCHAL_HAVE_VECTRALX: u32 = 0;
-pub const XCHAL_HAVE_PDX4: u32 = 0;
-pub const XCHAL_HAVE_CONNXD2: u32 = 0;
-pub const XCHAL_HAVE_CONNXD2_DUALLSFLIX: u32 = 0;
-pub const XCHAL_HAVE_BBE16: u32 = 0;
-pub const XCHAL_HAVE_BBE16_RSQRT: u32 = 0;
-pub const XCHAL_HAVE_BBE16_VECDIV: u32 = 0;
-pub const XCHAL_HAVE_BBE16_DESPREAD: u32 = 0;
-pub const XCHAL_HAVE_BBENEP: u32 = 0;
-pub const XCHAL_HAVE_BSP3: u32 = 0;
-pub const XCHAL_HAVE_BSP3_TRANSPOSE: u32 = 0;
-pub const XCHAL_HAVE_SSP16: u32 = 0;
-pub const XCHAL_HAVE_SSP16_VITERBI: u32 = 0;
-pub const XCHAL_HAVE_TURBO16: u32 = 0;
-pub const XCHAL_HAVE_BBP16: u32 = 0;
-pub const XCHAL_HAVE_FLIX3: u32 = 0;
-pub const XCHAL_HAVE_GRIVPEP: u32 = 0;
-pub const XCHAL_HAVE_GRIVPEP_HISTOGRAM: u32 = 0;
-pub const XCHAL_NUM_LOADSTORE_UNITS: u32 = 1;
-pub const XCHAL_NUM_WRITEBUFFER_ENTRIES: u32 = 4;
-pub const XCHAL_INST_FETCH_WIDTH: u32 = 4;
-pub const XCHAL_DATA_WIDTH: u32 = 4;
-pub const XCHAL_DATA_PIPE_DELAY: u32 = 2;
-pub const XCHAL_CLOCK_GATING_GLOBAL: u32 = 1;
-pub const XCHAL_CLOCK_GATING_FUNCUNIT: u32 = 1;
-pub const XCHAL_UNALIGNED_LOAD_EXCEPTION: u32 = 0;
-pub const XCHAL_UNALIGNED_STORE_EXCEPTION: u32 = 0;
-pub const XCHAL_UNALIGNED_LOAD_HW: u32 = 1;
-pub const XCHAL_UNALIGNED_STORE_HW: u32 = 1;
-pub const XCHAL_SW_VERSION: u32 = 1100003;
-pub const XCHAL_CORE_ID: &[u8; 17] = b"esp32_v3_49_prod\0";
-pub const XCHAL_BUILD_UNIQUE_ID: u32 = 392854;
-pub const XCHAL_HW_CONFIGID0: u32 = 3267166206;
-pub const XCHAL_HW_CONFIGID1: u32 = 482737814;
-pub const XCHAL_HW_VERSION_NAME: &[u8; 8] = b"LX6.0.3\0";
-pub const XCHAL_HW_VERSION_MAJOR: u32 = 2600;
-pub const XCHAL_HW_VERSION_MINOR: u32 = 3;
-pub const XCHAL_HW_VERSION: u32 = 260003;
-pub const XCHAL_HW_REL_LX6: u32 = 1;
-pub const XCHAL_HW_REL_LX6_0: u32 = 1;
-pub const XCHAL_HW_REL_LX6_0_3: u32 = 1;
-pub const XCHAL_HW_CONFIGID_RELIABLE: u32 = 1;
-pub const XCHAL_HW_MIN_VERSION_MAJOR: u32 = 2600;
-pub const XCHAL_HW_MIN_VERSION_MINOR: u32 = 3;
-pub const XCHAL_HW_MIN_VERSION: u32 = 260003;
-pub const XCHAL_HW_MAX_VERSION_MAJOR: u32 = 2600;
-pub const XCHAL_HW_MAX_VERSION_MINOR: u32 = 3;
-pub const XCHAL_HW_MAX_VERSION: u32 = 260003;
-pub const XCHAL_ICACHE_LINESIZE: u32 = 4;
-pub const XCHAL_DCACHE_LINESIZE: u32 = 4;
-pub const XCHAL_ICACHE_LINEWIDTH: u32 = 2;
-pub const XCHAL_DCACHE_LINEWIDTH: u32 = 2;
-pub const XCHAL_ICACHE_SIZE: u32 = 0;
-pub const XCHAL_DCACHE_SIZE: u32 = 0;
-pub const XCHAL_DCACHE_IS_WRITEBACK: u32 = 0;
-pub const XCHAL_DCACHE_IS_COHERENT: u32 = 0;
-pub const XCHAL_HAVE_PREFETCH: u32 = 0;
-pub const XCHAL_HAVE_PREFETCH_L1: u32 = 0;
-pub const XCHAL_PREFETCH_CASTOUT_LINES: u32 = 0;
-pub const XCHAL_PREFETCH_ENTRIES: u32 = 0;
-pub const XCHAL_PREFETCH_BLOCK_ENTRIES: u32 = 0;
-pub const XCHAL_HAVE_CACHE_BLOCKOPS: u32 = 0;
-pub const XCHAL_HAVE_ICACHE_TEST: u32 = 0;
-pub const XCHAL_HAVE_DCACHE_TEST: u32 = 0;
-pub const XCHAL_HAVE_ICACHE_DYN_WAYS: u32 = 0;
-pub const XCHAL_HAVE_DCACHE_DYN_WAYS: u32 = 0;
-pub const XCHAL_HAVE_PIF: u32 = 1;
-pub const XCHAL_HAVE_AXI: u32 = 0;
-pub const XCHAL_HAVE_PIF_WR_RESP: u32 = 0;
-pub const XCHAL_HAVE_PIF_REQ_ATTR: u32 = 0;
-pub const XCHAL_ICACHE_SETWIDTH: u32 = 0;
-pub const XCHAL_DCACHE_SETWIDTH: u32 = 0;
-pub const XCHAL_ICACHE_WAYS: u32 = 1;
-pub const XCHAL_DCACHE_WAYS: u32 = 1;
-pub const XCHAL_ICACHE_LINE_LOCKABLE: u32 = 0;
-pub const XCHAL_DCACHE_LINE_LOCKABLE: u32 = 0;
-pub const XCHAL_ICACHE_ECC_PARITY: u32 = 0;
-pub const XCHAL_DCACHE_ECC_PARITY: u32 = 0;
-pub const XCHAL_ICACHE_ACCESS_SIZE: u32 = 1;
-pub const XCHAL_DCACHE_ACCESS_SIZE: u32 = 1;
-pub const XCHAL_DCACHE_BANKS: u32 = 0;
-pub const XCHAL_CA_BITS: u32 = 4;
-pub const XCHAL_NUM_INSTROM: u32 = 1;
-pub const XCHAL_NUM_INSTRAM: u32 = 2;
-pub const XCHAL_NUM_DATAROM: u32 = 1;
-pub const XCHAL_NUM_DATARAM: u32 = 2;
-pub const XCHAL_NUM_URAM: u32 = 0;
-pub const XCHAL_NUM_XLMI: u32 = 1;
-pub const XCHAL_INSTROM0_VADDR: u32 = 1082130432;
-pub const XCHAL_INSTROM0_PADDR: u32 = 1082130432;
-pub const XCHAL_INSTROM0_SIZE: u32 = 4194304;
-pub const XCHAL_INSTROM0_ECC_PARITY: u32 = 0;
-pub const XCHAL_INSTRAM0_VADDR: u32 = 1073741824;
-pub const XCHAL_INSTRAM0_PADDR: u32 = 1073741824;
-pub const XCHAL_INSTRAM0_SIZE: u32 = 4194304;
-pub const XCHAL_INSTRAM0_ECC_PARITY: u32 = 0;
-pub const XCHAL_INSTRAM1_VADDR: u32 = 1077936128;
-pub const XCHAL_INSTRAM1_PADDR: u32 = 1077936128;
-pub const XCHAL_INSTRAM1_SIZE: u32 = 4194304;
-pub const XCHAL_INSTRAM1_ECC_PARITY: u32 = 0;
-pub const XCHAL_DATAROM0_VADDR: u32 = 1061158912;
-pub const XCHAL_DATAROM0_PADDR: u32 = 1061158912;
-pub const XCHAL_DATAROM0_SIZE: u32 = 4194304;
-pub const XCHAL_DATAROM0_ECC_PARITY: u32 = 0;
-pub const XCHAL_DATAROM0_BANKS: u32 = 1;
-pub const XCHAL_DATARAM0_VADDR: u32 = 1073217536;
-pub const XCHAL_DATARAM0_PADDR: u32 = 1073217536;
-pub const XCHAL_DATARAM0_SIZE: u32 = 524288;
-pub const XCHAL_DATARAM0_ECC_PARITY: u32 = 0;
-pub const XCHAL_DATARAM0_BANKS: u32 = 1;
-pub const XCHAL_DATARAM1_VADDR: u32 = 1065353216;
-pub const XCHAL_DATARAM1_PADDR: u32 = 1065353216;
-pub const XCHAL_DATARAM1_SIZE: u32 = 4194304;
-pub const XCHAL_DATARAM1_ECC_PARITY: u32 = 0;
-pub const XCHAL_DATARAM1_BANKS: u32 = 1;
-pub const XCHAL_XLMI0_VADDR: u32 = 1072693248;
-pub const XCHAL_XLMI0_PADDR: u32 = 1072693248;
-pub const XCHAL_XLMI0_SIZE: u32 = 524288;
-pub const XCHAL_XLMI0_ECC_PARITY: u32 = 0;
-pub const XCHAL_HAVE_IMEM_LOADSTORE: u32 = 1;
-pub const XCHAL_HAVE_INTERRUPTS: u32 = 1;
-pub const XCHAL_HAVE_HIGHPRI_INTERRUPTS: u32 = 1;
-pub const XCHAL_HAVE_NMI: u32 = 1;
-pub const XCHAL_HAVE_CCOUNT: u32 = 1;
-pub const XCHAL_NUM_TIMERS: u32 = 3;
-pub const XCHAL_NUM_INTERRUPTS: u32 = 32;
-pub const XCHAL_NUM_INTERRUPTS_LOG2: u32 = 5;
-pub const XCHAL_NUM_EXTINTERRUPTS: u32 = 26;
-pub const XCHAL_NUM_INTLEVELS: u32 = 6;
-pub const XCHAL_EXCM_LEVEL: u32 = 3;
-pub const XCHAL_INTLEVEL1_MASK: u32 = 407551;
-pub const XCHAL_INTLEVEL2_MASK: u32 = 3670016;
-pub const XCHAL_INTLEVEL3_MASK: u32 = 683706368;
-pub const XCHAL_INTLEVEL4_MASK: u32 = 1392508928;
-pub const XCHAL_INTLEVEL5_MASK: u32 = 2214658048;
-pub const XCHAL_INTLEVEL6_MASK: u32 = 0;
-pub const XCHAL_INTLEVEL7_MASK: u32 = 16384;
-pub const XCHAL_INTLEVEL1_ANDBELOW_MASK: u32 = 407551;
-pub const XCHAL_INTLEVEL2_ANDBELOW_MASK: u32 = 4077567;
-pub const XCHAL_INTLEVEL3_ANDBELOW_MASK: u32 = 687783935;
-pub const XCHAL_INTLEVEL4_ANDBELOW_MASK: u32 = 2080292863;
-pub const XCHAL_INTLEVEL5_ANDBELOW_MASK: u32 = 4294950911;
-pub const XCHAL_INTLEVEL6_ANDBELOW_MASK: u32 = 4294950911;
-pub const XCHAL_INTLEVEL7_ANDBELOW_MASK: u32 = 4294967295;
-pub const XCHAL_INT0_LEVEL: u32 = 1;
-pub const XCHAL_INT1_LEVEL: u32 = 1;
-pub const XCHAL_INT2_LEVEL: u32 = 1;
-pub const XCHAL_INT3_LEVEL: u32 = 1;
-pub const XCHAL_INT4_LEVEL: u32 = 1;
-pub const XCHAL_INT5_LEVEL: u32 = 1;
-pub const XCHAL_INT6_LEVEL: u32 = 1;
-pub const XCHAL_INT7_LEVEL: u32 = 1;
-pub const XCHAL_INT8_LEVEL: u32 = 1;
-pub const XCHAL_INT9_LEVEL: u32 = 1;
-pub const XCHAL_INT10_LEVEL: u32 = 1;
-pub const XCHAL_INT11_LEVEL: u32 = 3;
-pub const XCHAL_INT12_LEVEL: u32 = 1;
-pub const XCHAL_INT13_LEVEL: u32 = 1;
-pub const XCHAL_INT14_LEVEL: u32 = 7;
-pub const XCHAL_INT15_LEVEL: u32 = 3;
-pub const XCHAL_INT16_LEVEL: u32 = 5;
-pub const XCHAL_INT17_LEVEL: u32 = 1;
-pub const XCHAL_INT18_LEVEL: u32 = 1;
-pub const XCHAL_INT19_LEVEL: u32 = 2;
-pub const XCHAL_INT20_LEVEL: u32 = 2;
-pub const XCHAL_INT21_LEVEL: u32 = 2;
-pub const XCHAL_INT22_LEVEL: u32 = 3;
-pub const XCHAL_INT23_LEVEL: u32 = 3;
-pub const XCHAL_INT24_LEVEL: u32 = 4;
-pub const XCHAL_INT25_LEVEL: u32 = 4;
-pub const XCHAL_INT26_LEVEL: u32 = 5;
-pub const XCHAL_INT27_LEVEL: u32 = 3;
-pub const XCHAL_INT28_LEVEL: u32 = 4;
-pub const XCHAL_INT29_LEVEL: u32 = 3;
-pub const XCHAL_INT30_LEVEL: u32 = 4;
-pub const XCHAL_INT31_LEVEL: u32 = 5;
-pub const XCHAL_DEBUGLEVEL: u32 = 6;
-pub const XCHAL_HAVE_DEBUG_EXTERN_INT: u32 = 1;
-pub const XCHAL_NMILEVEL: u32 = 7;
-pub const XCHAL_INTTYPE_MASK_UNCONFIGURED: u32 = 0;
-pub const XCHAL_INTTYPE_MASK_SOFTWARE: u32 = 536871040;
-pub const XCHAL_INTTYPE_MASK_EXTERN_EDGE: u32 = 1346372608;
-pub const XCHAL_INTTYPE_MASK_EXTERN_LEVEL: u32 = 2411606847;
-pub const XCHAL_INTTYPE_MASK_TIMER: u32 = 98368;
-pub const XCHAL_INTTYPE_MASK_NMI: u32 = 16384;
-pub const XCHAL_INTTYPE_MASK_WRITE_ERROR: u32 = 0;
-pub const XCHAL_INTTYPE_MASK_PROFILING: u32 = 2048;
-pub const XCHAL_TIMER0_INTERRUPT: u32 = 6;
-pub const XCHAL_TIMER1_INTERRUPT: u32 = 15;
-pub const XCHAL_TIMER2_INTERRUPT: u32 = 16;
-pub const XCHAL_NMI_INTERRUPT: u32 = 14;
-pub const XCHAL_PROFILING_INTERRUPT: u32 = 11;
-pub const XCHAL_INTLEVEL7_NUM: u32 = 14;
-pub const XCHAL_EXTINT0_NUM: u32 = 0;
-pub const XCHAL_EXTINT1_NUM: u32 = 1;
-pub const XCHAL_EXTINT2_NUM: u32 = 2;
-pub const XCHAL_EXTINT3_NUM: u32 = 3;
-pub const XCHAL_EXTINT4_NUM: u32 = 4;
-pub const XCHAL_EXTINT5_NUM: u32 = 5;
-pub const XCHAL_EXTINT6_NUM: u32 = 8;
-pub const XCHAL_EXTINT7_NUM: u32 = 9;
-pub const XCHAL_EXTINT8_NUM: u32 = 10;
-pub const XCHAL_EXTINT9_NUM: u32 = 12;
-pub const XCHAL_EXTINT10_NUM: u32 = 13;
-pub const XCHAL_EXTINT11_NUM: u32 = 14;
-pub const XCHAL_EXTINT12_NUM: u32 = 17;
-pub const XCHAL_EXTINT13_NUM: u32 = 18;
-pub const XCHAL_EXTINT14_NUM: u32 = 19;
-pub const XCHAL_EXTINT15_NUM: u32 = 20;
-pub const XCHAL_EXTINT16_NUM: u32 = 21;
-pub const XCHAL_EXTINT17_NUM: u32 = 22;
-pub const XCHAL_EXTINT18_NUM: u32 = 23;
-pub const XCHAL_EXTINT19_NUM: u32 = 24;
-pub const XCHAL_EXTINT20_NUM: u32 = 25;
-pub const XCHAL_EXTINT21_NUM: u32 = 26;
-pub const XCHAL_EXTINT22_NUM: u32 = 27;
-pub const XCHAL_EXTINT23_NUM: u32 = 28;
-pub const XCHAL_EXTINT24_NUM: u32 = 30;
-pub const XCHAL_EXTINT25_NUM: u32 = 31;
-pub const XCHAL_INT0_EXTNUM: u32 = 0;
-pub const XCHAL_INT1_EXTNUM: u32 = 1;
-pub const XCHAL_INT2_EXTNUM: u32 = 2;
-pub const XCHAL_INT3_EXTNUM: u32 = 3;
-pub const XCHAL_INT4_EXTNUM: u32 = 4;
-pub const XCHAL_INT5_EXTNUM: u32 = 5;
-pub const XCHAL_INT8_EXTNUM: u32 = 6;
-pub const XCHAL_INT9_EXTNUM: u32 = 7;
-pub const XCHAL_INT10_EXTNUM: u32 = 8;
-pub const XCHAL_INT12_EXTNUM: u32 = 9;
-pub const XCHAL_INT13_EXTNUM: u32 = 10;
-pub const XCHAL_INT14_EXTNUM: u32 = 11;
-pub const XCHAL_INT17_EXTNUM: u32 = 12;
-pub const XCHAL_INT18_EXTNUM: u32 = 13;
-pub const XCHAL_INT19_EXTNUM: u32 = 14;
-pub const XCHAL_INT20_EXTNUM: u32 = 15;
-pub const XCHAL_INT21_EXTNUM: u32 = 16;
-pub const XCHAL_INT22_EXTNUM: u32 = 17;
-pub const XCHAL_INT23_EXTNUM: u32 = 18;
-pub const XCHAL_INT24_EXTNUM: u32 = 19;
-pub const XCHAL_INT25_EXTNUM: u32 = 20;
-pub const XCHAL_INT26_EXTNUM: u32 = 21;
-pub const XCHAL_INT27_EXTNUM: u32 = 22;
-pub const XCHAL_INT28_EXTNUM: u32 = 23;
-pub const XCHAL_INT30_EXTNUM: u32 = 24;
-pub const XCHAL_INT31_EXTNUM: u32 = 25;
-pub const XCHAL_XEA_VERSION: u32 = 2;
-pub const XCHAL_HAVE_XEA1: u32 = 0;
-pub const XCHAL_HAVE_XEA2: u32 = 1;
-pub const XCHAL_HAVE_XEAX: u32 = 0;
-pub const XCHAL_HAVE_EXCEPTIONS: u32 = 1;
-pub const XCHAL_HAVE_HALT: u32 = 0;
-pub const XCHAL_HAVE_BOOTLOADER: u32 = 0;
-pub const XCHAL_HAVE_MEM_ECC_PARITY: u32 = 0;
-pub const XCHAL_HAVE_VECTOR_SELECT: u32 = 1;
-pub const XCHAL_HAVE_VECBASE: u32 = 1;
-pub const XCHAL_VECBASE_RESET_VADDR: u32 = 1073741824;
-pub const XCHAL_VECBASE_RESET_PADDR: u32 = 1073741824;
-pub const XCHAL_RESET_VECBASE_OVERLAP: u32 = 0;
-pub const XCHAL_RESET_VECTOR0_VADDR: u32 = 1342177280;
-pub const XCHAL_RESET_VECTOR0_PADDR: u32 = 1342177280;
-pub const XCHAL_RESET_VECTOR1_VADDR: u32 = 1073742848;
-pub const XCHAL_RESET_VECTOR1_PADDR: u32 = 1073742848;
-pub const XCHAL_RESET_VECTOR_VADDR: u32 = 1073742848;
-pub const XCHAL_RESET_VECTOR_PADDR: u32 = 1073742848;
-pub const XCHAL_USER_VECOFS: u32 = 832;
-pub const XCHAL_USER_VECTOR_VADDR: u32 = 1073742656;
-pub const XCHAL_USER_VECTOR_PADDR: u32 = 1073742656;
-pub const XCHAL_KERNEL_VECOFS: u32 = 768;
-pub const XCHAL_KERNEL_VECTOR_VADDR: u32 = 1073742592;
-pub const XCHAL_KERNEL_VECTOR_PADDR: u32 = 1073742592;
-pub const XCHAL_DOUBLEEXC_VECOFS: u32 = 960;
-pub const XCHAL_DOUBLEEXC_VECTOR_VADDR: u32 = 1073742784;
-pub const XCHAL_DOUBLEEXC_VECTOR_PADDR: u32 = 1073742784;
-pub const XCHAL_WINDOW_OF4_VECOFS: u32 = 0;
-pub const XCHAL_WINDOW_UF4_VECOFS: u32 = 64;
-pub const XCHAL_WINDOW_OF8_VECOFS: u32 = 128;
-pub const XCHAL_WINDOW_UF8_VECOFS: u32 = 192;
-pub const XCHAL_WINDOW_OF12_VECOFS: u32 = 256;
-pub const XCHAL_WINDOW_UF12_VECOFS: u32 = 320;
-pub const XCHAL_WINDOW_VECTORS_VADDR: u32 = 1073741824;
-pub const XCHAL_WINDOW_VECTORS_PADDR: u32 = 1073741824;
-pub const XCHAL_INTLEVEL2_VECOFS: u32 = 384;
-pub const XCHAL_INTLEVEL2_VECTOR_VADDR: u32 = 1073742208;
-pub const XCHAL_INTLEVEL2_VECTOR_PADDR: u32 = 1073742208;
-pub const XCHAL_INTLEVEL3_VECOFS: u32 = 448;
-pub const XCHAL_INTLEVEL3_VECTOR_VADDR: u32 = 1073742272;
-pub const XCHAL_INTLEVEL3_VECTOR_PADDR: u32 = 1073742272;
-pub const XCHAL_INTLEVEL4_VECOFS: u32 = 512;
-pub const XCHAL_INTLEVEL4_VECTOR_VADDR: u32 = 1073742336;
-pub const XCHAL_INTLEVEL4_VECTOR_PADDR: u32 = 1073742336;
-pub const XCHAL_INTLEVEL5_VECOFS: u32 = 576;
-pub const XCHAL_INTLEVEL5_VECTOR_VADDR: u32 = 1073742400;
-pub const XCHAL_INTLEVEL5_VECTOR_PADDR: u32 = 1073742400;
-pub const XCHAL_INTLEVEL6_VECOFS: u32 = 640;
-pub const XCHAL_INTLEVEL6_VECTOR_VADDR: u32 = 1073742464;
-pub const XCHAL_INTLEVEL6_VECTOR_PADDR: u32 = 1073742464;
-pub const XCHAL_DEBUG_VECOFS: u32 = 640;
-pub const XCHAL_DEBUG_VECTOR_VADDR: u32 = 1073742464;
-pub const XCHAL_DEBUG_VECTOR_PADDR: u32 = 1073742464;
-pub const XCHAL_NMI_VECOFS: u32 = 704;
-pub const XCHAL_NMI_VECTOR_VADDR: u32 = 1073742528;
-pub const XCHAL_NMI_VECTOR_PADDR: u32 = 1073742528;
-pub const XCHAL_INTLEVEL7_VECOFS: u32 = 704;
-pub const XCHAL_INTLEVEL7_VECTOR_VADDR: u32 = 1073742528;
-pub const XCHAL_INTLEVEL7_VECTOR_PADDR: u32 = 1073742528;
-pub const XCHAL_HAVE_DEBUG_ERI: u32 = 1;
-pub const XCHAL_HAVE_DEBUG_APB: u32 = 1;
-pub const XCHAL_HAVE_DEBUG_JTAG: u32 = 1;
-pub const XCHAL_HAVE_OCD: u32 = 1;
-pub const XCHAL_NUM_IBREAK: u32 = 2;
-pub const XCHAL_NUM_DBREAK: u32 = 2;
-pub const XCHAL_HAVE_OCD_DIR_ARRAY: u32 = 0;
-pub const XCHAL_HAVE_OCD_LS32DDR: u32 = 1;
-pub const XCHAL_HAVE_TRAX: u32 = 1;
-pub const XCHAL_TRAX_MEM_SIZE: u32 = 16384;
-pub const XCHAL_TRAX_MEM_SHAREABLE: u32 = 1;
-pub const XCHAL_TRAX_ATB_WIDTH: u32 = 32;
-pub const XCHAL_TRAX_TIME_WIDTH: u32 = 0;
-pub const XCHAL_NUM_PERF_COUNTERS: u32 = 2;
-pub const XCHAL_HAVE_TLBS: u32 = 1;
-pub const XCHAL_HAVE_SPANNING_WAY: u32 = 1;
-pub const XCHAL_SPANNING_WAY: u32 = 0;
-pub const XCHAL_HAVE_IDENTITY_MAP: u32 = 1;
-pub const XCHAL_HAVE_CACHEATTR: u32 = 0;
-pub const XCHAL_HAVE_MIMIC_CACHEATTR: u32 = 1;
-pub const XCHAL_HAVE_XLT_CACHEATTR: u32 = 0;
-pub const XCHAL_HAVE_PTP_MMU: u32 = 0;
-pub const XCHAL_MMU_ASID_BITS: u32 = 0;
-pub const XCHAL_MMU_RINGS: u32 = 1;
-pub const XCHAL_MMU_RING_BITS: u32 = 0;
 pub const __BUFSIZ__: u32 = 128;
 pub const __RAND_MAX: u32 = 2147483647;
 pub const __GNUC_VA_LIST: u32 = 1;
@@ -646,31 +235,6 @@ pub const _RAND48_ADD: u32 = 11;
 pub const _REENT_EMERGENCY_SIZE: u32 = 25;
 pub const _REENT_ASCTIME_SIZE: u32 = 26;
 pub const _REENT_SIGNAL_SIZE: u32 = 24;
-pub const __BIT_TYPES_DEFINED__: u32 = 1;
-pub const _LITTLE_ENDIAN: u32 = 1234;
-pub const _BIG_ENDIAN: u32 = 4321;
-pub const _PDP_ENDIAN: u32 = 3412;
-pub const _BYTE_ORDER: u32 = 1234;
-pub const _QUAD_HIGHWORD: u32 = 1;
-pub const _QUAD_LOWWORD: u32 = 0;
-pub const LITTLE_ENDIAN: u32 = 1234;
-pub const BIG_ENDIAN: u32 = 4321;
-pub const PDP_ENDIAN: u32 = 3412;
-pub const BYTE_ORDER: u32 = 1234;
-pub const FD_SETSIZE: u32 = 64;
-pub const SCHED_OTHER: u32 = 0;
-pub const SCHED_FIFO: u32 = 1;
-pub const SCHED_RR: u32 = 2;
-pub const PTHREAD_SCOPE_PROCESS: u32 = 0;
-pub const PTHREAD_SCOPE_SYSTEM: u32 = 1;
-pub const PTHREAD_INHERIT_SCHED: u32 = 1;
-pub const PTHREAD_EXPLICIT_SCHED: u32 = 2;
-pub const PTHREAD_CREATE_DETACHED: u32 = 0;
-pub const PTHREAD_CREATE_JOINABLE: u32 = 1;
-pub const PTHREAD_MUTEX_NORMAL: u32 = 0;
-pub const PTHREAD_MUTEX_RECURSIVE: u32 = 1;
-pub const PTHREAD_MUTEX_ERRORCHECK: u32 = 2;
-pub const PTHREAD_MUTEX_DEFAULT: u32 = 3;
 pub const __SLBF: u32 = 1;
 pub const __SNBF: u32 = 2;
 pub const __SRD: u32 = 4;
@@ -982,6 +546,7 @@ pub const CONFIG_APP_BUILD_TYPE_APP_2NDBOOT: u32 = 1;
 pub const CONFIG_APP_BUILD_GENERATE_BINARIES: u32 = 1;
 pub const CONFIG_APP_BUILD_BOOTLOADER: u32 = 1;
 pub const CONFIG_APP_BUILD_USE_FLASH_SECTIONS: u32 = 1;
+pub const CONFIG_APP_REPRODUCIBLE_BUILD: u32 = 1;
 pub const CONFIG_BOOTLOADER_OFFSET_IN_FLASH: u32 = 4096;
 pub const CONFIG_BOOTLOADER_COMPILER_OPTIMIZATION_SIZE: u32 = 1;
 pub const CONFIG_BOOTLOADER_LOG_LEVEL_INFO: u32 = 1;
@@ -1025,9 +590,10 @@ pub const CONFIG_PARTITION_TABLE_FILENAME: &[u8; 25] = b"partitions_singleapp.cs
 pub const CONFIG_PARTITION_TABLE_OFFSET: u32 = 32768;
 pub const CONFIG_PARTITION_TABLE_MD5: u32 = 1;
 pub const CONFIG_COMPILER_OPTIMIZATION_SIZE: u32 = 1;
-pub const CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS_ENABLE: u32 = 1;
+pub const CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS_SILENT: u32 = 1;
 pub const CONFIG_COMPILER_FLOAT_LIB_FROM_GCCLIB: u32 = 1;
-pub const CONFIG_COMPILER_OPTIMIZATION_ASSERTION_LEVEL: u32 = 2;
+pub const CONFIG_COMPILER_OPTIMIZATION_ASSERTION_LEVEL: u32 = 1;
+pub const CONFIG_COMPILER_OPTIMIZATION_CHECKS_SILENT: u32 = 1;
 pub const CONFIG_COMPILER_HIDE_PATHS_MACROS: u32 = 1;
 pub const CONFIG_COMPILER_STACK_CHECK_MODE_NONE: u32 = 1;
 pub const CONFIG_APPTRACE_DEST_NONE: u32 = 1;
@@ -1146,13 +712,9 @@ pub const CONFIG_ESP_WIFI_SOFTAP_BEACON_MAX_LEN: u32 = 752;
 pub const CONFIG_ESP_WIFI_MGMT_SBUF_NUM: u32 = 32;
 pub const CONFIG_ESP_WIFI_IRAM_OPT: u32 = 1;
 pub const CONFIG_ESP_WIFI_RX_IRAM_OPT: u32 = 1;
-pub const CONFIG_ESP_WIFI_ENABLE_WPA3_SAE: u32 = 1;
-pub const CONFIG_ESP_WIFI_ENABLE_SAE_PK: u32 = 1;
-pub const CONFIG_ESP_WIFI_SOFTAP_SAE_SUPPORT: u32 = 1;
 pub const CONFIG_ESP_WIFI_STA_DISCONNECTED_PM_ENABLE: u32 = 1;
 pub const CONFIG_ESP_WIFI_SOFTAP_SUPPORT: u32 = 1;
 pub const CONFIG_ESP_WIFI_ESPNOW_MAX_ENCRYPT_NUM: u32 = 7;
-pub const CONFIG_ESP_WIFI_MBEDTLS_CRYPTO: u32 = 1;
 pub const CONFIG_ESP_WIFI_ENTERPRISE_SUPPORT: u32 = 1;
 pub const CONFIG_ESP_COREDUMP_ENABLE_TO_NONE: u32 = 1;
 pub const CONFIG_FATFS_VOLUME_COUNT: u32 = 2;
@@ -1188,7 +750,7 @@ pub const CONFIG_FREERTOS_NO_AFFINITY: u32 = 2147483647;
 pub const CONFIG_FREERTOS_SUPPORT_STATIC_ALLOCATION: u32 = 1;
 pub const CONFIG_FREERTOS_DEBUG_OCDAWARE: u32 = 1;
 pub const CONFIG_HAL_ASSERTION_EQUALS_SYSTEM: u32 = 1;
-pub const CONFIG_HAL_DEFAULT_ASSERTION_LEVEL: u32 = 2;
+pub const CONFIG_HAL_DEFAULT_ASSERTION_LEVEL: u32 = 1;
 pub const CONFIG_HAL_SPI_MASTER_FUNC_IN_IRAM: u32 = 1;
 pub const CONFIG_HAL_SPI_SLAVE_FUNC_IN_IRAM: u32 = 1;
 pub const CONFIG_HEAP_POISONING_DISABLED: u32 = 1;
@@ -1274,7 +836,6 @@ pub const CONFIG_MBEDTLS_PKCS7_C: u32 = 1;
 pub const CONFIG_MBEDTLS_CERTIFICATE_BUNDLE: u32 = 1;
 pub const CONFIG_MBEDTLS_CERTIFICATE_BUNDLE_DEFAULT_FULL: u32 = 1;
 pub const CONFIG_MBEDTLS_CERTIFICATE_BUNDLE_MAX_CERTS: u32 = 200;
-pub const CONFIG_MBEDTLS_CMAC_C: u32 = 1;
 pub const CONFIG_MBEDTLS_HARDWARE_AES: u32 = 1;
 pub const CONFIG_MBEDTLS_AES_USE_INTERRUPT: u32 = 1;
 pub const CONFIG_MBEDTLS_HARDWARE_GCM: u32 = 1;
@@ -1344,6 +905,7 @@ pub const CONFIG_ESP_PROTOCOMM_SUPPORT_SECURITY_VERSION_1: u32 = 1;
 pub const CONFIG_ESP_PROTOCOMM_SUPPORT_SECURITY_VERSION_2: u32 = 1;
 pub const CONFIG_PTHREAD_TASK_PRIO_DEFAULT: u32 = 5;
 pub const CONFIG_PTHREAD_TASK_STACK_SIZE_DEFAULT: u32 = 3072;
+pub const CONFIG_PTHREAD_STACK_MIN: u32 = 768;
 pub const CONFIG_PTHREAD_TASK_CORE_DEFAULT: i32 = -1;
 pub const CONFIG_PTHREAD_TASK_NAME_DEFAULT: &[u8; 8] = b"pthread\0";
 pub const CONFIG_MMU_PAGE_SIZE_64KB: u32 = 1;
@@ -1421,6 +983,7 @@ pub const CONFIG_ESP32S2_BROWNOUT_DET_LVL: u32 = 7;
 pub const CONFIG_ESP32S2_BROWNOUT_DET_LVL_SEL_7: u32 = 1;
 pub const CONFIG_ESP32S2_DEBUG_OCDAWARE: u32 = 1;
 pub const CONFIG_ESP32S2_DEFAULT_CPU_FREQ_160: u32 = 1;
+pub const CONFIG_ESP32S2_DEFAULT_CPU_FREQ_MHZ: u32 = 160;
 pub const CONFIG_ESP32S2_MEMPROT_FEATURE: u32 = 1;
 pub const CONFIG_ESP32S2_MEMPROT_FEATURE_LOCK: u32 = 1;
 pub const CONFIG_ESP32S2_PANIC_PRINT_REBOOT: u32 = 1;
@@ -1434,6 +997,7 @@ pub const CONFIG_ESP32_ENABLE_COREDUMP_TO_NONE: u32 = 1;
 pub const CONFIG_ESP32_PHY_CALIBRATION_AND_DATA_STORAGE: u32 = 1;
 pub const CONFIG_ESP32_PHY_MAX_TX_POWER: u32 = 20;
 pub const CONFIG_ESP32_PHY_MAX_WIFI_TX_POWER: u32 = 20;
+pub const CONFIG_ESP32_PTHREAD_STACK_MIN: u32 = 768;
 pub const CONFIG_ESP32_PTHREAD_TASK_CORE_DEFAULT: i32 = -1;
 pub const CONFIG_ESP32_PTHREAD_TASK_NAME_DEFAULT: &[u8; 8] = b"pthread\0";
 pub const CONFIG_ESP32_PTHREAD_TASK_PRIO_DEFAULT: u32 = 5;
@@ -1444,7 +1008,6 @@ pub const CONFIG_ESP32_WIFI_DYNAMIC_RX_BUFFER_NUM: u32 = 32;
 pub const CONFIG_ESP32_WIFI_DYNAMIC_TX_BUFFER: u32 = 1;
 pub const CONFIG_ESP32_WIFI_DYNAMIC_TX_BUFFER_NUM: u32 = 32;
 pub const CONFIG_ESP32_WIFI_ENABLED: u32 = 1;
-pub const CONFIG_ESP32_WIFI_ENABLE_WPA3_SAE: u32 = 1;
 pub const CONFIG_ESP32_WIFI_IRAM_OPT: u32 = 1;
 pub const CONFIG_ESP32_WIFI_MGMT_SBUF_NUM: u32 = 32;
 pub const CONFIG_ESP32_WIFI_NVS_ENABLED: u32 = 1;
@@ -1465,8 +1028,8 @@ pub const CONFIG_LOG_BOOTLOADER_LEVEL: u32 = 3;
 pub const CONFIG_LOG_BOOTLOADER_LEVEL_INFO: u32 = 1;
 pub const CONFIG_MAIN_TASK_STACK_SIZE: u32 = 3584;
 pub const CONFIG_MONITOR_BAUD: u32 = 115200;
-pub const CONFIG_OPTIMIZATION_ASSERTIONS_ENABLED: u32 = 1;
-pub const CONFIG_OPTIMIZATION_ASSERTION_LEVEL: u32 = 2;
+pub const CONFIG_OPTIMIZATION_ASSERTIONS_SILENT: u32 = 1;
+pub const CONFIG_OPTIMIZATION_ASSERTION_LEVEL: u32 = 1;
 pub const CONFIG_OPTIMIZATION_LEVEL_RELEASE: u32 = 1;
 pub const CONFIG_POST_EVENTS_FROM_IRAM_ISR: u32 = 1;
 pub const CONFIG_POST_EVENTS_FROM_ISR: u32 = 1;
@@ -1498,7 +1061,6 @@ pub const CONFIG_TIMER_TASK_PRIORITY: u32 = 1;
 pub const CONFIG_TIMER_TASK_STACK_DEPTH: u32 = 2048;
 pub const CONFIG_TIMER_TASK_STACK_SIZE: u32 = 3584;
 pub const CONFIG_UDP_RECVMBOX_SIZE: u32 = 6;
-pub const CONFIG_WPA_MBEDTLS_CRYPTO: u32 = 1;
 pub const ESP_OK: u32 = 0;
 pub const ESP_FAIL: i32 = -1;
 pub const ESP_ERR_NO_MEM: u32 = 257;
@@ -1616,7 +1178,7 @@ pub const WIFI_TASK_CORE_ID: u32 = 0;
 pub const WIFI_SOFTAP_BEACON_MAX_LEN: u32 = 752;
 pub const WIFI_MGMT_SBUF_NUM: u32 = 32;
 pub const WIFI_STA_DISCONNECTED_PM_ENABLED: u32 = 1;
-pub const WIFI_ENABLE_WPA3_SAE: u32 = 1;
+pub const WIFI_ENABLE_WPA3_SAE: u32 = 0;
 pub const WIFI_ENABLE_SPIRAM: u32 = 0;
 pub const WIFI_FTM_INITIATOR: u32 = 0;
 pub const WIFI_FTM_RESPONDER: u32 = 0;
@@ -1624,7 +1186,7 @@ pub const CONFIG_FEATURE_WPA3_SAE_BIT: u32 = 1;
 pub const CONFIG_FEATURE_CACHE_TX_BUF_BIT: u32 = 2;
 pub const CONFIG_FEATURE_FTM_INITIATOR_BIT: u32 = 4;
 pub const CONFIG_FEATURE_FTM_RESPONDER_BIT: u32 = 8;
-pub const WIFI_FEATURE_CAPS: u32 = 1;
+pub const WIFI_FEATURE_CAPS: u32 = 0;
 pub const ESP_WIFI_CONNECTIONLESS_INTERVAL_DEFAULT_MODE: u32 = 0;
 pub const WIFI_LOG_SUBMODULE_ALL: u32 = 0;
 pub const WIFI_LOG_SUBMODULE_INIT: u32 = 1;
@@ -1646,7 +1208,6 @@ pub const ESP_NOW_KEY_LEN: u32 = 16;
 pub const ESP_NOW_MAX_TOTAL_PEER_NUM: u32 = 20;
 pub const ESP_NOW_MAX_ENCRYPT_PEER_NUM: u32 = 6;
 pub const ESP_NOW_MAX_DATA_LEN: u32 = 250;
-pub type _lock_t = crate::c_types::c_int;
 pub type __int8_t = crate::c_types::c_schar;
 pub type __uint8_t = crate::c_types::c_uchar;
 pub type __int16_t = crate::c_types::c_short;
@@ -1685,13 +1246,7 @@ pub type int_fast32_t = crate::c_types::c_int;
 pub type uint_fast32_t = crate::c_types::c_uint;
 pub type int_fast64_t = crate::c_types::c_longlong;
 pub type uint_fast64_t = crate::c_types::c_ulonglong;
-pub const esp_log_level_e_ESP_LOG_NONE: esp_log_level_e = 0;
-pub const esp_log_level_e_ESP_LOG_ERROR: esp_log_level_e = 1;
-pub const esp_log_level_e_ESP_LOG_WARN: esp_log_level_e = 2;
-pub const esp_log_level_e_ESP_LOG_INFO: esp_log_level_e = 3;
-pub const esp_log_level_e_ESP_LOG_DEBUG: esp_log_level_e = 4;
-pub const esp_log_level_e_ESP_LOG_VERBOSE: esp_log_level_e = 5;
-pub type esp_log_level_e = crate::c_types::c_uint;
+pub type _lock_t = crate::c_types::c_int;
 pub type TickType_t = u32;
 pub type UBaseType_t = u32;
 pub type BaseType_t = i32;
@@ -1706,6 +1261,12 @@ pub struct ets_timer {
     pub period: u32,
     pub func: ::core::option::Option<unsafe extern "C" fn(priv_: *mut crate::c_types::c_void)>,
     pub priv_: *mut crate::c_types::c_void,
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct timeval {
+    pub tv_sec: u64,
+    pub tv_usec: u32,
 }
 pub type wchar_t = crate::c_types::c_uchar;
 #[repr(C)]
@@ -1751,8 +1312,9 @@ pub union _mbstate_t__bindgen_ty_1 {
 }
 pub type _iconv_t = *mut crate::c_types::c_void;
 pub type __clock_t = crate::c_types::c_ulong;
-pub type __time_t = crate::c_types::c_long;
+pub type __time_t = __int_least64_t;
 pub type __clockid_t = crate::c_types::c_ulong;
+pub type __daddr_t = crate::c_types::c_long;
 pub type __timer_t = crate::c_types::c_ulong;
 pub type __sa_family_t = __uint8_t;
 pub type __socklen_t = __uint32_t;
@@ -1851,21 +1413,6 @@ pub struct __sbuf {
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct __sFILE_fake {
-    pub _p: *mut crate::c_types::c_uchar,
-    pub _r: crate::c_types::c_int,
-    pub _w: crate::c_types::c_int,
-    pub _flags: crate::c_types::c_short,
-    pub _file: crate::c_types::c_short,
-    pub _bf: __sbuf,
-    pub _lbfsize: crate::c_types::c_int,
-    pub _data: *mut _reent,
-}
-extern "C" {
-    pub fn __sinit(arg1: *mut _reent);
-}
-#[repr(C)]
-#[derive(Copy, Clone)]
 pub struct __sFILE {
     pub _p: *mut crate::c_types::c_uchar,
     pub _r: crate::c_types::c_int,
@@ -1919,12 +1466,18 @@ pub struct __sFILE {
     pub _flags2: crate::c_types::c_int,
 }
 pub type __FILE = __sFILE;
+extern "C" {
+    pub static mut __sf: [__FILE; 3usize];
+}
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct _glue {
     pub _next: *mut _glue,
     pub _niobs: crate::c_types::c_int,
     pub _iobs: *mut __FILE,
+}
+extern "C" {
+    pub static mut __sglue: _glue;
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
@@ -1966,8 +1519,8 @@ pub struct _reent {
     pub _stderr: *mut __FILE,
     pub _inc: crate::c_types::c_int,
     pub _emergency: *mut crate::c_types::c_char,
-    pub __sdidinit: crate::c_types::c_int,
-    pub _unspecified_locale_info: crate::c_types::c_int,
+    pub _reserved_0: crate::c_types::c_int,
+    pub _reserved_1: crate::c_types::c_int,
     pub _locale: *mut __locale_t,
     pub _mp: *mut _mprec,
     pub __cleanup: ::core::option::Option<unsafe extern "C" fn(arg1: *mut _reent)>,
@@ -1978,21 +1531,12 @@ pub struct _reent {
     pub _localtime_buf: *mut __tm,
     pub _asctime_buf: *mut crate::c_types::c_char,
     pub _sig_func: *mut ::core::option::Option<unsafe extern "C" fn(arg1: crate::c_types::c_int)>,
-    pub _atexit: *mut _atexit,
-    pub _atexit0: _atexit,
-    pub __sglue: _glue,
+    pub _reserved_6: *mut _atexit,
+    pub _reserved_7: _atexit,
+    pub _reserved_8: _glue,
     pub __sf: *mut __FILE,
     pub _misc: *mut _misc_reent,
     pub _signal_buf: *mut crate::c_types::c_char,
-}
-extern "C" {
-    pub static __sf_fake_stdin: __sFILE_fake;
-}
-extern "C" {
-    pub static __sf_fake_stdout: __sFILE_fake;
-}
-extern "C" {
-    pub static __sf_fake_stderr: __sFILE_fake;
 }
 extern "C" {
     pub fn __assert(
@@ -2010,142 +1554,38 @@ extern "C" {
     ) -> !;
 }
 extern "C" {
-    pub static mut _global_impure_ptr: *mut _reent;
+    pub static mut _impure_ptr: *mut _reent;
+}
+extern "C" {
+    pub static mut _impure_data: _reent;
+}
+extern "C" {
+    pub fn __getreent() -> *mut _reent;
+}
+extern "C" {
+    pub static mut __atexit: *mut _atexit;
+}
+extern "C" {
+    pub static mut __atexit0: _atexit;
+}
+extern "C" {
+    pub static mut __stdio_exit_handler: ::core::option::Option<unsafe extern "C" fn()>;
 }
 extern "C" {
     pub fn _reclaim_reent(arg1: *mut _reent);
 }
 extern "C" {
-    pub fn __getreent() -> *mut _reent;
-}
-pub type u_int8_t = __uint8_t;
-pub type u_int16_t = __uint16_t;
-pub type u_int32_t = __uint32_t;
-pub type u_int64_t = __uint64_t;
-pub type register_t = __intptr_t;
-pub type __sigset_t = crate::c_types::c_ulong;
-pub type suseconds_t = __suseconds_t;
-pub type time_t = crate::c_types::c_long;
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct timeval {
-    pub tv_sec: time_t,
-    pub tv_usec: suseconds_t,
-}
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct timespec {
-    pub tv_sec: time_t,
-    pub tv_nsec: crate::c_types::c_long,
-}
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct itimerspec {
-    pub it_interval: timespec,
-    pub it_value: timespec,
-}
-pub type sigset_t = __sigset_t;
-pub type fd_mask = crate::c_types::c_ulong;
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct _types_fd_set {
-    pub fds_bits: [fd_mask; 2usize],
-}
-extern "C" {
-    pub fn select(
-        __n: crate::c_types::c_int,
-        __readfds: *mut _types_fd_set,
-        __writefds: *mut _types_fd_set,
-        __exceptfds: *mut _types_fd_set,
-        __timeout: *mut timeval,
+    pub fn _fwalk_sglue(
+        arg1: *mut _reent,
+        arg2: ::core::option::Option<
+            unsafe extern "C" fn(arg1: *mut _reent, arg2: *mut __FILE) -> crate::c_types::c_int,
+        >,
+        arg3: *mut _glue,
     ) -> crate::c_types::c_int;
-}
-extern "C" {
-    pub fn pselect(
-        __n: crate::c_types::c_int,
-        __readfds: *mut _types_fd_set,
-        __writefds: *mut _types_fd_set,
-        __exceptfds: *mut _types_fd_set,
-        __timeout: *const timespec,
-        __set: *const sigset_t,
-    ) -> crate::c_types::c_int;
-}
-pub type in_addr_t = __uint32_t;
-pub type in_port_t = __uint16_t;
-pub type u_register_t = __uintptr_t;
-pub type u_char = crate::c_types::c_uchar;
-pub type u_short = crate::c_types::c_ushort;
-pub type u_int = crate::c_types::c_uint;
-pub type u_long = crate::c_types::c_ulong;
-pub type ushort = crate::c_types::c_ushort;
-pub type uint = crate::c_types::c_uint;
-pub type ulong = crate::c_types::c_ulong;
-pub type blkcnt_t = __blkcnt_t;
-pub type blksize_t = __blksize_t;
-pub type clock_t = crate::c_types::c_ulong;
-pub type daddr_t = crate::c_types::c_long;
-pub type caddr_t = *mut crate::c_types::c_char;
-pub type fsblkcnt_t = __fsblkcnt_t;
-pub type fsfilcnt_t = __fsfilcnt_t;
-pub type id_t = __id_t;
-pub type ino_t = __ino_t;
-pub type off_t = __off_t;
-pub type dev_t = __dev_t;
-pub type uid_t = __uid_t;
-pub type gid_t = __gid_t;
-pub type pid_t = __pid_t;
-pub type key_t = __key_t;
-pub type mode_t = __mode_t;
-pub type nlink_t = __nlink_t;
-pub type clockid_t = __clockid_t;
-pub type timer_t = __timer_t;
-pub type useconds_t = __useconds_t;
-pub type sbintime_t = __int64_t;
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct sched_param {
-    pub sched_priority: crate::c_types::c_int,
-}
-extern "C" {
-    pub fn sched_yield() -> crate::c_types::c_int;
-}
-pub type pthread_t = __uint32_t;
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct pthread_attr_t {
-    pub is_initialized: crate::c_types::c_int,
-    pub stackaddr: *mut crate::c_types::c_void,
-    pub stacksize: crate::c_types::c_int,
-    pub contentionscope: crate::c_types::c_int,
-    pub inheritsched: crate::c_types::c_int,
-    pub schedpolicy: crate::c_types::c_int,
-    pub schedparam: sched_param,
-    pub detachstate: crate::c_types::c_int,
-}
-pub type pthread_mutex_t = __uint32_t;
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct pthread_mutexattr_t {
-    pub is_initialized: crate::c_types::c_int,
-    pub type_: crate::c_types::c_int,
-    pub recursive: crate::c_types::c_int,
-}
-pub type pthread_cond_t = __uint32_t;
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct pthread_condattr_t {
-    pub is_initialized: crate::c_types::c_int,
-    pub clock: clock_t,
-}
-pub type pthread_key_t = __uint32_t;
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct pthread_once_t {
-    pub is_initialized: crate::c_types::c_int,
-    pub init_executed: crate::c_types::c_int,
 }
 pub type FILE = __FILE;
 pub type fpos_t = _fpos_t;
+pub type off_t = __off_t;
 extern "C" {
     pub fn ctermid(arg1: *mut crate::c_types::c_char) -> *mut crate::c_types::c_char;
 }
@@ -8293,6 +7733,138 @@ extern "C" {
 extern "C" {
     #[doc = " @brief Get the ETM event handle of esp_timer underlying alarm event\n\n @note The created ETM event object can be deleted later by calling `esp_etm_del_event`\n\n @note The ETM event is generated by the underlying hardware -- systimer,\n       therefore, if the esp_timer is not clocked by systimer, then no ETM event will be generated.\n\n @param[out] out_event Returned ETM event handle\n @return\n      - ESP_OK Success\n      - ESP_ERR_INVALID_ARG Parameter error"]
     pub fn esp_timer_new_etm_alarm_event(out_event: *mut esp_etm_event_handle_t) -> esp_err_t;
+}
+#[doc = "< EAP (Extensible Authentication Protocol)"]
+pub const esp_eap_ttls_phase2_types_ESP_EAP_TTLS_PHASE2_EAP: esp_eap_ttls_phase2_types = 0;
+#[doc = "< MS-CHAPv2 (Microsoft Challenge Handshake Authentication Protocol - Version 2)"]
+pub const esp_eap_ttls_phase2_types_ESP_EAP_TTLS_PHASE2_MSCHAPV2: esp_eap_ttls_phase2_types = 1;
+#[doc = "< MS-CHAP (Microsoft Challenge Handshake Authentication Protocol)"]
+pub const esp_eap_ttls_phase2_types_ESP_EAP_TTLS_PHASE2_MSCHAP: esp_eap_ttls_phase2_types = 2;
+#[doc = "< PAP (Password Authentication Protocol)"]
+pub const esp_eap_ttls_phase2_types_ESP_EAP_TTLS_PHASE2_PAP: esp_eap_ttls_phase2_types = 3;
+#[doc = "< CHAP (Challenge Handshake Authentication Protocol)"]
+pub const esp_eap_ttls_phase2_types_ESP_EAP_TTLS_PHASE2_CHAP: esp_eap_ttls_phase2_types = 4;
+#[doc = " @brief Enumeration of phase 2 authentication types for EAP-TTLS.\n\n This enumeration defines the supported phase 2 authentication methods\n that can be used in the EAP-TTLS (Extensible Authentication Protocol -\n Tunneled Transport Layer Security) protocol for the second authentication\n phase."]
+pub type esp_eap_ttls_phase2_types = crate::c_types::c_uint;
+#[doc = " @brief Configuration settings for EAP-FAST\n        (Extensible Authentication Protocol - Flexible Authentication via Secure Tunneling).\n\n This structure defines the configuration options that can be used to customize the behavior of the\n EAP-FAST authentication protocol, specifically for Fast Provisioning and PAC (Protected Access Credential) handling."]
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct esp_eap_fast_config {
+    #[doc = "< Enable or disable Fast Provisioning in EAP-FAST (0 = disabled, 1 = enabled)"]
+    pub fast_provisioning: crate::c_types::c_int,
+    #[doc = "< Maximum length of the PAC (Protected Access Credential) list"]
+    pub fast_max_pac_list_len: crate::c_types::c_int,
+    #[doc = "< Set to true for binary format PAC, false for ASCII format PAC"]
+    pub fast_pac_format_binary: bool,
+}
+extern "C" {
+    #[doc = " @brief Enable EAP authentication(WiFi Enterprise) for the station mode.\n\n This function enables Extensible Authentication Protocol (EAP) authentication\n for the Wi-Fi station mode. When EAP authentication is enabled, the ESP device\n will attempt to authenticate with the configured EAP credentials when connecting\n to a secure Wi-Fi network.\n\n @note Before calling this function, ensure that the Wi-Fi configuration and EAP\n credentials (such as username and password) have been properly set using the\n appropriate configuration APIs.\n\n @return\n    - ESP_OK: EAP authentication enabled successfully.\n    - ESP_ERR_NO_MEM: Failed to enable EAP authentication due to memory allocation failure."]
+    pub fn esp_wifi_sta_enterprise_enable() -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Disable EAP authentication(WiFi Enterprise) for the station mode.\n\n This function disables Extensible Authentication Protocol (EAP) authentication\n for the Wi-Fi station mode. When EAP authentication is disabled, the ESP device\n will not attempt to authenticate using EAP credentials when connecting to a\n secure Wi-Fi network.\n\n @note Disabling EAP authentication may cause the device to connect to the Wi-Fi\n network using other available authentication methods, if configured using esp_wifi_set_config().\n\n @return\n    - ESP_OK: EAP authentication disabled successfully.\n    - ESP_ERR_INVALID_STATE: EAP client is in an invalid state for disabling."]
+    pub fn esp_wifi_sta_enterprise_disable() -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Set identity for PEAP/TTLS authentication method.\n\n This function sets the identity to be used during PEAP/TTLS authentication.\n\n @param[in] identity Pointer to the identity data.\n @param[in] len      Length of the identity data (limited to 1~127 bytes).\n\n @return\n    - ESP_OK: The identity was set successfully.\n    - ESP_ERR_INVALID_ARG: Invalid argument (len <= 0 or len >= 128).\n    - ESP_ERR_NO_MEM: Memory allocation failure."]
+    pub fn esp_eap_client_set_identity(
+        identity: *const crate::c_types::c_uchar,
+        len: crate::c_types::c_int,
+    ) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Clear the previously set identity for PEAP/TTLS authentication.\n\n This function clears the identity that was previously set for the EAP client.\n After calling this function, the EAP client will no longer use the previously\n configured identity during the authentication process."]
+    pub fn esp_eap_client_clear_identity();
+}
+extern "C" {
+    #[doc = " @brief Set username for PEAP/TTLS authentication method.\n\n This function sets the username to be used during PEAP/TTLS authentication.\n\n @param[in] username Pointer to the username data.\n @param[in] len      Length of the username data (limited to 1~127 bytes).\n\n @return\n    - ESP_OK: The username was set successfully.\n    - ESP_ERR_INVALID_ARG: Failed due to an invalid argument (len <= 0 or len >= 128).\n    - ESP_ERR_NO_MEM: Failed due to memory allocation failure."]
+    pub fn esp_eap_client_set_username(
+        username: *const crate::c_types::c_uchar,
+        len: crate::c_types::c_int,
+    ) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Clear username for PEAP/TTLS method.\n\n This function clears the previously set username for the EAP client."]
+    pub fn esp_eap_client_clear_username();
+}
+extern "C" {
+    #[doc = " @brief Set password for PEAP/TTLS authentication method.\n\n This function sets the password to be used during PEAP/TTLS authentication.\n\n @param[in] password Pointer to the password data.\n @param[in] len      Length of the password data (len > 0).\n\n @return\n    - ESP_OK: The password was set successfully.\n    - ESP_ERR_INVALID_ARG: Failed due to an invalid argument (len <= 0).\n    - ESP_ERR_NO_MEM: Failed due to memory allocation failure."]
+    pub fn esp_eap_client_set_password(
+        password: *const crate::c_types::c_uchar,
+        len: crate::c_types::c_int,
+    ) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Clear password for PEAP/TTLS method.\n\n This function clears the previously set password for the EAP client."]
+    pub fn esp_eap_client_clear_password();
+}
+extern "C" {
+    #[doc = " @brief Set a new password for MSCHAPv2 authentication method.\n\n This function sets the new password to be used during MSCHAPv2 authentication.\n The new password is used to substitute the old password when an eap-mschapv2 failure request\n message with error code ERROR_PASSWD_EXPIRED is received.\n\n @param[in] new_password Pointer to the new password data.\n @param[in] len          Length of the new password data.\n\n @return\n    - ESP_OK: The new password was set successfully.\n    - ESP_ERR_INVALID_ARG: Failed due to an invalid argument (len <= 0).\n    - ESP_ERR_NO_MEM: Failed due to memory allocation failure."]
+    pub fn esp_eap_client_set_new_password(
+        new_password: *const crate::c_types::c_uchar,
+        len: crate::c_types::c_int,
+    ) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Clear new password for MSCHAPv2 method.\n\n This function clears the previously set new password for the EAP client."]
+    pub fn esp_eap_client_clear_new_password();
+}
+extern "C" {
+    #[doc = " @brief Set CA certificate for EAP authentication.\n\n This function sets the Certificate Authority (CA) certificate to be used during EAP authentication.\n The CA certificate is passed to the EAP client module through a global pointer.\n\n @param[in] ca_cert     Pointer to the CA certificate data.\n @param[in] ca_cert_len Length of the CA certificate data.\n\n @return\n    - ESP_OK: The CA certificate was set successfully."]
+    pub fn esp_eap_client_set_ca_cert(
+        ca_cert: *const crate::c_types::c_uchar,
+        ca_cert_len: crate::c_types::c_int,
+    ) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Clear the previously set Certificate Authority (CA) certificate for EAP authentication.\n\n This function clears the CA certificate that was previously set for the EAP client.\n After calling this function, the EAP client will no longer use the previously\n configured CA certificate during the authentication process."]
+    pub fn esp_eap_client_clear_ca_cert();
+}
+extern "C" {
+    #[doc = " @brief Set client certificate and private key for EAP authentication.\n\n This function sets the client certificate and private key to be used during authentication.\n Optionally, a private key password can be provided for encrypted private keys.\n\n @attention 1. The client certificate, private key, and private key password are provided as pointers\n              to the respective data arrays.\n @attention 2. The client_cert, private_key, and private_key_password should be zero-terminated.\n\n @param[in] client_cert           Pointer to the client certificate data.\n @param[in] client_cert_len       Length of the client certificate data.\n @param[in] private_key           Pointer to the private key data.\n @param[in] private_key_len       Length of the private key data (limited to 1~4096 bytes).\n @param[in] private_key_password  Pointer to the private key password data (optional).\n @param[in] private_key_passwd_len Length of the private key password data (can be 0 for no password).\n\n @return\n    - ESP_OK: The certificate, private key, and password (if provided) were set successfully."]
+    pub fn esp_eap_client_set_certificate_and_key(
+        client_cert: *const crate::c_types::c_uchar,
+        client_cert_len: crate::c_types::c_int,
+        private_key: *const crate::c_types::c_uchar,
+        private_key_len: crate::c_types::c_int,
+        private_key_password: *const crate::c_types::c_uchar,
+        private_key_passwd_len: crate::c_types::c_int,
+    ) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Clear the previously set client certificate and private key for EAP authentication.\n\n This function clears the client certificate and private key that were previously set\n for the EAP client. After calling this function, the EAP client will no longer use the\n previously configured certificate and private key during the authentication process."]
+    pub fn esp_eap_client_clear_certificate_and_key();
+}
+extern "C" {
+    #[doc = " @brief Set EAP client certificates time check (disable or not).\n\n This function enables or disables the time check for EAP client certificates.\n When disabled, the certificates' expiration time will not be checked during the authentication process.\n\n @param[in] disable True to disable EAP client certificates time check, false to enable it.\n\n @return\n    - ESP_OK: The EAP client certificates time check setting was updated successfully."]
+    pub fn esp_eap_client_set_disable_time_check(disable: bool) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Get EAP client certificates time check status.\n\n This function retrieves the current status of the EAP client certificates time check.\n\n @param[out] disable Pointer to a boolean variable to store the disable status.\n\n @return\n    - ESP_OK: The status of EAP client certificates time check was retrieved successfully."]
+    pub fn esp_eap_client_get_disable_time_check(disable: *mut bool) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Set EAP-TTLS phase 2 method.\n\n This function sets the phase 2 method to be used during EAP-TTLS authentication.\n\n @param[in] type The type of phase 2 method to be used (e.g., EAP, MSCHAPv2, MSCHAP, PAP, CHAP).\n\n @return\n    - ESP_OK: The EAP-TTLS phase 2 method was set successfully."]
+    pub fn esp_eap_client_set_ttls_phase2_method(type_: esp_eap_ttls_phase2_types) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Enable or disable Suite-B 192-bit certification checks.\n\n This function enables or disables the 192-bit Suite-B certification checks during EAP-TLS authentication.\n Suite-B is a set of cryptographic algorithms which generally are considered more secure.\n\n @param[in] enable True to enable 192-bit Suite-B certification checks, false to disable it.\n\n @return\n    - ESP_OK: The 192-bit Suite-B certification checks were set successfully."]
+    pub fn esp_eap_client_set_suiteb_192bit_certification(enable: bool) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Set the PAC (Protected Access Credential) file for EAP-FAST authentication.\n\n EAP-FAST requires a PAC file that contains the client's credentials.\n\n @attention  1. For files read from the file system, length has to be decremented by 1 byte.\n @attention  2. Disabling the ESP_WIFI_MBEDTLS_TLS_CLIENT config is required to use EAP-FAST.\n\n @param[in] pac_file     Pointer to the PAC file buffer.\n @param[in] pac_file_len Length of the PAC file buffer.\n\n @return\n    - ESP_OK: The PAC file for EAP-FAST authentication was set successfully."]
+    pub fn esp_eap_client_set_pac_file(
+        pac_file: *const crate::c_types::c_uchar,
+        pac_file_len: crate::c_types::c_int,
+    ) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Set the parameters for EAP-FAST Phase 1 authentication.\n\n EAP-FAST supports Fast Provisioning, where clients can be authenticated faster using precomputed keys (PAC).\n This function allows configuring parameters for Fast Provisioning.\n\n @attention  1. Disabling the ESP_WIFI_MBEDTLS_TLS_CLIENT config is required to use EAP-FAST.\n\n @param[in] config Configuration structure with Fast Provisioning parameters.\n\n @return\n    - ESP_OK: The parameters for EAP-FAST Phase 1 authentication were set successfully."]
+    pub fn esp_eap_client_set_fast_params(config: esp_eap_fast_config) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Use the default certificate bundle for EAP authentication.\n\n By default, the EAP client uses a built-in certificate bundle for server verification.\n Enabling this option allows the use of the default certificate bundle.\n\n @param[in] use_default_bundle True to use the default certificate bundle, false to use a custom bundle.\n\n @return\n    - ESP_OK: The option to use the default certificate bundle was set successfully."]
+    pub fn esp_eap_client_use_default_cert_bundle(use_default_bundle: bool) -> esp_err_t;
 }
 #[doc = "< Send ESPNOW data successfully"]
 pub const esp_now_send_status_t_ESP_NOW_SEND_SUCCESS: esp_now_send_status_t = 0;

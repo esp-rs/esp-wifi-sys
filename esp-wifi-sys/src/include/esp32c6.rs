@@ -117,10 +117,9 @@ impl<T> ::core::fmt::Debug for __IncompleteArrayField<T> {
         fmt.write_str("__IncompleteArrayField")
     }
 }
-pub const SOC_COEX_HW_PTI: u32 = 1;
 pub const _NEWLIB_VERSION_H__: u32 = 1;
-pub const _NEWLIB_VERSION: &[u8; 6] = b"3.3.0\0";
-pub const __NEWLIB__: u32 = 3;
+pub const _NEWLIB_VERSION: &[u8; 6] = b"4.3.0\0";
+pub const __NEWLIB__: u32 = 4;
 pub const __NEWLIB_MINOR__: u32 = 3;
 pub const __NEWLIB_PATCHLEVEL__: u32 = 0;
 pub const _DEFAULT_SOURCE: u32 = 1;
@@ -177,12 +176,12 @@ pub const __int_fast16_t_defined: u32 = 1;
 pub const __int_fast32_t_defined: u32 = 1;
 pub const __int_fast64_t_defined: u32 = 1;
 pub const WINT_MIN: u32 = 0;
+pub const SOC_COEX_HW_PTI: u32 = 1;
 pub const true_: u32 = 1;
 pub const false_: u32 = 0;
 pub const __bool_true_false_are_defined: u32 = 1;
 pub const __GNUCLIKE_ASM: u32 = 3;
 pub const __GNUCLIKE___TYPEOF: u32 = 1;
-pub const __GNUCLIKE___OFFSETOF: u32 = 1;
 pub const __GNUCLIKE___SECTION: u32 = 1;
 pub const __GNUCLIKE_CTOR_SECTION_HANDLING: u32 = 1;
 pub const __GNUCLIKE_BUILTIN_CONSTANT_P: u32 = 1;
@@ -200,22 +199,24 @@ pub const __CC_SUPPORTS_WARNING: u32 = 1;
 pub const __CC_SUPPORTS_VARADIC_XXX: u32 = 1;
 pub const __CC_SUPPORTS_DYNAMIC_ARRAY_INIT: u32 = 1;
 pub const __NEWLIB_H__: u32 = 1;
+pub const _ATEXIT_DYNAMIC_ALLOC: u32 = 1;
+pub const _FSEEK_OPTIMIZATION: u32 = 1;
+pub const _FVWRITE_IN_STREAMIO: u32 = 1;
+pub const _HAVE_CC_INHIBIT_LOOP_TO_LIBCALL: u32 = 1;
+pub const _HAVE_INITFINI_ARRAY: u32 = 1;
+pub const _HAVE_LONG_DOUBLE: u32 = 1;
+pub const _ICONV_ENABLED: u32 = 1;
+pub const _MB_LEN_MAX: u32 = 1;
+pub const _NANO_MALLOC: u32 = 1;
+pub const _REENT_CHECK_VERIFY: u32 = 1;
+pub const _RETARGETABLE_LOCKING: u32 = 1;
+pub const _UNBUF_STREAM_OPT: u32 = 1;
 pub const _WANT_IO_C99_FORMATS: u32 = 1;
 pub const _WANT_IO_LONG_LONG: u32 = 1;
 pub const _WANT_IO_POS_ARGS: u32 = 1;
+pub const _WANT_REENT_BACKWARD_BINARY_COMPAT: u32 = 1;
 pub const _WANT_REENT_SMALL: u32 = 1;
-pub const _REENT_CHECK_VERIFY: u32 = 1;
-pub const _MB_LEN_MAX: u32 = 1;
-pub const _ICONV_ENABLED: u32 = 1;
-pub const HAVE_INITFINI_ARRAY: u32 = 1;
-pub const _ATEXIT_DYNAMIC_ALLOC: u32 = 1;
-pub const _HAVE_LONG_DOUBLE: u32 = 1;
-pub const _HAVE_CC_INHIBIT_LOOP_TO_LIBCALL: u32 = 1;
-pub const _FVWRITE_IN_STREAMIO: u32 = 1;
-pub const _FSEEK_OPTIMIZATION: u32 = 1;
-pub const _UNBUF_STREAM_OPT: u32 = 1;
-pub const _RETARGETABLE_LOCKING: u32 = 1;
-pub const _WANT_USE_LONG_TIME_T: u32 = 1;
+pub const _WANT_USE_GDTOA: u32 = 1;
 pub const __OBSOLETE_MATH_DEFAULT: u32 = 1;
 pub const __OBSOLETE_MATH: u32 = 1;
 pub const __BUFSIZ__: u32 = 128;
@@ -233,31 +234,6 @@ pub const _RAND48_ADD: u32 = 11;
 pub const _REENT_EMERGENCY_SIZE: u32 = 25;
 pub const _REENT_ASCTIME_SIZE: u32 = 26;
 pub const _REENT_SIGNAL_SIZE: u32 = 24;
-pub const __BIT_TYPES_DEFINED__: u32 = 1;
-pub const _LITTLE_ENDIAN: u32 = 1234;
-pub const _BIG_ENDIAN: u32 = 4321;
-pub const _PDP_ENDIAN: u32 = 3412;
-pub const _BYTE_ORDER: u32 = 1234;
-pub const _QUAD_HIGHWORD: u32 = 1;
-pub const _QUAD_LOWWORD: u32 = 0;
-pub const LITTLE_ENDIAN: u32 = 1234;
-pub const BIG_ENDIAN: u32 = 4321;
-pub const PDP_ENDIAN: u32 = 3412;
-pub const BYTE_ORDER: u32 = 1234;
-pub const FD_SETSIZE: u32 = 64;
-pub const SCHED_OTHER: u32 = 0;
-pub const SCHED_FIFO: u32 = 1;
-pub const SCHED_RR: u32 = 2;
-pub const PTHREAD_SCOPE_PROCESS: u32 = 0;
-pub const PTHREAD_SCOPE_SYSTEM: u32 = 1;
-pub const PTHREAD_INHERIT_SCHED: u32 = 1;
-pub const PTHREAD_EXPLICIT_SCHED: u32 = 2;
-pub const PTHREAD_CREATE_DETACHED: u32 = 0;
-pub const PTHREAD_CREATE_JOINABLE: u32 = 1;
-pub const PTHREAD_MUTEX_NORMAL: u32 = 0;
-pub const PTHREAD_MUTEX_RECURSIVE: u32 = 1;
-pub const PTHREAD_MUTEX_ERRORCHECK: u32 = 2;
-pub const PTHREAD_MUTEX_DEFAULT: u32 = 3;
 pub const __SLBF: u32 = 1;
 pub const __SNBF: u32 = 2;
 pub const __SRD: u32 = 4;
@@ -619,6 +595,7 @@ pub const CONFIG_APP_BUILD_TYPE_APP_2NDBOOT: u32 = 1;
 pub const CONFIG_APP_BUILD_GENERATE_BINARIES: u32 = 1;
 pub const CONFIG_APP_BUILD_BOOTLOADER: u32 = 1;
 pub const CONFIG_APP_BUILD_USE_FLASH_SECTIONS: u32 = 1;
+pub const CONFIG_APP_REPRODUCIBLE_BUILD: u32 = 1;
 pub const CONFIG_BOOTLOADER_OFFSET_IN_FLASH: u32 = 0;
 pub const CONFIG_BOOTLOADER_COMPILER_OPTIMIZATION_SIZE: u32 = 1;
 pub const CONFIG_BOOTLOADER_LOG_LEVEL_INFO: u32 = 1;
@@ -674,9 +651,10 @@ pub const CONFIG_PARTITION_TABLE_FILENAME: &[u8; 25] = b"partitions_singleapp.cs
 pub const CONFIG_PARTITION_TABLE_OFFSET: u32 = 32768;
 pub const CONFIG_PARTITION_TABLE_MD5: u32 = 1;
 pub const CONFIG_COMPILER_OPTIMIZATION_SIZE: u32 = 1;
-pub const CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS_ENABLE: u32 = 1;
+pub const CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS_SILENT: u32 = 1;
 pub const CONFIG_COMPILER_FLOAT_LIB_FROM_RVFPLIB: u32 = 1;
-pub const CONFIG_COMPILER_OPTIMIZATION_ASSERTION_LEVEL: u32 = 2;
+pub const CONFIG_COMPILER_OPTIMIZATION_ASSERTION_LEVEL: u32 = 1;
+pub const CONFIG_COMPILER_OPTIMIZATION_CHECKS_SILENT: u32 = 1;
 pub const CONFIG_COMPILER_HIDE_PATHS_MACROS: u32 = 1;
 pub const CONFIG_COMPILER_STACK_CHECK_MODE_NONE: u32 = 1;
 pub const CONFIG_APPTRACE_DEST_NONE: u32 = 1;
@@ -796,14 +774,10 @@ pub const CONFIG_ESP_WIFI_MGMT_SBUF_NUM: u32 = 32;
 pub const CONFIG_ESP_WIFI_IRAM_OPT: u32 = 1;
 pub const CONFIG_ESP_WIFI_EXTRA_IRAM_OPT: u32 = 1;
 pub const CONFIG_ESP_WIFI_RX_IRAM_OPT: u32 = 1;
-pub const CONFIG_ESP_WIFI_ENABLE_WPA3_SAE: u32 = 1;
-pub const CONFIG_ESP_WIFI_ENABLE_SAE_PK: u32 = 1;
-pub const CONFIG_ESP_WIFI_SOFTAP_SAE_SUPPORT: u32 = 1;
 pub const CONFIG_ESP_WIFI_STA_DISCONNECTED_PM_ENABLE: u32 = 1;
 pub const CONFIG_ESP_WIFI_SOFTAP_SUPPORT: u32 = 1;
 pub const CONFIG_ESP_WIFI_ESPNOW_MAX_ENCRYPT_NUM: u32 = 7;
 pub const CONFIG_ESP_WIFI_ENABLE_WIFI_TX_STATS: u32 = 1;
-pub const CONFIG_ESP_WIFI_MBEDTLS_CRYPTO: u32 = 1;
 pub const CONFIG_ESP_WIFI_ENABLE_WIFI_RX_STATS: u32 = 1;
 pub const CONFIG_ESP_WIFI_ENABLE_WIFI_RX_MU_STATS: u32 = 1;
 pub const CONFIG_ESP_WIFI_ENTERPRISE_SUPPORT: u32 = 1;
@@ -841,7 +815,7 @@ pub const CONFIG_FREERTOS_NO_AFFINITY: u32 = 2147483647;
 pub const CONFIG_FREERTOS_SUPPORT_STATIC_ALLOCATION: u32 = 1;
 pub const CONFIG_FREERTOS_DEBUG_OCDAWARE: u32 = 1;
 pub const CONFIG_HAL_ASSERTION_EQUALS_SYSTEM: u32 = 1;
-pub const CONFIG_HAL_DEFAULT_ASSERTION_LEVEL: u32 = 2;
+pub const CONFIG_HAL_DEFAULT_ASSERTION_LEVEL: u32 = 1;
 pub const CONFIG_HAL_SYSTIMER_USE_ROM_IMPL: u32 = 1;
 pub const CONFIG_HAL_WDT_USE_ROM_IMPL: u32 = 1;
 pub const CONFIG_HAL_SPI_MASTER_FUNC_IN_IRAM: u32 = 1;
@@ -936,7 +910,6 @@ pub const CONFIG_MBEDTLS_PKCS7_C: u32 = 1;
 pub const CONFIG_MBEDTLS_CERTIFICATE_BUNDLE: u32 = 1;
 pub const CONFIG_MBEDTLS_CERTIFICATE_BUNDLE_DEFAULT_FULL: u32 = 1;
 pub const CONFIG_MBEDTLS_CERTIFICATE_BUNDLE_MAX_CERTS: u32 = 200;
-pub const CONFIG_MBEDTLS_CMAC_C: u32 = 1;
 pub const CONFIG_MBEDTLS_HARDWARE_AES: u32 = 1;
 pub const CONFIG_MBEDTLS_AES_USE_INTERRUPT: u32 = 1;
 pub const CONFIG_MBEDTLS_HARDWARE_MPI: u32 = 1;
@@ -1008,6 +981,7 @@ pub const CONFIG_ESP_PROTOCOMM_SUPPORT_SECURITY_VERSION_1: u32 = 1;
 pub const CONFIG_ESP_PROTOCOMM_SUPPORT_SECURITY_VERSION_2: u32 = 1;
 pub const CONFIG_PTHREAD_TASK_PRIO_DEFAULT: u32 = 5;
 pub const CONFIG_PTHREAD_TASK_STACK_SIZE_DEFAULT: u32 = 3072;
+pub const CONFIG_PTHREAD_STACK_MIN: u32 = 768;
 pub const CONFIG_PTHREAD_TASK_CORE_DEFAULT: i32 = -1;
 pub const CONFIG_PTHREAD_TASK_NAME_DEFAULT: &[u8; 8] = b"pthread\0";
 pub const CONFIG_MMU_PAGE_SIZE_32KB: u32 = 1;
@@ -1065,6 +1039,7 @@ pub const CONFIG_ESP32_ENABLE_COREDUMP_TO_NONE: u32 = 1;
 pub const CONFIG_ESP32_PHY_CALIBRATION_AND_DATA_STORAGE: u32 = 1;
 pub const CONFIG_ESP32_PHY_MAX_TX_POWER: u32 = 20;
 pub const CONFIG_ESP32_PHY_MAX_WIFI_TX_POWER: u32 = 20;
+pub const CONFIG_ESP32_PTHREAD_STACK_MIN: u32 = 768;
 pub const CONFIG_ESP32_PTHREAD_TASK_CORE_DEFAULT: i32 = -1;
 pub const CONFIG_ESP32_PTHREAD_TASK_NAME_DEFAULT: &[u8; 8] = b"pthread\0";
 pub const CONFIG_ESP32_PTHREAD_TASK_PRIO_DEFAULT: u32 = 5;
@@ -1075,7 +1050,6 @@ pub const CONFIG_ESP32_WIFI_DYNAMIC_RX_BUFFER_NUM: u32 = 32;
 pub const CONFIG_ESP32_WIFI_DYNAMIC_TX_BUFFER: u32 = 1;
 pub const CONFIG_ESP32_WIFI_DYNAMIC_TX_BUFFER_NUM: u32 = 32;
 pub const CONFIG_ESP32_WIFI_ENABLED: u32 = 1;
-pub const CONFIG_ESP32_WIFI_ENABLE_WPA3_SAE: u32 = 1;
 pub const CONFIG_ESP32_WIFI_IRAM_OPT: u32 = 1;
 pub const CONFIG_ESP32_WIFI_MGMT_SBUF_NUM: u32 = 32;
 pub const CONFIG_ESP32_WIFI_NVS_ENABLED: u32 = 1;
@@ -1099,8 +1073,8 @@ pub const CONFIG_LOG_BOOTLOADER_LEVEL: u32 = 3;
 pub const CONFIG_LOG_BOOTLOADER_LEVEL_INFO: u32 = 1;
 pub const CONFIG_MAIN_TASK_STACK_SIZE: u32 = 3584;
 pub const CONFIG_MONITOR_BAUD: u32 = 115200;
-pub const CONFIG_OPTIMIZATION_ASSERTIONS_ENABLED: u32 = 1;
-pub const CONFIG_OPTIMIZATION_ASSERTION_LEVEL: u32 = 2;
+pub const CONFIG_OPTIMIZATION_ASSERTIONS_SILENT: u32 = 1;
+pub const CONFIG_OPTIMIZATION_ASSERTION_LEVEL: u32 = 1;
 pub const CONFIG_OPTIMIZATION_LEVEL_RELEASE: u32 = 1;
 pub const CONFIG_POST_EVENTS_FROM_IRAM_ISR: u32 = 1;
 pub const CONFIG_POST_EVENTS_FROM_ISR: u32 = 1;
@@ -1133,7 +1107,6 @@ pub const CONFIG_TIMER_TASK_PRIORITY: u32 = 1;
 pub const CONFIG_TIMER_TASK_STACK_DEPTH: u32 = 2048;
 pub const CONFIG_TIMER_TASK_STACK_SIZE: u32 = 3584;
 pub const CONFIG_UDP_RECVMBOX_SIZE: u32 = 6;
-pub const CONFIG_WPA_MBEDTLS_CRYPTO: u32 = 1;
 pub const ESP_OK: u32 = 0;
 pub const ESP_FAIL: i32 = -1;
 pub const ESP_ERR_NO_MEM: u32 = 257;
@@ -1155,6 +1128,8 @@ pub const ESP_ERR_FLASH_BASE: u32 = 24576;
 pub const ESP_ERR_HW_CRYPTO_BASE: u32 = 49152;
 pub const ESP_ERR_MEMPROT_BASE: u32 = 53248;
 pub const ESP_EVENT_ANY_ID: i32 = -1;
+pub const FLOW_ID_ALL: u32 = 8;
+pub const BSS_MAX_COLOR: u32 = 63;
 pub const WIFI_OFFCHAN_TX_REQ: u32 = 1;
 pub const WIFI_OFFCHAN_TX_CANCEL: u32 = 0;
 pub const WIFI_ROC_REQ: u32 = 1;
@@ -1251,7 +1226,7 @@ pub const WIFI_TASK_CORE_ID: u32 = 0;
 pub const WIFI_SOFTAP_BEACON_MAX_LEN: u32 = 752;
 pub const WIFI_MGMT_SBUF_NUM: u32 = 32;
 pub const WIFI_STA_DISCONNECTED_PM_ENABLED: u32 = 1;
-pub const WIFI_ENABLE_WPA3_SAE: u32 = 1;
+pub const WIFI_ENABLE_WPA3_SAE: u32 = 0;
 pub const WIFI_ENABLE_SPIRAM: u32 = 0;
 pub const WIFI_FTM_INITIATOR: u32 = 0;
 pub const WIFI_FTM_RESPONDER: u32 = 0;
@@ -1259,7 +1234,7 @@ pub const CONFIG_FEATURE_WPA3_SAE_BIT: u32 = 1;
 pub const CONFIG_FEATURE_CACHE_TX_BUF_BIT: u32 = 2;
 pub const CONFIG_FEATURE_FTM_INITIATOR_BIT: u32 = 4;
 pub const CONFIG_FEATURE_FTM_RESPONDER_BIT: u32 = 8;
-pub const WIFI_FEATURE_CAPS: u32 = 1;
+pub const WIFI_FEATURE_CAPS: u32 = 0;
 pub const ESP_WIFI_CONNECTIONLESS_INTERVAL_DEFAULT_MODE: u32 = 0;
 pub const WIFI_LOG_SUBMODULE_ALL: u32 = 0;
 pub const WIFI_LOG_SUBMODULE_INIT: u32 = 1;
@@ -1296,7 +1271,6 @@ pub const ESP_NOW_KEY_LEN: u32 = 16;
 pub const ESP_NOW_MAX_TOTAL_PEER_NUM: u32 = 20;
 pub const ESP_NOW_MAX_ENCRYPT_PEER_NUM: u32 = 6;
 pub const ESP_NOW_MAX_DATA_LEN: u32 = 250;
-pub type _lock_t = crate::c_types::c_int;
 pub type __int8_t = crate::c_types::c_schar;
 pub type __uint8_t = crate::c_types::c_uchar;
 pub type __int16_t = crate::c_types::c_short;
@@ -1335,13 +1309,7 @@ pub type int_fast32_t = crate::c_types::c_int;
 pub type uint_fast32_t = crate::c_types::c_uint;
 pub type int_fast64_t = crate::c_types::c_longlong;
 pub type uint_fast64_t = crate::c_types::c_ulonglong;
-pub const esp_log_level_e_ESP_LOG_NONE: esp_log_level_e = 0;
-pub const esp_log_level_e_ESP_LOG_ERROR: esp_log_level_e = 1;
-pub const esp_log_level_e_ESP_LOG_WARN: esp_log_level_e = 2;
-pub const esp_log_level_e_ESP_LOG_INFO: esp_log_level_e = 3;
-pub const esp_log_level_e_ESP_LOG_DEBUG: esp_log_level_e = 4;
-pub const esp_log_level_e_ESP_LOG_VERBOSE: esp_log_level_e = 5;
-pub type esp_log_level_e = crate::c_types::c_uint;
+pub type _lock_t = crate::c_types::c_int;
 pub type TickType_t = u32;
 pub type UBaseType_t = u32;
 pub type BaseType_t = i32;
@@ -1356,6 +1324,12 @@ pub struct ets_timer {
     pub period: u32,
     pub func: ::core::option::Option<unsafe extern "C" fn(priv_: *mut crate::c_types::c_void)>,
     pub priv_: *mut crate::c_types::c_void,
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct timeval {
+    pub tv_sec: u64,
+    pub tv_usec: u32,
 }
 pub type wchar_t = crate::c_types::c_int;
 #[repr(C)]
@@ -1403,8 +1377,9 @@ pub union _mbstate_t__bindgen_ty_1 {
 }
 pub type _iconv_t = *mut crate::c_types::c_void;
 pub type __clock_t = crate::c_types::c_ulong;
-pub type __time_t = crate::c_types::c_long;
+pub type __time_t = __int_least64_t;
 pub type __clockid_t = crate::c_types::c_ulong;
+pub type __daddr_t = crate::c_types::c_long;
 pub type __timer_t = crate::c_types::c_ulong;
 pub type __sa_family_t = __uint8_t;
 pub type __socklen_t = __uint32_t;
@@ -1503,21 +1478,6 @@ pub struct __sbuf {
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct __sFILE_fake {
-    pub _p: *mut crate::c_types::c_uchar,
-    pub _r: crate::c_types::c_int,
-    pub _w: crate::c_types::c_int,
-    pub _flags: crate::c_types::c_short,
-    pub _file: crate::c_types::c_short,
-    pub _bf: __sbuf,
-    pub _lbfsize: crate::c_types::c_int,
-    pub _data: *mut _reent,
-}
-extern "C" {
-    pub fn __sinit(arg1: *mut _reent);
-}
-#[repr(C)]
-#[derive(Copy, Clone)]
 pub struct __sFILE {
     pub _p: *mut crate::c_types::c_uchar,
     pub _r: crate::c_types::c_int,
@@ -1571,12 +1531,18 @@ pub struct __sFILE {
     pub _flags2: crate::c_types::c_int,
 }
 pub type __FILE = __sFILE;
+extern "C" {
+    pub static mut __sf: [__FILE; 3usize];
+}
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct _glue {
     pub _next: *mut _glue,
     pub _niobs: crate::c_types::c_int,
     pub _iobs: *mut __FILE,
+}
+extern "C" {
+    pub static mut __sglue: _glue;
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
@@ -1618,8 +1584,8 @@ pub struct _reent {
     pub _stderr: *mut __FILE,
     pub _inc: crate::c_types::c_int,
     pub _emergency: *mut crate::c_types::c_char,
-    pub __sdidinit: crate::c_types::c_int,
-    pub _unspecified_locale_info: crate::c_types::c_int,
+    pub _reserved_0: crate::c_types::c_int,
+    pub _reserved_1: crate::c_types::c_int,
     pub _locale: *mut __locale_t,
     pub _mp: *mut _mprec,
     pub __cleanup: ::core::option::Option<unsafe extern "C" fn(arg1: *mut _reent)>,
@@ -1630,21 +1596,12 @@ pub struct _reent {
     pub _localtime_buf: *mut __tm,
     pub _asctime_buf: *mut crate::c_types::c_char,
     pub _sig_func: *mut ::core::option::Option<unsafe extern "C" fn(arg1: crate::c_types::c_int)>,
-    pub _atexit: *mut _atexit,
-    pub _atexit0: _atexit,
-    pub __sglue: _glue,
+    pub _reserved_6: *mut _atexit,
+    pub _reserved_7: _atexit,
+    pub _reserved_8: _glue,
     pub __sf: *mut __FILE,
     pub _misc: *mut _misc_reent,
     pub _signal_buf: *mut crate::c_types::c_char,
-}
-extern "C" {
-    pub static __sf_fake_stdin: __sFILE_fake;
-}
-extern "C" {
-    pub static __sf_fake_stdout: __sFILE_fake;
-}
-extern "C" {
-    pub static __sf_fake_stderr: __sFILE_fake;
 }
 extern "C" {
     pub fn __assert(
@@ -1662,142 +1619,38 @@ extern "C" {
     ) -> !;
 }
 extern "C" {
-    pub static mut _global_impure_ptr: *mut _reent;
+    pub static mut _impure_ptr: *mut _reent;
+}
+extern "C" {
+    pub static mut _impure_data: _reent;
+}
+extern "C" {
+    pub fn __getreent() -> *mut _reent;
+}
+extern "C" {
+    pub static mut __atexit: *mut _atexit;
+}
+extern "C" {
+    pub static mut __atexit0: _atexit;
+}
+extern "C" {
+    pub static mut __stdio_exit_handler: ::core::option::Option<unsafe extern "C" fn()>;
 }
 extern "C" {
     pub fn _reclaim_reent(arg1: *mut _reent);
 }
 extern "C" {
-    pub fn __getreent() -> *mut _reent;
-}
-pub type u_int8_t = __uint8_t;
-pub type u_int16_t = __uint16_t;
-pub type u_int32_t = __uint32_t;
-pub type u_int64_t = __uint64_t;
-pub type register_t = __intptr_t;
-pub type __sigset_t = crate::c_types::c_ulong;
-pub type suseconds_t = __suseconds_t;
-pub type time_t = crate::c_types::c_long;
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct timeval {
-    pub tv_sec: time_t,
-    pub tv_usec: suseconds_t,
-}
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct timespec {
-    pub tv_sec: time_t,
-    pub tv_nsec: crate::c_types::c_long,
-}
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct itimerspec {
-    pub it_interval: timespec,
-    pub it_value: timespec,
-}
-pub type sigset_t = __sigset_t;
-pub type fd_mask = crate::c_types::c_ulong;
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct _types_fd_set {
-    pub fds_bits: [fd_mask; 2usize],
-}
-extern "C" {
-    pub fn select(
-        __n: crate::c_types::c_int,
-        __readfds: *mut _types_fd_set,
-        __writefds: *mut _types_fd_set,
-        __exceptfds: *mut _types_fd_set,
-        __timeout: *mut timeval,
+    pub fn _fwalk_sglue(
+        arg1: *mut _reent,
+        arg2: ::core::option::Option<
+            unsafe extern "C" fn(arg1: *mut _reent, arg2: *mut __FILE) -> crate::c_types::c_int,
+        >,
+        arg3: *mut _glue,
     ) -> crate::c_types::c_int;
-}
-extern "C" {
-    pub fn pselect(
-        __n: crate::c_types::c_int,
-        __readfds: *mut _types_fd_set,
-        __writefds: *mut _types_fd_set,
-        __exceptfds: *mut _types_fd_set,
-        __timeout: *const timespec,
-        __set: *const sigset_t,
-    ) -> crate::c_types::c_int;
-}
-pub type in_addr_t = __uint32_t;
-pub type in_port_t = __uint16_t;
-pub type u_register_t = __uintptr_t;
-pub type u_char = crate::c_types::c_uchar;
-pub type u_short = crate::c_types::c_ushort;
-pub type u_int = crate::c_types::c_uint;
-pub type u_long = crate::c_types::c_ulong;
-pub type ushort = crate::c_types::c_ushort;
-pub type uint = crate::c_types::c_uint;
-pub type ulong = crate::c_types::c_ulong;
-pub type blkcnt_t = __blkcnt_t;
-pub type blksize_t = __blksize_t;
-pub type clock_t = crate::c_types::c_ulong;
-pub type daddr_t = crate::c_types::c_long;
-pub type caddr_t = *mut crate::c_types::c_char;
-pub type fsblkcnt_t = __fsblkcnt_t;
-pub type fsfilcnt_t = __fsfilcnt_t;
-pub type id_t = __id_t;
-pub type ino_t = __ino_t;
-pub type off_t = __off_t;
-pub type dev_t = __dev_t;
-pub type uid_t = __uid_t;
-pub type gid_t = __gid_t;
-pub type pid_t = __pid_t;
-pub type key_t = __key_t;
-pub type mode_t = __mode_t;
-pub type nlink_t = __nlink_t;
-pub type clockid_t = __clockid_t;
-pub type timer_t = __timer_t;
-pub type useconds_t = __useconds_t;
-pub type sbintime_t = __int64_t;
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct sched_param {
-    pub sched_priority: crate::c_types::c_int,
-}
-extern "C" {
-    pub fn sched_yield() -> crate::c_types::c_int;
-}
-pub type pthread_t = __uint32_t;
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct pthread_attr_t {
-    pub is_initialized: crate::c_types::c_int,
-    pub stackaddr: *mut crate::c_types::c_void,
-    pub stacksize: crate::c_types::c_int,
-    pub contentionscope: crate::c_types::c_int,
-    pub inheritsched: crate::c_types::c_int,
-    pub schedpolicy: crate::c_types::c_int,
-    pub schedparam: sched_param,
-    pub detachstate: crate::c_types::c_int,
-}
-pub type pthread_mutex_t = __uint32_t;
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct pthread_mutexattr_t {
-    pub is_initialized: crate::c_types::c_int,
-    pub type_: crate::c_types::c_int,
-    pub recursive: crate::c_types::c_int,
-}
-pub type pthread_cond_t = __uint32_t;
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct pthread_condattr_t {
-    pub is_initialized: crate::c_types::c_int,
-    pub clock: clock_t,
-}
-pub type pthread_key_t = __uint32_t;
-#[repr(C)]
-#[derive(Copy, Clone)]
-pub struct pthread_once_t {
-    pub is_initialized: crate::c_types::c_int,
-    pub init_executed: crate::c_types::c_int,
 }
 pub type FILE = __FILE;
 pub type fpos_t = _fpos_t;
+pub type off_t = __off_t;
 extern "C" {
     pub fn ctermid(arg1: *mut crate::c_types::c_char) -> *mut crate::c_types::c_char;
 }
@@ -3822,14 +3675,25 @@ impl wifi_csi_acquire_config_t {
         }
     }
     #[inline]
+    pub fn dump_ack_en(&self) -> u32 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(12usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set_dump_ack_en(&mut self, val: u32) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(12usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
     pub fn reserved(&self) -> u32 {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(12usize, 20u8) as u32) }
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(13usize, 19u8) as u32) }
     }
     #[inline]
     pub fn set_reserved(&mut self, val: u32) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_1.set(12usize, 20u8, val as u64)
+            self._bitfield_1.set(13usize, 19u8, val as u64)
         }
     }
     #[inline]
@@ -3844,6 +3708,7 @@ impl wifi_csi_acquire_config_t {
         acquire_csi_beamformed: u32,
         acquire_csi_he_stbc: u32,
         val_scale_cfg: u32,
+        dump_ack_en: u32,
         reserved: u32,
     ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
@@ -3888,7 +3753,11 @@ impl wifi_csi_acquire_config_t {
             let val_scale_cfg: u32 = unsafe { ::core::mem::transmute(val_scale_cfg) };
             val_scale_cfg as u64
         });
-        __bindgen_bitfield_unit.set(12usize, 20u8, {
+        __bindgen_bitfield_unit.set(12usize, 1u8, {
+            let dump_ack_en: u32 = unsafe { ::core::mem::transmute(dump_ack_en) };
+            dump_ack_en as u64
+        });
+        __bindgen_bitfield_unit.set(13usize, 19u8, {
             let reserved: u32 = unsafe { ::core::mem::transmute(reserved) };
             reserved as u64
         });
@@ -4154,6 +4023,127 @@ pub const wifi_twt_setup_cmds_t_TWT_DICTATE: wifi_twt_setup_cmds_t = 6;
 pub const wifi_twt_setup_cmds_t_TWT_REJECT: wifi_twt_setup_cmds_t = 7;
 #[doc = " @brief TWT setup commands"]
 pub type wifi_twt_setup_cmds_t = crate::c_types::c_uint;
+#[doc = " @brief TWT setup config"]
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct wifi_twt_setup_config_t {
+    #[doc = "< Indicates the type of TWT command"]
+    pub setup_cmd: wifi_twt_setup_cmds_t,
+    pub _bitfield_align_1: [u8; 0],
+    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 2usize]>,
+    #[doc = "< Nominal Minimum Wake Duration, indicates the minimum amount of time, in unit of 256 us, that the TWT requesting STA expects that it needs to be awake. The value range is [1, 255]."]
+    pub min_wake_dura: u8,
+    #[doc = "< TWT Wake Interval Mantissa. The value range is [1, 65535]."]
+    pub wake_invl_mant: u16,
+    #[doc = "< TWT connection id, the value range is [0, 32767]."]
+    pub twt_id: u16,
+    #[doc = "< Timeout times of receiving setup action frame response, default 5s"]
+    pub timeout_time_ms: u16,
+}
+impl wifi_twt_setup_config_t {
+    #[inline]
+    pub fn trigger(&self) -> u16 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(0usize, 1u8) as u16) }
+    }
+    #[inline]
+    pub fn set_trigger(&mut self, val: u16) {
+        unsafe {
+            let val: u16 = ::core::mem::transmute(val);
+            self._bitfield_1.set(0usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn flow_type(&self) -> u16 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(1usize, 1u8) as u16) }
+    }
+    #[inline]
+    pub fn set_flow_type(&mut self, val: u16) {
+        unsafe {
+            let val: u16 = ::core::mem::transmute(val);
+            self._bitfield_1.set(1usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn flow_id(&self) -> u16 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(2usize, 3u8) as u16) }
+    }
+    #[inline]
+    pub fn set_flow_id(&mut self, val: u16) {
+        unsafe {
+            let val: u16 = ::core::mem::transmute(val);
+            self._bitfield_1.set(2usize, 3u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn wake_invl_expn(&self) -> u16 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(5usize, 5u8) as u16) }
+    }
+    #[inline]
+    pub fn set_wake_invl_expn(&mut self, val: u16) {
+        unsafe {
+            let val: u16 = ::core::mem::transmute(val);
+            self._bitfield_1.set(5usize, 5u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn wake_duration_unit(&self) -> u16 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(10usize, 1u8) as u16) }
+    }
+    #[inline]
+    pub fn set_wake_duration_unit(&mut self, val: u16) {
+        unsafe {
+            let val: u16 = ::core::mem::transmute(val);
+            self._bitfield_1.set(10usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn reserved(&self) -> u16 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(11usize, 5u8) as u16) }
+    }
+    #[inline]
+    pub fn set_reserved(&mut self, val: u16) {
+        unsafe {
+            let val: u16 = ::core::mem::transmute(val);
+            self._bitfield_1.set(11usize, 5u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn new_bitfield_1(
+        trigger: u16,
+        flow_type: u16,
+        flow_id: u16,
+        wake_invl_expn: u16,
+        wake_duration_unit: u16,
+        reserved: u16,
+    ) -> __BindgenBitfieldUnit<[u8; 2usize]> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 2usize]> = Default::default();
+        __bindgen_bitfield_unit.set(0usize, 1u8, {
+            let trigger: u16 = unsafe { ::core::mem::transmute(trigger) };
+            trigger as u64
+        });
+        __bindgen_bitfield_unit.set(1usize, 1u8, {
+            let flow_type: u16 = unsafe { ::core::mem::transmute(flow_type) };
+            flow_type as u64
+        });
+        __bindgen_bitfield_unit.set(2usize, 3u8, {
+            let flow_id: u16 = unsafe { ::core::mem::transmute(flow_id) };
+            flow_id as u64
+        });
+        __bindgen_bitfield_unit.set(5usize, 5u8, {
+            let wake_invl_expn: u16 = unsafe { ::core::mem::transmute(wake_invl_expn) };
+            wake_invl_expn as u64
+        });
+        __bindgen_bitfield_unit.set(10usize, 1u8, {
+            let wake_duration_unit: u16 = unsafe { ::core::mem::transmute(wake_duration_unit) };
+            wake_duration_unit as u64
+        });
+        __bindgen_bitfield_unit.set(11usize, 5u8, {
+            let reserved: u16 = unsafe { ::core::mem::transmute(reserved) };
+            reserved as u64
+        });
+        __bindgen_bitfield_unit
+    }
+}
 #[doc = "< 1 LTF and 0.8 us GI"]
 pub const he_su_gi_and_ltf_type_t_HE_SU_ERSU_1_LTF_0_8_US_GI: he_su_gi_and_ltf_type_t = 0;
 #[doc = "< 2 LTF and 0.8 us GI"]
@@ -4334,47 +4324,47 @@ impl esp_wifi_rxctrl_t {
         }
     }
     #[inline]
-    pub fn noise_floor(&self) -> crate::c_types::c_uint {
+    pub fn timestamp(&self) -> crate::c_types::c_uint {
+        unsafe { ::core::mem::transmute(self._bitfield_3.get(8usize, 32u8) as u32) }
+    }
+    #[inline]
+    pub fn set_timestamp(&mut self, val: crate::c_types::c_uint) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_3.set(8usize, 32u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn noise_floor(&self) -> crate::c_types::c_int {
         unsafe { ::core::mem::transmute(self._bitfield_3.get(72usize, 8u8) as u32) }
     }
     #[inline]
-    pub fn set_noise_floor(&mut self, val: crate::c_types::c_uint) {
+    pub fn set_noise_floor(&mut self, val: crate::c_types::c_int) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_3.set(72usize, 8u8, val as u64)
         }
     }
     #[inline]
-    pub fn data_rssi(&self) -> crate::c_types::c_int {
-        unsafe { ::core::mem::transmute(self._bitfield_3.get(80usize, 8u8) as u32) }
-    }
-    #[inline]
-    pub fn set_data_rssi(&mut self, val: crate::c_types::c_int) {
-        unsafe {
-            let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_3.set(80usize, 8u8, val as u64)
-        }
-    }
-    #[inline]
     pub fn channel(&self) -> crate::c_types::c_uint {
-        unsafe { ::core::mem::transmute(self._bitfield_3.get(104usize, 4u8) as u32) }
+        unsafe { ::core::mem::transmute(self._bitfield_3.get(80usize, 4u8) as u32) }
     }
     #[inline]
     pub fn set_channel(&mut self, val: crate::c_types::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_3.set(104usize, 4u8, val as u64)
+            self._bitfield_3.set(80usize, 4u8, val as u64)
         }
     }
     #[inline]
     pub fn second(&self) -> crate::c_types::c_uint {
-        unsafe { ::core::mem::transmute(self._bitfield_3.get(108usize, 4u8) as u32) }
+        unsafe { ::core::mem::transmute(self._bitfield_3.get(84usize, 4u8) as u32) }
     }
     #[inline]
     pub fn set_second(&mut self, val: crate::c_types::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_3.set(108usize, 4u8, val as u64)
+            self._bitfield_3.set(84usize, 4u8, val as u64)
         }
     }
     #[inline]
@@ -4470,20 +4460,14 @@ impl esp_wifi_rxctrl_t {
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct wifi_event_sta_itwt_setup_t {
-    #[doc = "< TWT setup command"]
-    pub setup_cmd: wifi_twt_setup_cmds_t,
-    #[doc = "< flow id"]
-    pub flow_id: u8,
-    #[doc = "< the min. wake duration, unit: 256 us by default"]
-    pub min_wake_dura: u8,
-    #[doc = "< the exponent of the TWT wake interval in microseconds, base 2"]
-    pub wake_invl_expn: u8,
-    #[doc = "< the value of the mantissa of the TWT wake interval value in microseconds, base 2"]
-    pub wake_invl_mant: u16,
-    #[doc = "< true: indicates a trigger-enabled TWT, false: indicates a non-trigger-enabled TWT"]
-    pub trigger: bool,
-    #[doc = "< 0: indicate an announced TWT, 1: indicates an unannounced TWT"]
-    pub flow_type: u8,
+    #[doc = "< itwt setup config, this value is determined by the AP"]
+    pub config: wifi_twt_setup_config_t,
+    #[doc = "< itwt setup status, 1: indicate setup success, others : indicate setup fail"]
+    pub status: esp_err_t,
+    #[doc = "< itwt setup frame tx fail reason"]
+    pub reason: u8,
+    #[doc = "< TWT SP start time"]
+    pub target_wake_time: u64,
 }
 #[doc = " Argument structure for WIFI_EVENT_TWT_TEARDOWN event"]
 #[repr(C)]
@@ -8572,6 +8556,138 @@ extern "C" {
     #[doc = " @brief Get the ETM event handle of esp_timer underlying alarm event\n\n @note The created ETM event object can be deleted later by calling `esp_etm_del_event`\n\n @note The ETM event is generated by the underlying hardware -- systimer,\n       therefore, if the esp_timer is not clocked by systimer, then no ETM event will be generated.\n\n @param[out] out_event Returned ETM event handle\n @return\n      - ESP_OK Success\n      - ESP_ERR_INVALID_ARG Parameter error"]
     pub fn esp_timer_new_etm_alarm_event(out_event: *mut esp_etm_event_handle_t) -> esp_err_t;
 }
+#[doc = "< EAP (Extensible Authentication Protocol)"]
+pub const esp_eap_ttls_phase2_types_ESP_EAP_TTLS_PHASE2_EAP: esp_eap_ttls_phase2_types = 0;
+#[doc = "< MS-CHAPv2 (Microsoft Challenge Handshake Authentication Protocol - Version 2)"]
+pub const esp_eap_ttls_phase2_types_ESP_EAP_TTLS_PHASE2_MSCHAPV2: esp_eap_ttls_phase2_types = 1;
+#[doc = "< MS-CHAP (Microsoft Challenge Handshake Authentication Protocol)"]
+pub const esp_eap_ttls_phase2_types_ESP_EAP_TTLS_PHASE2_MSCHAP: esp_eap_ttls_phase2_types = 2;
+#[doc = "< PAP (Password Authentication Protocol)"]
+pub const esp_eap_ttls_phase2_types_ESP_EAP_TTLS_PHASE2_PAP: esp_eap_ttls_phase2_types = 3;
+#[doc = "< CHAP (Challenge Handshake Authentication Protocol)"]
+pub const esp_eap_ttls_phase2_types_ESP_EAP_TTLS_PHASE2_CHAP: esp_eap_ttls_phase2_types = 4;
+#[doc = " @brief Enumeration of phase 2 authentication types for EAP-TTLS.\n\n This enumeration defines the supported phase 2 authentication methods\n that can be used in the EAP-TTLS (Extensible Authentication Protocol -\n Tunneled Transport Layer Security) protocol for the second authentication\n phase."]
+pub type esp_eap_ttls_phase2_types = crate::c_types::c_uint;
+#[doc = " @brief Configuration settings for EAP-FAST\n        (Extensible Authentication Protocol - Flexible Authentication via Secure Tunneling).\n\n This structure defines the configuration options that can be used to customize the behavior of the\n EAP-FAST authentication protocol, specifically for Fast Provisioning and PAC (Protected Access Credential) handling."]
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct esp_eap_fast_config {
+    #[doc = "< Enable or disable Fast Provisioning in EAP-FAST (0 = disabled, 1 = enabled)"]
+    pub fast_provisioning: crate::c_types::c_int,
+    #[doc = "< Maximum length of the PAC (Protected Access Credential) list"]
+    pub fast_max_pac_list_len: crate::c_types::c_int,
+    #[doc = "< Set to true for binary format PAC, false for ASCII format PAC"]
+    pub fast_pac_format_binary: bool,
+}
+extern "C" {
+    #[doc = " @brief Enable EAP authentication(WiFi Enterprise) for the station mode.\n\n This function enables Extensible Authentication Protocol (EAP) authentication\n for the Wi-Fi station mode. When EAP authentication is enabled, the ESP device\n will attempt to authenticate with the configured EAP credentials when connecting\n to a secure Wi-Fi network.\n\n @note Before calling this function, ensure that the Wi-Fi configuration and EAP\n credentials (such as username and password) have been properly set using the\n appropriate configuration APIs.\n\n @return\n    - ESP_OK: EAP authentication enabled successfully.\n    - ESP_ERR_NO_MEM: Failed to enable EAP authentication due to memory allocation failure."]
+    pub fn esp_wifi_sta_enterprise_enable() -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Disable EAP authentication(WiFi Enterprise) for the station mode.\n\n This function disables Extensible Authentication Protocol (EAP) authentication\n for the Wi-Fi station mode. When EAP authentication is disabled, the ESP device\n will not attempt to authenticate using EAP credentials when connecting to a\n secure Wi-Fi network.\n\n @note Disabling EAP authentication may cause the device to connect to the Wi-Fi\n network using other available authentication methods, if configured using esp_wifi_set_config().\n\n @return\n    - ESP_OK: EAP authentication disabled successfully.\n    - ESP_ERR_INVALID_STATE: EAP client is in an invalid state for disabling."]
+    pub fn esp_wifi_sta_enterprise_disable() -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Set identity for PEAP/TTLS authentication method.\n\n This function sets the identity to be used during PEAP/TTLS authentication.\n\n @param[in] identity Pointer to the identity data.\n @param[in] len      Length of the identity data (limited to 1~127 bytes).\n\n @return\n    - ESP_OK: The identity was set successfully.\n    - ESP_ERR_INVALID_ARG: Invalid argument (len <= 0 or len >= 128).\n    - ESP_ERR_NO_MEM: Memory allocation failure."]
+    pub fn esp_eap_client_set_identity(
+        identity: *const crate::c_types::c_uchar,
+        len: crate::c_types::c_int,
+    ) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Clear the previously set identity for PEAP/TTLS authentication.\n\n This function clears the identity that was previously set for the EAP client.\n After calling this function, the EAP client will no longer use the previously\n configured identity during the authentication process."]
+    pub fn esp_eap_client_clear_identity();
+}
+extern "C" {
+    #[doc = " @brief Set username for PEAP/TTLS authentication method.\n\n This function sets the username to be used during PEAP/TTLS authentication.\n\n @param[in] username Pointer to the username data.\n @param[in] len      Length of the username data (limited to 1~127 bytes).\n\n @return\n    - ESP_OK: The username was set successfully.\n    - ESP_ERR_INVALID_ARG: Failed due to an invalid argument (len <= 0 or len >= 128).\n    - ESP_ERR_NO_MEM: Failed due to memory allocation failure."]
+    pub fn esp_eap_client_set_username(
+        username: *const crate::c_types::c_uchar,
+        len: crate::c_types::c_int,
+    ) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Clear username for PEAP/TTLS method.\n\n This function clears the previously set username for the EAP client."]
+    pub fn esp_eap_client_clear_username();
+}
+extern "C" {
+    #[doc = " @brief Set password for PEAP/TTLS authentication method.\n\n This function sets the password to be used during PEAP/TTLS authentication.\n\n @param[in] password Pointer to the password data.\n @param[in] len      Length of the password data (len > 0).\n\n @return\n    - ESP_OK: The password was set successfully.\n    - ESP_ERR_INVALID_ARG: Failed due to an invalid argument (len <= 0).\n    - ESP_ERR_NO_MEM: Failed due to memory allocation failure."]
+    pub fn esp_eap_client_set_password(
+        password: *const crate::c_types::c_uchar,
+        len: crate::c_types::c_int,
+    ) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Clear password for PEAP/TTLS method.\n\n This function clears the previously set password for the EAP client."]
+    pub fn esp_eap_client_clear_password();
+}
+extern "C" {
+    #[doc = " @brief Set a new password for MSCHAPv2 authentication method.\n\n This function sets the new password to be used during MSCHAPv2 authentication.\n The new password is used to substitute the old password when an eap-mschapv2 failure request\n message with error code ERROR_PASSWD_EXPIRED is received.\n\n @param[in] new_password Pointer to the new password data.\n @param[in] len          Length of the new password data.\n\n @return\n    - ESP_OK: The new password was set successfully.\n    - ESP_ERR_INVALID_ARG: Failed due to an invalid argument (len <= 0).\n    - ESP_ERR_NO_MEM: Failed due to memory allocation failure."]
+    pub fn esp_eap_client_set_new_password(
+        new_password: *const crate::c_types::c_uchar,
+        len: crate::c_types::c_int,
+    ) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Clear new password for MSCHAPv2 method.\n\n This function clears the previously set new password for the EAP client."]
+    pub fn esp_eap_client_clear_new_password();
+}
+extern "C" {
+    #[doc = " @brief Set CA certificate for EAP authentication.\n\n This function sets the Certificate Authority (CA) certificate to be used during EAP authentication.\n The CA certificate is passed to the EAP client module through a global pointer.\n\n @param[in] ca_cert     Pointer to the CA certificate data.\n @param[in] ca_cert_len Length of the CA certificate data.\n\n @return\n    - ESP_OK: The CA certificate was set successfully."]
+    pub fn esp_eap_client_set_ca_cert(
+        ca_cert: *const crate::c_types::c_uchar,
+        ca_cert_len: crate::c_types::c_int,
+    ) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Clear the previously set Certificate Authority (CA) certificate for EAP authentication.\n\n This function clears the CA certificate that was previously set for the EAP client.\n After calling this function, the EAP client will no longer use the previously\n configured CA certificate during the authentication process."]
+    pub fn esp_eap_client_clear_ca_cert();
+}
+extern "C" {
+    #[doc = " @brief Set client certificate and private key for EAP authentication.\n\n This function sets the client certificate and private key to be used during authentication.\n Optionally, a private key password can be provided for encrypted private keys.\n\n @attention 1. The client certificate, private key, and private key password are provided as pointers\n              to the respective data arrays.\n @attention 2. The client_cert, private_key, and private_key_password should be zero-terminated.\n\n @param[in] client_cert           Pointer to the client certificate data.\n @param[in] client_cert_len       Length of the client certificate data.\n @param[in] private_key           Pointer to the private key data.\n @param[in] private_key_len       Length of the private key data (limited to 1~4096 bytes).\n @param[in] private_key_password  Pointer to the private key password data (optional).\n @param[in] private_key_passwd_len Length of the private key password data (can be 0 for no password).\n\n @return\n    - ESP_OK: The certificate, private key, and password (if provided) were set successfully."]
+    pub fn esp_eap_client_set_certificate_and_key(
+        client_cert: *const crate::c_types::c_uchar,
+        client_cert_len: crate::c_types::c_int,
+        private_key: *const crate::c_types::c_uchar,
+        private_key_len: crate::c_types::c_int,
+        private_key_password: *const crate::c_types::c_uchar,
+        private_key_passwd_len: crate::c_types::c_int,
+    ) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Clear the previously set client certificate and private key for EAP authentication.\n\n This function clears the client certificate and private key that were previously set\n for the EAP client. After calling this function, the EAP client will no longer use the\n previously configured certificate and private key during the authentication process."]
+    pub fn esp_eap_client_clear_certificate_and_key();
+}
+extern "C" {
+    #[doc = " @brief Set EAP client certificates time check (disable or not).\n\n This function enables or disables the time check for EAP client certificates.\n When disabled, the certificates' expiration time will not be checked during the authentication process.\n\n @param[in] disable True to disable EAP client certificates time check, false to enable it.\n\n @return\n    - ESP_OK: The EAP client certificates time check setting was updated successfully."]
+    pub fn esp_eap_client_set_disable_time_check(disable: bool) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Get EAP client certificates time check status.\n\n This function retrieves the current status of the EAP client certificates time check.\n\n @param[out] disable Pointer to a boolean variable to store the disable status.\n\n @return\n    - ESP_OK: The status of EAP client certificates time check was retrieved successfully."]
+    pub fn esp_eap_client_get_disable_time_check(disable: *mut bool) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Set EAP-TTLS phase 2 method.\n\n This function sets the phase 2 method to be used during EAP-TTLS authentication.\n\n @param[in] type The type of phase 2 method to be used (e.g., EAP, MSCHAPv2, MSCHAP, PAP, CHAP).\n\n @return\n    - ESP_OK: The EAP-TTLS phase 2 method was set successfully."]
+    pub fn esp_eap_client_set_ttls_phase2_method(type_: esp_eap_ttls_phase2_types) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Enable or disable Suite-B 192-bit certification checks.\n\n This function enables or disables the 192-bit Suite-B certification checks during EAP-TLS authentication.\n Suite-B is a set of cryptographic algorithms which generally are considered more secure.\n\n @param[in] enable True to enable 192-bit Suite-B certification checks, false to disable it.\n\n @return\n    - ESP_OK: The 192-bit Suite-B certification checks were set successfully."]
+    pub fn esp_eap_client_set_suiteb_192bit_certification(enable: bool) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Set the PAC (Protected Access Credential) file for EAP-FAST authentication.\n\n EAP-FAST requires a PAC file that contains the client's credentials.\n\n @attention  1. For files read from the file system, length has to be decremented by 1 byte.\n @attention  2. Disabling the ESP_WIFI_MBEDTLS_TLS_CLIENT config is required to use EAP-FAST.\n\n @param[in] pac_file     Pointer to the PAC file buffer.\n @param[in] pac_file_len Length of the PAC file buffer.\n\n @return\n    - ESP_OK: The PAC file for EAP-FAST authentication was set successfully."]
+    pub fn esp_eap_client_set_pac_file(
+        pac_file: *const crate::c_types::c_uchar,
+        pac_file_len: crate::c_types::c_int,
+    ) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Set the parameters for EAP-FAST Phase 1 authentication.\n\n EAP-FAST supports Fast Provisioning, where clients can be authenticated faster using precomputed keys (PAC).\n This function allows configuring parameters for Fast Provisioning.\n\n @attention  1. Disabling the ESP_WIFI_MBEDTLS_TLS_CLIENT config is required to use EAP-FAST.\n\n @param[in] config Configuration structure with Fast Provisioning parameters.\n\n @return\n    - ESP_OK: The parameters for EAP-FAST Phase 1 authentication were set successfully."]
+    pub fn esp_eap_client_set_fast_params(config: esp_eap_fast_config) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief Use the default certificate bundle for EAP authentication.\n\n By default, the EAP client uses a built-in certificate bundle for server verification.\n Enabling this option allows the use of the default certificate bundle.\n\n @param[in] use_default_bundle True to use the default certificate bundle, false to use a custom bundle.\n\n @return\n    - ESP_OK: The option to use the default certificate bundle was set successfully."]
+    pub fn esp_eap_client_use_default_cert_bundle(use_default_bundle: bool) -> esp_err_t;
+}
 pub type ble_npl_event_fn = ::core::option::Option<unsafe extern "C" fn(ev: *mut ble_npl_event)>;
 pub const ble_npl_error_BLE_NPL_OK: ble_npl_error = 0;
 pub const ble_npl_error_BLE_NPL_ENOMEM: ble_npl_error = 1;
@@ -9312,6 +9428,9 @@ extern "C" {
 }
 extern "C" {
     pub fn esp_coex_ieee802154_ack_pti_set(event: ieee802154_coex_event_t);
+}
+extern "C" {
+    pub fn esp_coex_ieee802154_coex_break_notify();
 }
 #[doc = "< Send ESPNOW data successfully"]
 pub const esp_now_send_status_t_ESP_NOW_SEND_SUCCESS: esp_now_send_status_t = 0;
