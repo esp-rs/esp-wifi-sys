@@ -41,7 +41,7 @@ esp32s2 = []
 esp32s3 = []
 
 # Enable log output from binary blobs - requires nightly
-binary-logs = []
+sys-logs = []
 
 [package.metadata.docs.rs]
 features = ["esp32c3"]
