@@ -16,7 +16,7 @@ mod fmt;
 pub mod include;
 
 #[cfg(feature = "binary-logs")]
-mod log {
+pub mod log {
     #[no_mangle]
     pub unsafe extern "C" fn rtc_printf(s: *const u8, args: ...) {
         syslog(0, s, args);
@@ -57,7 +57,7 @@ mod log {
 }
 
 #[cfg(not(feature = "binary-logs"))]
-mod log {
+pub mod log {
     #[no_mangle]
     pub unsafe extern "C" fn rtc_printf(_s: *const u8, _args: *const ()) {}
 
