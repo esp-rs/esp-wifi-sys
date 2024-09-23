@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2019-2021 Espressif Systems (Shanghai) CO LTD
+ * SPDX-FileCopyrightText: 2019-2023 Espressif Systems (Shanghai) CO LTD
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -201,8 +201,8 @@ void esp_wifi_sta_wpa2_ent_clear_ca_cert(void);
   */
 __attribute__((deprecated("Use 'esp_eap_client_set_certificate_and_key' instead")))
 esp_err_t esp_wifi_sta_wpa2_ent_set_cert_key(const unsigned char *client_cert, int client_cert_len,
-                                    const unsigned char *private_key, int private_key_len,
-                                    const unsigned char *private_key_passwd, int private_key_passwd_len);
+                                             const unsigned char *private_key, int private_key_len,
+                                             const unsigned char *private_key_passwd, int private_key_passwd_len);
 
 /**
   * @brief  Clear client certificate and key.

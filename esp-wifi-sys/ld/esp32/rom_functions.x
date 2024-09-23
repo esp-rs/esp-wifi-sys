@@ -1977,3 +1977,5 @@ PROVIDE ( lm_nego_cnt = 0x3ffb8344 );
 PROVIDE ( lm_nego_cntl = 0x3ffb8342 );
 PROVIDE ( lm_nego_max_cnt = 0x3ffb8343 );
 PROVIDE ( lm_nego_pkt_used = 0x3ffb8340 );
+
+__bswapdi2 = 0x40064b08;

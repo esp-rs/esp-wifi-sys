@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2015-2023 Espressif Systems (Shanghai) CO LTD
+ * SPDX-FileCopyrightText: 2015-2024 Espressif Systems (Shanghai) CO LTD
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -133,7 +133,7 @@ void phy_eco_version_sel(uint8_t chip_ver);
  * @brief Improve Wi-Fi receive 11b pkts when modules with high interference.
  *
  * @attention 1.This is a workaround to improve Wi-Fi receive 11b pkts for some modules using AC-DC power supply with high interference.
- * @attention 2.Enable this will sacrifice Wi-Fi OFDM receive performance. But to guarantee 11b receive performance serves as a bottom line in this case.
+ * @attention 2.Enable this will sacrifice Wi-Fi OFDM receive performance.But to guarantee 11b receive performance serves as a bottom line in this case.
  *
  * @param     enable  Enable or disable.
  */
@@ -174,6 +174,50 @@ esp_phy_modem_t phy_get_modem_flag(void);
  *
  */
 _lock_t phy_get_lock(void);
+
+/**
+ * @brief Call this funnction to track pll immediately.
+ *
+ */
+void phy_track_pll(void);
+
+/**
+ * @brief PHY antenna default configuration
+ *
+ */
+void ant_dft_cfg(bool default_ant);
+
+/**
+ * @brief PHY tx antenna config
+ *
+ */
+void ant_tx_cfg(uint8_t ant0);
+
+/**
+ * @brief PHY rx antenna config
+ *
+ */
+void ant_rx_cfg(bool auto_en, uint8_t ant0, uint8_t ant1);
+
+/**
+ * @brief PHY antenna need update
+ *
+ */
+bool phy_ant_need_update(void);
+
+/**
+ * @brief PHY antenna need update
+ *
+ */
+void phy_ant_clr_update_flag(void);
+
+/**
+ * @brief PHY antenna configuration update
+ *
+ */
+void phy_ant_update(void);
+
+
 #ifdef __cplusplus
 }
 #endif

@@ -121,6 +121,16 @@ fn generate_bindings_for_chip(
             &format!(
                 "-I{}",
                 sys_path
+                    .join("headers")
+                    .join("local")
+                    .display()
+                    .to_string()
+                    .replace("\\", "/")
+                    .replace("//?/C:", "")
+            ),
+            &format!(
+                "-I{}",
+                sys_path
                     .join("include")
                     .display()
                     .to_string()
