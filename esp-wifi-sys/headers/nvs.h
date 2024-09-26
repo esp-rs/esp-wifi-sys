@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2015-2022 Espressif Systems (Shanghai) CO LTD
+ * SPDX-FileCopyrightText: 2015-2024 Espressif Systems (Shanghai) CO LTD
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -60,6 +60,26 @@ typedef nvs_handle_t nvs_handle IDF_DEPRECATED("Replace with nvs_handle_t");
 #define NVS_PART_NAME_MAX_SIZE              16   /*!< maximum length of partition name (excluding null terminator) */
 #define NVS_KEY_NAME_MAX_SIZE               16   /*!< Maximum length of NVS key name (including null terminator) */
 #define NVS_NS_NAME_MAX_SIZE                NVS_KEY_NAME_MAX_SIZE /*!< Maximum length of NVS namespace name (including null terminator) */
+
+#define NVS_GUARD_SYSVIEW_MACRO_EXPANSION_PUSH() \
+_Pragma("push_macro(\"U8\")") \
+_Pragma("push_macro(\"I8\")") \
+_Pragma("push_macro(\"U16\")") \
+_Pragma("push_macro(\"I16\")") \
+_Pragma("push_macro(\"U32\")") \
+_Pragma("push_macro(\"I32\")") \
+_Pragma("push_macro(\"U64\")") \
+_Pragma("push_macro(\"I64\")")
+
+#define NVS_GUARD_SYSVIEW_MACRO_EXPANSION_POP() \
+_Pragma("pop_macro(\"U8\")") \
+_Pragma("pop_macro(\"I8\")") \
+_Pragma("pop_macro(\"U16\")") \
+_Pragma("pop_macro(\"I16\")") \
+_Pragma("pop_macro(\"U32\")") \
+_Pragma("pop_macro(\"I32\")") \
+_Pragma("pop_macro(\"U64\")") \
+_Pragma("pop_macro(\"I64\")")
 
 /**
  * @brief Mode of opening the non-volatile storage
@@ -135,6 +155,8 @@ typedef struct nvs_opaque_iterator_t *nvs_iterator_t;
  *             - ESP_ERR_NO_MEM in case memory could not be allocated for the internal structures
  *             - ESP_ERR_NVS_NOT_ENOUGH_SPACE if there is no space for a new entry or there are too many different
  *                                  namespaces (maximum allowed different namespaces: 254)
+ *             - ESP_ERR_NOT_ALLOWED if the NVS partition is read-only and mode is NVS_READWRITE
+ *             - ESP_ERR_INVALID_ARG if out_handle is equal to NULL
  *             - other error codes from the underlying storage driver
  */
 esp_err_t nvs_open(const char* namespace_name, nvs_open_mode_t open_mode, nvs_handle_t *out_handle);
@@ -166,6 +188,8 @@ esp_err_t nvs_open(const char* namespace_name, nvs_open_mode_t open_mode, nvs_ha
  *             - ESP_ERR_NO_MEM in case memory could not be allocated for the internal structures
  *             - ESP_ERR_NVS_NOT_ENOUGH_SPACE if there is no space for a new entry or there are too many different
  *                                  namespaces (maximum allowed different namespaces: 254)
+ *             - ESP_ERR_NOT_ALLOWED if the NVS partition is read-only and mode is NVS_READWRITE
+ *             - ESP_ERR_INVALID_ARG if out_handle is equal to NULL
  *             - other error codes from the underlying storage driver
  */
 esp_err_t nvs_open_from_partition(const char *part_name, const char* namespace_name, nvs_open_mode_t open_mode, nvs_handle_t *out_handle);
@@ -175,7 +199,10 @@ esp_err_t nvs_open_from_partition(const char *part_name, const char* namespace_n
  * @brief      set int8_t value for given key
  *
  * Set value for the key, given its name. Note that the actual storage will not be updated
- * until \c nvs_commit is called.
+ * until \c nvs_commit is called. Regardless whether key-value pair is created or updated,
+ * function always requires at least one nvs available entry. See \c nvs_get_stats .
+ * After create type of operation, the number of available entries is decreased by one.
+ * After update type of operation, the number of available entries remains the same.
  *
  * @param[in]  handle  Handle obtained from nvs_open function.
  *                     Handles that were opened read only cannot be used.
@@ -250,8 +277,15 @@ esp_err_t nvs_set_u64 (nvs_handle_t handle, const char* key, uint64_t value);
 /**
  * @brief      set string for given key
  *
- * Set value for the key, given its name. Note that the actual storage will not be updated
- * until \c nvs_commit is called.
+ * Sets string value for the key. Function requires whole space for new data to be available
+ * as contiguous entries in same nvs page. Operation consumes 1 overhead entry and 1 entry per
+ * each 32 characters of new string including zero character to be set. In case of value update
+ * for existing key, entries occupied by the previous value and overhead entry are returned to
+ * the pool of available entries.
+ * Note that storage of long string values can fail due to fragmentation of nvs pages even if
+ * \c available_entries returned by \c nvs_get_stats suggests enough overall space available.
+ * Note that the underlying storage will not be updated until \c nvs_commit is called.
+ *
  *
  * @param[in]  handle  Handle obtained from nvs_open function.
  *                     Handles that were opened read only cannot be used.
@@ -280,8 +314,11 @@ esp_err_t nvs_set_str (nvs_handle_t handle, const char* key, const char* value);
 /**
  * @brief       set variable length binary value for given key
  *
- * This family of functions set value for the key, given its name. Note that
- * actual storage will not be updated until nvs_commit function is called.
+ * Sets variable length binary value for the key. Function uses 2 overhead and 1 entry
+ * per each 32 bytes of new data from the pool of available entries. See \c nvs_get_stats .
+ * In case of value update for existing key, space occupied by the existing value and 2 overhead entries
+ * are returned to the pool of available entries.
+ * Note that the underlying storage will not be updated until \c nvs_commit is called.
  *
  * @param[in]  handle  Handle obtained from nvs_open function.
  *                     Handles that were opened read only cannot be used.
@@ -465,6 +502,25 @@ esp_err_t nvs_get_blob(nvs_handle_t handle, const char* key, void* out_value, si
 /**@}*/
 
 /**
+ * @brief      Lookup key-value pair with given key name.
+ *
+ * Note that function may indicate both existence of the key as well as the data type of NVS entry if it is found.
+ *
+ * @param[in]  handle    Storage handle obtained with nvs_open.
+ * @param[in]  key       Key name. Maximum length is (NVS_KEY_NAME_MAX_SIZE-1) characters. Shouldn't be empty.
+ * @param[out] out_type  Pointer to the output variable populated with data type of NVS entry in case key was found.
+ *                       May be NULL, respective data type is then not provided.
+ * @return
+ *              - ESP_OK if NVS entry for key provided was found
+ *              - ESP_ERR_NVS_NOT_FOUND if the requested key doesn't exist
+ *              - ESP_ERR_NVS_INVALID_HANDLE if handle has been closed or is NULL
+ *              - ESP_FAIL if there is an internal error; most likely due to corrupted
+ *                NVS partition (only if NVS assertion checks are disabled)
+ *              - other error codes from the underlying storage driver
+ */
+esp_err_t nvs_find_key(nvs_handle_t handle, const char* key, nvs_type_t* out_type);
+
+/**
  * @brief      Erase key-value pair with given key name.
  *
  * Note that actual storage may not be updated until nvs_commit function is called.
@@ -537,24 +593,25 @@ void nvs_close(nvs_handle_t handle);
  * @note Info about storage space NVS.
  */
 typedef struct {
-    size_t used_entries;      /**< Amount of used entries. */
-    size_t free_entries;      /**< Amount of free entries. */
-    size_t total_entries;     /**< Amount all available entries. */
-    size_t namespace_count;   /**< Amount name space. */
+    size_t used_entries;      /**< Number of used entries. */
+    size_t free_entries;      /**< Number of free entries. It includes also reserved entries. */
+    size_t available_entries; /**< Number of entries available for data storage. */
+    size_t total_entries;     /**< Number of all entries. */
+    size_t namespace_count;   /**< Number of namespaces. */
 } nvs_stats_t;
 
 /**
- * @brief      Fill structure nvs_stats_t. It provides info about used memory the partition.
+ * @brief      Fill structure nvs_stats_t. It provides info about memory used by NVS.
  *
- * This function calculates to runtime the number of used entries, free entries, total entries,
- * and amount namespace in partition.
+ * This function calculates the number of used entries, free entries, available entries, total entries
+ * and number of namespaces in partition.
  *
  * \code{c}
- * // Example of nvs_get_stats() to get the number of used entries and free entries:
+ * // Example of nvs_get_stats() to get overview of actual statistics of data entries :
  * nvs_stats_t nvs_stats;
  * nvs_get_stats(NULL, &nvs_stats);
- * printf("Count: UsedEntries = (%d), FreeEntries = (%d), AllEntries = (%d)\n",
-          nvs_stats.used_entries, nvs_stats.free_entries, nvs_stats.total_entries);
+ * printf("Count: UsedEntries = (%lu), FreeEntries = (%lu), AvailableEntries = (%lu), AllEntries = (%lu)\n",
+          nvs_stats.used_entries, nvs_stats.free_entries, nvs_stats.available_entries, nvs_stats.total_entries);
  * \endcode
  *
  * @param[in]   part_name   Partition name NVS in the partition table.
@@ -571,7 +628,7 @@ typedef struct {
  *               Return param nvs_stats will be filled 0.
  *             - ESP_ERR_NVS_NOT_INITIALIZED if the storage driver is not initialized.
  *               Return param nvs_stats will be filled 0.
- *             - ESP_ERR_INVALID_ARG if nvs_stats equal to NULL.
+ *             - ESP_ERR_INVALID_ARG if nvs_stats is equal to NULL.
  *             - ESP_ERR_INVALID_STATE if there is page with the status of INVALID.
  *               Return param nvs_stats will be filled not with correct values because
  *               not all pages will be counted. Counting will be interrupted at the first INVALID page.
@@ -612,7 +669,7 @@ esp_err_t nvs_get_stats(const char *part_name, nvs_stats_t *nvs_stats);
  *               Return param used_entries will be filled 0.
  *             - ESP_ERR_NVS_INVALID_HANDLE if handle has been closed or is NULL.
  *               Return param used_entries will be filled 0.
- *             - ESP_ERR_INVALID_ARG if used_entries equal to NULL.
+ *             - ESP_ERR_INVALID_ARG if used_entries is equal to NULL.
  *             - Other error codes from the underlying storage driver.
  *               Return param used_entries will be filled 0.
  */
@@ -662,13 +719,52 @@ esp_err_t nvs_entry_find(const char *part_name,
         nvs_iterator_t *output_iterator);
 
 /**
+ * @brief       Create an iterator to enumerate NVS entries based on a handle and type
+ *
+ * \code{c}
+ * // Example of listing all the key-value pairs of any type under specified handle (which defines a partition and namespace)
+ *  nvs_iterator_t it = NULL;
+ *  esp_err_t res = nvs_entry_find_in_handle(<nvs_handle>, NVS_TYPE_ANY, &it);
+ *  while(res == ESP_OK) {
+ *      nvs_entry_info_t info;
+ *      nvs_entry_info(it, &info); // Can omit error check if parameters are guaranteed to be non-NULL
+ *      printf("key '%s', type '%d' \n", info.key, info.type);
+ *      res = nvs_entry_next(&it);
+ *  }
+ *  nvs_release_iterator(it);
+ * \endcode
+ *
+ * @param[in]   handle          Handle obtained from nvs_open function.
+ *
+ * @param[in]   type            One of nvs_type_t values.
+ *
+ * @param[out] output_iterator
+ *          Set to a valid iterator to enumerate all the entries found.
+ *          Set to NULL if no entry for specified criteria was found.
+ *          If any other error except ESP_ERR_INVALID_ARG occurs, \c output_iterator is NULL, too.
+ *          If ESP_ERR_INVALID_ARG occurs, \c output_iterator is not changed.
+ *          If a valid iterator is obtained through this function, it has to be released
+ *          using \c nvs_release_iterator when not used any more, unless ESP_ERR_INVALID_ARG is returned.
+ *
+ * @return
+ *             - ESP_OK if no internal error or programming error occurred.
+ *             - ESP_ERR_NVS_NOT_FOUND if no element of specified criteria has been found.
+ *             - ESP_ERR_NO_MEM if memory has been exhausted during allocation of internal structures.
+ *             - ESP_ERR_NVS_INVALID_HANDLE if unknown handle was specified.
+ *             - ESP_ERR_INVALID_ARG if output_iterator parameter is NULL.
+ *                  Note: don't release \c output_iterator in case ESP_ERR_INVALID_ARG has been returned
+ */
+esp_err_t nvs_entry_find_in_handle(nvs_handle_t handle, nvs_type_t type, nvs_iterator_t *output_iterator);
+
+/**
  * @brief       Advances the iterator to next item matching the iterator criteria.
  *
  * Note that any copies of the iterator will be invalid after this call.
  *
- * @param[inout]   iterator Iterator obtained from nvs_entry_find function. Must be non-NULL.
- *                          If any error except ESP_ERR_INVALID_ARG occurs, \c iterator is set to NULL.
- *                          If ESP_ERR_INVALID_ARG occurs, \c iterator is not changed.
+ * @param[inout]   iterator Iterator obtained from nvs_entry_find or nvs_entry_find_in_handle
+ *                          function. Must be non-NULL. If any error except ESP_ERR_INVALID_ARG
+ *                          occurs, \c iterator is set to NULL. If ESP_ERR_INVALID_ARG occurs, \c
+ *                          iterator is not changed.
  *
  * @return
  *             - ESP_OK if no internal error or programming error occurred.
@@ -681,7 +777,8 @@ esp_err_t nvs_entry_next(nvs_iterator_t *iterator);
 /**
  * @brief       Fills nvs_entry_info_t structure with information about entry pointed to by the iterator.
  *
- * @param[in]   iterator     Iterator obtained from nvs_entry_find function. Must be non-NULL.
+ * @param[in]   iterator     Iterator obtained from nvs_entry_find or nvs_entry_find_in_handle
+ *                           function. Must be non-NULL.
  *
  * @param[out]  out_info     Structure to which entry information is copied.
  *
@@ -694,7 +791,9 @@ esp_err_t nvs_entry_info(const nvs_iterator_t iterator, nvs_entry_info_t *out_in
 /**
  * @brief       Release iterator
  *
- * @param[in]   iterator    Release iterator obtained from nvs_entry_find function. NULL argument is allowed.
+ * @param[in]   iterator    Release iterator obtained from nvs_entry_find or
+ *                          nvs_entry_find_in_handle or nvs_entry_next function. NULL argument is
+ *                          allowed.
  *
  */
 void nvs_release_iterator(nvs_iterator_t iterator);

@@ -28,6 +28,7 @@ struct timeval {
 };
 
 #include "esp_private/wifi.h"
+#include "esp_private/wifi_os_adapter.h"
 #include "esp_wpa.h"
 #include "esp_phy_init.h"
 #include "phy.h"

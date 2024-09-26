@@ -2343,3 +2343,6 @@ r_sch_arb_insert_hook = 0x40001ce0;
 r_sch_plan_offset_req_hook = 0x40001ce4;
 
 PROVIDE ( esp_rom_crc32_le = crc32_le );
+
+bzero = 0x40001260;
+__bswapdi2 = 0x400021cc;

@@ -75,3 +75,6 @@ strstr = 0x4001aee8;
 strchr = 0x4001adb0;
 
 PROVIDE ( crc32_le = 0x400119dc );
+
+__bswapdi2 = 0x40006d34;
+bzero = 0x400078c8;
