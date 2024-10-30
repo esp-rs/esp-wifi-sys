@@ -13,62 +13,34 @@ fn main() -> Result<()> {
 
     #[cfg(feature = "esp32")]
     {
-        configure_linker_for_chip(&out, "esp32")?;
         copy_libraries(&out)?;
     }
     #[cfg(feature = "esp32c2")]
     {
-        configure_linker_for_chip(&out, "esp32c2")?;
         copy_libraries(&out)?;
     }
     #[cfg(feature = "esp32c3")]
     {
-        configure_linker_for_chip(&out, "esp32c3")?;
         copy_libraries(&out)?;
     }
     #[cfg(feature = "esp32c6")]
     {
-        configure_linker_for_chip(&out, "esp32c6")?;
         copy_libraries(&out)?;
     }
     #[cfg(feature = "esp32h2")]
     {
-        configure_linker_for_chip(&out, "esp32h2")?;
         copy_libraries(&out)?;
     }
     #[cfg(feature = "esp32s2")]
     {
-        configure_linker_for_chip(&out, "esp32s2")?;
         copy_libraries(&out)?;
     }
     #[cfg(feature = "esp32s3")]
     {
-        configure_linker_for_chip(&out, "esp32s3")?;
         copy_libraries(&out)?;
     }
 
     println!("cargo:rustc-link-search={}", out.display());
-
-    Ok(())
-}
-
-fn configure_linker_for_chip(out: &PathBuf, chip: &str) -> Result<()> {
-    // Copy the linker script containg the ROM function definitions to the
-    // `out` directory:
-    copy_file(
-        out,
-        &format!("ld/{chip}/rom_functions.x"),
-        "rom_functions.x",
-    )?;
-
-    if chip == "esp32c6" {
-        copy_file(out, "ld/esp32c6/rom_coexist.x", "rom_coexist.x")?;
-        copy_file(out, "ld/esp32c6/rom_phy.x", "rom_phy.x")?;
-    } else if chip == "esp32h2" {
-        // These linker scripts are still expected to exist, even if they're empty:
-        File::create(out.join("rom_coexist.x"))?;
-        File::create(out.join("rom_phy.x"))?;
-    }
 
     Ok(())
 }
@@ -82,7 +54,6 @@ fn copy_file(out: &PathBuf, from: &str, to: &str) -> Result<()> {
 
 #[cfg(feature = "esp32")]
 fn copy_libraries(out: &PathBuf) -> Result<()> {
-    copy_file(out, "ld/esp32/rom_functions.x", "esp32_rom_functions.x")?;
     copy_file(out, "libs/esp32/libbtdm_app.a", "libbtdm_app.a")?;
     copy_file(out, "libs/esp32/libcoexist.a", "libcoexist.a")?;
     copy_file(out, "libs/esp32/libcore.a", "libcore.a")?;
@@ -240,7 +211,6 @@ fn copy_libraries(out: &PathBuf) -> Result<()> {
 
 #[cfg(feature = "esp32s2")]
 fn copy_libraries(out: &PathBuf) -> Result<()> {
-    copy_file(out, "ld/esp32s2/rom_functions.x", "esp32s2_rom_functions.x")?;
     copy_file(out, "libs/esp32s2/libcoexist.a", "libcoexist.a")?;
     copy_file(out, "libs/esp32s2/libcore.a", "libcore.a")?;
     copy_file(out, "libs/esp32s2/libespnow.a", "libespnow.a")?;
@@ -274,7 +244,6 @@ fn copy_libraries(out: &PathBuf) -> Result<()> {
 
 #[cfg(feature = "esp32s3")]
 fn copy_libraries(out: &PathBuf) -> Result<()> {
-    copy_file(out, "ld/esp32s3/rom_functions.x", "esp32s3_rom_functions.x")?;
     copy_file(out, "libs/esp32s3/libbtbb.a", "libbtbb.a")?;
     copy_file(out, "libs/esp32s3/libbtdm_app.a", "libbtdm_app.a")?;
     copy_file(out, "libs/esp32s3/libcoexist.a", "libcoexist.a")?;
