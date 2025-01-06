@@ -55,7 +55,7 @@ pub mod log {
 
         let mut buf = [0u8; 512];
         vsnprintf(&mut buf as *mut u8, 512, format, args);
-        let res_str = core::ffi::CStr::from_ptr(&buf as *const _ as *const i8);
+        let res_str = core::ffi::CStr::from_ptr(&buf as *const _ as *const core::ffi::c_char);
         info!("{}", res_str.to_str().unwrap());
     }
 }
