@@ -1,6 +1,6 @@
 [package]
 name        = "esp-wifi-sys"
-version     = "0.7.0"
+version     = "0.7.1"
 edition     = "2021"
 authors     = ["The ESP-RS team"]
 description = "Bindings to Espressif's WiFi and Bluetooth low-level drivers"
@@ -11,11 +11,11 @@ keywords   = ["bluetooth", "esp", "no-std", "wifi"]
 categories = ["embedded", "hardware-support", "no-std"]
 
 [dependencies]
-log   = { version = "0.4.22", optional = true }
-defmt = { version = "0.3.8", optional = true }
+log   = { version = "0.4.25", optional = true }
+defmt = { version = "0.3.10", optional = true }
 
 [build-dependencies]
-anyhow = "1.0.93"
+anyhow = "1.0.95"
 
 [features]
 default = []
