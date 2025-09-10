@@ -24,7 +24,12 @@ fn main() -> Result<()> {
     // Determine the $HOME directory, and subsequently the Espressif tools
     // directory:
     let home = UserDirs::new().unwrap().home_dir().to_path_buf();
-    let tools = home.join(".espressif").join("tools");
+    let mut tools = home.join(".espressif").join("tools");
+
+    if !tools.join("xtensa-esp-elf").exists() {
+        println!("Tools not found in home - using ESP_TOOLS_DIR env variable");
+        tools = PathBuf::from(std::env::var("ESP_TOOLS_DIR")?);
+    }
 
     generate_bindings_for_chip(
         "esp32",
@@ -94,6 +99,17 @@ fn generate_bindings_for_chip(
 ) -> Result<()> {
     let sys_path = workspace.join("esp-wifi-sys");
 
+    println!(
+        "{}",
+        sys_path
+            .join("include")
+            .join(chip)
+            .join("soc")
+            .display()
+            .to_string()
+            .replace("/", "\\")
+    );
+
     // Generate the bindings using `bindgen`:
     log::info!("Generating bindings for: {chip}");
     let bindings = Builder::default()
@@ -140,6 +156,16 @@ fn generate_bindings_for_chip(
             &format!(
                 "-I{}",
                 include_path
+                    .display()
+                    .to_string()
+                    .replace("\\", "/")
+                    .replace("//?/C:", "")
+            ),
+            &format!(
+                "-I{}",
+                sys_path
+                    .join("include")
+                    .join(chip)
                     .display()
                     .to_string()
                     .replace("\\", "/")

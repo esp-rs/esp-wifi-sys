@@ -1,6 +1,8 @@
 #![no_std]
 #![doc(html_logo_url = "https://avatars.githubusercontent.com/u/46717278")]
 #![cfg_attr(feature = "sys-logs", feature(c_variadic))]
+// bindgen generated code
+#![allow(unnecessary_transmutes)]
 
 pub mod c_types;
 mod fmt;
