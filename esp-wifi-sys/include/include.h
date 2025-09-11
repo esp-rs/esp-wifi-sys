@@ -2,8 +2,6 @@
 
 typedef int _lock_t;
 
-#define SOC_COEX_HW_PTI 1
-
 typedef uint32_t        TickType_t;
 typedef uint32_t        UBaseType_t;
 typedef int32_t         BaseType_t;
