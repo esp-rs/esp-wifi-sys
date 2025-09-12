@@ -1,6 +1,6 @@
 [package]
 name        = "esp-wifi-sys"
-version     = "0.8.0"
+version     = "0.8.1"
 edition     = "2021"
 authors     = ["The ESP-RS team"]
 description = "Bindings to Espressif's WiFi and Bluetooth low-level drivers"
