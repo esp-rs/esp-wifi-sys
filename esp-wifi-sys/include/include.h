@@ -32,6 +32,7 @@ struct timeval {
 #include "phy.h"
 #include "esp_timer.h"
 #include "esp_eap_client.h"
+#include "sdkconfig.h"
 
 #if !defined(CONFIG_IDF_TARGET_ESP32S2)
 #include "esp_bt.h"
