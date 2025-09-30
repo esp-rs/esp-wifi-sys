@@ -1,13 +1,6 @@
-use std::{
-    env,
-    fs::{self, File},
-    io::Write,
-    path::{Path, PathBuf},
-};
+use std::{env, path::PathBuf};
 
-use anyhow::Result;
-
-fn main() -> Result<()> {
+fn main() {
     // Put the linker script somewhere the linker can find it
     let out = PathBuf::from(env::var_os("OUT_DIR").unwrap());
 
@@ -27,22 +20,13 @@ fn main() -> Result<()> {
     ];
 
     for lib in libs {
-        copy_file(
-            &out,
-            &format!("libs/lib{}.a", lib),
-            &format!("lib{}.a", lib),
-        )?;
+        std::fs::copy(
+            format!("libs/lib{}.a", lib),
+            out.join(format!("lib{}.a", lib)),
+        )
+        .unwrap_or_else(|e| panic!("Failed to copy the {lib} library: {e}"));
         println!("cargo:rustc-link-lib={lib}");
     }
 
     println!("cargo:rustc-link-search={}", out.display());
-
-    Ok(())
-}
-
-fn copy_file(out: &Path, from: &str, to: &str) -> Result<()> {
-    let mut file = File::create(out.join(to))?;
-    file.write_all(&fs::read(from)?)?;
-
-    Ok(())
 }
