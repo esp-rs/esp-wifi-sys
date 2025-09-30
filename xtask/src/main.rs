@@ -60,13 +60,14 @@ fn generate_bindings_for_chip(
     tools: &Path,
     tool: &str,
 ) -> Result<()> {
-    let sysroot_path = tools.join(tool).join("esp-13.2.0_20230928").join(tool);
-    let include_path = sysroot_path.join(tool).join("include");
-    let sys_path = workspace.join("esp-wifi-sys");
+    let sysroot_path = tools.join(format!("{tool}/esp-13.2.0_20230928/{tool}"));
+    let include_path = sysroot_path.join(format!("{tool}/include"));
+    let c_path = workspace.join("c");
+    let crate_path = workspace.join(format!("esp-wifi-sys-{chip}"));
 
     println!(
         "{}",
-        sys_path
+        c_path
             .join("include")
             .join(chip)
             .join("soc")
@@ -82,7 +83,7 @@ fn generate_bindings_for_chip(
             &format!("-DCONFIG_IDF_TARGET_{}", chip.to_uppercase()),
             &format!(
                 "-I{}",
-                sys_path
+                c_path
                     .join("headers")
                     .display()
                     .to_string()
@@ -91,7 +92,7 @@ fn generate_bindings_for_chip(
             ),
             &format!(
                 "-I{}",
-                sys_path
+                c_path
                     .join("headers")
                     .join(chip)
                     .display()
@@ -101,7 +102,7 @@ fn generate_bindings_for_chip(
             ),
             &format!(
                 "-I{}",
-                sys_path
+                c_path
                     .join("headers")
                     .join("local")
                     .display()
@@ -111,7 +112,7 @@ fn generate_bindings_for_chip(
             ),
             &format!(
                 "-I{}",
-                sys_path
+                c_path
                     .join("include")
                     .display()
                     .to_string()
@@ -128,7 +129,7 @@ fn generate_bindings_for_chip(
             ),
             &format!(
                 "-I{}",
-                sys_path
+                c_path
                     .join("include")
                     .join(chip)
                     .display()
@@ -155,18 +156,15 @@ fn generate_bindings_for_chip(
         ])
         .ctypes_prefix("crate::c_types")
         .derive_debug(false)
-        .header(sys_path.join("include/include.h").to_string_lossy())
+        .header(c_path.join("include/include.h").to_string_lossy())
         .layout_tests(false)
-        .raw_line("#![allow(non_camel_case_types,non_snake_case,non_upper_case_globals,dead_code)]")
+        .raw_line("#![allow(non_camel_case_types,non_snake_case,non_upper_case_globals,dead_code,improper_ctypes)]")
         .use_core()
         .generate()
         .map_err(|_| anyhow!("Failed to generate bindings"))?;
 
     // Write out the bindings to the appropriate path:
-    let path = sys_path
-        .join("src")
-        .join("include")
-        .join(format!("{chip}.rs"));
+    let path = crate_path.join("src").join("include.rs");
     log::info!("Writing out bindings to: {}", path.display());
     bindings.write_to_file(&path)?;
 
