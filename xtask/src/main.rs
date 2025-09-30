@@ -1,11 +1,16 @@
-use std::{fs::File, io::Write, path::PathBuf, process::Command};
+use std::{
+    fs::File,
+    io::Write,
+    path::{Path, PathBuf},
+    process::Command,
+};
 
 use anyhow::{anyhow, Result};
 use bindgen::Builder;
 use directories::UserDirs;
 use log::LevelFilter;
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 enum Arch {
     RiscV,
     Xtensa,
@@ -31,61 +36,19 @@ fn main() -> Result<()> {
         tools = PathBuf::from(std::env::var("ESP_TOOLS_DIR")?);
     }
 
-    generate_bindings_for_chip(
-        "esp32",
-        Arch::Xtensa,
-        &workspace,
-        tools.join("xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/xtensa-esp-elf/include/"),
-        tools.join("xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/"),
-    )?;
+    let chips = [
+        ("esp32", "xtensa-esp-elf", Arch::Xtensa),
+        ("esp32s2", "xtensa-esp-elf", Arch::Xtensa),
+        ("esp32s3", "xtensa-esp-elf", Arch::Xtensa),
+        ("esp32c2", "riscv32-esp-elf", Arch::RiscV),
+        ("esp32c3", "riscv32-esp-elf", Arch::RiscV),
+        ("esp32h2", "riscv32-esp-elf", Arch::RiscV),
+        ("esp32c6", "riscv32-esp-elf", Arch::RiscV),
+    ];
 
-    generate_bindings_for_chip(
-        "esp32c2",
-        Arch::RiscV,
-        &workspace,
-        tools.join("riscv32-esp-elf/esp-13.2.0_20230928/riscv32-esp-elf/riscv32-esp-elf/include/"),
-        tools.join("riscv32-esp-elf/esp-13.2.0_20230928/riscv32-esp-elf/"),
-    )?;
-
-    generate_bindings_for_chip(
-        "esp32c3",
-        Arch::RiscV,
-        &workspace,
-        tools.join("riscv32-esp-elf/esp-13.2.0_20230928/riscv32-esp-elf/riscv32-esp-elf/include/"),
-        tools.join("riscv32-esp-elf/esp-13.2.0_20230928/riscv32-esp-elf/"),
-    )?;
-
-    generate_bindings_for_chip(
-        "esp32s2",
-        Arch::Xtensa,
-        &workspace,
-        tools.join("xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/xtensa-esp-elf/include/"),
-        tools.join("xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/"),
-    )?;
-
-    generate_bindings_for_chip(
-        "esp32s3",
-        Arch::Xtensa,
-        &workspace,
-        tools.join("xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/xtensa-esp-elf/include/"),
-        tools.join("xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/"),
-    )?;
-
-    generate_bindings_for_chip(
-        "esp32c6",
-        Arch::RiscV,
-        &workspace,
-        tools.join("riscv32-esp-elf/esp-13.2.0_20230928/riscv32-esp-elf/riscv32-esp-elf/include/"),
-        tools.join("riscv32-esp-elf/esp-13.2.0_20230928/riscv32-esp-elf/"),
-    )?;
-
-    generate_bindings_for_chip(
-        "esp32h2",
-        Arch::RiscV,
-        &workspace,
-        tools.join("riscv32-esp-elf/esp-13.2.0_20230928/riscv32-esp-elf/riscv32-esp-elf/include/"),
-        tools.join("riscv32-esp-elf/esp-13.2.0_20230928/riscv32-esp-elf/"),
-    )?;
+    for (chip, tool, arch) in chips {
+        generate_bindings_for_chip(chip, arch, &workspace, &tools, tool)?;
+    }
 
     Ok(())
 }
@@ -93,10 +56,12 @@ fn main() -> Result<()> {
 fn generate_bindings_for_chip(
     chip: &str,
     arch: Arch,
-    workspace: &PathBuf,
-    include_path: PathBuf,
-    sysroot_path: PathBuf,
+    workspace: &Path,
+    tools: &Path,
+    tool: &str,
 ) -> Result<()> {
+    let sysroot_path = tools.join(tool).join("esp-13.2.0_20230928").join(tool);
+    let include_path = sysroot_path.join(tool).join("include");
     let sys_path = workspace.join("esp-wifi-sys");
 
     println!(
