@@ -2,7 +2,7 @@
 
 This repository hosts the wireless-driver's binaries and low-level bindings.
 
-If you are looking for `esp-wifi` see [esp-wifi in esp-hal](https://github.com/esp-rs/esp-hal/tree/main/esp-wifi)
+If you are looking for `esp-wifi` see [esp-radio in esp-hal](https://github.com/esp-rs/esp-hal/tree/main/esp-radio)
 
 ## License
 

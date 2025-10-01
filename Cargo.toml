@@ -1,6 +1,5 @@
 [workspace]
-members = ["esp-wifi-sys", "xtask"]
-exclude = ["printf"]
+members = ["esp-wifi-sys-esp32", "esp-wifi-sys-esp32c2", "esp-wifi-sys-esp32c3", "esp-wifi-sys-esp32c6", "esp-wifi-sys-esp32h2", "esp-wifi-sys-esp32s2", "esp-wifi-sys-esp32s3", "xtask"]
 resolver = "2"
 
 [profile.release]
