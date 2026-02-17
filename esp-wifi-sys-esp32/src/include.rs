@@ -180,24 +180,6 @@ pub const WINT_MIN: u32 = 0;
 pub const __bool_true_false_are_defined: u32 = 1;
 pub const true_: u32 = 1;
 pub const false_: u32 = 0;
-pub const __GNUCLIKE_ASM: u32 = 3;
-pub const __GNUCLIKE___TYPEOF: u32 = 1;
-pub const __GNUCLIKE___SECTION: u32 = 1;
-pub const __GNUCLIKE_CTOR_SECTION_HANDLING: u32 = 1;
-pub const __GNUCLIKE_BUILTIN_CONSTANT_P: u32 = 1;
-pub const __GNUCLIKE_BUILTIN_VARARGS: u32 = 1;
-pub const __GNUCLIKE_BUILTIN_STDARG: u32 = 1;
-pub const __GNUCLIKE_BUILTIN_VAALIST: u32 = 1;
-pub const __GNUC_VA_LIST_COMPATIBILITY: u32 = 1;
-pub const __GNUCLIKE_BUILTIN_NEXT_ARG: u32 = 1;
-pub const __GNUCLIKE_BUILTIN_MEMCPY: u32 = 1;
-pub const __CC_SUPPORTS_INLINE: u32 = 1;
-pub const __CC_SUPPORTS___INLINE: u32 = 1;
-pub const __CC_SUPPORTS___INLINE__: u32 = 1;
-pub const __CC_SUPPORTS___FUNC__: u32 = 1;
-pub const __CC_SUPPORTS_WARNING: u32 = 1;
-pub const __CC_SUPPORTS_VARADIC_XXX: u32 = 1;
-pub const __CC_SUPPORTS_DYNAMIC_ARRAY_INIT: u32 = 1;
 pub const __NEWLIB_H__: u32 = 1;
 pub const _ATEXIT_DYNAMIC_ALLOC: u32 = 1;
 pub const _FSEEK_OPTIMIZATION: u32 = 1;
@@ -222,6 +204,24 @@ pub const __OBSOLETE_MATH_DEFAULT: u32 = 1;
 pub const __OBSOLETE_MATH: u32 = 1;
 pub const __BUFSIZ__: u32 = 128;
 pub const __RAND_MAX: u32 = 2147483647;
+pub const __GNUCLIKE_ASM: u32 = 3;
+pub const __GNUCLIKE___TYPEOF: u32 = 1;
+pub const __GNUCLIKE___SECTION: u32 = 1;
+pub const __GNUCLIKE_CTOR_SECTION_HANDLING: u32 = 1;
+pub const __GNUCLIKE_BUILTIN_CONSTANT_P: u32 = 1;
+pub const __GNUCLIKE_BUILTIN_VARARGS: u32 = 1;
+pub const __GNUCLIKE_BUILTIN_STDARG: u32 = 1;
+pub const __GNUCLIKE_BUILTIN_VAALIST: u32 = 1;
+pub const __GNUC_VA_LIST_COMPATIBILITY: u32 = 1;
+pub const __GNUCLIKE_BUILTIN_NEXT_ARG: u32 = 1;
+pub const __GNUCLIKE_BUILTIN_MEMCPY: u32 = 1;
+pub const __CC_SUPPORTS_INLINE: u32 = 1;
+pub const __CC_SUPPORTS___INLINE: u32 = 1;
+pub const __CC_SUPPORTS___INLINE__: u32 = 1;
+pub const __CC_SUPPORTS___FUNC__: u32 = 1;
+pub const __CC_SUPPORTS_WARNING: u32 = 1;
+pub const __CC_SUPPORTS_VARADIC_XXX: u32 = 1;
+pub const __CC_SUPPORTS_DYNAMIC_ARRAY_INIT: u32 = 1;
 pub const _NULL: u32 = 0;
 pub const _ATEXIT_SIZE: u32 = 32;
 pub const _RAND48_SEED_0: u32 = 13070;
@@ -1444,7 +1444,7 @@ pub const WIFI_SOFTAP_BEACON_MAX_LEN: u32 = 752;
 pub const WIFI_MGMT_SBUF_NUM: u32 = 32;
 pub const WIFI_STA_DISCONNECTED_PM_ENABLED: u32 = 1;
 pub const WIFI_ENABLE_WPA3_SAE: u32 = 0;
-pub const WIFI_ENABLE_SPIRAM: u32 = 0;
+pub const WIFI_ENABLE_CACHE_TX_BUFFER: u32 = 0;
 pub const WIFI_FTM_INITIATOR: u32 = 0;
 pub const WIFI_FTM_RESPONDER: u32 = 0;
 pub const WIFI_ENABLE_GCMP: u32 = 0;
@@ -1453,6 +1453,7 @@ pub const WIFI_ENABLE_11R: u32 = 0;
 pub const WIFI_ENABLE_ENTERPRISE: u32 = 128;
 pub const WIFI_DUMP_HESIGB_ENABLED: u32 = 0;
 pub const WIFI_TX_HETB_QUEUE_NUM: u32 = 1;
+pub const WIFI_ENABLE_BSS_MAX_IDLE: u32 = 0;
 pub const CONFIG_FEATURE_WPA3_SAE_BIT: u32 = 1;
 pub const CONFIG_FEATURE_CACHE_TX_BUF_BIT: u32 = 2;
 pub const CONFIG_FEATURE_FTM_INITIATOR_BIT: u32 = 4;
@@ -1461,6 +1462,7 @@ pub const CONFIG_FEATURE_GCMP_BIT: u32 = 16;
 pub const CONFIG_FEATURE_GMAC_BIT: u32 = 32;
 pub const CONFIG_FEATURE_11R_BIT: u32 = 64;
 pub const CONFIG_FEATURE_WIFI_ENT_BIT: u32 = 128;
+pub const CONFIG_FEATURE_BSS_MAX_IDLE_BIT: u32 = 256;
 pub const WIFI_FEATURE_CAPS: u32 = 160;
 pub const ESP_WIFI_CONNECTIONLESS_INTERVAL_DEFAULT_MODE: u32 = 0;
 pub const WIFI_LOG_SUBMODULE_ALL: u32 = 0;
@@ -7287,7 +7289,7 @@ extern "C" {
     ) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief Register an event handler to the system event loop (legacy).\n\n This function can be used to register a handler for either: (1) specific events,\n (2) all events of a certain event base, or (3) all events known by the system event loop.\n\n  - specific events: specify exact event_base and event_id\n  - all events of a certain base: specify exact event_base and use ESP_EVENT_ANY_ID as the event_id\n  - all events known by the loop: use ESP_EVENT_ANY_BASE for event_base and ESP_EVENT_ANY_ID as the event_id\n\n Registering multiple handlers to events is possible. Registering a single handler to multiple events is\n also possible. However, registering the same handler to the same event multiple times would cause the\n previous registrations to be overwritten.\n\n @param[in] event_base the base ID of the event to register the handler for\n @param[in] event_id the ID of the event to register the handler for\n @param[in] event_handler the handler function which gets called when the event is dispatched\n @param[in] event_handler_arg data, aside from event data, that is passed to the handler when it is called\n\n @note the event loop library does not maintain a copy of event_handler_arg, therefore the user should\n ensure that event_handler_arg still points to a valid location by the time the handler gets called\n\n @return\n  - ESP_OK: Success\n  - ESP_ERR_NO_MEM: Cannot allocate memory for the handler\n  - ESP_ERR_INVALID_ARG: Invalid combination of event base and event ID\n  - Others: Fail"]
+    #[doc = " @brief Register an event handler to the system event loop (legacy).\n\n This function can be used to register a handler for either: (1) specific events,\n (2) all events of a certain event base, or (3) all events known by the system event loop.\n\n  - specific events: specify exact event_base and event_id\n  - all events of a certain base: specify exact event_base and use ESP_EVENT_ANY_ID as the event_id\n  - all events known by the loop: use ESP_EVENT_ANY_BASE for event_base and ESP_EVENT_ANY_ID as the event_id\n\n Registering multiple handlers to events is possible. Registering a single handler to multiple events is\n also possible. However, registering the same handler to the same event multiple times would cause the\n overwriting of the event_handler_arg but the handler will be kept at the same position in the list associated\n with the event that triggers it. It means that the call order of registered handlers for that event will remain\n the same.\n\n @param[in] event_base the base ID of the event to register the handler for\n @param[in] event_id the ID of the event to register the handler for\n @param[in] event_handler the handler function which gets called when the event is dispatched\n @param[in] event_handler_arg data, aside from event data, that is passed to the handler when it is called\n\n @note the event loop library does not maintain a copy of event_handler_arg, therefore the user should\n ensure that event_handler_arg still points to a valid location by the time the handler gets called\n\n @return\n  - ESP_OK: Success\n  - ESP_ERR_NO_MEM: Cannot allocate memory for the handler\n  - ESP_ERR_INVALID_ARG: Invalid combination of event base and event ID\n  - Others: Fail"]
     pub fn esp_event_handler_register(
         event_base: esp_event_base_t,
         event_id: i32,
@@ -7849,7 +7851,7 @@ extern "C" {
     pub fn esp_wifi_get_mode(mode: *mut wifi_mode_t) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief  Start WiFi according to current configuration\n         If mode is WIFI_MODE_STA, it creates station control block and starts station\n         If mode is WIFI_MODE_AP, it creates soft-AP control block and starts soft-AP\n         If mode is WIFI_MODE_APSTA, it creates soft-AP and station control block and starts soft-AP and station\n         If mode is WIFI_MODE_NAN, it creates NAN control block and starts NAN\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_INVALID_ARG: It doesn't normally happen, the function called inside the API was passed invalid argument, user should check if the wifi related config is correct\n    - ESP_ERR_NO_MEM: out of memory\n    - ESP_ERR_WIFI_CONN: WiFi internal error, station or soft-AP control block wrong\n    - ESP_FAIL: other WiFi internal errors"]
+    #[doc = " @brief  Start WiFi according to current configuration\n         If mode is WIFI_MODE_STA, it creates station control block and starts station\n         If mode is WIFI_MODE_AP, it creates soft-AP control block and starts soft-AP\n         If mode is WIFI_MODE_APSTA, it creates soft-AP and station control block and starts soft-AP and station\n         If mode is WIFI_MODE_NAN, it creates NAN control block and starts NAN\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_INVALID_ARG: It doesn't normally happen, the function called inside the API was passed invalid argument, user should check if the WiFi related config is correct\n    - ESP_ERR_NO_MEM: out of memory\n    - ESP_ERR_WIFI_CONN: WiFi internal error, station or soft-AP control block wrong\n    - ESP_FAIL: other WiFi internal errors"]
     pub fn esp_wifi_start() -> esp_err_t;
 }
 extern "C" {
@@ -7877,7 +7879,7 @@ extern "C" {
     pub fn esp_wifi_deauth_sta(aid: u16) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief     Scan all available APs.\n\n @attention If this API is called, the found APs are stored in WiFi driver dynamic allocated memory. And then\n            can be freed in esp_wifi_scan_get_ap_records(), esp_wifi_scan_get_ap_record() or esp_wifi_clear_ap_list(),\n            so call any one to free the memory once the scan is done.\n @attention The values of maximum active scan time and passive scan time per channel are limited to 1500 milliseconds.\n            Values above 1500ms may cause station to disconnect from AP and are not recommended.\n\n @param     config  configuration settings for scanning, if set to NULL default settings will be used\n                    of which default values are show_hidden:false, scan_type:active, scan_time.active.min:0,\n                    scan_time.active.max:120 milliseconds, scan_time.passive:360 milliseconds\n                    home_chan_dwell_time:30ms\n\n @param     block if block is true, this API will block the caller until the scan is done, otherwise\n                         it will return immediately\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi was not started by esp_wifi_start\n    - ESP_ERR_WIFI_TIMEOUT: blocking scan is timeout\n    - ESP_ERR_WIFI_STATE: wifi still connecting when invoke esp_wifi_scan_start\n    - others: refer to error code in esp_err.h"]
+    #[doc = " @brief     Scan all available APs.\n\n @attention If this API is called, the found APs are stored in WiFi driver dynamic allocated memory. And then\n            can be freed in esp_wifi_scan_get_ap_records(), esp_wifi_scan_get_ap_record() or esp_wifi_clear_ap_list(),\n            so call any one to free the memory once the scan is done.\n @attention The values of maximum active scan time and passive scan time per channel are limited to 1500 milliseconds.\n            Values above 1500ms may cause station to disconnect from AP and are not recommended.\n\n @param     config  configuration settings for scanning, if set to NULL default settings will be used\n                    of which default values are show_hidden:false, scan_type:active, scan_time.active.min:0,\n                    scan_time.active.max:120 milliseconds, scan_time.passive:360 milliseconds\n                    home_chan_dwell_time:30ms\n\n @param     block if block is true, this API will block the caller until the scan is done, otherwise\n                         it will return immediately\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi was not started by esp_wifi_start\n    - ESP_ERR_WIFI_TIMEOUT: blocking scan is timeout\n    - ESP_ERR_WIFI_STATE: WiFi still connecting when invoke esp_wifi_scan_start\n    - others: refer to error code in esp_err.h"]
     pub fn esp_wifi_scan_start(config: *const wifi_scan_config_t, block: bool) -> esp_err_t;
 }
 extern "C" {
@@ -7889,7 +7891,7 @@ extern "C" {
     pub fn esp_wifi_get_scan_parameters(config: *mut wifi_scan_default_params_t) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief     Stop the scan in process\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start"]
+    #[doc = " @brief     Stop the scan in process\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_WIFI_STATE: WiFi is still connecting when esp_wifi_scan_stop() is invoked."]
     pub fn esp_wifi_scan_stop() -> esp_err_t;
 }
 extern "C" {
@@ -7897,18 +7899,18 @@ extern "C" {
     pub fn esp_wifi_scan_get_ap_num(number: *mut u16) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief     Get AP list found in last scan.\n\n @attention  This API will free all memory occupied by scanned AP list.\n\n @param[inout]  number As input param, it stores max AP number ap_records can hold.\n                As output param, it receives the actual AP number this API returns.\n @param         ap_records  wifi_ap_record_t array to hold the found APs\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_INVALID_ARG: invalid argument\n    - ESP_ERR_NO_MEM: out of memory"]
+    #[doc = " @brief     Retrieve the list of APs found during the last scan. The returned AP list is sorted in descending order based on RSSI.\n\n @attention  This API will free all memory occupied by scanned AP list.\n\n @param[inout]  number As input param, it stores max AP number ap_records can hold.\n                As output param, it receives the actual AP number this API returns.\n @param         ap_records  wifi_ap_record_t array to hold the found APs\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_INVALID_ARG: invalid argument\n    - ESP_ERR_NO_MEM: out of memory"]
     pub fn esp_wifi_scan_get_ap_records(
         number: *mut u16,
         ap_records: *mut wifi_ap_record_t,
     ) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief      Get one AP record from the scanned AP list.\n\n @attention  Different from esp_wifi_scan_get_ap_records(), this API only gets one AP record\n             from the scanned AP list each time. This API will free the memory of one AP record,\n             if the user doesn't get all records in the scannned AP list, then needs to call esp_wifi_clear_ap_list()\n             to free the remaining memory.\n\n @param[out] ap_record  pointer to one AP record\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_INVALID_ARG: invalid argument\n    - ESP_FAIL: scan APs is NULL, means all AP records fetched or no AP found"]
+    #[doc = " @brief      Get one AP record from the scanned AP list.\n\n @attention  Different from esp_wifi_scan_get_ap_records(), this API only gets one AP record\n             from the scanned AP list each time. This API will free the memory of one AP record,\n             if the user doesn't get all records in the scanned AP list, then needs to call esp_wifi_clear_ap_list()\n             to free the remaining memory.\n\n @param[out] ap_record  pointer to one AP record\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_INVALID_ARG: invalid argument\n    - ESP_FAIL: scan APs is NULL, means all AP records fetched or no AP found"]
     pub fn esp_wifi_scan_get_ap_record(ap_record: *mut wifi_ap_record_t) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief     Clear AP list found in last scan\n\n @attention This API will free all memory occupied by scanned AP list.\n            When the obtained AP list fails, AP records must be cleared,otherwise it may cause memory leakage.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_WIFI_MODE: WiFi mode is wrong\n    - ESP_ERR_INVALID_ARG: It doesn't normally happen, the function called inside the API was passed invalid argument, user should check if the wifi related config is correct"]
+    #[doc = " @brief     Clear AP list found in last scan\n\n @attention This API will free all memory occupied by scanned AP list.\n            When the obtained AP list fails, AP records must be cleared,otherwise it may cause memory leakage.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_WIFI_MODE: WiFi mode is wrong\n    - ESP_ERR_INVALID_ARG: It doesn't normally happen, the function called inside the API was passed invalid argument, user should check if the WiFi related config is correct"]
     pub fn esp_wifi_clear_ap_list() -> esp_err_t;
 }
 extern "C" {
@@ -7924,23 +7926,23 @@ extern "C" {
     pub fn esp_wifi_get_ps(type_: *mut wifi_ps_type_t) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief     Set protocol type of specified interface\n            The default protocol is (WIFI_PROTOCOL_11B|WIFI_PROTOCOL_11G|WIFI_PROTOCOL_11N).\n            if CONFIG_SOC_WIFI_HE_SUPPORT and band is 2.4G, the default protocol is (WIFI_PROTOCOL_11B|WIFI_PROTOCOL_11G|WIFI_PROTOCOL_11N|WIFI_PROTOCOL_11AX).\n            if CONFIG_SOC_WIFI_HE_SUPPORT and band is 5G, the default protocol is (WIFI_PROTOCOL_11A|WIFI_PROTOCOL_11N|WIFI_PROTOCOL_11AC|WIFI_PROTOCOL_11AX).\n\n @attention 2.4G: Support 802.11b or 802.11bg or 802.11bgn or 802.11bgnax or LR mode\n            5G: Support 802.11a or 802.11an or 802.11anac or 802.11anacax\n\n @param     ifx  interfaces\n @param     protocol_bitmap  WiFi protocol bitmap\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_IF: invalid interface\n    - others: refer to error codes in esp_err.h"]
+    #[doc = " @brief     Set protocol type of specified interface\n            The default protocol is (WIFI_PROTOCOL_11B|WIFI_PROTOCOL_11G|WIFI_PROTOCOL_11N).\n            if CONFIG_SOC_WIFI_HE_SUPPORT and band mode is 2.4G, the default protocol is (WIFI_PROTOCOL_11B|WIFI_PROTOCOL_11G|WIFI_PROTOCOL_11N|WIFI_PROTOCOL_11AX).\n            if CONFIG_SOC_WIFI_SUPPORT_5G and band mode is 5G, the default protocol is (WIFI_PROTOCOL_11A|WIFI_PROTOCOL_11N|WIFI_PROTOCOL_11AC|WIFI_PROTOCOL_11AX).\n\n @attention 1. When WiFi band mode is 2.4G only, support 802.11b or 802.11bg or 802.11bgn or 802.11bgnax or LR mode\n @attention 2. When WiFi band mode is 5G only, support 802.11a or 802.11an or 802.11anac or 802.11anacax\n @attention 3. Can not set WiFi protocol under band mode 2.4G + 5G (WIFI_BAND_MODE_AUTO), you can use esp_wifi_set_protocols instead\n @attention 4. API return ESP_ERR_NOT_SUPPORTED if the band mode is set to 2.4G + 5G (WIFI_BAND_MODE_AUTO)\n\n @param     ifx  interface\n @param     protocol_bitmap  WiFi protocol bitmap\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_IF: invalid interface\n    - ESP_ERR_INVALID_ARG: invalid argument\n    - ESP_ERR_NOT_SUPPORTED: This API is not supported when the band mode is set to 2.4G + 5G (WIFI_BAND_MODE_AUTO)\n    - others: refer to error codes in esp_err.h"]
     pub fn esp_wifi_set_protocol(ifx: wifi_interface_t, protocol_bitmap: u8) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief     Get the current protocol bitmap of the specified interface\n\n @param     ifx  interface\n @param[out] protocol_bitmap  store current WiFi protocol bitmap of interface ifx\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_IF: invalid interface\n    - ESP_ERR_INVALID_ARG: invalid argument\n    - others: refer to error codes in esp_err.h"]
+    #[doc = " @brief     Get the current protocol bitmap of the specified interface\n\n @attention 1. When WiFi band mode is 2.4G only, it will return the protocol supported in the 2.4G band\n @attention 2. When WiFi band mode is 5G only, it will return the protocol supported in the 5G band\n @attention 3. Can not get WiFi protocol under band mode 2.4G + 5G (WIFI_BAND_MODE_AUTO), you can use esp_wifi_get_protocols instead\n @attention 4. API return ESP_ERR_NOT_SUPPORTED if the band mode is set to 2.4G + 5G (WIFI_BAND_MODE_AUTO)\n\n @param     ifx  interface\n @param[out] protocol_bitmap  store current WiFi protocol bitmap of interface ifx\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_IF: invalid interface\n    - ESP_ERR_INVALID_ARG: invalid argument\n    - ESP_ERR_NOT_SUPPORTED: This API is not supported when the band mode is set to 2.4G + 5G (WIFI_BAND_MODE_AUTO)\n    - others: refer to error codes in esp_err.h"]
     pub fn esp_wifi_get_protocol(ifx: wifi_interface_t, protocol_bitmap: *mut u8) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief     Set the bandwidth of specified interface\n\n @attention 1. API return false if try to configure an interface that is not enabled\n @attention 2. WIFI_BW_HT40 is supported only when the interface support 11N\n\n @param     ifx  interface to be configured\n @param     bw  bandwidth\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_IF: invalid interface\n    - ESP_ERR_INVALID_ARG: invalid argument\n    - others: refer to error codes in esp_err.h"]
+    #[doc = " @brief     Set the bandwidth of specified interface\n\n @attention 1. WIFI_BW_HT40 is supported only when the interface support 11N\n @attention 2. When the interface supports 11AX/11AC, it only supports setting WIFI_BW_HT20.\n @attention 3. Can not set WiFi bandwidth under band mode 2.4G + 5G (WIFI_BAND_MODE_AUTO), you can use esp_wifi_set_bandwidths instead\n @attention 4. API return ESP_ERR_NOT_SUPPORTED if the band mode is set to 2.4G + 5G (WIFI_BAND_MODE_AUTO)\n\n @param     ifx  interface to be configured\n @param     bw  bandwidth\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_IF: invalid interface\n    - ESP_ERR_INVALID_ARG: invalid argument\n    - ESP_ERR_NOT_SUPPORTED: This API is not supported when the band mode is set to 2.4G + 5G (WIFI_BAND_MODE_AUTO)\n    - others: refer to error codes in esp_err.h"]
     pub fn esp_wifi_set_bandwidth(ifx: wifi_interface_t, bw: wifi_bandwidth_t) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief     Get the bandwidth of specified interface\n\n @attention 1. API return false if try to get a interface that is not enable\n\n @param     ifx interface to be configured\n @param[out] bw  store bandwidth of interface ifx\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_IF: invalid interface\n    - ESP_ERR_INVALID_ARG: invalid argument"]
+    #[doc = " @brief     Get the bandwidth of specified interface\n\n @attention 1. Can not get WiFi bandwidth under band mode 2.4G + 5G (WIFI_BAND_MODE_AUTO), you can use esp_wifi_get_bandwidths instead\n @attention 2. API return ESP_ERR_NOT_SUPPORTED if the band mode is set to 2.4G + 5G (WIFI_BAND_MODE_AUTO)\n\n @param     ifx interface to be configured\n @param[out] bw  store bandwidth of interface ifx\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_IF: invalid interface\n    - ESP_ERR_INVALID_ARG: invalid argument\n    - ESP_ERR_NOT_SUPPORTED: This API is not supported when the band mode is set to 2.4G + 5G (WIFI_BAND_MODE_AUTO)"]
     pub fn esp_wifi_get_bandwidth(ifx: wifi_interface_t, bw: *mut wifi_bandwidth_t) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief     Set primary/secondary channel of device\n\n @attention 1. This API should be called after esp_wifi_start() and before esp_wifi_stop()\n @attention 2. When device is in STA mode, this API should not be called when STA is scanning or connecting to an external AP\n @attention 3. When device is in softAP mode, this API should not be called when softAP has connected to external STAs\n @attention 4. When device is in STA+softAP mode, this API should not be called when in the scenarios described above\n @attention 5. The channel info set by this API will not be stored in NVS. So If you want to remember the channel used before wifi stop,\n               you need to call this API again after wifi start, or you can call `esp_wifi_set_config()` to store the channel info in NVS.\n\n @param     primary  for HT20, primary is the channel number, for HT40, primary is the primary channel\n @param     second   for HT20, second is ignored, for HT40, second is the second channel\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_IF: invalid interface\n    - ESP_ERR_INVALID_ARG: invalid argument\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start"]
+    #[doc = " @brief     Set primary/secondary channel of device\n\n @attention 1. This API should be called after esp_wifi_start() and before esp_wifi_stop()\n @attention 2. When device is in STA mode, this API should not be called when STA is scanning or connecting to an external AP\n @attention 3. When device is in softAP mode, this API should not be called when softAP has connected to external STAs\n @attention 4. When device is in STA+softAP mode, this API should not be called when in the scenarios described above\n @attention 5. The channel info set by this API will not be stored in NVS. So If you want to remember the channel used before WiFi stop,\n               you need to call this API again after WiFi start, or you can call `esp_wifi_set_config()` to store the channel info in NVS.\n @attention 6. When operating in 5 GHz band, the second channel is automatically determined by the primary channel according to the 802.11 standard.\n               Any manually configured second channel will be ignored.\n\n @param     primary  for HT20, primary is the channel number, for HT40, primary is the primary channel\n @param     second   for HT20, second is ignored, for HT40, second is the second channel\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_IF: invalid interface\n    - ESP_ERR_INVALID_ARG: invalid argument\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start"]
     pub fn esp_wifi_set_channel(primary: u8, second: wifi_second_chan_t) -> esp_err_t;
 }
 extern "C" {
@@ -8000,7 +8002,7 @@ extern "C" {
     ) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief     Set the configuration of the STA, AP or NAN\n\n @attention 1. This API can be called only when specified interface is enabled, otherwise, API fail\n @attention 2. For station configuration, bssid_set needs to be 0; and it needs to be 1 only when users need to check the MAC address of the AP.\n @attention 3. ESP devices are limited to only one channel, so when in the soft-AP+station mode, the soft-AP will adjust its channel automatically to be the same as\n               the channel of the station.\n @attention 4. The configuration will be stored in NVS for station and soft-AP\n\n @param     interface  interface\n @param     conf  station, soft-AP or NAN configuration\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_INVALID_ARG: invalid argument\n    - ESP_ERR_WIFI_IF: invalid interface\n    - ESP_ERR_WIFI_MODE: invalid mode\n    - ESP_ERR_WIFI_PASSWORD: invalid password\n    - ESP_ERR_WIFI_NVS: WiFi internal NVS error\n    - others: refer to the error code in esp_err.h"]
+    #[doc = " @brief     Set the configuration of the STA, AP or NAN\n\n @attention 1. This API can be called only when specified interface is enabled, otherwise, API fail\n @attention 2. For station configuration, bssid_set needs to be 0; and it needs to be 1 only when users need to check the MAC address of the AP.\n @attention 3. ESP devices are limited to only one channel, so when in the soft-AP+station mode, the soft-AP will adjust its channel automatically to be the same as\n               the channel of the station.\n @attention 4. The configuration will be stored in NVS for station and soft-AP\n\n @param     interface  interface\n @param     conf  station, soft-AP or NAN configuration\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_INVALID_ARG: invalid argument\n    - ESP_ERR_WIFI_IF: invalid interface\n    - ESP_ERR_WIFI_MODE: invalid mode\n    - ESP_ERR_WIFI_PASSWORD: invalid password\n    - ESP_ERR_WIFI_NVS: WiFi internal NVS error\n    - ESP_ERR_WIFI_STATE: WiFi still connecting when invoke esp_wifi_set_config\n    - others: refer to the error code in esp_err.h"]
     pub fn esp_wifi_set_config(interface: wifi_interface_t, conf: *mut wifi_config_t) -> esp_err_t;
 }
 extern "C" {
@@ -8046,7 +8048,7 @@ extern "C" {
     ) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief     Set maximum transmitting power after WiFi start.\n\n @attention 1. Maximum power before wifi startup is limited by PHY init data bin.\n @attention 2. The value set by this API will be mapped to the max_tx_power of the structure wifi_country_t variable.\n @attention 3. Mapping Table {Power, max_tx_power} = {{8,   2}, {20,  5}, {28,  7}, {34,  8}, {44, 11},\n                                                      {52, 13}, {56, 14}, {60, 15}, {66, 16}, {72, 18}, {80, 20}}.\n @attention 4. Param power unit is 0.25dBm, range is [8, 84] corresponding to 2dBm - 20dBm.\n @attention 5. Relationship between set value and actual value. As follows: {set value range, actual value} = {{[8,  19],8}, {[20, 27],20}, {[28, 33],28}, {[34, 43],34}, {[44, 51],44}, {[52, 55],52}, {[56, 59],56}, {[60, 65],60}, {[66, 71],66}, {[72, 79],72}, {[80, 84],80}}.\n\n @param     power  Maximum WiFi transmitting power.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_INVALID_ARG: invalid argument, e.g. parameter is out of range"]
+    #[doc = " @brief     Set maximum transmitting power after WiFi start.\n\n @attention 1. Maximum power before WiFi startup is limited by PHY init data bin.\n @attention 2. The value set by this API will be mapped to the max_tx_power of the structure wifi_country_t variable.\n @attention 3. Mapping Table {Power, max_tx_power} = {{8,   2}, {20,  5}, {28,  7}, {34,  8}, {44, 11},\n                                                      {52, 13}, {56, 14}, {60, 15}, {66, 16}, {72, 18}, {80, 20}}.\n @attention 4. Param power unit is 0.25dBm, range is [8, 84] corresponding to 2dBm - 20dBm.\n @attention 5. Relationship between set value and actual value. As follows: {set value range, actual value} = {{[8,  19],8}, {[20, 27],20}, {[28, 33],28}, {[34, 43],34}, {[44, 51],44}, {[52, 55],52}, {[56, 59],56}, {[60, 65],60}, {[66, 71],66}, {[72, 79],72}, {[80, 84],80}}.\n\n @param     power  Maximum WiFi transmitting power.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_INVALID_ARG: invalid argument, e.g. parameter is out of range"]
     pub fn esp_wifi_set_max_tx_power(power: i8) -> esp_err_t;
 }
 extern "C" {
@@ -8069,6 +8071,13 @@ extern "C" {
         len: crate::c_types::c_int,
         en_sys_seq: bool,
     ) -> esp_err_t;
+}
+#[doc = " @brief Callback function of 80211 tx data\n\n @param tx_info TX information of 80211 tx. The information can only be used in the callback context."]
+pub type esp_wifi_80211_tx_done_cb_t =
+    ::core::option::Option<unsafe extern "C" fn(tx_info: *const esp_80211_tx_info_t)>;
+extern "C" {
+    #[doc = " @brief Register the TX callback function of 80211 tx data.\n\n @attention This callback will be executed in WiFi task, so avoid doing any time consuming activity in the callback.\n            Doing heavy work here can affect the WiFi performance.\n\n @param cb callback function. If the cb is NULL, then unregister the tx cb.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init"]
+    pub fn esp_wifi_register_80211_tx_cb(cb: esp_wifi_80211_tx_done_cb_t) -> esp_err_t;
 }
 #[doc = " @brief The RX callback function of Channel State Information(CSI)  data.\n\n        Each time a CSI data is received, the callback function will be called.\n\n @param ctx context argument, passed to esp_wifi_set_csi_rx_cb() when registering callback function.\n @param data CSI data received. The memory that it points to will be deallocated after callback function returns.\n"]
 pub type wifi_csi_cb_t = ::core::option::Option<
@@ -8163,7 +8172,7 @@ extern "C" {
     pub fn esp_wifi_force_wakeup_release() -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief     configure country\n\n @attention 1. When ieee80211d_enabled, the country info of the AP to which\n               the station is connected is used. E.g. if the configured country is US\n               and the country info of the AP to which the station is connected is JP\n               then the country info that will be used is JP. If the station disconnected\n               from the AP the country info is set back to the country info of the station automatically,\n               US in the example.\n @attention 2. When ieee80211d_enabled is disabled, then the configured country info is used always.\n @attention 3. When the country info is changed because of configuration or because the station connects to a different\n               external AP, the country IE in probe response/beacon of the soft-AP is also changed.\n @attention 4. The country configuration is stored into flash.\n @attention 5. When this API is called, the PHY init data will switch to the PHY init data type corresponding to the\n               country info.\n @attention 6. Supported country codes are \"01\"(world safe mode) \"AT\",\"AU\",\"BE\",\"BG\",\"BR\",\n               \"CA\",\"CH\",\"CN\",\"CY\",\"CZ\",\"DE\",\"DK\",\"EE\",\"ES\",\"FI\",\"FR\",\"GB\",\"GR\",\"HK\",\"HR\",\"HU\",\n               \"IE\",\"IN\",\"IS\",\"IT\",\"JP\",\"KR\",\"LI\",\"LT\",\"LU\",\"LV\",\"MT\",\"MX\",\"NL\",\"NO\",\"NZ\",\"PL\",\"PT\",\n               \"RO\",\"SE\",\"SI\",\"SK\",\"TW\",\"US\"\n\n @attention 7. When country code \"01\" (world safe mode) is set, SoftAP mode won't contain country IE.\n @attention 8. The default country is \"01\" (world safe mode) and ieee80211d_enabled is TRUE.\n @attention 9. The third octet of country code string is one of the following: ' ', 'O', 'I', 'X', otherwise it is considered as ' '.\n\n @param     country   the configured country ISO code\n @param     ieee80211d_enabled   802.11d is enabled or not\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_INVALID_ARG: invalid argument"]
+    #[doc = " @brief     configure country\n\n @attention 1. When ieee80211d_enabled is enabled, the country info of the AP to which\n               the station is connected is used. E.g. if the configured country is US\n               and the country info of the AP to which the station is connected is JP\n               then the country info that will be used is JP. If the station disconnected\n               from the AP the country info is set back to the country info of the station automatically,\n               US in the example.\n @attention 2. When ieee80211d_enabled is disabled, then the configured country info is used always.\n @attention 3. When the country info is changed because of configuration or because the station connects to a different\n               external AP, the country IE in probe response/beacon of the soft-AP is also changed.\n @attention 4. The country configuration is stored into flash.\n @attention 5. When this API is called, the PHY init data will switch to the PHY init data type corresponding to the\n               country info.\n @attention 6. Supported country codes are \"01\"(world safe mode) \"AT\",\"AU\",\"BE\",\"BG\",\"BR\",\n               \"CA\",\"CH\",\"CN\",\"CY\",\"CZ\",\"DE\",\"DK\",\"EE\",\"ES\",\"FI\",\"FR\",\"GB\",\"GR\",\"HK\",\"HR\",\"HU\",\n               \"IE\",\"IN\",\"IS\",\"IT\",\"JP\",\"KR\",\"LI\",\"LT\",\"LU\",\"LV\",\"MT\",\"MX\",\"NL\",\"NO\",\"NZ\",\"PL\",\"PT\",\n               \"RO\",\"SE\",\"SI\",\"SK\",\"TW\",\"US\"\n\n @attention 7. When country code \"01\" (world safe mode) is set, SoftAP mode won't contain country IE.\n @attention 8. The default country is \"01\" (world safe mode) and ieee80211d_enabled is TRUE.\n @attention 9. The third octet of country code string is one of the following: ' ', 'O', 'I', 'X', otherwise it is considered as ' '.\n\n @param     country   the configured country ISO code\n @param     ieee80211d_enabled   802.11d is enabled or not\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_INVALID_ARG: invalid argument"]
     pub fn esp_wifi_set_country_code(
         country: *const crate::c_types::c_char,
         ieee80211d_enabled: bool,
@@ -8174,9 +8183,16 @@ extern "C" {
     pub fn esp_wifi_get_country_code(country: *mut crate::c_types::c_char) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief      Config 80211 tx rate of specified interface\n\n @attention  1. This API should be called after esp_wifi_init() and before esp_wifi_start().\n\n @param      ifx  Interface to be configured.\n @param      rate Phy rate to be configured.\n\n @return\n    - ESP_OK: succeed\n    - others: failed"]
+    #[doc = " @brief      Config 80211 tx rate of specified interface\n\n @attention  1. This API should be called after esp_wifi_init() and before esp_wifi_start().\n @attention  2. Can not set 80211 tx rate under 11A/11AC/11AX protocol, you can use esp_wifi_config_80211_tx instead.\n\n @param      ifx  Interface to be configured.\n @param      rate Phy rate to be configured.\n\n @return\n    - ESP_OK: succeed\n    - others: failed"]
     pub fn esp_wifi_config_80211_tx_rate(ifx: wifi_interface_t, rate: wifi_phy_rate_t)
         -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief      Config 80211 tx rate and phymode of specified interface\n\n @attention  1. This API should be called after esp_wifi_init() and before esp_wifi_start().\n\n\n @param      ifx  Interface to be configured.\n @param      config rate_config to be configured.\n\n @return\n    - ESP_OK: succeed\n    - others: failed"]
+    pub fn esp_wifi_config_80211_tx(
+        ifx: wifi_interface_t,
+        config: *mut wifi_tx_rate_config_t,
+    ) -> esp_err_t;
 }
 extern "C" {
     #[doc = " @brief      Disable PMF configuration for specified interface\n\n @attention  This API should be called after esp_wifi_set_config() and before esp_wifi_start().\n\n @param      ifx  Interface to be configured.\n\n @return\n    - ESP_OK: succeed\n    - others: failed"]
@@ -8197,6 +8213,52 @@ extern "C" {
 extern "C" {
     #[doc = " @brief      Get the rssi information of AP to which the device is associated with\n\n @attention 1. This API should be called after station connected to AP.\n @attention 2. Use this API only in WIFI_MODE_STA or WIFI_MODE_APSTA mode.\n\n @param      rssi store the rssi info received from last beacon.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_INVALID_ARG: invalid argument\n    - ESP_FAIL: failed"]
     pub fn esp_wifi_sta_get_rssi(rssi: *mut crate::c_types::c_int) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief     Set WiFi current band.\n\n @attention 1. This API is only operational when the WiFi band mode is configured to 2.4G + 5G (WIFI_BAND_MODE_AUTO)\n @attention 2. When device is in STA mode, this API should not be called when STA is scanning or connecting to an external AP\n @attention 3. When device is in softAP mode, this API should not be called when softAP has connected to external STAs\n @attention 4. When device is in STA+softAP mode, this API should not be called when in the scenarios described above\n @attention 5. It is recommended not to use this API. If you want to change the current band, you can use esp_wifi_set_channel instead.\n\n @param[in]    band WiFi band 2.4G / 5G\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_INVALID_ARG: invalid argument"]
+    pub fn esp_wifi_set_band(band: wifi_band_t) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief     Get WiFi current band.\n\n @param[in]    band store current band of WiFi\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_INVALID_ARG: invalid argument"]
+    pub fn esp_wifi_get_band(band: *mut wifi_band_t) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief     Set WiFi band mode.\n\n @attention 1. When the WiFi band mode is set to 2.4G only, it operates exclusively on the 2.4GHz channels.\n @attention 2. When the WiFi band mode is set to 5G only, it operates exclusively on the 5GHz channels.\n @attention 3. When the WiFi band mode is set to 2.4G + 5G (WIFI_BAND_MODE_AUTO), it can operate on both the 2.4GHz and 5GHz channels.\n @attention 4. WiFi band mode can be set to 5G only or 2.4G + 5G (WIFI_BAND_MODE_AUTO) if CONFIG_SOC_WIFI_SUPPORT_5G is supported.\n @attention 5. If CONFIG_SOC_WIFI_SUPPORT_5G is not supported, the API will return ESP_ERR_INVALID_ARG when the band mode is set to either 5G only or 2.4G + 5G (WIFI_BAND_MODE_AUTO).\n @attention 6. When a WiFi band mode change triggers a band change, if no channel is set for the current band, a default channel will be assigned: channel 1 for 2.4G band and channel 36 for 5G band.\n\n @param[in]    band_mode store the band mode of WiFi\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_INVALID_ARG: invalid argument\n"]
+    pub fn esp_wifi_set_band_mode(band_mode: wifi_band_mode_t) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief     get WiFi band mode.\n\n @param[in]    band_mode store the band mode of WiFi\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_INVALID_ARG: invalid argument"]
+    pub fn esp_wifi_get_band_mode(band_mode: *mut wifi_band_mode_t) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief     Set the supported WiFi protocols for the specified interface.\n\n @attention 1. When the WiFi band mode is set to 2.4G only, it will not set 5G protocol\n @attention 2. When the WiFi band mode is set to 5G only, it will not set 2.4G protocol\n @attention 3. This API supports setting the maximum protocol. For example, if the 2.4G protocol is set to 802.11n, it will automatically configure to 802.11b/g/n.\n\n @param     ifx  interface\n @param     protocols  WiFi protocols include 2.4G protocol and 5G protocol\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_IF: invalid interface\n    - others: refer to error codes in esp_err.h"]
+    pub fn esp_wifi_set_protocols(
+        ifx: wifi_interface_t,
+        protocols: *mut wifi_protocols_t,
+    ) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief     Get the current protocol of the specified interface and specified band\n\n @attention 1. The 5G protocol can only be read when CONFIG_SOC_WIFI_SUPPORT_5G is enabled.\n @attention 2. When the WiFi band mode is set to 2.4G only, it will not get 5G protocol\n @attention 3. When the WiFi band mode is set to 5G only, it will not get 2.4G protocol\n\n @param     ifx  interface\n @param[out] protocols  store current WiFi protocols of interface ifx\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_IF: invalid interface\n    - ESP_ERR_INVALID_ARG: invalid argument\n    - others: refer to error codes in esp_err.h"]
+    pub fn esp_wifi_get_protocols(
+        ifx: wifi_interface_t,
+        protocols: *mut wifi_protocols_t,
+    ) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief     Set the bandwidth of specified interface and specified band\n\n @attention 1. WIFI_BW_HT40 is supported only when the interface support 11N\n @attention 2. When the interface supports 11AX/11AC, it only supports setting WIFI_BW_HT20.\n @attention 3. When the WiFi band mode is set to 2.4G only, it will not set 5G bandwidth\n @attention 4. When the WiFi band mode is set to 5G only, it will not set 2.4G bandwidth\n\n @param     ifx  interface to be configured\n @param     bw  WiFi bandwidths include 2.4G bandwidth and 5G bandwidth\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_IF: invalid interface\n    - ESP_ERR_INVALID_ARG: invalid argument\n    - others: refer to error codes in esp_err.h"]
+    pub fn esp_wifi_set_bandwidths(ifx: wifi_interface_t, bw: *mut wifi_bandwidths_t) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief     Get the bandwidth of specified interface and specified band\n\n @attention 1. The 5G bandwidth can only be read when CONFIG_SOC_WIFI_SUPPORT_5G is enabled.\n @attention 2. When the WiFi band mode is set to 2.4G only, it will not get 5G bandwidth\n @attention 3. When the WiFi band mode is set to 5G only, it will not get 2.4G bandwidth\n\n @param     ifx interface to be configured\n @param[out] bw  store bandwidths of interface ifx\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_IF: invalid interface\n    - ESP_ERR_INVALID_ARG: invalid argument"]
+    pub fn esp_wifi_get_bandwidths(ifx: wifi_interface_t, bw: *mut wifi_bandwidths_t) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief      Send action frame on target channel\n\n @param    req   action tx request structure containing relevant fields\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_NO_MEM: failed to allocate memory\n    - ESP_FAIL: failed to send frame"]
+    pub fn esp_wifi_action_tx_req(req: *mut wifi_action_tx_req_t) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief      Remain on the target channel for required duration\n\n @param    req  roc request structure containing relevant fields\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_NO_MEM: failed to allocate memory\n    - ESP_FAIL: failed to perform roc operation"]
+    pub fn esp_wifi_remain_on_channel(req: *mut wifi_roc_req_t) -> esp_err_t;
 }
 #[doc = "< protocol: ESPTouch"]
 pub const smartconfig_type_t_SC_TYPE_ESPTOUCH: smartconfig_type_t = 0;

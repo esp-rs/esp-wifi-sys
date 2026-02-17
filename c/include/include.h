@@ -25,6 +25,7 @@ struct timeval {
 	uint32_t	tv_usec;	/* and microseconds */
 };
 
+#include "esp_wifi.h"
 #include "esp_private/wifi.h"
 #include "esp_private/wifi_os_adapter.h"
 #include "esp_wpa.h"
@@ -40,7 +41,7 @@ struct timeval {
 #include "esp_coexist_adapter.h"
 #endif
 
-#if ( defined(CONFIG_IDF_TARGET_ESP32C6) || defined(CONFIG_IDF_TARGET_ESP32H2) )
+#if ( defined(CONFIG_IDF_TARGET_ESP32C6) || defined(CONFIG_IDF_TARGET_ESP32H2) || defined(CONFIG_IDF_TARGET_ESP32C5) )
 #include "esp_coexist.h"
 #include "esp_coex_i154.h"
 #endif
