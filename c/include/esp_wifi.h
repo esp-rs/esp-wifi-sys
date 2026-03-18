@@ -1092,6 +1092,9 @@ typedef void (*esp_vendor_ie_cb_t)(void *ctx, wifi_vendor_ie_type_t type, const 
   * @param     vnd_ie Pointer to vendor specific element data. First 6 bytes should be a header with fields matching vendor_ie_data_t.
   *            If enable is false, this argument is ignored and can be NULL. Data does not need to remain valid after the function returns.
   *
+  * @attention If user set the same vendor ie twice, the second set will fail and return ESP_ERR_INVALID_ARG.
+  *            Please clear the vendor ie before setting again.
+  *
   * @return
   *    - ESP_OK: succeed
   *    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init()
@@ -1829,6 +1832,7 @@ esp_err_t esp_wifi_get_bandwidths(wifi_interface_t ifx, wifi_bandwidths_t *bw);
   * @return
   *    - ESP_OK: succeed
   *    - ESP_ERR_NO_MEM: failed to allocate memory
+  *    - ESP_ERR_INVALID_ARG: the <channel, sec_channel> pair is invalid
   *    - ESP_FAIL: failed to send frame
   */
 esp_err_t esp_wifi_action_tx_req(wifi_action_tx_req_t *req);
@@ -1841,6 +1845,7 @@ esp_err_t esp_wifi_action_tx_req(wifi_action_tx_req_t *req);
   * @return
   *    - ESP_OK: succeed
   *    - ESP_ERR_NO_MEM: failed to allocate memory
+  *    - ESP_ERR_INVALID_ARG: the <channel, sec_channel> pair is invalid
   *    - ESP_FAIL: failed to perform roc operation
   */
 esp_err_t esp_wifi_remain_on_channel(wifi_roc_req_t * req);

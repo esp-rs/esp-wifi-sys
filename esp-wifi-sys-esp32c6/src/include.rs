@@ -313,6 +313,7 @@ pub const CONFIG_SOC_SDIO_SLAVE_SUPPORTED: u32 = 1;
 pub const CONFIG_SOC_BOD_SUPPORTED: u32 = 1;
 pub const CONFIG_SOC_APM_SUPPORTED: u32 = 1;
 pub const CONFIG_SOC_PMU_SUPPORTED: u32 = 1;
+pub const CONFIG_SOC_PMU_PVT_SUPPORTED: u32 = 1;
 pub const CONFIG_SOC_PAU_SUPPORTED: u32 = 1;
 pub const CONFIG_SOC_LP_TIMER_SUPPORTED: u32 = 1;
 pub const CONFIG_SOC_LP_AON_SUPPORTED: u32 = 1;
@@ -397,7 +398,6 @@ pub const CONFIG_SOC_GPIO_DEEP_SLEEP_WAKE_VALID_GPIO_MASK: u32 = 0;
 pub const CONFIG_SOC_GPIO_DEEP_SLEEP_WAKE_SUPPORTED_PIN_CNT: u32 = 8;
 pub const CONFIG_SOC_GPIO_VALID_DIGITAL_IO_PAD_MASK: u32 = 2147483392;
 pub const CONFIG_SOC_GPIO_SUPPORT_FORCE_HOLD: u32 = 1;
-pub const CONFIG_SOC_GPIO_SUPPORT_HOLD_IO_IN_DSLP: u32 = 1;
 pub const CONFIG_SOC_GPIO_SUPPORT_HOLD_SINGLE_IO_IN_DSLP: u32 = 1;
 pub const CONFIG_SOC_GPIO_CLOCKOUT_BY_GPIO_MATRIX: u32 = 1;
 pub const CONFIG_SOC_CLOCKOUT_HAS_SOURCE_GATE: u32 = 1;
@@ -471,7 +471,7 @@ pub const CONFIG_SOC_RMT_CHANNELS_PER_GROUP: u32 = 4;
 pub const CONFIG_SOC_RMT_MEM_WORDS_PER_CHANNEL: u32 = 48;
 pub const CONFIG_SOC_RMT_SUPPORT_RX_PINGPONG: u32 = 1;
 pub const CONFIG_SOC_RMT_SUPPORT_RX_DEMODULATION: u32 = 1;
-pub const CONFIG_SOC_RMT_SUPPORT_TX_ASYNC_STOP: u32 = 1;
+pub const CONFIG_SOC_RMT_SUPPORT_ASYNC_STOP: u32 = 1;
 pub const CONFIG_SOC_RMT_SUPPORT_TX_LOOP_COUNT: u32 = 1;
 pub const CONFIG_SOC_RMT_SUPPORT_TX_LOOP_AUTO_STOP: u32 = 1;
 pub const CONFIG_SOC_RMT_SUPPORT_TX_SYNCHRO: u32 = 1;
@@ -635,6 +635,7 @@ pub const CONFIG_SOC_PM_CPU_RETENTION_BY_SW: u32 = 1;
 pub const CONFIG_SOC_PM_MODEM_RETENTION_BY_REGDMA: u32 = 1;
 pub const CONFIG_SOC_PM_RETENTION_HAS_CLOCK_BUG: u32 = 1;
 pub const CONFIG_SOC_EXT_MEM_CACHE_TAG_IN_CPU_DOMAIN: u32 = 1;
+pub const CONFIG_SOC_PM_MODEM_RF_FLAG_UPDATE_WORKAROUND: u32 = 1;
 pub const CONFIG_SOC_PM_PAU_LINK_NUM: u32 = 4;
 pub const CONFIG_SOC_PM_PAU_REGDMA_LINK_MULTI_ADDR: u32 = 1;
 pub const CONFIG_SOC_PM_PAU_REGDMA_LINK_WIFIMAC: u32 = 1;
@@ -660,6 +661,7 @@ pub const CONFIG_SOC_WIFI_HW_TSF: u32 = 1;
 pub const CONFIG_SOC_WIFI_FTM_SUPPORT: u32 = 1;
 pub const CONFIG_SOC_WIFI_GCMP_SUPPORT: u32 = 1;
 pub const CONFIG_SOC_WIFI_WAPI_SUPPORT: u32 = 1;
+pub const CONFIG_SOC_WIFI_TXOP_SUPPORT: u32 = 1;
 pub const CONFIG_SOC_WIFI_CSI_SUPPORT: u32 = 1;
 pub const CONFIG_SOC_WIFI_MESH_SUPPORT: u32 = 1;
 pub const CONFIG_SOC_WIFI_HE_SUPPORT: u32 = 1;
@@ -673,6 +675,7 @@ pub const CONFIG_SOC_BLE_POWER_CONTROL_SUPPORTED: u32 = 1;
 pub const CONFIG_SOC_BLE_PERIODIC_ADV_ENH_SUPPORTED: u32 = 1;
 pub const CONFIG_SOC_BLUFI_SUPPORTED: u32 = 1;
 pub const CONFIG_SOC_BLE_MULTI_CONN_OPTIMIZATION: u32 = 1;
+pub const CONFIG_SOC_BLE_PERIODIC_ADV_WITH_RESPONSE: u32 = 1;
 pub const CONFIG_SOC_BLE_USE_WIFI_PWR_CLK_WORKAROUND: u32 = 1;
 pub const CONFIG_SOC_PHY_COMBO_MODULE: u32 = 1;
 pub const CONFIG_SOC_CAPS_NO_RESET_BY_ANA_BOD: u32 = 1;
@@ -685,7 +688,7 @@ pub const CONFIG_IDF_TOOLCHAIN_GCC: u32 = 1;
 pub const CONFIG_IDF_TARGET_ARCH_RISCV: u32 = 1;
 pub const CONFIG_IDF_TARGET_ARCH: &[u8; 6] = b"riscv\0";
 pub const CONFIG_IDF_TARGET: &[u8; 8] = b"esp32c6\0";
-pub const CONFIG_IDF_INIT_VERSION: &[u8; 6] = b"5.5.1\0";
+pub const CONFIG_IDF_INIT_VERSION: &[u8; 6] = b"5.5.3\0";
 pub const CONFIG_IDF_TARGET_ESP32C6: u32 = 1;
 pub const CONFIG_IDF_FIRMWARE_CHIP_ID: u32 = 13;
 pub const CONFIG_APP_BUILD_TYPE_APP_2NDBOOT: u32 = 1;
@@ -744,6 +747,7 @@ pub const CONFIG_ESP_ROM_SUPPORT_DEEP_SLEEP_WAKEUP_STUB: u32 = 1;
 pub const CONFIG_ESP_ROM_HAS_OUTPUT_PUTC_FUNC: u32 = 1;
 pub const CONFIG_ESP_ROM_NO_USB_SERIAL_OUTPUT_API: u32 = 1;
 pub const CONFIG_ESP_ROM_HAS_SUBOPTIMAL_NEWLIB_ON_MISALIGNED_MEMORY: u32 = 1;
+pub const CONFIG_ESP_ROM_SUPPORT_SECURE_BOOT_FAST_WAKEUP: u32 = 1;
 pub const CONFIG_BOOT_ROM_LOG_ALWAYS_ON: u32 = 1;
 pub const CONFIG_SECURE_TEE_LOG_LEVEL: u32 = 0;
 pub const CONFIG_ESPTOOLPY_FLASHMODE_DIO: u32 = 1;
@@ -819,6 +823,7 @@ pub const CONFIG_HTTPD_PURGE_BUF_LEN: u32 = 32;
 pub const CONFIG_HTTPD_SERVER_EVENT_POST_TIMEOUT: u32 = 2000;
 pub const CONFIG_ESP_HTTPS_OTA_EVENT_POST_TIMEOUT: u32 = 2000;
 pub const CONFIG_ESP_HTTPS_SERVER_EVENT_POST_TIMEOUT: u32 = 2000;
+pub const CONFIG_ESP_HW_SUPPORT_FUNC_IN_IRAM: u32 = 1;
 pub const CONFIG_ESP32C6_REV_MIN_0: u32 = 1;
 pub const CONFIG_ESP32C6_REV_MIN_FULL: u32 = 0;
 pub const CONFIG_ESP_REV_MIN_FULL: u32 = 0;
@@ -841,6 +846,8 @@ pub const CONFIG_ESP_SLEEP_WAIT_FLASH_READY_EXTRA_DELAY: u32 = 0;
 pub const CONFIG_ESP_SLEEP_GPIO_ENABLE_INTERNAL_RESISTORS: u32 = 1;
 pub const CONFIG_RTC_CLK_SRC_INT_RC: u32 = 1;
 pub const CONFIG_RTC_CLK_CAL_CYCLES: u32 = 1024;
+pub const CONFIG_RTC_CLK_FUNC_IN_IRAM: u32 = 1;
+pub const CONFIG_RTC_TIME_FUNC_IN_IRAM: u32 = 1;
 pub const CONFIG_ESP_PERIPH_CTRL_FUNC_IN_IRAM: u32 = 1;
 pub const CONFIG_ESP_REGI2C_CTRL_FUNC_IN_IRAM: u32 = 1;
 pub const CONFIG_GDMA_CTRL_FUNC_IN_IRAM: u32 = 1;
@@ -1004,8 +1011,9 @@ pub const CONFIG_IEEE802154_ENABLED: u32 = 1;
 pub const CONFIG_IEEE802154_RX_BUFFER_SIZE: u32 = 20;
 pub const CONFIG_IEEE802154_CCA_ED: u32 = 1;
 pub const CONFIG_IEEE802154_CCA_MODE: u32 = 1;
-pub const CONFIG_IEEE802154_CCA_THRESHOLD: i32 = -60;
+pub const CONFIG_IEEE802154_CCA_THRESHOLD: i32 = -75;
 pub const CONFIG_IEEE802154_PENDING_TABLE_SIZE: u32 = 20;
+pub const CONFIG_IEEE802154_INTERFACE_NUM: u32 = 1;
 pub const CONFIG_IEEE802154_TIMING_OPTIMIZATION: u32 = 1;
 pub const CONFIG_LOG_VERSION_1: u32 = 1;
 pub const CONFIG_LOG_VERSION: u32 = 1;
@@ -1523,6 +1531,7 @@ pub const SOC_SDIO_SLAVE_SUPPORTED: u32 = 1;
 pub const SOC_BOD_SUPPORTED: u32 = 1;
 pub const SOC_APM_SUPPORTED: u32 = 1;
 pub const SOC_PMU_SUPPORTED: u32 = 1;
+pub const SOC_PMU_PVT_SUPPORTED: u32 = 1;
 pub const SOC_PAU_SUPPORTED: u32 = 1;
 pub const SOC_LP_TIMER_SUPPORTED: u32 = 1;
 pub const SOC_LP_AON_SUPPORTED: u32 = 1;
@@ -1609,7 +1618,6 @@ pub const SOC_GPIO_OUT_RANGE_MAX: u32 = 30;
 pub const SOC_GPIO_DEEP_SLEEP_WAKE_SUPPORTED_PIN_CNT: u32 = 8;
 pub const SOC_GPIO_VALID_DIGITAL_IO_PAD_MASK: u32 = 2147483392;
 pub const SOC_GPIO_SUPPORT_FORCE_HOLD: u32 = 1;
-pub const SOC_GPIO_SUPPORT_HOLD_IO_IN_DSLP: u32 = 1;
 pub const SOC_GPIO_SUPPORT_HOLD_SINGLE_IO_IN_DSLP: u32 = 1;
 pub const SOC_GPIO_CLOCKOUT_BY_GPIO_MATRIX: u32 = 1;
 pub const SOC_CLOCKOUT_HAS_SOURCE_GATE: u32 = 1;
@@ -1686,7 +1694,7 @@ pub const SOC_RMT_CHANNELS_PER_GROUP: u32 = 4;
 pub const SOC_RMT_MEM_WORDS_PER_CHANNEL: u32 = 48;
 pub const SOC_RMT_SUPPORT_RX_PINGPONG: u32 = 1;
 pub const SOC_RMT_SUPPORT_RX_DEMODULATION: u32 = 1;
-pub const SOC_RMT_SUPPORT_TX_ASYNC_STOP: u32 = 1;
+pub const SOC_RMT_SUPPORT_ASYNC_STOP: u32 = 1;
 pub const SOC_RMT_SUPPORT_TX_LOOP_COUNT: u32 = 1;
 pub const SOC_RMT_SUPPORT_TX_LOOP_AUTO_STOP: u32 = 1;
 pub const SOC_RMT_SUPPORT_TX_SYNCHRO: u32 = 1;
@@ -1852,6 +1860,7 @@ pub const SOC_PM_CPU_RETENTION_BY_SW: u32 = 1;
 pub const SOC_PM_MODEM_RETENTION_BY_REGDMA: u32 = 1;
 pub const SOC_PM_RETENTION_HAS_CLOCK_BUG: u32 = 1;
 pub const SOC_EXT_MEM_CACHE_TAG_IN_CPU_DOMAIN: u32 = 1;
+pub const SOC_PM_MODEM_RF_FLAG_UPDATE_WORKAROUND: u32 = 1;
 pub const SOC_PM_PAU_LINK_NUM: u32 = 4;
 pub const SOC_PM_PAU_REGDMA_LINK_MULTI_ADDR: u32 = 1;
 pub const SOC_PM_PAU_REGDMA_LINK_WIFIMAC: u32 = 1;
@@ -1877,6 +1886,7 @@ pub const SOC_WIFI_HW_TSF: u32 = 1;
 pub const SOC_WIFI_FTM_SUPPORT: u32 = 1;
 pub const SOC_WIFI_GCMP_SUPPORT: u32 = 1;
 pub const SOC_WIFI_WAPI_SUPPORT: u32 = 1;
+pub const SOC_WIFI_TXOP_SUPPORT: u32 = 1;
 pub const SOC_WIFI_CSI_SUPPORT: u32 = 1;
 pub const SOC_WIFI_MESH_SUPPORT: u32 = 1;
 pub const SOC_WIFI_HE_SUPPORT: u32 = 1;
@@ -1890,6 +1900,7 @@ pub const SOC_BLE_POWER_CONTROL_SUPPORTED: u32 = 1;
 pub const SOC_BLE_PERIODIC_ADV_ENH_SUPPORTED: u32 = 1;
 pub const SOC_BLUFI_SUPPORTED: u32 = 1;
 pub const SOC_BLE_MULTI_CONN_OPTIMIZATION: u32 = 1;
+pub const SOC_BLE_PERIODIC_ADV_WITH_RESPONSE: u32 = 1;
 pub const SOC_BLE_USE_WIFI_PWR_CLK_WORKAROUND: u32 = 1;
 pub const SOC_PHY_COMBO_MODULE: u32 = 1;
 pub const SOC_CAPS_NO_RESET_BY_ANA_BOD: u32 = 1;
@@ -3175,7 +3186,7 @@ pub const RTC_LP_VAD_TRIG_EN: u32 = 0;
 pub const RTC_VBAT_UNDER_VOLT_TRIG_EN: u32 = 0;
 pub const RTC_XTAL32K_DEAD_TRIG_EN: u32 = 0;
 pub const RTC_BROWNOUT_DET_TRIG_EN: u32 = 0;
-pub const CONFIG_VERSION: u32 = 539297286;
+pub const CONFIG_VERSION: u32 = 539300369;
 pub const CONFIG_MAGIC: u32 = 1515890085;
 pub const EXTERNAL_COEXIST_WIRE_1: u32 = 0;
 pub const EXTERNAL_COEXIST_WIRE_2: u32 = 1;
@@ -6313,7 +6324,7 @@ pub struct wifi_ap_config_t {
     pub ftm_responder: bool,
     #[doc = "< Configuration for Protected Management Frame"]
     pub pmf_cfg: wifi_pmf_config_t,
-    #[doc = "< Configuration for SAE PWE derivation method"]
+    #[doc = "< Configuration for SAE PWE derivation method. Default value :2 (WPA3_SAE_PWE_BOTH)"]
     pub sae_pwe_h2e: wifi_sae_pwe_method_t,
     #[doc = "< Whether to enable transition disable feature"]
     pub transition_disable: u8,
@@ -6350,7 +6361,7 @@ pub struct wifi_sta_config_t {
     pub pmf_cfg: wifi_pmf_config_t,
     pub _bitfield_align_1: [u32; 0],
     pub _bitfield_1: __BindgenBitfieldUnit<[u8; 4usize]>,
-    #[doc = "< Configuration for SAE PWE derivation method"]
+    #[doc = "< Configuration for SAE PWE derivation method. Default value :2 (WPA3_SAE_PWE_BOTH)"]
     pub sae_pwe_h2e: wifi_sae_pwe_method_t,
     #[doc = "< Configuration for SAE-PK (Public Key) Authentication method"]
     pub sae_pk_mode: wifi_sae_pk_mode_t,
@@ -6358,7 +6369,7 @@ pub struct wifi_sta_config_t {
     pub failure_retry_cnt: u8,
     pub _bitfield_align_2: [u32; 0],
     pub _bitfield_2: __BindgenBitfieldUnit<[u8; 4usize]>,
-    #[doc = "< Password identifier for H2E. this needs to be null terminated string"]
+    #[doc = "< Password identifier for H2E. Strings null-terminated (length < SAE_H2E_IDENTIFIER_LEN) or non-null terminated (length = SAE_H2E_IDENTIFIER_LEN) are accepted. Non-null terminated string with 0xFF for full length of SAE_H2E_IDENTIFIER_LEN is not considered a valid identifier"]
     pub sae_h2e_identifier: [u8; 32usize],
 }
 impl wifi_sta_config_t {
@@ -7083,6 +7094,8 @@ pub struct wifi_action_tx_req_t {
     pub type_: wifi_action_tx_t,
     #[doc = "< Channel on which to perform ACTION TX Operation"]
     pub channel: u8,
+    #[doc = "< Secondary channel"]
+    pub sec_channel: wifi_second_chan_t,
     #[doc = "< Duration to wait for on target channel"]
     pub wait_time_ms: u32,
     #[doc = "< Indicates no ack required"]
@@ -10265,7 +10278,7 @@ pub type esp_vendor_ie_cb_t = ::core::option::Option<
     ),
 >;
 extern "C" {
-    #[doc = " @brief     Set 802.11 Vendor-Specific Information Element\n\n @param     enable If true, specified IE is enabled. If false, specified IE is removed.\n @param     type Information Element type. Determines the frame type to associate with the IE.\n @param     idx  Index to set or clear. Each IE type can be associated with up to two elements (indices 0 & 1).\n @param     vnd_ie Pointer to vendor specific element data. First 6 bytes should be a header with fields matching vendor_ie_data_t.\n            If enable is false, this argument is ignored and can be NULL. Data does not need to remain valid after the function returns.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init()\n    - ESP_ERR_INVALID_ARG: Invalid argument, including if first byte of vnd_ie is not WIFI_VENDOR_IE_ELEMENT_ID (0xDD)\n      or second byte is an invalid length.\n    - ESP_ERR_NO_MEM: Out of memory"]
+    #[doc = " @brief     Set 802.11 Vendor-Specific Information Element\n\n @param     enable If true, specified IE is enabled. If false, specified IE is removed.\n @param     type Information Element type. Determines the frame type to associate with the IE.\n @param     idx  Index to set or clear. Each IE type can be associated with up to two elements (indices 0 & 1).\n @param     vnd_ie Pointer to vendor specific element data. First 6 bytes should be a header with fields matching vendor_ie_data_t.\n            If enable is false, this argument is ignored and can be NULL. Data does not need to remain valid after the function returns.\n\n @attention If user set the same vendor ie twice, the second set will fail and return ESP_ERR_INVALID_ARG.\n            Please clear the vendor ie before setting again.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init()\n    - ESP_ERR_INVALID_ARG: Invalid argument, including if first byte of vnd_ie is not WIFI_VENDOR_IE_ELEMENT_ID (0xDD)\n      or second byte is an invalid length.\n    - ESP_ERR_NO_MEM: Out of memory"]
     pub fn esp_wifi_set_vendor_ie(
         enable: bool,
         type_: wifi_vendor_ie_type_t,
@@ -10486,11 +10499,11 @@ extern "C" {
     pub fn esp_wifi_get_bandwidths(ifx: wifi_interface_t, bw: *mut wifi_bandwidths_t) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief      Send action frame on target channel\n\n @param    req   action tx request structure containing relevant fields\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_NO_MEM: failed to allocate memory\n    - ESP_FAIL: failed to send frame"]
+    #[doc = " @brief      Send action frame on target channel\n\n @param    req   action tx request structure containing relevant fields\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_NO_MEM: failed to allocate memory\n    - ESP_ERR_INVALID_ARG: the <channel, sec_channel> pair is invalid\n    - ESP_FAIL: failed to send frame"]
     pub fn esp_wifi_action_tx_req(req: *mut wifi_action_tx_req_t) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief      Remain on the target channel for required duration\n\n @param    req  roc request structure containing relevant fields\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_NO_MEM: failed to allocate memory\n    - ESP_FAIL: failed to perform roc operation"]
+    #[doc = " @brief      Remain on the target channel for required duration\n\n @param    req  roc request structure containing relevant fields\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_NO_MEM: failed to allocate memory\n    - ESP_ERR_INVALID_ARG: the <channel, sec_channel> pair is invalid\n    - ESP_FAIL: failed to perform roc operation"]
     pub fn esp_wifi_remain_on_channel(req: *mut wifi_roc_req_t) -> esp_err_t;
 }
 #[doc = "< protocol: ESPTouch"]
@@ -10641,6 +10654,57 @@ pub struct wifi_static_queue_t {
     pub handle: QueueHandle_t,
     #[doc = "< storage for FreeRTOS queue"]
     pub storage: *mut crate::c_types::c_void,
+}
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct nan_callbacks {
+    pub service_match: ::core::option::Option<
+        unsafe extern "C" fn(
+            sub_id: u8,
+            pub_id: u8,
+            pub_mac: *mut u8,
+            capab: u16,
+            ssi_ver: u8,
+            ssi: *mut u8,
+            ssi_len: u16,
+        ),
+    >,
+    pub replied: ::core::option::Option<
+        unsafe extern "C" fn(pub_id: u8, sub_id: u8, pub_mac: *mut u8, ssi: *mut u8, ssi_len: u16),
+    >,
+    pub receive: ::core::option::Option<
+        unsafe extern "C" fn(
+            svc_id: u8,
+            peer_svc_id: u8,
+            peer_mac: *mut u8,
+            ssi: *mut u8,
+            ssi_len: u16,
+        ),
+    >,
+    pub ndp_indication: ::core::option::Option<
+        unsafe extern "C" fn(
+            pub_id: u8,
+            ndp_id: u8,
+            peer_nmi: *mut u8,
+            peer_ndi: *mut u8,
+            ssi: *mut u8,
+            ssi_len: u16,
+        ),
+    >,
+    pub ndp_confirm: ::core::option::Option<
+        unsafe extern "C" fn(
+            status: u8,
+            ndp_id: u8,
+            peer_nmi: *mut u8,
+            peer_ndi: *mut u8,
+            own_ndi: *mut u8,
+            ssi: *mut u8,
+            ssi_len: u16,
+        ),
+    >,
+    pub ndp_terminated:
+        ::core::option::Option<unsafe extern "C" fn(reason: u8, ndp_id: u8, init_ndi: *mut u8)>,
+    pub action_txdone: ::core::option::Option<unsafe extern "C" fn(context: u32, tx_status: bool)>,
 }
 pub const wifi_log_level_t_WIFI_LOG_NONE: wifi_log_level_t = 0;
 pub const wifi_log_level_t_WIFI_LOG_ERROR: wifi_log_level_t = 1;
@@ -10916,9 +10980,10 @@ extern "C" {
     ) -> esp_err_t;
 }
 extern "C" {
-    #[doc = " @brief      Send Follow-up to the Publisher with matching service\n\n @attention  This API should be called after WIFI_EVENT_NAN_SVC_MATCH event is received.\n\n @param      fup_params  Configuration parameters for sending a Follow-up to the Peer.\n\n @return\n    - ESP_OK: succeed\n    - others: failed"]
+    #[doc = " @brief      Send Follow-up to the Publisher with matching service\n\n @attention  This API should be called after WIFI_EVENT_NAN_SVC_MATCH event is received.\n\n @param[in]  fup_params  Configuration parameters for sending a Follow-up to the Peer.\n @param[out] context Context returned for Follow-up frame to be matched in Tx done.\n\n @return\n    - ESP_OK: succeed\n    - others: failed"]
     pub fn esp_nan_internal_send_followup(
         fup_params: *const wifi_nan_followup_params_t,
+        context: *mut u32,
     ) -> esp_err_t;
 }
 extern "C" {
@@ -10935,6 +11000,10 @@ extern "C" {
 extern "C" {
     #[doc = " @brief      End NAN Datapath that is active\n\n @attention  This API should be called after receiving WIFI_EVENT_NDP_CONFIRM event.\n\n @param      req  NAN Datapath end request parameters.\n\n @return\n    - ESP_OK: succeed\n    - others: failed"]
     pub fn esp_nan_internal_datapath_end(req: *mut wifi_nan_datapath_end_req_t) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief      End NAN Datapath that is active\n\n @attention  This API should be called after receiving WIFI_EVENT_NDP_CONFIRM event.\n\n @param      req  NAN Datapath end request parameters.\n\n @return\n    - ESP_OK: succeed\n    - others: failed"]
+    pub fn esp_nan_internal_register_callbacks(cb: *mut nan_callbacks) -> esp_err_t;
 }
 extern "C" {
     #[doc = " @brief     Connect WiFi station to the AP.\n\n @attention 1. This API only impact WIFI_MODE_STA or WIFI_MODE_APSTA mode\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_WIFI_MODE: WiFi mode error\n    - ESP_ERR_WIFI_CONN: WiFi internal error, station or soft-AP control block wrong\n    - ESP_ERR_WIFI_SSID: SSID of AP which station connects is invalid"]
@@ -12270,7 +12339,8 @@ pub const periph_module_t_PERIPH_PHY_MODULE: periph_module_t = 37;
 pub const periph_module_t_PERIPH_ANA_I2C_MASTER_MODULE: periph_module_t = 38;
 pub const periph_module_t_PERIPH_MODEM_ETM_MODULE: periph_module_t = 39;
 pub const periph_module_t_PERIPH_MODEM_ADC_COMMON_FE_MODULE: periph_module_t = 40;
-pub const periph_module_t_PERIPH_MODULE_MAX: periph_module_t = 41;
+pub const periph_module_t_PERIPH_PHY_CALIBRATION_MODULE: periph_module_t = 41;
+pub const periph_module_t_PERIPH_MODULE_MAX: periph_module_t = 42;
 pub type periph_module_t = crate::c_types::c_uint;
 pub const modem_clock_domain_t_MODEM_CLOCK_DOMAIN_MODEM_APB: modem_clock_domain_t = 0;
 pub const modem_clock_domain_t_MODEM_CLOCK_DOMAIN_MODEM_PERIPH: modem_clock_domain_t = 1;
@@ -12477,6 +12547,8 @@ pub const soc_periph_mcpwm_carrier_clk_src_t_MCPWM_CARRIER_CLK_SRC_DEFAULT:
 pub type soc_periph_mcpwm_carrier_clk_src_t = crate::c_types::c_uint;
 #[doc = "< Select PLL_F160M as the default source clock"]
 pub const soc_periph_i2s_clk_src_t_I2S_CLK_SRC_DEFAULT: soc_periph_i2s_clk_src_t = 5;
+#[doc = "< Select PLL_F240M as the source clock"]
+pub const soc_periph_i2s_clk_src_t_I2S_CLK_SRC_PLL_240M: soc_periph_i2s_clk_src_t = 6;
 #[doc = "< Select PLL_F160M as the source clock"]
 pub const soc_periph_i2s_clk_src_t_I2S_CLK_SRC_PLL_160M: soc_periph_i2s_clk_src_t = 5;
 #[doc = "< Select XTAL as the source clock"]
@@ -23921,6 +23993,14 @@ extern "C" {
     pub fn modem_clock_module_disable(module: periph_module_t);
 }
 extern "C" {
+    #[doc = " @brief Gets the clock bitmask associated with the specified modem module.\n\n This function returns the complete set of clock-enable bits that correspond\n to @p module.\n\n @param module  Target shared peripheral clock module.\n\n @return Bitmask of clock-enable bits for the given module."]
+    pub fn modem_clock_module_bits_get(module: periph_module_t) -> u32;
+}
+extern "C" {
+    #[doc = " @brief Set Wi-Fi initialization status.\n\n @param inited Wi-Fi initialization status."]
+    pub fn modem_clock_configure_wifi_status(inited: bool);
+}
+extern "C" {
     #[doc = " @brief Reset the mac of modem module\n\n @param module  modem module, must be one of\n    PERIPH_WIFI_MODULE / PERIPH_BT_MODULE /PERIPH_IEEE802154_MODULE"]
     pub fn modem_clock_module_mac_reset(module: periph_module_t);
 }
@@ -24219,6 +24299,14 @@ pub struct esp_bt_controller_config_t {
     pub adv_rsv_cnt: u8,
     #[doc = "< BLE conn state machine reserve count number"]
     pub conn_rsv_cnt: u8,
+    #[doc = "< The option for priority level configuration"]
+    pub priority_level_cfg: u8,
+    #[doc = "< The option for enabling slave fast PDU reception during latency."]
+    pub slv_fst_rx_lat_en: u8,
+    #[doc = "< The option for automatically initiate the data length update when phy update or connect interval update."]
+    pub dl_itvl_phy_sync_en: u8,
+    #[doc = "< The option for ext scan to allow PDU with specific adi."]
+    pub scan_allow_adi_filter: u8,
     #[doc = "< Magic number for configuration validation"]
     pub config_magic: u32,
 }
@@ -24411,6 +24499,8 @@ pub type coex_schm_callback_type_t = crate::c_types::c_uint;
 pub const coex_schm_st_type_t_COEX_SCHM_ST_TYPE_WIFI: coex_schm_st_type_t = 0;
 pub const coex_schm_st_type_t_COEX_SCHM_ST_TYPE_BLE: coex_schm_st_type_t = 1;
 pub const coex_schm_st_type_t_COEX_SCHM_ST_TYPE_BT: coex_schm_st_type_t = 2;
+pub const coex_schm_st_type_t_COEX_SCHM_ST_TYPE_EXTERNAL_COEX: coex_schm_st_type_t = 3;
+pub const coex_schm_st_type_t_COEX_SCHM_ST_TYPE_I154: coex_schm_st_type_t = 4;
 pub type coex_schm_st_type_t = crate::c_types::c_uint;
 pub type coex_func_cb_t =
     ::core::option::Option<unsafe extern "C" fn(event: u32, sched_cnt: crate::c_types::c_int)>;
@@ -24568,7 +24658,9 @@ pub const ieee802154_coex_event_t_IEEE802154_MIDDLE: ieee802154_coex_event_t = 2
 pub const ieee802154_coex_event_t_IEEE802154_LOW: ieee802154_coex_event_t = 3;
 pub const ieee802154_coex_event_t_IEEE802154_IDLE: ieee802154_coex_event_t = 4;
 pub const ieee802154_coex_event_t_IEEE802154_EVENT_MAX: ieee802154_coex_event_t = 5;
+#[doc = " @brief 802.15.4 coex event"]
 pub type ieee802154_coex_event_t = crate::c_types::c_uint;
+#[doc = " @brief 802.15.4 coexistence configurations"]
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct esp_ieee802154_coex_config_t {
@@ -24577,19 +24669,32 @@ pub struct esp_ieee802154_coex_config_t {
     pub txrx_at: ieee802154_coex_event_t,
 }
 extern "C" {
+    #[doc = " @brief Set 802.15.4 tx/rx pti\n @param 802.15.4 coexistence event"]
     pub fn esp_coex_ieee802154_txrx_pti_set(event: ieee802154_coex_event_t);
 }
 extern "C" {
+    #[doc = " @brief Set 802.15.4 ack pti\n @param 802.15.4 coexistence event"]
     pub fn esp_coex_ieee802154_ack_pti_set(event: ieee802154_coex_event_t);
 }
 extern "C" {
+    #[doc = " @brief Indicate that a coexistence break occurred in 802.15.4"]
     pub fn esp_coex_ieee802154_coex_break_notify();
 }
 extern "C" {
+    #[doc = " @brief Enter the TX stage for 802.15.4 external coexistence handling"]
     pub fn esp_coex_ieee802154_extcoex_tx_stage();
 }
 extern "C" {
+    #[doc = " @brief Enter the RX stage for 802.15.4 external coexistence handling"]
     pub fn esp_coex_ieee802154_extcoex_rx_stage();
+}
+extern "C" {
+    #[doc = " @brief Enable the 802.15.4 status for coexistence"]
+    pub fn esp_coex_ieee802154_status_enable();
+}
+extern "C" {
+    #[doc = " @brief Disable the 802.15.4 status for coexistence"]
+    pub fn esp_coex_ieee802154_status_disable();
 }
 #[doc = "< Send ESPNOW data successfully"]
 pub const esp_now_send_status_t_ESP_NOW_SEND_SUCCESS: esp_now_send_status_t = 0;
@@ -24644,6 +24749,41 @@ pub type esp_now_recv_info_t = esp_now_recv_info;
 pub type esp_now_send_info_t = wifi_tx_info_t;
 #[doc = " @brief ESPNOW rate config"]
 pub type esp_now_rate_config_t = wifi_tx_rate_config_t;
+#[doc = " @brief ESPNOW switch channel information"]
+#[repr(C)]
+pub struct esp_now_switch_channel_t {
+    #[doc = "< ACTION TX operation type"]
+    pub type_: wifi_action_tx_t,
+    #[doc = "< Channel on which to perform ESPNOW TX Operation"]
+    pub channel: u8,
+    #[doc = "< Secondary channel"]
+    pub sec_channel: wifi_second_chan_t,
+    #[doc = "< Duration to wait for on target channel"]
+    pub wait_time_ms: u32,
+    #[doc = "< Unique Identifier for operation provided by wifi driver"]
+    pub op_id: u8,
+    #[doc = "< Destination MAC address"]
+    pub dest_mac: [u8; 6usize],
+    #[doc = "< Length of the appended Data"]
+    pub data_len: u16,
+    #[doc = "< Appended Data payload"]
+    pub data: __IncompleteArrayField<u8>,
+}
+#[doc = " @brief ESPNOW remain on channel information"]
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct esp_now_remain_on_channel_t {
+    #[doc = "< ROC operation type"]
+    pub type_: wifi_roc_t,
+    #[doc = "< Channel on which to perform ESPNOW ROC Operation"]
+    pub channel: u8,
+    #[doc = "< Secondary channel"]
+    pub sec_channel: wifi_second_chan_t,
+    #[doc = "< Duration to wait for on target channel"]
+    pub wait_time_ms: u32,
+    #[doc = "< ID of this specific ROC operation provided by wifi driver"]
+    pub op_id: u8,
+}
 #[doc = " @brief     Callback function of receiving ESPNOW data\n @param     esp_now_info received ESPNOW packet information\n @param     data received data\n @param     data_len length of received data\n @attention esp_now_info is a local variable，it can only be used in the callback."]
 pub type esp_now_recv_cb_t = ::core::option::Option<
     unsafe extern "C" fn(
@@ -24742,6 +24882,14 @@ extern "C" {
 extern "C" {
     #[doc = " @brief     Get the OUI (Organization Identifier) in the vendor-specific element for ESPNOW.\n\n @param     oui  user configured OUI.\n\n @return\n          - ESP_OK : succeed\n          - ESP_ERR_ESPNOW_ARG : invalid argument"]
     pub fn esp_now_get_user_oui(oui: *mut u8) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief     ESPNOW switch to a specific channel for a required duration, and send one ESPNOW data.\n\n @param     config  ESPNOW switch channel relevant information\n\n @return\n          - ESP_OK : succeed\n          - ESP_ERR_NO_MEM: failed to allocate memory\n          - ESP_ERR_INVALID_ARG: the <channel, sec_channel> pair is invalid\n          - ESP_FAIL: failed to send frame"]
+    pub fn esp_now_switch_channel_tx(config: *mut esp_now_switch_channel_t) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief     ESPNOW remain on the target channel for required duration.\n\n @param     config  ESPNOW remain on channel relevant information\n\n @return\n          - ESP_OK : succeed\n          - ESP_ERR_NO_MEM: failed to allocate memory\n          - ESP_ERR_INVALID_ARG: the <channel, sec_channel> pair is invalid\n          - ESP_FAIL: failed to perform roc operation"]
+    pub fn esp_now_remain_on_channel(config: *mut esp_now_remain_on_channel_t) -> esp_err_t;
 }
 #[repr(C)]
 #[derive(Copy, Clone)]
