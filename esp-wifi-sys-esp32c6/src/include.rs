@@ -8868,6 +8868,8 @@ pub const wifi_rx_bb_format_t_RX_BB_FORMAT_HE_MU: wifi_rx_bb_format_t = 5;
 pub const wifi_rx_bb_format_t_RX_BB_FORMAT_HE_ERSU: wifi_rx_bb_format_t = 6;
 #[doc = "< the reception frame is a HE TB MPDU"]
 pub const wifi_rx_bb_format_t_RX_BB_FORMAT_HE_TB: wifi_rx_bb_format_t = 7;
+#[doc = "< the reception frame is a VHT MU MPDU"]
+pub const wifi_rx_bb_format_t_RX_BB_FORMAT_VHT_MU: wifi_rx_bb_format_t = 11;
 #[doc = " @brief Reception format"]
 pub type wifi_rx_bb_format_t = crate::c_types::c_uint;
 #[repr(C, packed)]
@@ -9279,6 +9281,8 @@ pub type wifi_twt_type_t = crate::c_types::c_uint;
 pub struct wifi_twt_config_t {
     #[doc = "< post twt wakeup event"]
     pub post_wakeup_event: bool,
+    #[doc = "< twt enable send qos null to keep alive"]
+    pub twt_enable_keep_alive: bool,
 }
 #[doc = " Argument structure for WIFI_EVENT_TWT_WAKEUP event"]
 #[repr(C)]

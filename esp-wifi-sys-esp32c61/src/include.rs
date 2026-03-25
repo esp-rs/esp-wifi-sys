@@ -1296,7 +1296,7 @@ pub const WIFI_MAX_REGULATORY_RULE_NUM: u32 = 2;
 pub const FLOW_ID_ALL: u32 = 8;
 pub const BTWT_ID_ALL: u32 = 32;
 pub const BSS_MAX_COLOR: u32 = 63;
-pub const ESP_WIFI_MAX_CONN_NUM: u32 = 15;
+pub const ESP_WIFI_MAX_CONN_NUM: u32 = 10;
 pub const ESP_WIFI_CRYPTO_VERSION: u32 = 1;
 pub const ESP_ERR_WIFI_NOT_INIT: u32 = 12289;
 pub const ESP_ERR_WIFI_NOT_STARTED: u32 = 12290;
@@ -8129,7 +8129,7 @@ pub type _bindgen_ty_1 = crate::c_types::c_uint;
 #[repr(align(4))]
 #[derive(Copy, Clone)]
 pub struct wifi_csi_acquire_config_t {
-    pub _bitfield_align_1: [u32; 0],
+    pub _bitfield_align_1: [u16; 0],
     pub _bitfield_1: __BindgenBitfieldUnit<[u8; 4usize]>,
 }
 impl wifi_csi_acquire_config_t {
@@ -8156,128 +8156,164 @@ impl wifi_csi_acquire_config_t {
         }
     }
     #[inline]
-    pub fn acquire_csi_ht20(&self) -> u32 {
+    pub fn acquire_csi_force_lltf(&self) -> u32 {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(2usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_acquire_csi_ht20(&mut self, val: u32) {
+    pub fn set_acquire_csi_force_lltf(&mut self, val: u32) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(2usize, 1u8, val as u64)
         }
     }
     #[inline]
-    pub fn acquire_csi_ht40(&self) -> u32 {
+    pub fn acquire_csi_ht20(&self) -> u32 {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(3usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_acquire_csi_ht40(&mut self, val: u32) {
+    pub fn set_acquire_csi_ht20(&mut self, val: u32) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(3usize, 1u8, val as u64)
         }
     }
     #[inline]
-    pub fn acquire_csi_su(&self) -> u32 {
+    pub fn acquire_csi_ht40(&self) -> u32 {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(4usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_acquire_csi_su(&mut self, val: u32) {
+    pub fn set_acquire_csi_ht40(&mut self, val: u32) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(4usize, 1u8, val as u64)
         }
     }
     #[inline]
-    pub fn acquire_csi_mu(&self) -> u32 {
+    pub fn acquire_csi_vht(&self) -> u32 {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(5usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_acquire_csi_mu(&mut self, val: u32) {
+    pub fn set_acquire_csi_vht(&mut self, val: u32) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(5usize, 1u8, val as u64)
         }
     }
     #[inline]
-    pub fn acquire_csi_dcm(&self) -> u32 {
+    pub fn acquire_csi_su(&self) -> u32 {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(6usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_acquire_csi_dcm(&mut self, val: u32) {
+    pub fn set_acquire_csi_su(&mut self, val: u32) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(6usize, 1u8, val as u64)
         }
     }
     #[inline]
-    pub fn acquire_csi_beamformed(&self) -> u32 {
+    pub fn acquire_csi_mu(&self) -> u32 {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(7usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_acquire_csi_beamformed(&mut self, val: u32) {
+    pub fn set_acquire_csi_mu(&mut self, val: u32) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(7usize, 1u8, val as u64)
         }
     }
     #[inline]
-    pub fn acquire_csi_he_stbc(&self) -> u32 {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(8usize, 2u8) as u32) }
+    pub fn acquire_csi_dcm(&self) -> u32 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(8usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_acquire_csi_he_stbc(&mut self, val: u32) {
+    pub fn set_acquire_csi_dcm(&mut self, val: u32) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_1.set(8usize, 2u8, val as u64)
+            self._bitfield_1.set(8usize, 1u8, val as u64)
         }
     }
     #[inline]
-    pub fn val_scale_cfg(&self) -> u32 {
+    pub fn acquire_csi_beamformed(&self) -> u32 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(9usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set_acquire_csi_beamformed(&mut self, val: u32) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(9usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn acquire_csi_he_stbc_mode(&self) -> u32 {
         unsafe { ::core::mem::transmute(self._bitfield_1.get(10usize, 2u8) as u32) }
     }
     #[inline]
-    pub fn set_val_scale_cfg(&mut self, val: u32) {
+    pub fn set_acquire_csi_he_stbc_mode(&mut self, val: u32) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_1.set(10usize, 2u8, val as u64)
         }
     }
     #[inline]
+    pub fn val_scale_cfg(&self) -> u32 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(12usize, 4u8) as u32) }
+    }
+    #[inline]
+    pub fn set_val_scale_cfg(&mut self, val: u32) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(12usize, 4u8, val as u64)
+        }
+    }
+    #[inline]
     pub fn dump_ack_en(&self) -> u32 {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(12usize, 1u8) as u32) }
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(16usize, 1u8) as u32) }
     }
     #[inline]
     pub fn set_dump_ack_en(&mut self, val: u32) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_1.set(12usize, 1u8, val as u64)
+            self._bitfield_1.set(16usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn lltf_bit_mode(&self) -> u32 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(17usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set_lltf_bit_mode(&mut self, val: u32) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(17usize, 1u8, val as u64)
         }
     }
     #[inline]
     pub fn reserved(&self) -> u32 {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(13usize, 19u8) as u32) }
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(18usize, 14u8) as u32) }
     }
     #[inline]
     pub fn set_reserved(&mut self, val: u32) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_1.set(13usize, 19u8, val as u64)
+            self._bitfield_1.set(18usize, 14u8, val as u64)
         }
     }
     #[inline]
     pub fn new_bitfield_1(
         enable: u32,
         acquire_csi_legacy: u32,
+        acquire_csi_force_lltf: u32,
         acquire_csi_ht20: u32,
         acquire_csi_ht40: u32,
+        acquire_csi_vht: u32,
         acquire_csi_su: u32,
         acquire_csi_mu: u32,
         acquire_csi_dcm: u32,
         acquire_csi_beamformed: u32,
-        acquire_csi_he_stbc: u32,
+        acquire_csi_he_stbc_mode: u32,
         val_scale_cfg: u32,
         dump_ack_en: u32,
+        lltf_bit_mode: u32,
         reserved: u32,
     ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
@@ -8290,43 +8326,57 @@ impl wifi_csi_acquire_config_t {
             acquire_csi_legacy as u64
         });
         __bindgen_bitfield_unit.set(2usize, 1u8, {
+            let acquire_csi_force_lltf: u32 =
+                unsafe { ::core::mem::transmute(acquire_csi_force_lltf) };
+            acquire_csi_force_lltf as u64
+        });
+        __bindgen_bitfield_unit.set(3usize, 1u8, {
             let acquire_csi_ht20: u32 = unsafe { ::core::mem::transmute(acquire_csi_ht20) };
             acquire_csi_ht20 as u64
         });
-        __bindgen_bitfield_unit.set(3usize, 1u8, {
+        __bindgen_bitfield_unit.set(4usize, 1u8, {
             let acquire_csi_ht40: u32 = unsafe { ::core::mem::transmute(acquire_csi_ht40) };
             acquire_csi_ht40 as u64
         });
-        __bindgen_bitfield_unit.set(4usize, 1u8, {
+        __bindgen_bitfield_unit.set(5usize, 1u8, {
+            let acquire_csi_vht: u32 = unsafe { ::core::mem::transmute(acquire_csi_vht) };
+            acquire_csi_vht as u64
+        });
+        __bindgen_bitfield_unit.set(6usize, 1u8, {
             let acquire_csi_su: u32 = unsafe { ::core::mem::transmute(acquire_csi_su) };
             acquire_csi_su as u64
         });
-        __bindgen_bitfield_unit.set(5usize, 1u8, {
+        __bindgen_bitfield_unit.set(7usize, 1u8, {
             let acquire_csi_mu: u32 = unsafe { ::core::mem::transmute(acquire_csi_mu) };
             acquire_csi_mu as u64
         });
-        __bindgen_bitfield_unit.set(6usize, 1u8, {
+        __bindgen_bitfield_unit.set(8usize, 1u8, {
             let acquire_csi_dcm: u32 = unsafe { ::core::mem::transmute(acquire_csi_dcm) };
             acquire_csi_dcm as u64
         });
-        __bindgen_bitfield_unit.set(7usize, 1u8, {
+        __bindgen_bitfield_unit.set(9usize, 1u8, {
             let acquire_csi_beamformed: u32 =
                 unsafe { ::core::mem::transmute(acquire_csi_beamformed) };
             acquire_csi_beamformed as u64
         });
-        __bindgen_bitfield_unit.set(8usize, 2u8, {
-            let acquire_csi_he_stbc: u32 = unsafe { ::core::mem::transmute(acquire_csi_he_stbc) };
-            acquire_csi_he_stbc as u64
-        });
         __bindgen_bitfield_unit.set(10usize, 2u8, {
+            let acquire_csi_he_stbc_mode: u32 =
+                unsafe { ::core::mem::transmute(acquire_csi_he_stbc_mode) };
+            acquire_csi_he_stbc_mode as u64
+        });
+        __bindgen_bitfield_unit.set(12usize, 4u8, {
             let val_scale_cfg: u32 = unsafe { ::core::mem::transmute(val_scale_cfg) };
             val_scale_cfg as u64
         });
-        __bindgen_bitfield_unit.set(12usize, 1u8, {
+        __bindgen_bitfield_unit.set(16usize, 1u8, {
             let dump_ack_en: u32 = unsafe { ::core::mem::transmute(dump_ack_en) };
             dump_ack_en as u64
         });
-        __bindgen_bitfield_unit.set(13usize, 19u8, {
+        __bindgen_bitfield_unit.set(17usize, 1u8, {
+            let lltf_bit_mode: u32 = unsafe { ::core::mem::transmute(lltf_bit_mode) };
+            lltf_bit_mode as u64
+        });
+        __bindgen_bitfield_unit.set(18usize, 14u8, {
             let reserved: u32 = unsafe { ::core::mem::transmute(reserved) };
             reserved as u64
         });
@@ -8690,6 +8740,8 @@ pub const wifi_rx_bb_format_t_RX_BB_FORMAT_HE_MU: wifi_rx_bb_format_t = 5;
 pub const wifi_rx_bb_format_t_RX_BB_FORMAT_HE_ERSU: wifi_rx_bb_format_t = 6;
 #[doc = "< the reception frame is a HE TB MPDU"]
 pub const wifi_rx_bb_format_t_RX_BB_FORMAT_HE_TB: wifi_rx_bb_format_t = 7;
+#[doc = "< the reception frame is a VHT MU MPDU"]
+pub const wifi_rx_bb_format_t_RX_BB_FORMAT_VHT_MU: wifi_rx_bb_format_t = 11;
 #[doc = " @brief Reception format"]
 pub type wifi_rx_bb_format_t = crate::c_types::c_uint;
 #[repr(C, packed)]
@@ -8697,14 +8749,14 @@ pub type wifi_rx_bb_format_t = crate::c_types::c_uint;
 pub struct esp_wifi_rxctrl_t {
     pub _bitfield_align_1: [u8; 0],
     pub _bitfield_1: __BindgenBitfieldUnit<[u8; 4usize]>,
-    #[doc = "< HE-SIGA1 or HT-SIG"]
+    #[doc = "< HE-SIGA1 or HT-SIG or VHT-SIG"]
     pub he_siga1: u32,
     pub _bitfield_align_2: [u8; 0],
     pub _bitfield_2: __BindgenBitfieldUnit<[u8; 1usize]>,
     #[doc = "< HE-SIGA2"]
     pub he_siga2: u16,
     pub _bitfield_align_3: [u8; 0],
-    pub _bitfield_3: __BindgenBitfieldUnit<[u8; 81usize]>,
+    pub _bitfield_3: __BindgenBitfieldUnit<[u8; 53usize]>,
 }
 impl esp_wifi_rxctrl_t {
     #[inline]
@@ -8865,113 +8917,102 @@ impl esp_wifi_rxctrl_t {
         }
     }
     #[inline]
+    pub fn sigb_len(&self) -> crate::c_types::c_uint {
+        unsafe { ::core::mem::transmute(self._bitfield_3.get(122usize, 10u8) as u32) }
+    }
+    #[inline]
+    pub fn set_sigb_len(&mut self, val: crate::c_types::c_uint) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_3.set(122usize, 10u8, val as u64)
+        }
+    }
+    #[inline]
     pub fn channel(&self) -> crate::c_types::c_uint {
-        unsafe { ::core::mem::transmute(self._bitfield_3.get(80usize, 4u8) as u32) }
+        unsafe { ::core::mem::transmute(self._bitfield_3.get(136usize, 8u8) as u32) }
     }
     #[inline]
     pub fn set_channel(&mut self, val: crate::c_types::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_3.set(80usize, 4u8, val as u64)
+            self._bitfield_3.set(136usize, 8u8, val as u64)
         }
     }
     #[inline]
     pub fn second(&self) -> crate::c_types::c_uint {
-        unsafe { ::core::mem::transmute(self._bitfield_3.get(84usize, 4u8) as u32) }
+        unsafe { ::core::mem::transmute(self._bitfield_3.get(144usize, 8u8) as u32) }
     }
     #[inline]
     pub fn set_second(&mut self, val: crate::c_types::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_3.set(84usize, 4u8, val as u64)
-        }
-    }
-    #[inline]
-    pub fn rx_channel_estimate_len(&self) -> crate::c_types::c_uint {
-        unsafe { ::core::mem::transmute(self._bitfield_3.get(176usize, 10u8) as u32) }
-    }
-    #[inline]
-    pub fn set_rx_channel_estimate_len(&mut self, val: crate::c_types::c_uint) {
-        unsafe {
-            let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_3.set(176usize, 10u8, val as u64)
-        }
-    }
-    #[inline]
-    pub fn rx_channel_estimate_info_vld(&self) -> crate::c_types::c_uint {
-        unsafe { ::core::mem::transmute(self._bitfield_3.get(186usize, 1u8) as u32) }
-    }
-    #[inline]
-    pub fn set_rx_channel_estimate_info_vld(&mut self, val: crate::c_types::c_uint) {
-        unsafe {
-            let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_3.set(186usize, 1u8, val as u64)
+            self._bitfield_3.set(144usize, 8u8, val as u64)
         }
     }
     #[inline]
     pub fn cur_bb_format(&self) -> crate::c_types::c_uint {
-        unsafe { ::core::mem::transmute(self._bitfield_3.get(224usize, 4u8) as u32) }
+        unsafe { ::core::mem::transmute(self._bitfield_3.get(212usize, 4u8) as u32) }
     }
     #[inline]
     pub fn set_cur_bb_format(&mut self, val: crate::c_types::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_3.set(224usize, 4u8, val as u64)
+            self._bitfield_3.set(212usize, 4u8, val as u64)
         }
     }
     #[inline]
-    pub fn cur_single_mpdu(&self) -> crate::c_types::c_uint {
-        unsafe { ::core::mem::transmute(self._bitfield_3.get(228usize, 1u8) as u32) }
+    pub fn rx_channel_estimate_len(&self) -> crate::c_types::c_uint {
+        unsafe { ::core::mem::transmute(self._bitfield_3.get(216usize, 10u8) as u32) }
     }
     #[inline]
-    pub fn set_cur_single_mpdu(&mut self, val: crate::c_types::c_uint) {
+    pub fn set_rx_channel_estimate_len(&mut self, val: crate::c_types::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_3.set(228usize, 1u8, val as u64)
+            self._bitfield_3.set(216usize, 10u8, val as u64)
         }
     }
     #[inline]
-    pub fn he_sigb_len(&self) -> crate::c_types::c_uint {
-        unsafe { ::core::mem::transmute(self._bitfield_3.get(496usize, 6u8) as u32) }
+    pub fn rx_channel_estimate_info_vld(&self) -> crate::c_types::c_uint {
+        unsafe { ::core::mem::transmute(self._bitfield_3.get(226usize, 1u8) as u32) }
     }
     #[inline]
-    pub fn set_he_sigb_len(&mut self, val: crate::c_types::c_uint) {
+    pub fn set_rx_channel_estimate_info_vld(&mut self, val: crate::c_types::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_3.set(496usize, 6u8, val as u64)
+            self._bitfield_3.set(226usize, 1u8, val as u64)
         }
     }
     #[inline]
     pub fn sig_len(&self) -> crate::c_types::c_uint {
-        unsafe { ::core::mem::transmute(self._bitfield_3.get(584usize, 14u8) as u32) }
+        unsafe { ::core::mem::transmute(self._bitfield_3.get(360usize, 14u8) as u32) }
     }
     #[inline]
     pub fn set_sig_len(&mut self, val: crate::c_types::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_3.set(584usize, 14u8, val as u64)
+            self._bitfield_3.set(360usize, 14u8, val as u64)
         }
     }
     #[inline]
     pub fn dump_len(&self) -> crate::c_types::c_uint {
-        unsafe { ::core::mem::transmute(self._bitfield_3.get(600usize, 14u8) as u32) }
+        unsafe { ::core::mem::transmute(self._bitfield_3.get(376usize, 14u8) as u32) }
     }
     #[inline]
     pub fn set_dump_len(&mut self, val: crate::c_types::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_3.set(600usize, 14u8, val as u64)
+            self._bitfield_3.set(376usize, 14u8, val as u64)
         }
     }
     #[inline]
     pub fn rx_state(&self) -> crate::c_types::c_uint {
-        unsafe { ::core::mem::transmute(self._bitfield_3.get(616usize, 8u8) as u32) }
+        unsafe { ::core::mem::transmute(self._bitfield_3.get(392usize, 8u8) as u32) }
     }
     #[inline]
     pub fn set_rx_state(&mut self, val: crate::c_types::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_3.set(616usize, 8u8, val as u64)
+            self._bitfield_3.set(392usize, 8u8, val as u64)
         }
     }
 }
@@ -9101,6 +9142,8 @@ pub type wifi_twt_type_t = crate::c_types::c_uint;
 pub struct wifi_twt_config_t {
     #[doc = "< post twt wakeup event"]
     pub post_wakeup_event: bool,
+    #[doc = "< twt enable send qos null to keep alive"]
+    pub twt_enable_keep_alive: bool,
 }
 #[doc = " Argument structure for WIFI_EVENT_TWT_WAKEUP event"]
 #[repr(C)]
@@ -9276,7 +9319,7 @@ impl esp_wifi_btwt_info_t {
 #[derive(Copy, Clone)]
 pub struct wifi_sta_list_t {
     #[doc = "< station list"]
-    pub sta: [wifi_sta_info_t; 15usize],
+    pub sta: [wifi_sta_info_t; 10usize],
     #[doc = "< number of stations in the list (other entries are invalid)"]
     pub num: crate::c_types::c_int,
 }
