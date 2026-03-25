@@ -8633,14 +8633,25 @@ impl wifi_csi_acquire_config_t {
         }
     }
     #[inline]
+    pub fn lltf_bit_mode(&self) -> u32 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(17usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set_lltf_bit_mode(&mut self, val: u32) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(17usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
     pub fn reserved(&self) -> u32 {
-        unsafe { ::core::mem::transmute(self._bitfield_1.get(17usize, 15u8) as u32) }
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(18usize, 14u8) as u32) }
     }
     #[inline]
     pub fn set_reserved(&mut self, val: u32) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_1.set(17usize, 15u8, val as u64)
+            self._bitfield_1.set(18usize, 14u8, val as u64)
         }
     }
     #[inline]
@@ -8658,6 +8669,7 @@ impl wifi_csi_acquire_config_t {
         acquire_csi_he_stbc_mode: u32,
         val_scale_cfg: u32,
         dump_ack_en: u32,
+        lltf_bit_mode: u32,
         reserved: u32,
     ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
         let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
@@ -8716,7 +8728,11 @@ impl wifi_csi_acquire_config_t {
             let dump_ack_en: u32 = unsafe { ::core::mem::transmute(dump_ack_en) };
             dump_ack_en as u64
         });
-        __bindgen_bitfield_unit.set(17usize, 15u8, {
+        __bindgen_bitfield_unit.set(17usize, 1u8, {
+            let lltf_bit_mode: u32 = unsafe { ::core::mem::transmute(lltf_bit_mode) };
+            lltf_bit_mode as u64
+        });
+        __bindgen_bitfield_unit.set(18usize, 14u8, {
             let reserved: u32 = unsafe { ::core::mem::transmute(reserved) };
             reserved as u64
         });
@@ -9080,6 +9096,8 @@ pub const wifi_rx_bb_format_t_RX_BB_FORMAT_HE_MU: wifi_rx_bb_format_t = 5;
 pub const wifi_rx_bb_format_t_RX_BB_FORMAT_HE_ERSU: wifi_rx_bb_format_t = 6;
 #[doc = "< the reception frame is a HE TB MPDU"]
 pub const wifi_rx_bb_format_t_RX_BB_FORMAT_HE_TB: wifi_rx_bb_format_t = 7;
+#[doc = "< the reception frame is a VHT MU MPDU"]
+pub const wifi_rx_bb_format_t_RX_BB_FORMAT_VHT_MU: wifi_rx_bb_format_t = 11;
 #[doc = " @brief Reception format"]
 pub type wifi_rx_bb_format_t = crate::c_types::c_uint;
 #[repr(C, packed)]
@@ -9244,11 +9262,11 @@ impl esp_wifi_rxctrl_t {
         }
     }
     #[inline]
-    pub fn noise_floor(&self) -> crate::c_types::c_uint {
+    pub fn noise_floor(&self) -> crate::c_types::c_int {
         unsafe { ::core::mem::transmute(self._bitfield_3.get(72usize, 8u8) as u32) }
     }
     #[inline]
-    pub fn set_noise_floor(&mut self, val: crate::c_types::c_uint) {
+    pub fn set_noise_floor(&mut self, val: crate::c_types::c_int) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
             self._bitfield_3.set(72usize, 8u8, val as u64)
@@ -9267,24 +9285,24 @@ impl esp_wifi_rxctrl_t {
     }
     #[inline]
     pub fn channel(&self) -> crate::c_types::c_uint {
-        unsafe { ::core::mem::transmute(self._bitfield_3.get(136usize, 4u8) as u32) }
+        unsafe { ::core::mem::transmute(self._bitfield_3.get(136usize, 8u8) as u32) }
     }
     #[inline]
     pub fn set_channel(&mut self, val: crate::c_types::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_3.set(136usize, 4u8, val as u64)
+            self._bitfield_3.set(136usize, 8u8, val as u64)
         }
     }
     #[inline]
     pub fn second(&self) -> crate::c_types::c_uint {
-        unsafe { ::core::mem::transmute(self._bitfield_3.get(140usize, 4u8) as u32) }
+        unsafe { ::core::mem::transmute(self._bitfield_3.get(144usize, 8u8) as u32) }
     }
     #[inline]
     pub fn set_second(&mut self, val: crate::c_types::c_uint) {
         unsafe {
             let val: u32 = ::core::mem::transmute(val);
-            self._bitfield_3.set(140usize, 4u8, val as u64)
+            self._bitfield_3.set(144usize, 8u8, val as u64)
         }
     }
     #[inline]
@@ -9480,6 +9498,8 @@ pub type wifi_twt_type_t = crate::c_types::c_uint;
 pub struct wifi_twt_config_t {
     #[doc = "< post twt wakeup event"]
     pub post_wakeup_event: bool,
+    #[doc = "< twt enable send qos null to keep alive"]
+    pub twt_enable_keep_alive: bool,
 }
 #[doc = " Argument structure for WIFI_EVENT_TWT_WAKEUP event"]
 #[repr(C)]
