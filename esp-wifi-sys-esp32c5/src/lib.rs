@@ -39,7 +39,7 @@ pub mod log {
     pub unsafe extern "C" fn syslog(
         _priority: u32,
         format: *const u8,
-        args: core::ffi::VaListImpl,
+        args: core::ffi::VaList,
     ) {
         #[allow(clashing_extern_declarations)]
         extern "C" {
