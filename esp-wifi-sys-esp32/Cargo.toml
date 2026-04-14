@@ -1,6 +1,6 @@
 [package]
 name        = "esp-wifi-sys-esp32"
-version     = "0.1.0"
+version     = "0.2.0"
 edition     = "2021"
 description = "Bindings to Espressif's WiFi and Bluetooth low-level drivers for ESP32"
 repository  = "https://github.com/esp-rs/esp-wifi-sys"
