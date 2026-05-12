@@ -24868,6 +24868,75 @@ extern "C" {
     #[doc = " @brief     Check the MD5 values of the coexistence adapter header files in IDF and WiFi library\n\n @attention 1. It is used for internal CI version check\n\n @return\n     - ESP_OK : succeed\n     - ESP_WIFI_INVALID_ARG : MD5 check fail"]
     pub fn esp_coex_adapter_funcs_md5_check(md5: *const crate::c_types::c_char) -> esp_err_t;
 }
+extern "C" {
+    #[doc = " @brief     Set up an individual TWT agreement (NegotiationType=0) or change TWT parameters of the existing TWT agreement\n            - TWT Wake Interval = TWT Wake Interval Mantissa * (2 ^ TWT Wake Interval Exponent), unit: us\n            - e.g. TWT Wake Interval Mantissa = 512,  TWT Wake Interval Exponent = 12, then TWT Wake Interval is 2097.152 ms\n                   Nominal Minimum Wake Duration = 255, then TWT Wake Duration is 65.28 ms\n\n @attention  Support at most 8 TWT agreements, otherwise ESP_ERR_WIFI_TWT_FULL will be returned.\n             Support sleep time up to (1 << 35) us.\n\n @param[in,out]   setup_config pointer to itwt setup config structure.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_WIFI_CONN: WiFi internal error, station or soft-AP control block wrong\n    - ESP_ERR_WIFI_NOT_CONNECT: The station is in disconnect status\n    - ESP_ERR_WIFI_TWT_FULL: no available flow id\n    - ESP_ERR_INVALID_ARG: invalid argument"]
+    pub fn esp_wifi_sta_itwt_setup(setup_config: *mut wifi_itwt_setup_config_t) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief     Tear down individual TWT agreements\n\n @param[in]    flow_id  The value range is [0, 7].\n                        FLOW_ID_ALL indicates tear down all individual TWT agreements.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_WIFI_CONN: WiFi internal error, station or soft-AP control block wrong\n    - ESP_ERR_WIFI_NOT_CONNECT: The station is in disconnect status\n    - ESP_ERR_INVALID_ARG: invalid argument"]
+    pub fn esp_wifi_sta_itwt_teardown(flow_id: crate::c_types::c_int) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief     Send a TWT Information frame to AP for suspending/resuming established iTWT agreements.\n\n @param[in]    flow_id The value range is [0, 7].\n                       FLOW_ID_ALL indicates suspend all individual TWT agreements\n @param[in]    suspend_time_ms If the value is 0, indicates the specified flow_id or all established agreements will be suspended until resume by users.\n                               If the value is greater than 0, indicates the specified flow_id or all established agreements will be suspended until suspend_time_ms timeout, unit: ms.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_WIFI_CONN: WiFi internal error, station or soft-AP control block wrong\n    - ESP_ERR_WIFI_NOT_ASSOC: WiFi is not associated\n    - ESP_ERR_INVALID_ARG: invalid argument"]
+    pub fn esp_wifi_sta_itwt_suspend(
+        flow_id: crate::c_types::c_int,
+        suspend_time_ms: crate::c_types::c_int,
+    ) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief     Get flow id status\n\n @param[in]    flow_id_bitmap Flow id status bitmap with 8 bit. Each bit represents that whether the corresponding flow id is setup.\n                              1: setup, 0: not setup.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_WIFI_CONN: WiFi internal error, station or soft-AP control block wrong\n    - ESP_ERR_WIFI_NOT_CONNECT: The station is in disconnect status\n    - ESP_ERR_INVALID_ARG: invalid argument"]
+    pub fn esp_wifi_sta_itwt_get_flow_id_status(
+        flow_id_bitmap: *mut crate::c_types::c_int,
+    ) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief     Send probe to update TSF time\n\n @attention  In bad network, timeout_ms is variable with the network\n\n @param[in]    timeout_ms The estimated time includes sending probe request and receiving probe response, unit: ms.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_WIFI_CONN: WiFi internal error, station or soft-AP control block wrong\n    - ESP_ERR_WIFI_NOT_ASSOC: WiFi is not associated"]
+    pub fn esp_wifi_sta_itwt_send_probe_req(timeout_ms: crate::c_types::c_int) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief     Set time offset with TBTT of target wake time field in itwt setup request frame.\n\n @param[in]    offset_us Offset with TBTT of target wake time field in itwt setup request frame, range is [0, 102400], unit microseconds.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_WIFI_CONN: WiFi internal error, station or soft-AP control block wrong\n    - ESP_ERR_WIFI_NOT_ASSOC: WiFi is not associated\n    - ESP_ERR_INVALID_ARG: invalid argument"]
+    pub fn esp_wifi_sta_itwt_set_target_wake_time_offset(
+        offset_us: crate::c_types::c_int,
+    ) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief     Enable the reception statistics.\n\n @param[in]    rx_stats indicate whether enable the reception statistics for HT, HE SU, HE ER SU and legacy\n @param[in]    rx_mu_stats indicate whether enable the reception statistics for DL MU-MIMO and DL OFDMA\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_NO_MEM: out of memory"]
+    pub fn esp_wifi_enable_rx_statistics(rx_stats: bool, rx_mu_stats: bool) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief     Enable the transmission statistics.\n\n @param[in]    aci access category of the transmission\n @param[in]    tx_stats indicate whether enable the transmission statistics\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_NO_MEM: out of memory"]
+    pub fn esp_wifi_enable_tx_statistics(aci: esp_wifi_aci_t, tx_stats: bool) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief     Set up an broadcast TWT agreement (NegotiationType=3) or change TWT parameters of the existing TWT agreement\n            - TWT Wake Interval = TWT Wake Interval Mantissa * (2 ^ TWT Wake Interval Exponent), unit: us\n            - e.g. TWT Wake Interval Mantissa = 512,  TWT Wake Interval Exponent = 12, then TWT Wake Interval is 2097.152 ms\n                   Nominal Minimum Wake Duration = 255, then TWT Wake Duration is 65.28 ms\n\n @attention  Support at most 32 TWT agreements, otherwise ESP_ERR_WIFI_TWT_FULL will be returned.\n             Support sleep time up to (1 << 35) us.\n\n @param[in,out]   config pointer to btwt setup config structure.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_WIFI_CONN: WiFi internal error, station or soft-AP control block wrong\n    - ESP_ERR_WIFI_NOT_CONNECT: The station is in disconnect status\n    - ESP_ERR_WIFI_TWT_FULL: no available flow id\n    - ESP_ERR_INVALID_ARG: invalid argument"]
+    pub fn esp_wifi_sta_btwt_setup(config: *mut wifi_btwt_setup_config_t) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief     Tear down broadcast TWT agreements\n\n @param[in]    btwt_id  The value range is [0, 31].\n                        BTWT_ID_ALL indicates tear down all broadcast TWT agreements.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_WIFI_CONN: WiFi internal error, station or soft-AP control block wrong\n    - ESP_ERR_WIFI_NOT_CONNECT: The station is in disconnect status\n    - ESP_ERR_INVALID_ARG: invalid argument"]
+    pub fn esp_wifi_sta_btwt_teardown(btwt_id: u8) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief     Get number of broadcast TWTs supported by the connected AP\n\n @param[out] btwt_number  store number of btwts supported by the connected AP\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_INVALID_ARG: invalid argument"]
+    pub fn esp_wifi_sta_get_btwt_num(btwt_number: *mut u8) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief     Get broadcast TWT information\n\n @param[in]    btwt_number As input param, it stores max btwt number AP supported.\n @param[in]    btwt_info array to hold the btwt information supported by AP, and the array size must be at least as large as the BTWT number.\n\n @return\n    - ESP_OK: succeed\n    - ESP_FAIL: fail\n    - ESP_ERR_WIFI_CONN: WiFi internal error, station or soft-AP control block wrong"]
+    pub fn esp_wifi_sta_btwt_get_info(
+        btwt_number: u8,
+        btwt_info: *mut esp_wifi_btwt_info_t,
+    ) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief     Set WiFi TWT config\n\n @param[in]    config pointer to the WiFi TWT configure structure.\n\n @return\n    - ESP_OK: succeed"]
+    pub fn esp_wifi_sta_twt_config(config: *mut wifi_twt_config_t) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief     Enable bss color collision detection.\n\n @attention Currently, only STA BSS color collision detection is supported.\n\n @param     ifx interface to be configured\n @param     enable If true, when the STA detects a BSS color collision, it will report the BSS color collision event to the access point (AP).\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_IF: Invalid interface\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start"]
+    pub fn esp_wifi_enable_bsscolor_collision_detection(
+        ifx: wifi_interface_t,
+        enable: bool,
+    ) -> esp_err_t;
+}
 #[doc = "< Send ESPNOW data successfully"]
 pub const esp_now_send_status_t_ESP_NOW_SEND_SUCCESS: esp_now_send_status_t = 0;
 #[doc = "< Send ESPNOW data fail"]

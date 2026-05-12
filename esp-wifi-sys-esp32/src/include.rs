@@ -1791,6 +1791,9 @@ pub const ESP_COEX_BT_ST_A2DP_PAUSED: u32 = 32;
 pub const COEX_ADAPTER_VERSION: u32 = 2;
 pub const COEX_ADAPTER_MAGIC: u32 = 3735928495;
 pub const COEX_ADAPTER_FUNCS_TIME_BLOCKING: u32 = 4294967295;
+pub const FLOW_ID_ALL: u32 = 8;
+pub const BTWT_ID_ALL: u32 = 32;
+pub const BSS_MAX_COLOR: u32 = 63;
 pub const ESP_ERR_ESPNOW_BASE: u32 = 12388;
 pub const ESP_ERR_ESPNOW_NOT_INIT: u32 = 12389;
 pub const ESP_ERR_ESPNOW_ARG: u32 = 12390;
@@ -10289,6 +10292,1245 @@ extern "C" {
 extern "C" {
     #[doc = " @brief     Check the MD5 values of the coexistence adapter header files in IDF and WiFi library\n\n @attention 1. It is used for internal CI version check\n\n @return\n     - ESP_OK : succeed\n     - ESP_WIFI_INVALID_ARG : MD5 check fail"]
     pub fn esp_coex_adapter_funcs_md5_check(md5: *const crate::c_types::c_char) -> esp_err_t;
+}
+#[doc = "< voice traffic"]
+pub const esp_wifi_aci_t_ESP_WIFI_ACI_VO: esp_wifi_aci_t = 0;
+#[doc = "< video traffic"]
+pub const esp_wifi_aci_t_ESP_WIFI_ACI_VI: esp_wifi_aci_t = 1;
+#[doc = "< best effort traffic"]
+pub const esp_wifi_aci_t_ESP_WIFI_ACI_BE: esp_wifi_aci_t = 2;
+#[doc = "< background traffic"]
+pub const esp_wifi_aci_t_ESP_WIFI_ACI_BK: esp_wifi_aci_t = 3;
+#[doc = "< the max value"]
+pub const esp_wifi_aci_t_ESP_WIFI_ACI_MAX: esp_wifi_aci_t = 4;
+#[doc = " @brief Access category"]
+pub type esp_wifi_aci_t = crate::c_types::c_uint;
+#[doc = "< HE STBC: select the first HE-LTF"]
+pub const ESP_CSI_ACQUIRE_STBC_HELTF1: _bindgen_ty_1 = 0;
+#[doc = "< HE STBC: select the second HE-LTF"]
+pub const ESP_CSI_ACQUIRE_STBC_HELTF2: _bindgen_ty_1 = 1;
+#[doc = "< HE STBC: sample alternating scarier of HE-LTF1 and HE-LTF2"]
+pub const ESP_CSI_ACQUIRE_STBC_SAMPLE_HELTFS: _bindgen_ty_1 = 2;
+#[doc = " @brief Channel state information(CSI) HE STBC CSI selection"]
+pub type _bindgen_ty_1 = crate::c_types::c_uint;
+#[repr(C)]
+#[repr(align(4))]
+#[derive(Copy, Clone)]
+pub struct wifi_csi_acquire_config_t {
+    pub _bitfield_align_1: [u32; 0],
+    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 4usize]>,
+}
+impl wifi_csi_acquire_config_t {
+    #[inline]
+    pub fn enable(&self) -> u32 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(0usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set_enable(&mut self, val: u32) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(0usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn acquire_csi_legacy(&self) -> u32 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(1usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set_acquire_csi_legacy(&mut self, val: u32) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(1usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn acquire_csi_ht20(&self) -> u32 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(2usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set_acquire_csi_ht20(&mut self, val: u32) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(2usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn acquire_csi_ht40(&self) -> u32 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(3usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set_acquire_csi_ht40(&mut self, val: u32) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(3usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn acquire_csi_su(&self) -> u32 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(4usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set_acquire_csi_su(&mut self, val: u32) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(4usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn acquire_csi_mu(&self) -> u32 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(5usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set_acquire_csi_mu(&mut self, val: u32) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(5usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn acquire_csi_dcm(&self) -> u32 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(6usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set_acquire_csi_dcm(&mut self, val: u32) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(6usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn acquire_csi_beamformed(&self) -> u32 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(7usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set_acquire_csi_beamformed(&mut self, val: u32) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(7usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn acquire_csi_he_stbc(&self) -> u32 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(8usize, 2u8) as u32) }
+    }
+    #[inline]
+    pub fn set_acquire_csi_he_stbc(&mut self, val: u32) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(8usize, 2u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn val_scale_cfg(&self) -> u32 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(10usize, 2u8) as u32) }
+    }
+    #[inline]
+    pub fn set_val_scale_cfg(&mut self, val: u32) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(10usize, 2u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn dump_ack_en(&self) -> u32 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(12usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set_dump_ack_en(&mut self, val: u32) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(12usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn reserved(&self) -> u32 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(13usize, 19u8) as u32) }
+    }
+    #[inline]
+    pub fn set_reserved(&mut self, val: u32) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(13usize, 19u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn new_bitfield_1(
+        enable: u32,
+        acquire_csi_legacy: u32,
+        acquire_csi_ht20: u32,
+        acquire_csi_ht40: u32,
+        acquire_csi_su: u32,
+        acquire_csi_mu: u32,
+        acquire_csi_dcm: u32,
+        acquire_csi_beamformed: u32,
+        acquire_csi_he_stbc: u32,
+        val_scale_cfg: u32,
+        dump_ack_en: u32,
+        reserved: u32,
+    ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
+        __bindgen_bitfield_unit.set(0usize, 1u8, {
+            let enable: u32 = unsafe { ::core::mem::transmute(enable) };
+            enable as u64
+        });
+        __bindgen_bitfield_unit.set(1usize, 1u8, {
+            let acquire_csi_legacy: u32 = unsafe { ::core::mem::transmute(acquire_csi_legacy) };
+            acquire_csi_legacy as u64
+        });
+        __bindgen_bitfield_unit.set(2usize, 1u8, {
+            let acquire_csi_ht20: u32 = unsafe { ::core::mem::transmute(acquire_csi_ht20) };
+            acquire_csi_ht20 as u64
+        });
+        __bindgen_bitfield_unit.set(3usize, 1u8, {
+            let acquire_csi_ht40: u32 = unsafe { ::core::mem::transmute(acquire_csi_ht40) };
+            acquire_csi_ht40 as u64
+        });
+        __bindgen_bitfield_unit.set(4usize, 1u8, {
+            let acquire_csi_su: u32 = unsafe { ::core::mem::transmute(acquire_csi_su) };
+            acquire_csi_su as u64
+        });
+        __bindgen_bitfield_unit.set(5usize, 1u8, {
+            let acquire_csi_mu: u32 = unsafe { ::core::mem::transmute(acquire_csi_mu) };
+            acquire_csi_mu as u64
+        });
+        __bindgen_bitfield_unit.set(6usize, 1u8, {
+            let acquire_csi_dcm: u32 = unsafe { ::core::mem::transmute(acquire_csi_dcm) };
+            acquire_csi_dcm as u64
+        });
+        __bindgen_bitfield_unit.set(7usize, 1u8, {
+            let acquire_csi_beamformed: u32 =
+                unsafe { ::core::mem::transmute(acquire_csi_beamformed) };
+            acquire_csi_beamformed as u64
+        });
+        __bindgen_bitfield_unit.set(8usize, 2u8, {
+            let acquire_csi_he_stbc: u32 = unsafe { ::core::mem::transmute(acquire_csi_he_stbc) };
+            acquire_csi_he_stbc as u64
+        });
+        __bindgen_bitfield_unit.set(10usize, 2u8, {
+            let val_scale_cfg: u32 = unsafe { ::core::mem::transmute(val_scale_cfg) };
+            val_scale_cfg as u64
+        });
+        __bindgen_bitfield_unit.set(12usize, 1u8, {
+            let dump_ack_en: u32 = unsafe { ::core::mem::transmute(dump_ack_en) };
+            dump_ack_en as u64
+        });
+        __bindgen_bitfield_unit.set(13usize, 19u8, {
+            let reserved: u32 = unsafe { ::core::mem::transmute(reserved) };
+            reserved as u64
+        });
+        __bindgen_bitfield_unit
+    }
+}
+#[doc = " @brief HE variant HT Control field including OM(Operation mode)"]
+#[repr(C)]
+#[repr(align(4))]
+#[derive(Copy, Clone)]
+pub struct esp_wifi_htc_omc_t {
+    pub _bitfield_align_1: [u16; 0],
+    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 4usize]>,
+}
+impl esp_wifi_htc_omc_t {
+    #[inline]
+    pub fn id(&self) -> u32 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(0usize, 2u8) as u32) }
+    }
+    #[inline]
+    pub fn set_id(&mut self, val: u32) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(0usize, 2u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn ctrl_id(&self) -> u32 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(2usize, 4u8) as u32) }
+    }
+    #[inline]
+    pub fn set_ctrl_id(&mut self, val: u32) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(2usize, 4u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn rx_nss(&self) -> u32 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(6usize, 3u8) as u32) }
+    }
+    #[inline]
+    pub fn set_rx_nss(&mut self, val: u32) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(6usize, 3u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn bw(&self) -> u32 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(9usize, 2u8) as u32) }
+    }
+    #[inline]
+    pub fn set_bw(&mut self, val: u32) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(9usize, 2u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn ul_mu_disable(&self) -> u32 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(11usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set_ul_mu_disable(&mut self, val: u32) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(11usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn tx_nsts(&self) -> u32 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(12usize, 3u8) as u32) }
+    }
+    #[inline]
+    pub fn set_tx_nsts(&mut self, val: u32) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(12usize, 3u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn er_su_disable(&self) -> u32 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(15usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set_er_su_disable(&mut self, val: u32) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(15usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn dl_mu_mimo_resounding_recommendation(&self) -> u32 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(16usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set_dl_mu_mimo_resounding_recommendation(&mut self, val: u32) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(16usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn ul_mu_data_disable(&self) -> u32 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(17usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set_ul_mu_data_disable(&mut self, val: u32) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(17usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn padding(&self) -> u32 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(18usize, 14u8) as u32) }
+    }
+    #[inline]
+    pub fn set_padding(&mut self, val: u32) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(18usize, 14u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn new_bitfield_1(
+        id: u32,
+        ctrl_id: u32,
+        rx_nss: u32,
+        bw: u32,
+        ul_mu_disable: u32,
+        tx_nsts: u32,
+        er_su_disable: u32,
+        dl_mu_mimo_resounding_recommendation: u32,
+        ul_mu_data_disable: u32,
+        padding: u32,
+    ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
+        __bindgen_bitfield_unit.set(0usize, 2u8, {
+            let id: u32 = unsafe { ::core::mem::transmute(id) };
+            id as u64
+        });
+        __bindgen_bitfield_unit.set(2usize, 4u8, {
+            let ctrl_id: u32 = unsafe { ::core::mem::transmute(ctrl_id) };
+            ctrl_id as u64
+        });
+        __bindgen_bitfield_unit.set(6usize, 3u8, {
+            let rx_nss: u32 = unsafe { ::core::mem::transmute(rx_nss) };
+            rx_nss as u64
+        });
+        __bindgen_bitfield_unit.set(9usize, 2u8, {
+            let bw: u32 = unsafe { ::core::mem::transmute(bw) };
+            bw as u64
+        });
+        __bindgen_bitfield_unit.set(11usize, 1u8, {
+            let ul_mu_disable: u32 = unsafe { ::core::mem::transmute(ul_mu_disable) };
+            ul_mu_disable as u64
+        });
+        __bindgen_bitfield_unit.set(12usize, 3u8, {
+            let tx_nsts: u32 = unsafe { ::core::mem::transmute(tx_nsts) };
+            tx_nsts as u64
+        });
+        __bindgen_bitfield_unit.set(15usize, 1u8, {
+            let er_su_disable: u32 = unsafe { ::core::mem::transmute(er_su_disable) };
+            er_su_disable as u64
+        });
+        __bindgen_bitfield_unit.set(16usize, 1u8, {
+            let dl_mu_mimo_resounding_recommendation: u32 =
+                unsafe { ::core::mem::transmute(dl_mu_mimo_resounding_recommendation) };
+            dl_mu_mimo_resounding_recommendation as u64
+        });
+        __bindgen_bitfield_unit.set(17usize, 1u8, {
+            let ul_mu_data_disable: u32 = unsafe { ::core::mem::transmute(ul_mu_data_disable) };
+            ul_mu_data_disable as u64
+        });
+        __bindgen_bitfield_unit.set(18usize, 14u8, {
+            let padding: u32 = unsafe { ::core::mem::transmute(padding) };
+            padding as u64
+        });
+        __bindgen_bitfield_unit
+    }
+}
+#[doc = "< request to join a TWT without providing a set of TWT parameters"]
+pub const wifi_twt_setup_cmds_t_TWT_REQUEST: wifi_twt_setup_cmds_t = 0;
+#[doc = "< request to join a TWT and offer a set of preferred TWT parameters but might accept alternative TWT parameters"]
+pub const wifi_twt_setup_cmds_t_TWT_SUGGEST: wifi_twt_setup_cmds_t = 1;
+#[doc = "< request to join a TWT and currently accept only the indicated TWT parameters"]
+pub const wifi_twt_setup_cmds_t_TWT_DEMAND: wifi_twt_setup_cmds_t = 2;
+#[doc = "< for S1G STA"]
+pub const wifi_twt_setup_cmds_t_TWT_GROUPING: wifi_twt_setup_cmds_t = 3;
+#[doc = "< accept the TWT request with the TWT parameters, also used in unsolicited TWT response"]
+pub const wifi_twt_setup_cmds_t_TWT_ACCEPT: wifi_twt_setup_cmds_t = 4;
+#[doc = "< indicate a counter-offer of TWT parameters without creation of a TWT agreement"]
+pub const wifi_twt_setup_cmds_t_TWT_ALTERNATE: wifi_twt_setup_cmds_t = 5;
+#[doc = "< indicate no TWT agreement is created, but one is likely to be accepted only if the requesting STA transmits a new TWT setup request with the indicated TWT parameters"]
+pub const wifi_twt_setup_cmds_t_TWT_DICTATE: wifi_twt_setup_cmds_t = 6;
+#[doc = "< indicate that the negotiation has ended in failure to create a new TWT agreement"]
+pub const wifi_twt_setup_cmds_t_TWT_REJECT: wifi_twt_setup_cmds_t = 7;
+#[doc = " @brief TWT setup commands"]
+pub type wifi_twt_setup_cmds_t = crate::c_types::c_uint;
+#[doc = " @brief broadcast TWT setup config"]
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct wifi_btwt_setup_config_t {
+    #[doc = "< Indicates the type of TWT command"]
+    pub setup_cmd: wifi_twt_setup_cmds_t,
+    #[doc = "< When set up an broadcast TWT agreement, the broadcast twt id will be assigned by AP after a successful agreement setup.\nbroadcast twt id could be specified to a value in the range of [1, 31], but it might be change by AP in the response.\nWhen change TWT parameters of the existing TWT agreement, broadcast twt id should be an existing one. The value range is [1, 31]."]
+    pub btwt_id: u8,
+    #[doc = "< Timeout times of receiving setup action frame response, default 5s"]
+    pub timeout_time_ms: u16,
+}
+#[doc = " @brief Individual TWT setup config"]
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct wifi_twt_setup_config_t {
+    #[doc = "< Indicates the type of TWT command"]
+    pub setup_cmd: wifi_twt_setup_cmds_t,
+    pub _bitfield_align_1: [u8; 0],
+    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 2usize]>,
+    #[doc = "< Nominal Minimum Wake Duration, indicates the minimum amount of time, in unit of 256 us, that the individual TWT requesting STA expects that it needs to be awake. The value range is [1, 255]."]
+    pub min_wake_dura: u8,
+    #[doc = "< Individual TWT Wake Interval Mantissa. The value range is [1, 65535]."]
+    pub wake_invl_mant: u16,
+    #[doc = "< Individual TWT connection id, the value range is [0, 32767]."]
+    pub twt_id: u16,
+    #[doc = "< Timeout times of receiving setup action frame response, default 5s"]
+    pub timeout_time_ms: u16,
+}
+impl wifi_twt_setup_config_t {
+    #[inline]
+    pub fn trigger(&self) -> u16 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(0usize, 1u8) as u16) }
+    }
+    #[inline]
+    pub fn set_trigger(&mut self, val: u16) {
+        unsafe {
+            let val: u16 = ::core::mem::transmute(val);
+            self._bitfield_1.set(0usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn flow_type(&self) -> u16 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(1usize, 1u8) as u16) }
+    }
+    #[inline]
+    pub fn set_flow_type(&mut self, val: u16) {
+        unsafe {
+            let val: u16 = ::core::mem::transmute(val);
+            self._bitfield_1.set(1usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn flow_id(&self) -> u16 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(2usize, 3u8) as u16) }
+    }
+    #[inline]
+    pub fn set_flow_id(&mut self, val: u16) {
+        unsafe {
+            let val: u16 = ::core::mem::transmute(val);
+            self._bitfield_1.set(2usize, 3u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn wake_invl_expn(&self) -> u16 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(5usize, 5u8) as u16) }
+    }
+    #[inline]
+    pub fn set_wake_invl_expn(&mut self, val: u16) {
+        unsafe {
+            let val: u16 = ::core::mem::transmute(val);
+            self._bitfield_1.set(5usize, 5u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn wake_duration_unit(&self) -> u16 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(10usize, 1u8) as u16) }
+    }
+    #[inline]
+    pub fn set_wake_duration_unit(&mut self, val: u16) {
+        unsafe {
+            let val: u16 = ::core::mem::transmute(val);
+            self._bitfield_1.set(10usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn reserved(&self) -> u16 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(11usize, 5u8) as u16) }
+    }
+    #[inline]
+    pub fn set_reserved(&mut self, val: u16) {
+        unsafe {
+            let val: u16 = ::core::mem::transmute(val);
+            self._bitfield_1.set(11usize, 5u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn new_bitfield_1(
+        trigger: u16,
+        flow_type: u16,
+        flow_id: u16,
+        wake_invl_expn: u16,
+        wake_duration_unit: u16,
+        reserved: u16,
+    ) -> __BindgenBitfieldUnit<[u8; 2usize]> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 2usize]> = Default::default();
+        __bindgen_bitfield_unit.set(0usize, 1u8, {
+            let trigger: u16 = unsafe { ::core::mem::transmute(trigger) };
+            trigger as u64
+        });
+        __bindgen_bitfield_unit.set(1usize, 1u8, {
+            let flow_type: u16 = unsafe { ::core::mem::transmute(flow_type) };
+            flow_type as u64
+        });
+        __bindgen_bitfield_unit.set(2usize, 3u8, {
+            let flow_id: u16 = unsafe { ::core::mem::transmute(flow_id) };
+            flow_id as u64
+        });
+        __bindgen_bitfield_unit.set(5usize, 5u8, {
+            let wake_invl_expn: u16 = unsafe { ::core::mem::transmute(wake_invl_expn) };
+            wake_invl_expn as u64
+        });
+        __bindgen_bitfield_unit.set(10usize, 1u8, {
+            let wake_duration_unit: u16 = unsafe { ::core::mem::transmute(wake_duration_unit) };
+            wake_duration_unit as u64
+        });
+        __bindgen_bitfield_unit.set(11usize, 5u8, {
+            let reserved: u16 = unsafe { ::core::mem::transmute(reserved) };
+            reserved as u64
+        });
+        __bindgen_bitfield_unit
+    }
+}
+#[doc = " @brief Individual TWT setup config"]
+pub type wifi_itwt_setup_config_t = wifi_twt_setup_config_t;
+#[doc = "< 1 LTF and 0.8 us GI"]
+pub const he_su_gi_and_ltf_type_t_HE_SU_ERSU_1_LTF_0_8_US_GI: he_su_gi_and_ltf_type_t = 0;
+#[doc = "< 2 LTF and 0.8 us GI"]
+pub const he_su_gi_and_ltf_type_t_HE_SU_ERSU_2_LTF_0_8_US_GI: he_su_gi_and_ltf_type_t = 1;
+#[doc = "< 2 LTF and 1.6 us GI"]
+pub const he_su_gi_and_ltf_type_t_HE_SU_ERSU_2_LTF_1_6_US_GI: he_su_gi_and_ltf_type_t = 2;
+#[doc = "< 4 LTF and 3.2 us GI"]
+pub const he_su_gi_and_ltf_type_t_HE_SU_ERSU_4_LTF_3_2_US_GI: he_su_gi_and_ltf_type_t = 3;
+#[doc = " @brief HE SU GI and LTF types"]
+pub type he_su_gi_and_ltf_type_t = crate::c_types::c_uint;
+#[doc = "< the reception frame is a 11b MPDU"]
+pub const wifi_rx_bb_format_t_RX_BB_FORMAT_11B: wifi_rx_bb_format_t = 0;
+#[doc = "< the reception frame is a 11g MPDU"]
+pub const wifi_rx_bb_format_t_RX_BB_FORMAT_11G: wifi_rx_bb_format_t = 1;
+#[doc = "< the reception frame is a 11a MPDU"]
+pub const wifi_rx_bb_format_t_RX_BB_FORMAT_11A: wifi_rx_bb_format_t = 1;
+#[doc = "< the reception frame is a HT MPDU"]
+pub const wifi_rx_bb_format_t_RX_BB_FORMAT_HT: wifi_rx_bb_format_t = 2;
+#[doc = "< the reception frame is a VHT MPDU"]
+pub const wifi_rx_bb_format_t_RX_BB_FORMAT_VHT: wifi_rx_bb_format_t = 3;
+#[doc = "< the reception frame is a HE SU MPDU"]
+pub const wifi_rx_bb_format_t_RX_BB_FORMAT_HE_SU: wifi_rx_bb_format_t = 4;
+#[doc = "< the reception frame is a HE MU MPDU"]
+pub const wifi_rx_bb_format_t_RX_BB_FORMAT_HE_MU: wifi_rx_bb_format_t = 5;
+#[doc = "< the reception frame is a HE ER SU MPDU"]
+pub const wifi_rx_bb_format_t_RX_BB_FORMAT_HE_ERSU: wifi_rx_bb_format_t = 6;
+#[doc = "< the reception frame is a HE TB MPDU"]
+pub const wifi_rx_bb_format_t_RX_BB_FORMAT_HE_TB: wifi_rx_bb_format_t = 7;
+#[doc = "< the reception frame is a VHT MU MPDU"]
+pub const wifi_rx_bb_format_t_RX_BB_FORMAT_VHT_MU: wifi_rx_bb_format_t = 11;
+#[doc = " @brief Reception format"]
+pub type wifi_rx_bb_format_t = crate::c_types::c_uint;
+#[repr(C, packed)]
+#[derive(Copy, Clone)]
+pub struct esp_wifi_rxctrl_t {
+    pub _bitfield_align_1: [u8; 0],
+    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 4usize]>,
+    #[doc = "< HE-SIGA1 or HT-SIG"]
+    pub he_siga1: u32,
+    pub _bitfield_align_2: [u8; 0],
+    pub _bitfield_2: __BindgenBitfieldUnit<[u8; 1usize]>,
+    #[doc = "< HE-SIGA2"]
+    pub he_siga2: u16,
+    pub _bitfield_align_3: [u8; 0],
+    pub _bitfield_3: __BindgenBitfieldUnit<[u8; 81usize]>,
+}
+impl esp_wifi_rxctrl_t {
+    #[inline]
+    pub fn rssi(&self) -> crate::c_types::c_int {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(0usize, 8u8) as u32) }
+    }
+    #[inline]
+    pub fn set_rssi(&mut self, val: crate::c_types::c_int) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(0usize, 8u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn rate(&self) -> crate::c_types::c_uint {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(8usize, 5u8) as u32) }
+    }
+    #[inline]
+    pub fn set_rate(&mut self, val: crate::c_types::c_uint) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(8usize, 5u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn rxmatch0(&self) -> crate::c_types::c_uint {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(28usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set_rxmatch0(&mut self, val: crate::c_types::c_uint) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(28usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn rxmatch1(&self) -> crate::c_types::c_uint {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(29usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set_rxmatch1(&mut self, val: crate::c_types::c_uint) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(29usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn rxmatch2(&self) -> crate::c_types::c_uint {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(30usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set_rxmatch2(&mut self, val: crate::c_types::c_uint) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(30usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn rxmatch3(&self) -> crate::c_types::c_uint {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(31usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set_rxmatch3(&mut self, val: crate::c_types::c_uint) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(31usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn new_bitfield_1(
+        rssi: crate::c_types::c_int,
+        rate: crate::c_types::c_uint,
+        rxmatch0: crate::c_types::c_uint,
+        rxmatch1: crate::c_types::c_uint,
+        rxmatch2: crate::c_types::c_uint,
+        rxmatch3: crate::c_types::c_uint,
+    ) -> __BindgenBitfieldUnit<[u8; 4usize]> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 4usize]> = Default::default();
+        __bindgen_bitfield_unit.set(0usize, 8u8, {
+            let rssi: u32 = unsafe { ::core::mem::transmute(rssi) };
+            rssi as u64
+        });
+        __bindgen_bitfield_unit.set(8usize, 5u8, {
+            let rate: u32 = unsafe { ::core::mem::transmute(rate) };
+            rate as u64
+        });
+        __bindgen_bitfield_unit.set(28usize, 1u8, {
+            let rxmatch0: u32 = unsafe { ::core::mem::transmute(rxmatch0) };
+            rxmatch0 as u64
+        });
+        __bindgen_bitfield_unit.set(29usize, 1u8, {
+            let rxmatch1: u32 = unsafe { ::core::mem::transmute(rxmatch1) };
+            rxmatch1 as u64
+        });
+        __bindgen_bitfield_unit.set(30usize, 1u8, {
+            let rxmatch2: u32 = unsafe { ::core::mem::transmute(rxmatch2) };
+            rxmatch2 as u64
+        });
+        __bindgen_bitfield_unit.set(31usize, 1u8, {
+            let rxmatch3: u32 = unsafe { ::core::mem::transmute(rxmatch3) };
+            rxmatch3 as u64
+        });
+        __bindgen_bitfield_unit
+    }
+    #[inline]
+    pub fn rxend_state(&self) -> crate::c_types::c_uint {
+        unsafe { ::core::mem::transmute(self._bitfield_2.get(0usize, 8u8) as u32) }
+    }
+    #[inline]
+    pub fn set_rxend_state(&mut self, val: crate::c_types::c_uint) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_2.set(0usize, 8u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn new_bitfield_2(
+        rxend_state: crate::c_types::c_uint,
+    ) -> __BindgenBitfieldUnit<[u8; 1usize]> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize]> = Default::default();
+        __bindgen_bitfield_unit.set(0usize, 8u8, {
+            let rxend_state: u32 = unsafe { ::core::mem::transmute(rxend_state) };
+            rxend_state as u64
+        });
+        __bindgen_bitfield_unit
+    }
+    #[inline]
+    pub fn is_group(&self) -> crate::c_types::c_uint {
+        unsafe { ::core::mem::transmute(self._bitfield_3.get(7usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set_is_group(&mut self, val: crate::c_types::c_uint) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_3.set(7usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn timestamp(&self) -> crate::c_types::c_uint {
+        unsafe { ::core::mem::transmute(self._bitfield_3.get(8usize, 32u8) as u32) }
+    }
+    #[inline]
+    pub fn set_timestamp(&mut self, val: crate::c_types::c_uint) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_3.set(8usize, 32u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn noise_floor(&self) -> crate::c_types::c_int {
+        unsafe { ::core::mem::transmute(self._bitfield_3.get(72usize, 8u8) as u32) }
+    }
+    #[inline]
+    pub fn set_noise_floor(&mut self, val: crate::c_types::c_int) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_3.set(72usize, 8u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn channel(&self) -> crate::c_types::c_uint {
+        unsafe { ::core::mem::transmute(self._bitfield_3.get(80usize, 4u8) as u32) }
+    }
+    #[inline]
+    pub fn set_channel(&mut self, val: crate::c_types::c_uint) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_3.set(80usize, 4u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn second(&self) -> crate::c_types::c_uint {
+        unsafe { ::core::mem::transmute(self._bitfield_3.get(84usize, 4u8) as u32) }
+    }
+    #[inline]
+    pub fn set_second(&mut self, val: crate::c_types::c_uint) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_3.set(84usize, 4u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn rx_channel_estimate_len(&self) -> crate::c_types::c_uint {
+        unsafe { ::core::mem::transmute(self._bitfield_3.get(176usize, 10u8) as u32) }
+    }
+    #[inline]
+    pub fn set_rx_channel_estimate_len(&mut self, val: crate::c_types::c_uint) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_3.set(176usize, 10u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn rx_channel_estimate_info_vld(&self) -> crate::c_types::c_uint {
+        unsafe { ::core::mem::transmute(self._bitfield_3.get(186usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set_rx_channel_estimate_info_vld(&mut self, val: crate::c_types::c_uint) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_3.set(186usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn cur_bb_format(&self) -> crate::c_types::c_uint {
+        unsafe { ::core::mem::transmute(self._bitfield_3.get(224usize, 4u8) as u32) }
+    }
+    #[inline]
+    pub fn set_cur_bb_format(&mut self, val: crate::c_types::c_uint) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_3.set(224usize, 4u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn cur_single_mpdu(&self) -> crate::c_types::c_uint {
+        unsafe { ::core::mem::transmute(self._bitfield_3.get(228usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set_cur_single_mpdu(&mut self, val: crate::c_types::c_uint) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_3.set(228usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn he_sigb_len(&self) -> crate::c_types::c_uint {
+        unsafe { ::core::mem::transmute(self._bitfield_3.get(496usize, 6u8) as u32) }
+    }
+    #[inline]
+    pub fn set_he_sigb_len(&mut self, val: crate::c_types::c_uint) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_3.set(496usize, 6u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn sig_len(&self) -> crate::c_types::c_uint {
+        unsafe { ::core::mem::transmute(self._bitfield_3.get(584usize, 14u8) as u32) }
+    }
+    #[inline]
+    pub fn set_sig_len(&mut self, val: crate::c_types::c_uint) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_3.set(584usize, 14u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn dump_len(&self) -> crate::c_types::c_uint {
+        unsafe { ::core::mem::transmute(self._bitfield_3.get(600usize, 14u8) as u32) }
+    }
+    #[inline]
+    pub fn set_dump_len(&mut self, val: crate::c_types::c_uint) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_3.set(600usize, 14u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn rx_state(&self) -> crate::c_types::c_uint {
+        unsafe { ::core::mem::transmute(self._bitfield_3.get(616usize, 8u8) as u32) }
+    }
+    #[inline]
+    pub fn set_rx_state(&mut self, val: crate::c_types::c_uint) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_3.set(616usize, 8u8, val as u64)
+        }
+    }
+}
+#[doc = "< station sends btwt setup request frame fail"]
+pub const wifi_btwt_setup_status_t_BTWT_SETUP_TXFAIL: wifi_btwt_setup_status_t = 0;
+#[doc = "< station receives btwt setup response frame and setup btwt sucessfully"]
+pub const wifi_btwt_setup_status_t_BTWT_SETUP_SUCCESS: wifi_btwt_setup_status_t = 1;
+#[doc = "< timeout of receiving btwt setup response frame"]
+pub const wifi_btwt_setup_status_t_BTWT_SETUP_TIMEOUT: wifi_btwt_setup_status_t = 2;
+#[doc = "< indicate there is no available btwt id"]
+pub const wifi_btwt_setup_status_t_BTWT_SETUP_FULL: wifi_btwt_setup_status_t = 3;
+#[doc = "< indicate invalid argument to setup btwt"]
+pub const wifi_btwt_setup_status_t_BTWT_SETUP_INVALID_ARG: wifi_btwt_setup_status_t = 4;
+#[doc = "< indicate internal error to setup btwt"]
+pub const wifi_btwt_setup_status_t_BTWT_SETUP_INTERNAL_ERR: wifi_btwt_setup_status_t = 5;
+#[doc = " @brief bTWT setup status"]
+pub type wifi_btwt_setup_status_t = crate::c_types::c_uint;
+#[doc = " Argument structure for WIFI_EVENT_TWT_SET_UP event"]
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct wifi_event_sta_itwt_setup_t {
+    #[doc = "< itwt setup config, this value is determined by the AP"]
+    pub config: wifi_itwt_setup_config_t,
+    #[doc = "< itwt setup status, 1: indicate setup success, others : indicate setup fail"]
+    pub status: esp_err_t,
+    #[doc = "< itwt setup frame tx fail reason"]
+    pub reason: u8,
+    #[doc = "< TWT SP start time"]
+    pub target_wake_time: u64,
+}
+#[doc = "< station sends teardown frame fail"]
+pub const wifi_itwt_teardown_status_t_ITWT_TEARDOWN_FAIL: wifi_itwt_teardown_status_t = 0;
+#[doc = "< 1) station successfully sends teardown frame to AP; 2) station receives teardown frame from AP"]
+pub const wifi_itwt_teardown_status_t_ITWT_TEARDOWN_SUCCESS: wifi_itwt_teardown_status_t = 1;
+#[doc = " @brief iTWT teardown status"]
+pub type wifi_itwt_teardown_status_t = crate::c_types::c_uint;
+#[doc = " Argument structure for WIFI_EVENT_TWT_TEARDOWN event"]
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct wifi_event_sta_itwt_teardown_t {
+    #[doc = "< flow id"]
+    pub flow_id: u8,
+    #[doc = "< itwt teardown status"]
+    pub status: wifi_itwt_teardown_status_t,
+}
+#[doc = " Argument structure for WIFI_EVENT_BTWT_SET_UP event"]
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct wifi_event_sta_btwt_setup_t {
+    #[doc = "< indicate btwt setup status"]
+    pub status: wifi_btwt_setup_status_t,
+    #[doc = "< indicate the type of TWT command"]
+    pub setup_cmd: wifi_twt_setup_cmds_t,
+    #[doc = "< indicate btwt id"]
+    pub btwt_id: u8,
+    #[doc = "< Nominal Minimum Wake Duration, indicates the minimum amount of time, in unit of 256 us, that the TWT requesting STA expects that it needs to be awake. The value range is [1, 255]."]
+    pub min_wake_dura: u8,
+    #[doc = "< TWT Wake Interval Exponent. The value range is [0, 31]."]
+    pub wake_invl_expn: u8,
+    #[doc = "< TWT Wake Interval Mantissa. The value range is [1, 65535]."]
+    pub wake_invl_mant: u16,
+    #[doc = "< 1: a trigger-enabled TWT, 0: a non-trigger-enabled TWT"]
+    pub trigger: bool,
+    #[doc = "< 0: an announced TWT, 1: an unannounced TWT"]
+    pub flow_type: u8,
+    #[doc = "< btwt setup frame tx fail reason"]
+    pub reason: u8,
+    #[doc = "< TWT SP start time"]
+    pub target_wake_time: u64,
+}
+#[doc = "< station sends teardown frame fail"]
+pub const wifi_btwt_teardown_status_t_BTWT_TEARDOWN_FAIL: wifi_btwt_teardown_status_t = 0;
+#[doc = "< 1) station successfully sends teardown frame to AP; 2) station receives teardown frame from AP"]
+pub const wifi_btwt_teardown_status_t_BTWT_TEARDOWN_SUCCESS: wifi_btwt_teardown_status_t = 1;
+#[doc = " @brief BTWT teardown status"]
+pub type wifi_btwt_teardown_status_t = crate::c_types::c_uint;
+#[doc = " Argument structure for WIFI_EVENT_TWT_TEARDOWN event"]
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct wifi_event_sta_btwt_teardown_t {
+    #[doc = "< btwt id"]
+    pub btwt_id: u8,
+    #[doc = "< btwt teardown status"]
+    pub status: wifi_btwt_teardown_status_t,
+}
+#[doc = "< station sends probe request fail"]
+pub const wifi_itwt_probe_status_t_ITWT_PROBE_FAIL: wifi_itwt_probe_status_t = 0;
+#[doc = "< 1) station receives beacon from AP; 2) station receives probe response from AP"]
+pub const wifi_itwt_probe_status_t_ITWT_PROBE_SUCCESS: wifi_itwt_probe_status_t = 1;
+#[doc = "< 1) timeout of receiving ACK in response of previously probe request sending by station\n2) timeout of receiving probe response in response of previously probe request sending by station"]
+pub const wifi_itwt_probe_status_t_ITWT_PROBE_TIMEOUT: wifi_itwt_probe_status_t = 2;
+#[doc = "< station is not connected"]
+pub const wifi_itwt_probe_status_t_ITWT_PROBE_STA_DISCONNECTED: wifi_itwt_probe_status_t = 3;
+#[doc = " @brief iTWT probe status"]
+pub type wifi_itwt_probe_status_t = crate::c_types::c_uint;
+#[doc = " Argument structure for WIFI_EVENT_ITWT_SEND_PROBE event"]
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct wifi_event_sta_itwt_probe_t {
+    #[doc = "< probe status"]
+    pub status: wifi_itwt_probe_status_t,
+    #[doc = "< failure reason"]
+    pub reason: u8,
+}
+#[doc = " Argument structure for WIFI_EVENT_ITWT_SUSPEND event"]
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct wifi_event_sta_itwt_suspend_t {
+    #[doc = "< suspend status"]
+    pub status: esp_err_t,
+    #[doc = "< bitmap of the suspended flow id"]
+    pub flow_id_bitmap: u8,
+    #[doc = "< the actual suspend time for each flow id, unit: ms"]
+    pub actual_suspend_time_ms: [u32; 8usize],
+}
+#[doc = "< individual twt"]
+pub const wifi_twt_type_t_TWT_TYPE_INDIVIDUAL: wifi_twt_type_t = 0;
+#[doc = "< broadcast twt"]
+pub const wifi_twt_type_t_TWT_TYPE_BROADCAST: wifi_twt_type_t = 1;
+#[doc = "< the max value"]
+pub const wifi_twt_type_t_TWT_TYPE_MAX: wifi_twt_type_t = 2;
+#[doc = " @brief TWT types"]
+pub type wifi_twt_type_t = crate::c_types::c_uint;
+#[doc = " Argument structure for twt configuration"]
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct wifi_twt_config_t {
+    #[doc = "< post twt wakeup event"]
+    pub post_wakeup_event: bool,
+    #[doc = "< twt enable send qos null to keep alive"]
+    pub twt_enable_keep_alive: bool,
+}
+#[doc = " Argument structure for WIFI_EVENT_TWT_WAKEUP event"]
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct wifi_event_sta_twt_wakeup_t {
+    #[doc = "< twt type"]
+    pub twt_type: wifi_twt_type_t,
+    #[doc = "< flow id"]
+    pub flow_id: u8,
+}
+#[doc = " Argument structure for twt information"]
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct esp_wifi_btwt_info_t {
+    #[doc = "< indicate whether the btwt id is in use or not"]
+    pub btwt_id_in_use: bool,
+    pub _bitfield_align_1: [u8; 0],
+    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 2usize]>,
+    pub __bindgen_padding_0: u8,
+    #[doc = "< TWT Wake duration unit, 0: 256us 1: TU (TU = 1024us)"]
+    pub btwt_wake_duration: u8,
+    #[doc = "< TWT Wake Interval Mantissa. The value range is [1, 65535]."]
+    pub btwt_wake_interval_mantissa: u16,
+    pub _bitfield_align_2: [u8; 0],
+    pub _bitfield_2: __BindgenBitfieldUnit<[u8; 2usize]>,
+}
+impl esp_wifi_btwt_info_t {
+    #[inline]
+    pub fn btwt_trigger(&self) -> u16 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(0usize, 1u8) as u16) }
+    }
+    #[inline]
+    pub fn set_btwt_trigger(&mut self, val: u16) {
+        unsafe {
+            let val: u16 = ::core::mem::transmute(val);
+            self._bitfield_1.set(0usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn btwt_flow_type(&self) -> u16 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(1usize, 1u8) as u16) }
+    }
+    #[inline]
+    pub fn set_btwt_flow_type(&mut self, val: u16) {
+        unsafe {
+            let val: u16 = ::core::mem::transmute(val);
+            self._bitfield_1.set(1usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn btwt_recommendation(&self) -> u16 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(2usize, 3u8) as u16) }
+    }
+    #[inline]
+    pub fn set_btwt_recommendation(&mut self, val: u16) {
+        unsafe {
+            let val: u16 = ::core::mem::transmute(val);
+            self._bitfield_1.set(2usize, 3u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn btwt_wake_interval_exponent(&self) -> u16 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(5usize, 5u8) as u16) }
+    }
+    #[inline]
+    pub fn set_btwt_wake_interval_exponent(&mut self, val: u16) {
+        unsafe {
+            let val: u16 = ::core::mem::transmute(val);
+            self._bitfield_1.set(5usize, 5u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn btwt_rsvd(&self) -> u16 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(10usize, 6u8) as u16) }
+    }
+    #[inline]
+    pub fn set_btwt_rsvd(&mut self, val: u16) {
+        unsafe {
+            let val: u16 = ::core::mem::transmute(val);
+            self._bitfield_1.set(10usize, 6u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn new_bitfield_1(
+        btwt_trigger: u16,
+        btwt_flow_type: u16,
+        btwt_recommendation: u16,
+        btwt_wake_interval_exponent: u16,
+        btwt_rsvd: u16,
+    ) -> __BindgenBitfieldUnit<[u8; 2usize]> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 2usize]> = Default::default();
+        __bindgen_bitfield_unit.set(0usize, 1u8, {
+            let btwt_trigger: u16 = unsafe { ::core::mem::transmute(btwt_trigger) };
+            btwt_trigger as u64
+        });
+        __bindgen_bitfield_unit.set(1usize, 1u8, {
+            let btwt_flow_type: u16 = unsafe { ::core::mem::transmute(btwt_flow_type) };
+            btwt_flow_type as u64
+        });
+        __bindgen_bitfield_unit.set(2usize, 3u8, {
+            let btwt_recommendation: u16 = unsafe { ::core::mem::transmute(btwt_recommendation) };
+            btwt_recommendation as u64
+        });
+        __bindgen_bitfield_unit.set(5usize, 5u8, {
+            let btwt_wake_interval_exponent: u16 =
+                unsafe { ::core::mem::transmute(btwt_wake_interval_exponent) };
+            btwt_wake_interval_exponent as u64
+        });
+        __bindgen_bitfield_unit.set(10usize, 6u8, {
+            let btwt_rsvd: u16 = unsafe { ::core::mem::transmute(btwt_rsvd) };
+            btwt_rsvd as u64
+        });
+        __bindgen_bitfield_unit
+    }
+    #[inline]
+    pub fn btwt_info_id(&self) -> u16 {
+        unsafe { ::core::mem::transmute(self._bitfield_2.get(0usize, 5u8) as u16) }
+    }
+    #[inline]
+    pub fn set_btwt_info_id(&mut self, val: u16) {
+        unsafe {
+            let val: u16 = ::core::mem::transmute(val);
+            self._bitfield_2.set(0usize, 5u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn btwt_info_persistence(&self) -> u16 {
+        unsafe { ::core::mem::transmute(self._bitfield_2.get(5usize, 8u8) as u16) }
+    }
+    #[inline]
+    pub fn set_btwt_info_persistence(&mut self, val: u16) {
+        unsafe {
+            let val: u16 = ::core::mem::transmute(val);
+            self._bitfield_2.set(5usize, 8u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn btwt_info_rsvd(&self) -> u16 {
+        unsafe { ::core::mem::transmute(self._bitfield_2.get(13usize, 3u8) as u16) }
+    }
+    #[inline]
+    pub fn set_btwt_info_rsvd(&mut self, val: u16) {
+        unsafe {
+            let val: u16 = ::core::mem::transmute(val);
+            self._bitfield_2.set(13usize, 3u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn new_bitfield_2(
+        btwt_info_id: u16,
+        btwt_info_persistence: u16,
+        btwt_info_rsvd: u16,
+    ) -> __BindgenBitfieldUnit<[u8; 2usize]> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 2usize]> = Default::default();
+        __bindgen_bitfield_unit.set(0usize, 5u8, {
+            let btwt_info_id: u16 = unsafe { ::core::mem::transmute(btwt_info_id) };
+            btwt_info_id as u64
+        });
+        __bindgen_bitfield_unit.set(5usize, 8u8, {
+            let btwt_info_persistence: u16 =
+                unsafe { ::core::mem::transmute(btwt_info_persistence) };
+            btwt_info_persistence as u64
+        });
+        __bindgen_bitfield_unit.set(13usize, 3u8, {
+            let btwt_info_rsvd: u16 = unsafe { ::core::mem::transmute(btwt_info_rsvd) };
+            btwt_info_rsvd as u64
+        });
+        __bindgen_bitfield_unit
+    }
+}
+extern "C" {
+    #[doc = " @brief     Set up an individual TWT agreement (NegotiationType=0) or change TWT parameters of the existing TWT agreement\n            - TWT Wake Interval = TWT Wake Interval Mantissa * (2 ^ TWT Wake Interval Exponent), unit: us\n            - e.g. TWT Wake Interval Mantissa = 512,  TWT Wake Interval Exponent = 12, then TWT Wake Interval is 2097.152 ms\n                   Nominal Minimum Wake Duration = 255, then TWT Wake Duration is 65.28 ms\n\n @attention  Support at most 8 TWT agreements, otherwise ESP_ERR_WIFI_TWT_FULL will be returned.\n             Support sleep time up to (1 << 35) us.\n\n @param[in,out]   setup_config pointer to itwt setup config structure.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_WIFI_CONN: WiFi internal error, station or soft-AP control block wrong\n    - ESP_ERR_WIFI_NOT_CONNECT: The station is in disconnect status\n    - ESP_ERR_WIFI_TWT_FULL: no available flow id\n    - ESP_ERR_INVALID_ARG: invalid argument"]
+    pub fn esp_wifi_sta_itwt_setup(setup_config: *mut wifi_itwt_setup_config_t) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief     Tear down individual TWT agreements\n\n @param[in]    flow_id  The value range is [0, 7].\n                        FLOW_ID_ALL indicates tear down all individual TWT agreements.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_WIFI_CONN: WiFi internal error, station or soft-AP control block wrong\n    - ESP_ERR_WIFI_NOT_CONNECT: The station is in disconnect status\n    - ESP_ERR_INVALID_ARG: invalid argument"]
+    pub fn esp_wifi_sta_itwt_teardown(flow_id: crate::c_types::c_int) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief     Send a TWT Information frame to AP for suspending/resuming established iTWT agreements.\n\n @param[in]    flow_id The value range is [0, 7].\n                       FLOW_ID_ALL indicates suspend all individual TWT agreements\n @param[in]    suspend_time_ms If the value is 0, indicates the specified flow_id or all established agreements will be suspended until resume by users.\n                               If the value is greater than 0, indicates the specified flow_id or all established agreements will be suspended until suspend_time_ms timeout, unit: ms.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_WIFI_CONN: WiFi internal error, station or soft-AP control block wrong\n    - ESP_ERR_WIFI_NOT_ASSOC: WiFi is not associated\n    - ESP_ERR_INVALID_ARG: invalid argument"]
+    pub fn esp_wifi_sta_itwt_suspend(
+        flow_id: crate::c_types::c_int,
+        suspend_time_ms: crate::c_types::c_int,
+    ) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief     Get flow id status\n\n @param[in]    flow_id_bitmap Flow id status bitmap with 8 bit. Each bit represents that whether the corresponding flow id is setup.\n                              1: setup, 0: not setup.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_WIFI_CONN: WiFi internal error, station or soft-AP control block wrong\n    - ESP_ERR_WIFI_NOT_CONNECT: The station is in disconnect status\n    - ESP_ERR_INVALID_ARG: invalid argument"]
+    pub fn esp_wifi_sta_itwt_get_flow_id_status(
+        flow_id_bitmap: *mut crate::c_types::c_int,
+    ) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief     Send probe to update TSF time\n\n @attention  In bad network, timeout_ms is variable with the network\n\n @param[in]    timeout_ms The estimated time includes sending probe request and receiving probe response, unit: ms.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_WIFI_CONN: WiFi internal error, station or soft-AP control block wrong\n    - ESP_ERR_WIFI_NOT_ASSOC: WiFi is not associated"]
+    pub fn esp_wifi_sta_itwt_send_probe_req(timeout_ms: crate::c_types::c_int) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief     Set time offset with TBTT of target wake time field in itwt setup request frame.\n\n @param[in]    offset_us Offset with TBTT of target wake time field in itwt setup request frame, range is [0, 102400], unit microseconds.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_WIFI_CONN: WiFi internal error, station or soft-AP control block wrong\n    - ESP_ERR_WIFI_NOT_ASSOC: WiFi is not associated\n    - ESP_ERR_INVALID_ARG: invalid argument"]
+    pub fn esp_wifi_sta_itwt_set_target_wake_time_offset(
+        offset_us: crate::c_types::c_int,
+    ) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief     Enable the reception statistics.\n\n @param[in]    rx_stats indicate whether enable the reception statistics for HT, HE SU, HE ER SU and legacy\n @param[in]    rx_mu_stats indicate whether enable the reception statistics for DL MU-MIMO and DL OFDMA\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_NO_MEM: out of memory"]
+    pub fn esp_wifi_enable_rx_statistics(rx_stats: bool, rx_mu_stats: bool) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief     Enable the transmission statistics.\n\n @param[in]    aci access category of the transmission\n @param[in]    tx_stats indicate whether enable the transmission statistics\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_NO_MEM: out of memory"]
+    pub fn esp_wifi_enable_tx_statistics(aci: esp_wifi_aci_t, tx_stats: bool) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief     Set up an broadcast TWT agreement (NegotiationType=3) or change TWT parameters of the existing TWT agreement\n            - TWT Wake Interval = TWT Wake Interval Mantissa * (2 ^ TWT Wake Interval Exponent), unit: us\n            - e.g. TWT Wake Interval Mantissa = 512,  TWT Wake Interval Exponent = 12, then TWT Wake Interval is 2097.152 ms\n                   Nominal Minimum Wake Duration = 255, then TWT Wake Duration is 65.28 ms\n\n @attention  Support at most 32 TWT agreements, otherwise ESP_ERR_WIFI_TWT_FULL will be returned.\n             Support sleep time up to (1 << 35) us.\n\n @param[in,out]   config pointer to btwt setup config structure.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_WIFI_CONN: WiFi internal error, station or soft-AP control block wrong\n    - ESP_ERR_WIFI_NOT_CONNECT: The station is in disconnect status\n    - ESP_ERR_WIFI_TWT_FULL: no available flow id\n    - ESP_ERR_INVALID_ARG: invalid argument"]
+    pub fn esp_wifi_sta_btwt_setup(config: *mut wifi_btwt_setup_config_t) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief     Tear down broadcast TWT agreements\n\n @param[in]    btwt_id  The value range is [0, 31].\n                        BTWT_ID_ALL indicates tear down all broadcast TWT agreements.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_WIFI_CONN: WiFi internal error, station or soft-AP control block wrong\n    - ESP_ERR_WIFI_NOT_CONNECT: The station is in disconnect status\n    - ESP_ERR_INVALID_ARG: invalid argument"]
+    pub fn esp_wifi_sta_btwt_teardown(btwt_id: u8) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief     Get number of broadcast TWTs supported by the connected AP\n\n @param[out] btwt_number  store number of btwts supported by the connected AP\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_INVALID_ARG: invalid argument"]
+    pub fn esp_wifi_sta_get_btwt_num(btwt_number: *mut u8) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief     Get broadcast TWT information\n\n @param[in]    btwt_number As input param, it stores max btwt number AP supported.\n @param[in]    btwt_info array to hold the btwt information supported by AP, and the array size must be at least as large as the BTWT number.\n\n @return\n    - ESP_OK: succeed\n    - ESP_FAIL: fail\n    - ESP_ERR_WIFI_CONN: WiFi internal error, station or soft-AP control block wrong"]
+    pub fn esp_wifi_sta_btwt_get_info(
+        btwt_number: u8,
+        btwt_info: *mut esp_wifi_btwt_info_t,
+    ) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief     Set WiFi TWT config\n\n @param[in]    config pointer to the WiFi TWT configure structure.\n\n @return\n    - ESP_OK: succeed"]
+    pub fn esp_wifi_sta_twt_config(config: *mut wifi_twt_config_t) -> esp_err_t;
+}
+extern "C" {
+    #[doc = " @brief     Enable bss color collision detection.\n\n @attention Currently, only STA BSS color collision detection is supported.\n\n @param     ifx interface to be configured\n @param     enable If true, when the STA detects a BSS color collision, it will report the BSS color collision event to the access point (AP).\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_IF: Invalid interface\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start"]
+    pub fn esp_wifi_enable_bsscolor_collision_detection(
+        ifx: wifi_interface_t,
+        enable: bool,
+    ) -> esp_err_t;
 }
 #[doc = "< Send ESPNOW data successfully"]
 pub const esp_now_send_status_t_ESP_NOW_SEND_SUCCESS: esp_now_send_status_t = 0;

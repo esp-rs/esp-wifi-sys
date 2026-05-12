@@ -46,4 +46,6 @@ struct timeval {
 #include "esp_coex_i154.h"
 #endif
 
+#include "esp_wifi_he.h"
+
 #include "esp_now.h"
