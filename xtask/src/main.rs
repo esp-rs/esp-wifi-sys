@@ -6,7 +6,10 @@ use std::{
 };
 
 use anyhow::{anyhow, Result};
-use bindgen::Builder;
+use bindgen::{
+    callbacks::{DeriveInfo, ParseCallbacks},
+    Builder,
+};
 use directories::UserDirs;
 use log::LevelFilter;
 
@@ -158,7 +161,7 @@ fn generate_bindings_for_chip(
         ])
         .ctypes_prefix("crate::c_types")
         .derive_debug(false)
-        .derive_partialeq(true)
+        .parse_callbacks(Box::new(AddPartialEq))
         .header(c_path.join("include/include.h").to_string_lossy())
         .layout_tests(false)
         .raw_line("#![allow(non_camel_case_types,non_snake_case,non_upper_case_globals,dead_code,improper_ctypes)]")
@@ -185,4 +188,26 @@ fn generate_bindings_for_chip(
         .output()?;
 
     Ok(())
+}
+
+// Types for which we want derive PartialEq added
+const PARTIALEQ_TYPES: &[&str] = &[
+    "wifi_ap_config_t",
+    "wifi_sta_config_t",
+    "wifi_scan_threshold_t",
+    "wifi_pmf_config_t",
+    "wifi_bss_max_idle_config_t",
+];
+
+#[derive(Debug)]
+struct AddPartialEq;
+
+impl ParseCallbacks for AddPartialEq {
+    fn add_derives(&self, info: &DeriveInfo<'_>) -> Vec<String> {
+        if PARTIALEQ_TYPES.contains(&info.name) {
+            vec!["PartialEq".to_string()]
+        } else {
+            vec![]
+        }
+    }
 }
