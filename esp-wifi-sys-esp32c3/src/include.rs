@@ -1932,7 +1932,7 @@ pub type QueueHandle_t = *mut crate::c_types::c_void;
 pub type esp_netif_t = *mut crate::c_types::c_void;
 pub type esp_netif_inherent_config_t = *mut crate::c_types::c_void;
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct ets_timer {
     pub next: *mut timer_adpt,
     pub expire: u32,
@@ -1941,7 +1941,7 @@ pub struct ets_timer {
     pub priv_: *mut crate::c_types::c_void,
 }
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct timeval {
     pub tv_sec: u64,
     pub tv_usec: u32,
@@ -1949,7 +1949,7 @@ pub struct timeval {
 pub type wchar_t = crate::c_types::c_int;
 #[repr(C)]
 #[repr(align(16))]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct max_align_t {
     pub __clang_max_align_nonce1: crate::c_types::c_longlong,
     pub __bindgen_padding_0: u64,
@@ -2047,7 +2047,7 @@ pub struct __locale_t {
     _unused: [u8; 0],
 }
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct _Bigint {
     pub _next: *mut _Bigint,
     pub _k: crate::c_types::c_int,
@@ -2057,7 +2057,7 @@ pub struct _Bigint {
     pub _x: [__ULong; 1usize],
 }
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct __tm {
     pub __tm_sec: crate::c_types::c_int,
     pub __tm_min: crate::c_types::c_int,
@@ -2070,7 +2070,7 @@ pub struct __tm {
     pub __tm_isdst: crate::c_types::c_int,
 }
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct _on_exit_args {
     pub _fnargs: [*mut crate::c_types::c_void; 32usize],
     pub _dso_handle: [*mut crate::c_types::c_void; 32usize],
@@ -2078,7 +2078,7 @@ pub struct _on_exit_args {
     pub _is_cxa: __ULong,
 }
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct _atexit {
     pub _next: *mut _atexit,
     pub _ind: crate::c_types::c_int,
@@ -2086,7 +2086,7 @@ pub struct _atexit {
     pub _on_exit_args_ptr: *mut _on_exit_args,
 }
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct __sbuf {
     pub _base: *mut crate::c_types::c_uchar,
     pub _size: crate::c_types::c_int,
@@ -2150,7 +2150,7 @@ extern "C" {
     pub static mut __sf: [__FILE; 3usize];
 }
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct _glue {
     pub _next: *mut _glue,
     pub _niobs: crate::c_types::c_int,
@@ -2160,7 +2160,7 @@ extern "C" {
     pub static mut __sglue: _glue;
 }
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct _rand48 {
     pub _seed: [crate::c_types::c_ushort; 3usize],
     pub _mult: [crate::c_types::c_ushort; 3usize],
@@ -2168,7 +2168,7 @@ pub struct _rand48 {
     pub _rand_next: crate::c_types::c_ulonglong,
 }
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct _mprec {
     pub _result: *mut _Bigint,
     pub _result_k: crate::c_types::c_int,
@@ -2191,7 +2191,7 @@ pub struct _misc_reent {
     pub _wcsrtombs_state: _mbstate_t,
 }
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct _reent {
     pub _errno: crate::c_types::c_int,
     pub _stdin: *mut __FILE,
@@ -3441,19 +3441,19 @@ extern "C" {
     ) -> *mut FILE;
 }
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct div_t {
     pub quot: crate::c_types::c_int,
     pub rem: crate::c_types::c_int,
 }
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct ldiv_t {
     pub quot: crate::c_types::c_long,
     pub rem: crate::c_types::c_long,
 }
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct lldiv_t {
     pub quot: crate::c_types::c_longlong,
     pub rem: crate::c_types::c_longlong,
@@ -4194,7 +4194,7 @@ pub const wifi_country_policy_t_WIFI_COUNTRY_POLICY_MANUAL: wifi_country_policy_
 pub type wifi_country_policy_t = crate::c_types::c_uint;
 #[doc = " @brief Structure describing Wi-Fi country-based regional restrictions."]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_country_t {
     #[doc = "< Country code string"]
     pub cc: [crate::c_types::c_char; 3usize],
@@ -4390,7 +4390,7 @@ pub const wifi_scan_type_t_WIFI_SCAN_TYPE_PASSIVE: wifi_scan_type_t = 1;
 pub type wifi_scan_type_t = crate::c_types::c_uint;
 #[doc = " @brief Range of active scan times per channel"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_active_scan_time_t {
     #[doc = "< Minimum active scan time per channel, units: millisecond"]
     pub min: u32,
@@ -4399,7 +4399,7 @@ pub struct wifi_active_scan_time_t {
 }
 #[doc = " @brief Aggregate of active & passive scan time per channel"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_scan_time_t {
     #[doc = "< Active scan time per channel, units: millisecond."]
     pub active: wifi_active_scan_time_t,
@@ -4408,7 +4408,7 @@ pub struct wifi_scan_time_t {
 }
 #[doc = " @brief Channel bitmap for setting specific channels to be scanned"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_scan_channel_bitmap_t {
     #[doc = "< Represents 2.4 GHz channels, that bits can be set as wifi_2g_channel_bit_t shown."]
     pub ghz_2_channels: u16,
@@ -4417,7 +4417,7 @@ pub struct wifi_scan_channel_bitmap_t {
 }
 #[doc = " @brief Parameters for an SSID scan"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_scan_config_t {
     #[doc = "< SSID of AP"]
     pub ssid: *mut u8,
@@ -4440,7 +4440,7 @@ pub struct wifi_scan_config_t {
 }
 #[doc = " @brief Parameters default scan configurations"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_scan_default_params_t {
     #[doc = "< Scan time per channel"]
     pub scan_time: wifi_scan_time_t,
@@ -4501,7 +4501,7 @@ pub const wifi_ant_t_WIFI_ANT_MAX: wifi_ant_t = 2;
 pub type wifi_ant_t = crate::c_types::c_uint;
 #[doc = " @brief Description of a Wi-Fi AP HE Info"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_he_ap_info_t {
     pub _bitfield_align_1: [u8; 0],
     pub _bitfield_1: __BindgenBitfieldUnit<[u8; 1usize]>,
@@ -4566,7 +4566,7 @@ impl wifi_he_ap_info_t {
 }
 #[doc = " @brief Description of a Wi-Fi AP"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_ap_record_t {
     #[doc = "< MAC address of AP"]
     pub bssid: [u8; 6usize],
@@ -4797,7 +4797,7 @@ pub const wifi_sort_method_t_WIFI_CONNECT_AP_BY_SECURITY: wifi_sort_method_t = 1
 pub type wifi_sort_method_t = crate::c_types::c_uint;
 #[doc = " @brief Structure describing parameters for a Wi-Fi fast scan"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_scan_threshold_t {
     #[doc = "< The minimum rssi to accept in the fast scan mode. Defaults to -127 if set to >= 0"]
     pub rssi: i8,
@@ -4918,7 +4918,7 @@ pub const wifi_5g_channel_bit_t_WIFI_CHANNEL_177: wifi_5g_channel_bit_t = 268435
 pub type wifi_5g_channel_bit_t = crate::c_types::c_uint;
 #[doc = " @brief Description of a Wi-Fi protocols"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_protocols_t {
     #[doc = "< Represents 2.4 GHz protocol, support 802.11b or 802.11g or 802.11n or 802.11ax or LR mode"]
     pub ghz_2g: u16,
@@ -4927,7 +4927,7 @@ pub struct wifi_protocols_t {
 }
 #[doc = " @brief Description of a Wi-Fi band bandwidths"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_bandwidths_t {
     #[doc = "< Represents 2.4 GHz bandwidth"]
     pub ghz_2g: wifi_bandwidth_t,
@@ -4936,7 +4936,7 @@ pub struct wifi_bandwidths_t {
 }
 #[doc = " @brief Configuration structure for Protected Management Frame"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_pmf_config_t {
     #[doc = "< Deprecated variable. Device will always connect in PMF mode if other device also advertises PMF capability."]
     pub capable: bool,
@@ -4956,7 +4956,7 @@ pub const wifi_sae_pk_mode_t_WPA3_SAE_PK_MODE_DISABLED: wifi_sae_pk_mode_t = 2;
 pub type wifi_sae_pk_mode_t = crate::c_types::c_uint;
 #[doc = " @brief Configuration structure for BSS max idle"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_bss_max_idle_config_t {
     #[doc = "< Sets BSS Max idle period (1 Unit = 1000TUs OR 1.024 Seconds). If there are no frames for this period from a STA, SoftAP will disassociate due to inactivity. Setting it to 0 disables the feature"]
     pub period: u16,
@@ -4965,7 +4965,7 @@ pub struct wifi_bss_max_idle_config_t {
 }
 #[doc = " @brief Soft-AP configuration settings for the device"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_ap_config_t {
     #[doc = "< SSID of soft-AP. If ssid_len field is 0, this must be a Null terminated string. Otherwise, length is set according to ssid_len."]
     pub ssid: [u8; 32usize],
@@ -5006,7 +5006,7 @@ pub struct wifi_ap_config_t {
 }
 #[doc = " @brief STA configuration settings for the device"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_sta_config_t {
     #[doc = "< SSID of target AP."]
     pub ssid: [u8; 32usize],
@@ -5369,7 +5369,7 @@ impl wifi_sta_config_t {
 }
 #[doc = " @brief NAN Discovery start configuration"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_nan_config_t {
     #[doc = "< NAN Discovery operating channel"]
     pub op_channel: u8,
@@ -5394,7 +5394,7 @@ pub union wifi_config_t {
 #[doc = " @brief Description of STA associated with AP"]
 #[repr(C)]
 #[repr(align(4))]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_sta_info_t {
     #[doc = "< MAC address"]
     pub mac: [u8; 6usize],
@@ -5623,14 +5623,14 @@ pub const wifi_promiscuous_pkt_type_t_WIFI_PKT_MISC: wifi_promiscuous_pkt_type_t
 pub type wifi_promiscuous_pkt_type_t = crate::c_types::c_uint;
 #[doc = " @brief Mask for filtering different packet types in promiscuous mode"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_promiscuous_filter_t {
     #[doc = "< OR of one or more filter values WIFI_PROMIS_FILTER_*"]
     pub filter_mask: u32,
 }
 #[doc = " @brief Wi-Fi GPIO configuration for antenna selection\n"]
 #[repr(C, packed)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_ant_gpio_t {
     pub _bitfield_align_1: [u8; 0],
     pub _bitfield_1: __BindgenBitfieldUnit<[u8; 1usize]>,
@@ -5674,7 +5674,7 @@ impl wifi_ant_gpio_t {
 }
 #[doc = " @brief Wi-Fi GPIOs configuration for antenna selection\n"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_ant_gpio_config_t {
     #[doc = "< The configurations of GPIOs that connect to external antenna switch"]
     pub gpio_cfg: [wifi_ant_gpio_t; 4usize],
@@ -5691,7 +5691,7 @@ pub const wifi_ant_mode_t_WIFI_ANT_MODE_MAX: wifi_ant_mode_t = 3;
 pub type wifi_ant_mode_t = crate::c_types::c_uint;
 #[doc = " @brief Wi-Fi antenna configuration\n"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_ant_config_t {
     #[doc = "< Wi-Fi antenna mode for receiving"]
     pub rx_ant_mode: wifi_ant_mode_t,
@@ -5790,7 +5790,7 @@ pub type wifi_action_roc_done_cb_t = ::core::option::Option<
 >;
 #[doc = " @brief Remain on Channel request\n\n"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_roc_req_t {
     #[doc = "< WiFi interface to send request to"]
     pub ifx: wifi_interface_t,
@@ -5811,7 +5811,7 @@ pub struct wifi_roc_req_t {
 }
 #[doc = " @brief FTM Initiator configuration\n"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_ftm_initiator_cfg_t {
     #[doc = "< MAC address of the FTM Responder"]
     pub resp_mac: [u8; 6usize],
@@ -5858,7 +5858,7 @@ pub const wifi_nan_service_type_t_NAN_SUBSCRIBE_PASSIVE: wifi_nan_service_type_t
 pub type wifi_nan_service_type_t = crate::c_types::c_uint;
 #[doc = " @brief NAN Publish service configuration parameters\n"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_nan_publish_cfg_t {
     #[doc = "< Service name identifier"]
     pub service_name: [crate::c_types::c_char; 256usize],
@@ -5965,7 +5965,7 @@ impl wifi_nan_publish_cfg_t {
 }
 #[doc = " @brief NAN Subscribe service configuration parameters\n"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_nan_subscribe_cfg_t {
     #[doc = "< Service name identifier"]
     pub service_name: [crate::c_types::c_char; 256usize],
@@ -6072,7 +6072,7 @@ impl wifi_nan_subscribe_cfg_t {
 }
 #[doc = " @brief NAN Follow-up parameters\n"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_nan_followup_params_t {
     #[doc = "< Own service instance id"]
     pub inst_id: u8,
@@ -6089,7 +6089,7 @@ pub struct wifi_nan_followup_params_t {
 }
 #[doc = " @brief NAN Datapath Request parameters\n"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_nan_datapath_req_t {
     #[doc = "< Publisher's service instance id"]
     pub pub_id: u8,
@@ -6100,7 +6100,7 @@ pub struct wifi_nan_datapath_req_t {
 }
 #[doc = " @brief NAN Datapath Response parameters\n"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_nan_datapath_resp_t {
     #[doc = "< True - Accept incoming NDP, False - Reject it"]
     pub accept: bool,
@@ -6111,7 +6111,7 @@ pub struct wifi_nan_datapath_resp_t {
 }
 #[doc = " @brief NAN Datapath End parameters\n"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_nan_datapath_end_req_t {
     #[doc = "< NAN Datapath Identifier"]
     pub ndp_id: u8,
@@ -6297,7 +6297,7 @@ extern "C" {
 }
 #[doc = " @brief Argument structure for WIFI_EVENT_SCAN_DONE event"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_event_sta_scan_done_t {
     #[doc = "< Status of scanning APs: 0 — success, 1 - failure"]
     pub status: u32,
@@ -6308,7 +6308,7 @@ pub struct wifi_event_sta_scan_done_t {
 }
 #[doc = " @brief Argument structure for WIFI_EVENT_STA_CONNECTED event"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_event_sta_connected_t {
     #[doc = "< SSID of connected AP"]
     pub ssid: [u8; 32usize],
@@ -6325,7 +6325,7 @@ pub struct wifi_event_sta_connected_t {
 }
 #[doc = " @brief Argument structure for WIFI_EVENT_STA_DISCONNECTED event"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_event_sta_disconnected_t {
     #[doc = "< SSID of disconnected AP"]
     pub ssid: [u8; 32usize],
@@ -6340,7 +6340,7 @@ pub struct wifi_event_sta_disconnected_t {
 }
 #[doc = " @brief Argument structure for WIFI_EVENT_STA_AUTHMODE_CHANGE event"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_event_sta_authmode_change_t {
     #[doc = "< Old auth mode of AP"]
     pub old_mode: wifi_auth_mode_t,
@@ -6349,7 +6349,7 @@ pub struct wifi_event_sta_authmode_change_t {
 }
 #[doc = " @brief Argument structure for WIFI_EVENT_STA_WPS_ER_PIN event"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_event_sta_wps_er_pin_t {
     #[doc = "< PIN code of station in enrollee mode"]
     pub pin_code: [u8; 8usize],
@@ -6370,7 +6370,7 @@ pub const wifi_event_sta_wps_fail_reason_t_WPS_FAIL_REASON_MAX: wifi_event_sta_w
 pub type wifi_event_sta_wps_fail_reason_t = crate::c_types::c_uint;
 #[doc = " @brief Argument structure for WIFI_EVENT_STA_WPS_ER_SUCCESS event"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_event_sta_wps_er_success_t {
     #[doc = "< Number of AP credentials received"]
     pub ap_cred_cnt: u8,
@@ -6378,7 +6378,7 @@ pub struct wifi_event_sta_wps_er_success_t {
     pub ap_cred: [wifi_event_sta_wps_er_success_t__bindgen_ty_1; 3usize],
 }
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_event_sta_wps_er_success_t__bindgen_ty_1 {
     #[doc = "< SSID of AP"]
     pub ssid: [u8; 32usize],
@@ -6387,7 +6387,7 @@ pub struct wifi_event_sta_wps_er_success_t__bindgen_ty_1 {
 }
 #[doc = " @brief Argument structure for WIFI_EVENT_AP_STACONNECTED event"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_event_ap_staconnected_t {
     #[doc = "< MAC address of the station connected to Soft-AP"]
     pub mac: [u8; 6usize],
@@ -6398,7 +6398,7 @@ pub struct wifi_event_ap_staconnected_t {
 }
 #[doc = " @brief Argument structure for WIFI_EVENT_AP_STADISCONNECTED event"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_event_ap_stadisconnected_t {
     #[doc = "< MAC address of the station disconnects from the soft-AP"]
     pub mac: [u8; 6usize],
@@ -6411,7 +6411,7 @@ pub struct wifi_event_ap_stadisconnected_t {
 }
 #[doc = " @brief Argument structure for WIFI_EVENT_AP_PROBEREQRECVED event"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_event_ap_probe_req_rx_t {
     #[doc = "< Received probe request signal strength"]
     pub rssi: crate::c_types::c_int,
@@ -6420,14 +6420,14 @@ pub struct wifi_event_ap_probe_req_rx_t {
 }
 #[doc = " @brief Argument structure for WIFI_EVENT_STA_BSS_RSSI_LOW event"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_event_bss_rssi_low_t {
     #[doc = "< RSSI value of bss"]
     pub rssi: i32,
 }
 #[doc = " @brief Argument structure for WIFI_EVENT_HOME_CHANNEL_CHANGE event"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_event_home_channel_change_t {
     #[doc = "< Old home channel of the device"]
     pub old_chan: u8,
@@ -6456,7 +6456,7 @@ pub const wifi_ftm_status_t_FTM_STATUS_USER_TERM: wifi_ftm_status_t = 6;
 pub type wifi_ftm_status_t = crate::c_types::c_uint;
 #[doc = " @brief Structure representing a report entry for Fine Timing Measurement (FTM) in Wi-Fi.\n\n This structure holds the information related to the FTM process between a Wi-Fi FTM Initiator\n and a Wi-Fi FTM Responder. FTM is used for precise distance measurement by timing the exchange\n of frames between devices."]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_ftm_report_entry_t {
     #[doc = "< Dialog Token of the FTM frame"]
     pub dlog_token: u8,
@@ -6475,7 +6475,7 @@ pub struct wifi_ftm_report_entry_t {
 }
 #[doc = " @brief Argument structure for WIFI_EVENT_FTM_REPORT event"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_event_ftm_report_t {
     #[doc = "< MAC address of the FTM Peer"]
     pub peer_mac: [u8; 6usize],
@@ -6506,7 +6506,7 @@ pub const wifi_action_tx_status_type_t_WIFI_ACTION_TX_OP_CANCELLED: wifi_action_
 pub type wifi_action_tx_status_type_t = crate::c_types::c_uint;
 #[doc = " Argument structure for WIFI_EVENT_ACTION_TX_STATUS event"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_event_action_tx_status_t {
     #[doc = "< WiFi interface to send request to"]
     pub ifx: wifi_interface_t,
@@ -6521,7 +6521,7 @@ pub struct wifi_event_action_tx_status_t {
 }
 #[doc = " @brief Argument structure for WIFI_EVENT_ROC_DONE event"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_event_roc_done_t {
     #[doc = "< Context to identify the initiator of the request"]
     pub context: u32,
@@ -6534,7 +6534,7 @@ pub struct wifi_event_roc_done_t {
 }
 #[doc = " @brief Argument structure for WIFI_EVENT_AP_WPS_RG_PIN event"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_event_ap_wps_rg_pin_t {
     #[doc = "< PIN code of station in enrollee mode"]
     pub pin_code: [u8; 8usize],
@@ -6551,7 +6551,7 @@ pub const wps_fail_reason_t_WPS_AP_FAIL_REASON_MAX: wps_fail_reason_t = 3;
 pub type wps_fail_reason_t = crate::c_types::c_uint;
 #[doc = " @brief Argument structure for WIFI_EVENT_AP_WPS_RG_FAILED event"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_event_ap_wps_rg_fail_reason_t {
     #[doc = "< WPS failure reason wps_fail_reason_t"]
     pub reason: wps_fail_reason_t,
@@ -6560,7 +6560,7 @@ pub struct wifi_event_ap_wps_rg_fail_reason_t {
 }
 #[doc = " @brief Argument structure for WIFI_EVENT_AP_WPS_RG_SUCCESS event"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_event_ap_wps_rg_success_t {
     #[doc = "< Enrollee mac address"]
     pub peer_macaddr: [u8; 6usize],
@@ -6747,7 +6747,7 @@ pub struct wifi_event_ndp_confirm_t {
 }
 #[doc = " @brief Argument structure for WIFI_EVENT_NDP_TERMINATED event"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_event_ndp_terminated_t {
     #[doc = "< Termination reason code"]
     pub reason: u8,
@@ -6768,14 +6768,14 @@ pub struct wifi_event_neighbor_report_t {
 }
 #[doc = " Argument structure for WIFI_EVENT_AP_WRONG_PASSWORD event"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_event_ap_wrong_password_t {
     #[doc = "< MAC address of the station trying to connect to Soft-AP"]
     pub mac: [u8; 6usize],
 }
 #[doc = " @brief Argument structure for wifi_tx_rate_config"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_tx_rate_config_t {
     #[doc = "< Phymode of specified interface"]
     pub phymode: wifi_phy_mode_t,
@@ -6789,7 +6789,7 @@ pub struct wifi_tx_rate_config_t {
 #[doc = " Argument structure for regulatory rule"]
 #[repr(C)]
 #[repr(align(2))]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_reg_rule_t {
     #[doc = "< start channel of regulatory rule"]
     pub start_channel: u8,
@@ -6872,7 +6872,7 @@ impl wifi_reg_rule_t {
 }
 #[doc = " Argument structure for regdomain"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_regulatory_t {
     #[doc = "< number of regulatory rules"]
     pub n_reg_rules: u8,
@@ -6881,7 +6881,7 @@ pub struct wifi_regulatory_t {
 }
 #[doc = " Argument structure for regdomain"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_regdomain_t {
     #[doc = "< country code string"]
     pub cn: [crate::c_types::c_char; 2usize],
@@ -6896,7 +6896,7 @@ pub const wifi_tx_status_t_WIFI_SEND_FAIL: wifi_tx_status_t = 1;
 pub type wifi_tx_status_t = crate::c_types::c_uint;
 #[doc = " @brief Information of wifi sending data"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_tx_info_t {
     #[doc = "< The address of the receive device"]
     pub des_addr: *mut u8,
@@ -6917,7 +6917,7 @@ pub struct wifi_tx_info_t {
 pub type esp_80211_tx_info_t = wifi_tx_info_t;
 #[doc = " Argument structure for WIFI_EVENT_STA_BEACON_OFFSET_UNSTABLE event"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_event_sta_beacon_offset_unstable_t {
     #[doc = "< Received beacon success rate"]
     pub beacon_success_rate: f32,
@@ -6939,14 +6939,14 @@ pub struct wifi_event_dpp_config_received_t {
 }
 #[doc = " Argument structure for WIFI_EVENT_DPP_FAIL event"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_event_dpp_failed_t {
     #[doc = "< Failure reason"]
     pub failure_reason: crate::c_types::c_int,
 }
 #[doc = " @brief List of stations associated with the Soft-AP"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_sta_list_t {
     #[doc = "< station list"]
     pub sta: [wifi_sta_info_t; 10usize],
@@ -6956,7 +6956,7 @@ pub struct wifi_sta_list_t {
 #[doc = " @brief Received packet radio metadata header, this is the common header at the beginning of all promiscuous mode RX callback buffers"]
 #[repr(C)]
 #[repr(align(4))]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_pkt_rx_ctrl_t {
     pub _bitfield_align_1: [u32; 0],
     pub _bitfield_1: __BindgenBitfieldUnit<[u8; 48usize]>,
@@ -7173,7 +7173,7 @@ impl wifi_pkt_rx_ctrl_t {
     }
 }
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_csi_config_t {
     #[doc = "< enable to receive legacy long training field(lltf) data. Default enabled"]
     pub lltf_en: bool,
@@ -7202,7 +7202,7 @@ pub struct wifi_promiscuous_pkt_t {
 }
 #[doc = " @brief CSI data type\n"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_csi_info_t {
     #[doc = "< received packet radio metadata header of the CSI data"]
     pub rx_ctrl: wifi_pkt_rx_ctrl_t,
@@ -7227,7 +7227,7 @@ pub struct wifi_csi_info_t {
 }
 #[doc = " Configuration for creating event loops"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct esp_event_loop_args_t {
     #[doc = "< size of the event loop queue"]
     pub queue_size: i32,
@@ -7658,7 +7658,7 @@ pub type esp_crc32_le_t =
     ::core::option::Option<unsafe extern "C" fn(crc: u32, buf: *const u8, len: u32) -> u32>;
 #[doc = " @brief The crypto callback function structure used by esp_wifi.\n        The structure can be set as software crypto or the crypto optimized by device's\n        hardware."]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wpa_crypto_funcs_t {
     #[doc = "< The crypto callback function structure size"]
     pub size: u32,
@@ -7685,7 +7685,7 @@ pub struct wpa_crypto_funcs_t {
 }
 #[doc = " @brief The crypto callback function structure used in mesh vendor IE encryption. The\n        structure can be set as software crypto or the crypto optimized by device's\n        hardware."]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct mesh_crypto_funcs_t {
     #[doc = "< Callback function used in mesh vendor IE encryption"]
     pub aes_128_encrypt: esp_aes_128_encrypt_t,
@@ -7750,7 +7750,7 @@ extern "C" {
 }
 #[doc = " @brief WiFi stack configuration parameters passed to esp_wifi_init call."]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_init_config_t {
     #[doc = "< WiFi OS functions"]
     pub osi_funcs: *mut wifi_osi_funcs_t,
@@ -8263,7 +8263,7 @@ extern "C" {
 }
 #[doc = " Argument structure for SC_EVENT_GOT_SSID_PSWD event"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct smartconfig_event_got_ssid_pswd_t {
     #[doc = "< SSID of the AP. Null terminated string."]
     pub ssid: [u8; 32usize],
@@ -8282,7 +8282,7 @@ pub struct smartconfig_event_got_ssid_pswd_t {
 }
 #[doc = " Configure structure for esp_smartconfig_start"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct smartconfig_start_config_t {
     #[doc = "< Enable smartconfig logs."]
     pub enable_log: bool,
@@ -8328,7 +8328,7 @@ pub const wifi_ioctl_cmd_t_WIFI_IOCTL_MAX: wifi_ioctl_cmd_t = 3;
 pub type wifi_ioctl_cmd_t = crate::c_types::c_uint;
 #[doc = " @brief Configuration for STA's HT2040 coexist management\n"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_ht2040_coex_t {
     #[doc = "< Indicate whether STA's HT2040 coexist management is enabled or not"]
     pub enable: crate::c_types::c_int,
@@ -8353,7 +8353,7 @@ pub const wifi_beacon_drop_t_WIFI_BEACON_DROP_FORCED: wifi_beacon_drop_t = 2;
 pub type wifi_beacon_drop_t = crate::c_types::c_uint;
 #[doc = " @brief WiFi beacon monitor parameter configuration\n"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_beacon_monitor_config_t {
     #[doc = "< Enable or disable beacon monitor"]
     pub enable: bool,
@@ -8370,7 +8370,7 @@ pub struct wifi_beacon_monitor_config_t {
 }
 #[doc = " @brief WiFi beacon sample parameter configuration\n"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_beacon_offset_config_t {
     #[doc = "< Sample beacon period, unit: number of beacons"]
     pub sample_period: u16,
@@ -8380,7 +8380,7 @@ pub struct wifi_beacon_offset_config_t {
     pub difference: u8,
 }
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_static_queue_t {
     #[doc = "< FreeRTOS queue handler"]
     pub handle: QueueHandle_t,
@@ -8388,7 +8388,7 @@ pub struct wifi_static_queue_t {
     pub storage: *mut crate::c_types::c_void,
 }
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct nan_callbacks {
     pub service_match: ::core::option::Option<
         unsafe extern "C" fn(
@@ -8758,7 +8758,7 @@ extern "C" {
     pub fn esp_wifi_enable_easy_fragment(enable: bool);
 }
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_osi_funcs_t {
     pub _version: i32,
     pub _env_is_chip: ::core::option::Option<unsafe extern "C" fn() -> bool>,
@@ -9151,7 +9151,7 @@ extern "C" {
 }
 #[doc = " @brief Structure holding PHY init parameters"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct esp_phy_init_data_t {
     #[doc = "< opaque PHY initialization parameters"]
     pub params: [u8; 128usize],
@@ -9168,7 +9168,7 @@ pub const esp_phy_modem_t_PHY_MODEM_MAX: esp_phy_modem_t = 5;
 pub type esp_phy_modem_t = crate::c_types::c_uint;
 #[doc = " @brief Opaque PHY calibration data"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct esp_phy_calibration_data_t {
     #[doc = "< PHY version"]
     pub version: [u8; 4usize],
@@ -9272,13 +9272,13 @@ extern "C" {
     pub fn esp_wifi_bt_power_domain_off();
 }
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct phy_i2c_master_command_attribute_t {
     pub cmd_type: u8,
     pub config: phy_i2c_master_command_attribute_t__bindgen_ty_1,
 }
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct phy_i2c_master_command_attribute_t__bindgen_ty_1 {
     pub start: u8,
     pub end: u8,
@@ -9407,7 +9407,7 @@ pub struct esp_etm_task_t {
 pub type esp_etm_task_handle_t = *mut esp_etm_task_t;
 #[doc = " @brief ETM channel configuration"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct esp_etm_channel_config_t {}
 extern "C" {
     #[doc = " @brief Allocate an ETM channel\n\n @note The channel can later be freed by `esp_etm_del_channel`\n\n @param[in] config ETM channel configuration\n @param[out] ret_chan Returned ETM channel handle\n @return\n      - ESP_OK: Allocate ETM channel successfully\n      - ESP_ERR_INVALID_ARG: Allocate ETM channel failed because of invalid argument\n      - ESP_ERR_NO_MEM: Allocate ETM channel failed because of out of memory\n      - ESP_ERR_NOT_FOUND: Allocate ETM channel failed because all channels are used up and no more free one\n      - ESP_FAIL: Allocate ETM channel failed because of other reasons"]
@@ -9466,7 +9466,7 @@ pub const esp_timer_dispatch_t_ESP_TIMER_MAX: esp_timer_dispatch_t = 1;
 pub type esp_timer_dispatch_t = crate::c_types::c_uint;
 #[doc = " @brief Timer configuration passed to esp_timer_create()"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct esp_timer_create_args_t {
     #[doc = "!< Callback function to execute when timer expires"]
     pub callback: esp_timer_cb_t,
@@ -9578,7 +9578,7 @@ pub const esp_eap_method_t_ESP_EAP_TYPE_ALL: esp_eap_method_t = 15;
 pub type esp_eap_method_t = crate::c_types::c_uint;
 #[doc = " @brief Configuration settings for EAP-FAST\n        (Extensible Authentication Protocol - Flexible Authentication via Secure Tunneling).\n\n This structure defines the configuration options that can be used to customize the behavior of the\n EAP-FAST authentication protocol, specifically for Fast Provisioning and PAC (Protected Access Credential) handling."]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct esp_eap_fast_config {
     #[doc = "< Enable or disable Fast Provisioning in EAP-FAST (0 = disabled, 1 = enabled)"]
     pub fast_provisioning: crate::c_types::c_int,
@@ -9767,7 +9767,7 @@ pub type esp_bt_hci_tl_callback_t =
     ::core::option::Option<unsafe extern "C" fn(arg: *mut crate::c_types::c_void, status: u8)>;
 #[doc = " @brief Controller HCI transport layer function structure\n\n @note This structure must be registered when HCI transport layer is UART"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct esp_bt_hci_tl_t {
     #[doc = "< Magic number"]
     pub _magic: u32,
@@ -9806,7 +9806,7 @@ pub struct esp_bt_hci_tl_t {
 }
 #[doc = " @brief Bluetooth Controller config options\n @note\n      1. For parameters configurable through menuconfig, it is recommended to adjust them via the menuconfig interface. Please refer to menuconfig for details on the range and default values.\n      2. It is not recommended to modify the values for parameters which are not configurable through menuconfig."]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct esp_bt_controller_config_t {
     #[doc = "< Magic number"]
     pub magic: u32,
@@ -10079,7 +10079,7 @@ extern "C" {
 }
 #[doc = " @brief Virtual HCI (VHCI) callback functions to notify the Host on the next operation"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct esp_vhci_host_callback {
     #[doc = "< callback used to notify that the Host can send the HCI data to Controller"]
     pub notify_host_send_available: ::core::option::Option<unsafe extern "C" fn()>,
@@ -10147,7 +10147,7 @@ extern "C" {
     pub fn esp_coex_status_bit_clear(type_: esp_coex_status_type_t, status: u32) -> esp_err_t;
 }
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct coex_adapter_funcs_t {
     pub _version: i32,
     pub _task_yield_from_isr: ::core::option::Option<unsafe extern "C" fn()>,
@@ -10207,7 +10207,7 @@ extern "C" {
     pub static mut g_coex_adapter_funcs: coex_adapter_funcs_t;
 }
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct coex_version_t {
     pub major: u8,
     pub minor: u8,
@@ -10387,7 +10387,7 @@ pub const esp_now_send_status_t_ESP_NOW_SEND_FAIL: esp_now_send_status_t = 1;
 pub type esp_now_send_status_t = crate::c_types::c_uint;
 #[doc = " @brief ESPNOW peer information parameters."]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct esp_now_peer_info {
     #[doc = "< ESPNOW peer MAC address that is also the MAC address of station or softap"]
     pub peer_addr: [u8; 6usize],
@@ -10406,7 +10406,7 @@ pub struct esp_now_peer_info {
 pub type esp_now_peer_info_t = esp_now_peer_info;
 #[doc = " @brief Number of ESPNOW peers which exist currently."]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct esp_now_peer_num {
     #[doc = "< Total number of ESPNOW peers, maximum value is ESP_NOW_MAX_TOTAL_PEER_NUM"]
     pub total_num: crate::c_types::c_int,
@@ -10417,7 +10417,7 @@ pub struct esp_now_peer_num {
 pub type esp_now_peer_num_t = esp_now_peer_num;
 #[doc = " @brief ESPNOW receive packet information"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct esp_now_recv_info {
     #[doc = "< Source address of ESPNOW packet"]
     pub src_addr: *mut u8,
@@ -10454,7 +10454,7 @@ pub struct esp_now_switch_channel_t {
 }
 #[doc = " @brief ESPNOW remain on channel information"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct esp_now_remain_on_channel_t {
     #[doc = "< ROC operation type"]
     pub type_: wifi_roc_t,
@@ -10575,7 +10575,7 @@ extern "C" {
     pub fn esp_now_remain_on_channel(config: *mut esp_now_remain_on_channel_t) -> esp_err_t;
 }
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct timer_adpt {
     pub _address: u8,
 }

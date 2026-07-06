@@ -158,6 +158,7 @@ fn generate_bindings_for_chip(
         ])
         .ctypes_prefix("crate::c_types")
         .derive_debug(false)
+        .derive_partialeq(true)
         .header(c_path.join("include/include.h").to_string_lossy())
         .layout_tests(false)
         .raw_line("#![allow(non_camel_case_types,non_snake_case,non_upper_case_globals,dead_code,improper_ctypes)]")
