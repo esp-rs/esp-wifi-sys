@@ -6128,7 +6128,7 @@ pub const wifi_sort_method_t_WIFI_CONNECT_AP_BY_SECURITY: wifi_sort_method_t = 1
 pub type wifi_sort_method_t = crate::c_types::c_uint;
 #[doc = " @brief Structure describing parameters for a Wi-Fi fast scan"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_scan_threshold_t {
     #[doc = "< The minimum rssi to accept in the fast scan mode. Defaults to -127 if set to >= 0"]
     pub rssi: i8,
@@ -6267,7 +6267,7 @@ pub struct wifi_bandwidths_t {
 }
 #[doc = " @brief Configuration structure for Protected Management Frame"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_pmf_config_t {
     #[doc = "< Deprecated variable. Device will always connect in PMF mode if other device also advertises PMF capability."]
     pub capable: bool,
@@ -6287,7 +6287,7 @@ pub const wifi_sae_pk_mode_t_WPA3_SAE_PK_MODE_DISABLED: wifi_sae_pk_mode_t = 2;
 pub type wifi_sae_pk_mode_t = crate::c_types::c_uint;
 #[doc = " @brief Configuration structure for BSS max idle"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_bss_max_idle_config_t {
     #[doc = "< Sets BSS Max idle period (1 Unit = 1000TUs OR 1.024 Seconds). If there are no frames for this period from a STA, SoftAP will disassociate due to inactivity. Setting it to 0 disables the feature"]
     pub period: u16,
@@ -6296,7 +6296,7 @@ pub struct wifi_bss_max_idle_config_t {
 }
 #[doc = " @brief Soft-AP configuration settings for the device"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_ap_config_t {
     #[doc = "< SSID of soft-AP. If ssid_len field is 0, this must be a Null terminated string. Otherwise, length is set according to ssid_len."]
     pub ssid: [u8; 32usize],
@@ -6337,7 +6337,7 @@ pub struct wifi_ap_config_t {
 }
 #[doc = " @brief STA configuration settings for the device"]
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct wifi_sta_config_t {
     #[doc = "< SSID of target AP."]
     pub ssid: [u8; 32usize],
