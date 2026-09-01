@@ -11733,5 +11733,49 @@ pub struct timer_adpt {
     pub _address: u8,
 }
 
+#[doc = " @brief  Callback function type to get neighbor report\n\n @param  ctx: neighbor report context\n @param  report: neighbor report\n @param  report_len: neighbor report length\n\n @return\n    - void"]
+pub type neighbor_rep_request_cb = ::core::option::Option<
+    unsafe extern "C" fn(ctx: *mut crate::c_types::c_void, report: *const u8, report_len: usize),
+>;
+extern "C" {
+    #[doc = " @brief  Send Radio measurement neighbor report request to connected AP\n\n @deprecated This function is deprecated and will be removed in the future.\n             Please use 'esp_rrm_send_neighbor_report_request'\n @param  cb: callback function for neighbor report\n @param  cb_ctx: callback context\n\n @return\n    - 0: success\n    - -1: AP does not support RRM\n    - -2: station not connected to AP"]
+    pub fn esp_rrm_send_neighbor_rep_request(
+        cb: neighbor_rep_request_cb,
+        cb_ctx: *mut crate::c_types::c_void,
+    ) -> crate::c_types::c_int;
+}
+extern "C" {
+    #[doc = " @brief  Send Radio measurement neighbor report request to connected AP\n @return\n    - 0: success\n    - -1: AP does not support RRM\n    - -2: station not connected to AP"]
+    pub fn esp_rrm_send_neighbor_report_request() -> crate::c_types::c_int;
+}
+extern "C" {
+    #[doc = " @brief  Check RRM capability of connected AP\n\n @return\n    - true: AP supports RRM\n    - false: AP does not support RRM or station not connected to AP"]
+    pub fn esp_rrm_is_rrm_supported_connection() -> bool;
+}
+pub const btm_query_reason_REASON_UNSPECIFIED: btm_query_reason = 0;
+pub const btm_query_reason_REASON_FRAME_LOSS: btm_query_reason = 1;
+pub const btm_query_reason_REASON_DELAY: btm_query_reason = 2;
+pub const btm_query_reason_REASON_BANDWIDTH: btm_query_reason = 3;
+pub const btm_query_reason_REASON_LOAD_BALANCE: btm_query_reason = 4;
+pub const btm_query_reason_REASON_RSSI: btm_query_reason = 5;
+pub const btm_query_reason_REASON_RETRANSMISSIONS: btm_query_reason = 6;
+pub const btm_query_reason_REASON_INTERFERENCE: btm_query_reason = 7;
+pub const btm_query_reason_REASON_GRAY_ZONE: btm_query_reason = 8;
+pub const btm_query_reason_REASON_PREMIUM_AP: btm_query_reason = 9;
+#[doc = " enum btm_query_reason: Reason code for sending btm query"]
+pub type btm_query_reason = crate::c_types::c_uint;
+extern "C" {
+    #[doc = " @brief  Send bss transition query to connected AP\n\n @param  query_reason: reason for sending query\n @param  btm_candidates: btm candidates list if available\n @param  cand_list: whether candidate list to be included from scan results available in supplicant's cache.\n\n @return\n    - 0: success\n    - -1: AP does not support BTM\n    - -2: station not connected to AP"]
+    pub fn esp_wnm_send_bss_transition_mgmt_query(
+        query_reason: btm_query_reason,
+        btm_candidates: *const crate::c_types::c_char,
+        cand_list: crate::c_types::c_int,
+    ) -> crate::c_types::c_int;
+}
+extern "C" {
+    #[doc = " @brief  Check bss transition capability of connected AP\n\n @return\n    - true: AP supports BTM\n    - false: AP does not support BTM or station not connected to AP"]
+    pub fn esp_wnm_is_btm_supported_connection() -> bool;
+}
+
 unsafe impl Sync for wifi_init_config_t {}
 unsafe impl Sync for wifi_osi_funcs_t {}
