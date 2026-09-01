@@ -29,6 +29,8 @@ struct timeval {
 #include "esp_private/wifi.h"
 #include "esp_private/wifi_os_adapter.h"
 #include "esp_wpa.h"
+#include "esp_rrm.h"
+#include "esp_wnm.h"
 #include "esp_phy_init.h"
 #include "phy.h"
 #include "esp_timer.h"
