@@ -1,7 +1,7 @@
 /*
- * SPDX-FileCopyrightText: 2018-2023 Espressif Systems (Shanghai) CO LTD
+ * SPDX-FileCopyrightText: 2018-2025 Espressif Systems (Shanghai) CO LTD
  *
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-License-Identifier: Apache-2.0 OR MIT
  */
 
 #pragma once
@@ -85,8 +85,6 @@ typedef enum {
     ETS_CACHE_IA_INTR_SOURCE,                /**< interrupt of Cache Invalid Access, LEVEL*/
     ETS_MAX_INTR_SOURCE,                     /**< total number of interrupt sources*/
 } periph_interrupt_t;
-
-typedef periph_interrupt_t periph_interrput_t __attribute__((deprecated("in favor of periph_interrupt_t")));
 
 #define ETS_CAN_INTR_SOURCE ETS_TWAI_INTR_SOURCE
 

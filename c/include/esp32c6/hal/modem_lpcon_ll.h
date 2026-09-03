@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2022-2024 Espressif Systems (Shanghai) CO LTD
+ * SPDX-FileCopyrightText: 2022-2025 Espressif Systems (Shanghai) CO LTD
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -134,7 +134,7 @@ static inline uint32_t modem_lpcon_ll_get_wifi_lpclk_divisor_value(modem_lpcon_d
 }
 
 __attribute__((always_inline))
-static inline void modem_lpcon_ll_select_modem_32k_clock_source(modem_lpcon_dev_t *hw, uint32_t src)
+static inline void modem_lpcon_ll_select_modem_32k_clock_source(modem_lpcon_dev_t *hw, modem_clock_32k_clk_src_t src)
 {
     hw->modem_32k_clk_conf.clk_modem_32k_sel = src;
 }
@@ -146,15 +146,33 @@ static inline void modem_lpcon_ll_enable_wifipwr_clock(modem_lpcon_dev_t *hw, bo
 }
 
 __attribute__((always_inline))
+static inline bool modem_lpcon_ll_wifipwr_clock_is_enabled(modem_lpcon_dev_t *hw)
+{
+    return hw->clk_conf.clk_wifipwr_en;
+}
+
+__attribute__((always_inline))
 static inline void modem_lpcon_ll_enable_coex_clock(modem_lpcon_dev_t *hw, bool en)
 {
     hw->clk_conf.clk_coex_en = en;
 }
 
 __attribute__((always_inline))
+static inline bool modem_lpcon_ll_coex_clock_is_enabled(modem_lpcon_dev_t *hw)
+{
+    return hw->clk_conf.clk_coex_en;
+}
+
+__attribute__((always_inline))
 static inline void modem_lpcon_ll_enable_ble_rtc_timer_clock(modem_lpcon_dev_t *hw, bool en)
 {
     hw->clk_conf.clk_lp_timer_en = en;
+}
+
+__attribute__((always_inline))
+static inline bool modem_lpcon_ll_ble_rtc_timer_clock_is_enabled(modem_lpcon_dev_t *hw)
+{
+    return hw->clk_conf.clk_lp_timer_en;
 }
 
 __attribute__((always_inline))
@@ -249,12 +267,6 @@ static inline void modem_lpcon_ll_reset_all(modem_lpcon_dev_t *hw)
 {
     hw->rst_conf.val = 0xf;
     hw->rst_conf.val = 0;
-}
-
-__attribute__((always_inline))
-static inline uint32_t modem_lpcon_ll_get_date(modem_lpcon_dev_t *hw)
-{
-    return hw->date.val;
 }
 
 #ifdef __cplusplus

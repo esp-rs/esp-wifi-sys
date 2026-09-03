@@ -1,7 +1,7 @@
 /*
- * SPDX-FileCopyrightText: 2018-2023 Espressif Systems (Shanghai) CO LTD
+ * SPDX-FileCopyrightText: 2018-2025 Espressif Systems (Shanghai) CO LTD
  *
- * SPDX-License-Identifier: Apache-2.0
+ * SPDX-License-Identifier: Apache-2.0 OR MIT
  */
 
 #pragma once
@@ -86,8 +86,6 @@ typedef enum {
     ETS_ECDSA_INTR_SOURCE,                      /**< interrupt of ECDSA accelerator, level*/
     ETS_MAX_INTR_SOURCE,
 } periph_interrupt_t;
-
-typedef periph_interrupt_t periph_interrput_t __attribute__((deprecated("in favor of periph_interrupt_t")));
 
 extern const char * const esp_isr_names[ETS_MAX_INTR_SOURCE];
 

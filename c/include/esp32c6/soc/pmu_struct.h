@@ -1,7 +1,7 @@
 /**
- * SPDX-FileCopyrightText: 2022-2023 Espressif Systems (Shanghai) CO LTD
+ * SPDX-FileCopyrightText: 2022-2025 Espressif Systems (Shanghai) CO LTD
  *
- *  SPDX-License-Identifier: Apache-2.0
+ *  SPDX-License-Identifier: Apache-2.0 OR MIT
  */
 #pragma once
 
@@ -605,7 +605,7 @@ typedef union {
         uint32_t sleep_switch_active_end  : 1;
         uint32_t sleep_switch_modem_end   : 1;
         uint32_t modem_switch_sleep_end   : 1;
-        uint32_t active_swtich_sleep_end  : 1;
+        uint32_t active_switch_sleep_end  : 1;
         uint32_t modem_switch_active_start: 1;
         uint32_t sleep_switch_active_start: 1;
         uint32_t sleep_switch_modem_start : 1;
