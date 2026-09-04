@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2015-2025 Espressif Systems (Shanghai) CO LTD
+ * SPDX-FileCopyrightText: 2015-2026 Espressif Systems (Shanghai) CO LTD
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -120,6 +120,8 @@ typedef struct {
     int                    espnow_max_encrypt_num; /**< Maximum encrypt number of peers supported by espnow */
     int                    tx_hetb_queue_num;      /**< WiFi TX HE TB QUEUE number for STA HE TB PPDU transmission */
     bool                   dump_hesigb_enable;     /**< enable dump sigb field */
+    bool                   privacy_enhancements;   /**< WiFi privacy enhancements (enables random mac, seq number, dialogue token number, vendor seq number cnt). Supported on station interface only; softAP may be added in future */
+    uint8_t                rmac_auto_reset_int;    /**< Random MAC auto-reset interval in hours (1-24) while not connected */
     int                    magic;                  /**< WiFi init magic number, it should be the last field */
 } wifi_init_config_t;
 
@@ -284,6 +286,18 @@ extern wifi_osi_funcs_t g_wifi_osi_funcs;
 #define WIFI_ENABLE_BSS_MAX_IDLE 0
 #endif
 
+#if CONFIG_ESP_WIFI_PASSIVE_HIDDEN_AP_SUPPORT
+#define WIFI_ENABLE_PASSIVE_HIDDEN_AP (1<<9)
+#else
+#define WIFI_ENABLE_PASSIVE_HIDDEN_AP 0
+#endif
+
+#if CONFIG_ESP_WIFI_ENABLE_WPA3_OWE_SOFTAP
+#define WIFI_ENABLE_OWE_SOFTAP (1<<10)
+#else
+#define WIFI_ENABLE_OWE_SOFTAP 0
+#endif
+
 #define CONFIG_FEATURE_WPA3_SAE_BIT     (1<<0)
 #define CONFIG_FEATURE_CACHE_TX_BUF_BIT (1<<1)
 #define CONFIG_FEATURE_FTM_INITIATOR_BIT (1<<2)
@@ -293,6 +307,8 @@ extern wifi_osi_funcs_t g_wifi_osi_funcs;
 #define CONFIG_FEATURE_11R_BIT (1<<6)
 #define CONFIG_FEATURE_WIFI_ENT_BIT (1<<7)
 #define CONFIG_FEATURE_BSS_MAX_IDLE_BIT (1<<8)
+#define CONFIG_FEATURE_WIFI_PASSIVE_HIDDEN_AP_BIT (1<<9)
+#define CONFIG_FEATURE_OWE_SOFTAP_BIT (1<<10)
 
 /* Set additional WiFi features and capabilities */
 #define WIFI_FEATURE_CAPS (WIFI_ENABLE_WPA3_SAE | \
@@ -303,7 +319,21 @@ extern wifi_osi_funcs_t g_wifi_osi_funcs;
                            WIFI_ENABLE_GMAC | \
                            WIFI_ENABLE_11R  | \
                            WIFI_ENABLE_ENTERPRISE | \
-                           WIFI_ENABLE_BSS_MAX_IDLE)
+                           WIFI_ENABLE_BSS_MAX_IDLE | \
+                           WIFI_ENABLE_PASSIVE_HIDDEN_AP | \
+                           WIFI_ENABLE_OWE_SOFTAP)
+
+#if CONFIG_ESP_WIFI_PRIVACY_ENHANCEMENTS_ENABLED
+#define WIFI_PRIVACY_ENHANCEMENTS_ENABLED true
+#else
+#define WIFI_PRIVACY_ENHANCEMENTS_ENABLED false
+#endif
+
+#ifdef CONFIG_ESP_WIFI_RMAC_AUTO_RESET_INTERVAL
+#define WIFI_RMAC_AUTO_RESET_INTERVAL CONFIG_ESP_WIFI_RMAC_AUTO_RESET_INTERVAL
+#else
+#define WIFI_RMAC_AUTO_RESET_INTERVAL 0
+#endif
 
 #define WIFI_INIT_CONFIG_DEFAULT() { \
     .osi_funcs = &g_wifi_osi_funcs, \
@@ -331,6 +361,8 @@ extern wifi_osi_funcs_t g_wifi_osi_funcs;
     .espnow_max_encrypt_num = CONFIG_ESP_WIFI_ESPNOW_MAX_ENCRYPT_NUM, \
     .tx_hetb_queue_num = WIFI_TX_HETB_QUEUE_NUM, \
     .dump_hesigb_enable = WIFI_DUMP_HESIGB_ENABLED, \
+    .privacy_enhancements = WIFI_PRIVACY_ENHANCEMENTS_ENABLED, \
+    .rmac_auto_reset_int = WIFI_RMAC_AUTO_RESET_INTERVAL, \
     .magic = WIFI_INIT_CONFIG_MAGIC\
 }
 
@@ -730,8 +762,8 @@ esp_err_t esp_wifi_get_protocol(wifi_interface_t ifx, uint8_t *protocol_bitmap);
 /**
   * @brief     Set the bandwidth of specified interface
   *
-  * @attention 1. WIFI_BW_HT40 is supported only when the interface support 11N
-  * @attention 2. When the interface supports 11AX/11AC, it only supports setting WIFI_BW_HT20.
+  * @attention 1. WIFI_BW40 is supported only when the interface support 11N
+  * @attention 2. When the interface supports 11AX/11AC, it only supports setting WIFI_BW20.
   * @attention 3. Can not set WiFi bandwidth under band mode 2.4G + 5G (WIFI_BAND_MODE_AUTO), you can use esp_wifi_set_bandwidths instead
   * @attention 4. API return ESP_ERR_NOT_SUPPORTED if the band mode is set to 2.4G + 5G (WIFI_BAND_MODE_AUTO)
   *
@@ -771,8 +803,9 @@ esp_err_t esp_wifi_get_bandwidth(wifi_interface_t ifx, wifi_bandwidth_t *bw);
   *
   * @attention 1. This API should be called after esp_wifi_start() and before esp_wifi_stop()
   * @attention 2. When device is in STA mode, this API should not be called when STA is scanning or connecting to an external AP
-  * @attention 3. When device is in softAP mode, this API should not be called when softAP has connected to external STAs
-  * @attention 4. When device is in STA+softAP mode, this API should not be called when in the scenarios described above
+  * @attention 3. When device is in softAP mode and has connected to external STAs, it initiates the CSA process
+  * @attention 4. When device is in STA+softAP mode, this API should not be called when STA is scanning or connecting to an external AP
+  *               or softAP has connected to external STAs.
   * @attention 5. The channel info set by this API will not be stored in NVS. So If you want to remember the channel used before WiFi stop,
   *               you need to call this API again after WiFi start, or you can call `esp_wifi_set_config()` to store the channel info in NVS.
   * @attention 6. When operating in 5 GHz band, the second channel is automatically determined by the primary channel according to the 802.11 standard.
@@ -804,6 +837,20 @@ esp_err_t esp_wifi_set_channel(uint8_t primary, wifi_second_chan_t second);
   *    - ESP_ERR_INVALID_ARG: invalid argument
   */
 esp_err_t esp_wifi_get_channel(uint8_t *primary, wifi_second_chan_t *second);
+
+/**
+  * @brief     Get the home channel of device
+  *
+  * @param     primary   store primary channel
+  * @param[out]  second  store second channel
+  *
+  * @return
+  *    - ESP_OK: succeed
+  *    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init
+  *    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start
+  *    - ESP_ERR_INVALID_ARG: invalid argument
+  */
+esp_err_t esp_wifi_get_home_channel(uint8_t *primary, wifi_second_chan_t *second);
 
 /**
   * @brief     configure country info
@@ -1292,54 +1339,6 @@ esp_err_t esp_wifi_get_csi_config(wifi_csi_config_t *config);
 esp_err_t esp_wifi_set_csi(bool en);
 
 /**
-  * @brief     Set antenna GPIO configuration
-  *
-  * @param     config  Antenna GPIO configuration.
-  *
-  * @return
-  *    - ESP_OK: succeed
-  *    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init
-  *    - ESP_ERR_INVALID_ARG: Invalid argument, e.g. parameter is NULL, invalid GPIO number etc
-  */
-esp_err_t esp_wifi_set_ant_gpio(const wifi_ant_gpio_config_t *config) __attribute__((deprecated("Please use esp_phy_set_ant_gpio instead")));
-
-/**
-  * @brief     Get current antenna GPIO configuration
-  *
-  * @param     config  Antenna GPIO configuration.
-  *
-  * @return
-  *    - ESP_OK: succeed
-  *    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init
-  *    - ESP_ERR_INVALID_ARG: invalid argument, e.g. parameter is NULL
-  */
-esp_err_t esp_wifi_get_ant_gpio(wifi_ant_gpio_config_t *config) __attribute__((deprecated("Please use esp_phy_get_ant_gpio instead")));
-
-/**
-  * @brief     Set antenna configuration
-  *
-  * @param     config  Antenna configuration.
-  *
-  * @return
-  *    - ESP_OK: succeed
-  *    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init
-  *    - ESP_ERR_INVALID_ARG: Invalid argument, e.g. parameter is NULL, invalid antenna mode or invalid GPIO number
-  */
-esp_err_t esp_wifi_set_ant(const wifi_ant_config_t *config) __attribute__((deprecated("Please use esp_phy_set_ant instead")));
-
-/**
-  * @brief     Get current antenna configuration
-  *
-  * @param     config  Antenna configuration.
-  *
-  * @return
-  *    - ESP_OK: succeed
-  *    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init
-  *    - ESP_ERR_INVALID_ARG: invalid argument, e.g. parameter is NULL
-  */
-esp_err_t esp_wifi_get_ant(wifi_ant_config_t *config) __attribute__((deprecated("Please use esp_phy_get_ant instead")));
-
-/**
  * @brief      Get the TSF time
  *             In Station mode or SoftAP+Station mode if station is not connected or station doesn't receive at least
  *             one beacon after connected, will return 0
@@ -1461,8 +1460,7 @@ esp_err_t esp_wifi_ftm_resp_set_offset(int16_t offset_cm);
   *                (sizeof(wifi_ftm_report_entry_t) * num_entries) where the API will fill up to num_entries
   *                valid FTM measurements in the buffer. Total number of entries can be found in the event
   *                WIFI_EVENT_FTM_REPORT as ftm_report_num_entries
-  * @attention  2. The internal FTM report is freed upon use of this API which means the API can only be used
-  *                once after every FTM session initiated
+  * @attention  2. The internal FTM report is freed upon use of this API OR after initiating a fresh FTM session
   * @attention  3. Passing the buffer as NULL merely frees the FTM report
   *
   * @param      report  Pointer to the buffer for receiving the FTM report
@@ -1610,6 +1608,8 @@ esp_err_t esp_wifi_config_80211_tx(wifi_interface_t ifx, wifi_tx_rate_config_t *
   * @brief      Disable PMF configuration for specified interface
   *
   * @attention  This API should be called after esp_wifi_set_config() and before esp_wifi_start().
+  * @attention  SoftAP: PMF cannot be disabled for `WIFI_AUTH_WPA3_PSK`, `WIFI_AUTH_WPA2_WPA3_PSK`, `WIFI_AUTH_OWE`, or when `wifi_ap_config_t.wpa3_compatible_mode` is enabled.
+  * @attention  Station: PMF cannot be disabled when `wifi_sta_config_t.threshold.authmode` is `WIFI_AUTH_WPA3_PSK`, `WIFI_AUTH_WPA2_WPA3_PSK`, or `WIFI_AUTH_OWE` (see `wifi_scan_threshold_t`), or when `disable_wpa3_compatible_mode` is false.
   *
   * @param      ifx  Interface to be configured.
   *
@@ -1638,6 +1638,8 @@ esp_err_t esp_wifi_sta_get_aid(uint16_t *aid);
   *
   * @return
   *    - ESP_OK: succeed
+  *    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start
+  *    - ESP_ERR_WIFI_NOT_CONNECT: No connection between STA and AP
   */
 esp_err_t esp_wifi_sta_get_negotiated_phymode(wifi_phy_mode_t *phymode);
 
@@ -1789,8 +1791,8 @@ esp_err_t esp_wifi_get_protocols(wifi_interface_t ifx, wifi_protocols_t *protoco
 /**
   * @brief     Set the bandwidth of specified interface and specified band
   *
-  * @attention 1. WIFI_BW_HT40 is supported only when the interface support 11N
-  * @attention 2. When the interface supports 11AX/11AC, it only supports setting WIFI_BW_HT20.
+  * @attention 1. WIFI_BW40 is supported only when the interface support 11N
+  * @attention 2. When the interface supports 11AX/11AC, it only supports setting WIFI_BW20.
   * @attention 3. When the WiFi band mode is set to 2.4G only, it will not set 5G bandwidth
   * @attention 4. When the WiFi band mode is set to 5G only, it will not set 2.4G bandwidth
   *
@@ -1839,6 +1841,8 @@ esp_err_t esp_wifi_action_tx_req(wifi_action_tx_req_t *req);
 
 /**
   * @brief      Remain on the target channel for required duration
+  *
+  * @attention 1. The API returns ESP_ERR_INVALID_ARG when `req->allow_broadcast` is true and the device operates in AP+STA mode.
   *
   * @param    req  roc request structure containing relevant fields
   *

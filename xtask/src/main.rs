@@ -49,6 +49,7 @@ fn main() -> Result<()> {
         ("esp32c6", "riscv32-esp-elf", Arch::RiscV),
         ("esp32c5", "riscv32-esp-elf", Arch::RiscV),
         ("esp32c61", "riscv32-esp-elf", Arch::RiscV),
+        ("esp32s31", "riscv32-esp-elf", Arch::RiscV),
     ];
 
     for (chip, tool, arch) in chips {
@@ -65,7 +66,7 @@ fn generate_bindings_for_chip(
     tools: &Path,
     tool: &str,
 ) -> Result<()> {
-    let sysroot_path = tools.join(format!("{tool}/esp-13.2.0_20230928/{tool}"));
+    let sysroot_path = tools.join(format!("{tool}/esp-15.2.0_20251204/{tool}"));
     let include_path = sysroot_path.join(format!("{tool}/include"));
     let c_path = workspace.join("c");
     let crate_path = workspace.join(format!("esp-wifi-sys-{chip}"));

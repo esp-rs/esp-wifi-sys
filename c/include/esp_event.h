@@ -12,8 +12,6 @@
 
 
 
-
-
 #include "esp_event_base.h"
 
 #ifdef __cplusplus
