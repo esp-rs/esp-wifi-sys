@@ -6,6 +6,7 @@ fn main() {
 
     let libs = [
         "ble_app",
+        "btdm_common",
         "btbb",
         "coexist",
         "core",
