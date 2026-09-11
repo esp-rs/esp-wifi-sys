@@ -41,7 +41,7 @@ struct timeval {
 #include "esp_coexist_adapter.h"
 #endif
 
-#if ( defined(CONFIG_IDF_TARGET_ESP32C6) || defined(CONFIG_IDF_TARGET_ESP32H2) || defined(CONFIG_IDF_TARGET_ESP32C5) )
+#if ( defined(CONFIG_IDF_TARGET_ESP32C6) || defined(CONFIG_IDF_TARGET_ESP32H2) || defined(CONFIG_IDF_TARGET_ESP32C5) || defined(CONFIG_IDF_TARGET_ESP32S31))
 #include "esp_coexist.h"
 #include "esp_coex_i154.h"
 #endif

@@ -13242,6 +13242,53 @@ extern "C" {
     #[doc = " @brief     Check the MD5 values of the coexistence adapter header files in IDF and WiFi library\n\n @attention 1. It is used for internal CI version check\n\n @return\n     - ESP_OK : succeed\n     - ESP_WIFI_INVALID_ARG : MD5 check fail"]
     pub fn esp_coex_adapter_funcs_md5_check(md5: *const crate::c_types::c_char) -> esp_err_t;
 }
+pub const ieee802154_coex_event_t_IEEE802154_HIGH: ieee802154_coex_event_t = 1;
+pub const ieee802154_coex_event_t_IEEE802154_MIDDLE: ieee802154_coex_event_t = 2;
+pub const ieee802154_coex_event_t_IEEE802154_LOW: ieee802154_coex_event_t = 3;
+pub const ieee802154_coex_event_t_IEEE802154_IDLE: ieee802154_coex_event_t = 4;
+pub const ieee802154_coex_event_t_IEEE802154_EVENT_MAX: ieee802154_coex_event_t = 5;
+#[doc = " @brief 802.15.4 coex event"]
+pub type ieee802154_coex_event_t = crate::c_types::c_uint;
+#[doc = " @brief 802.15.4 coexistence configurations"]
+#[repr(C)]
+#[derive(Copy, Clone)]
+pub struct esp_ieee802154_coex_config_t {
+    pub idle: ieee802154_coex_event_t,
+    pub txrx: ieee802154_coex_event_t,
+    pub txrx_at: ieee802154_coex_event_t,
+}
+extern "C" {
+    #[doc = " @brief Set 802.15.4 tx/rx pti\n @param 802.15.4 coexistence event"]
+    pub fn esp_coex_ieee802154_txrx_pti_set(event: ieee802154_coex_event_t);
+}
+extern "C" {
+    #[doc = " @brief Set 802.15.4 ack pti\n @param 802.15.4 coexistence event"]
+    pub fn esp_coex_ieee802154_ack_pti_set(event: ieee802154_coex_event_t);
+}
+extern "C" {
+    #[doc = " @brief Indicate that a coexistence break occurred in 802.15.4"]
+    pub fn esp_coex_ieee802154_coex_break_notify();
+}
+extern "C" {
+    #[doc = " @brief Enter the TX stage for 802.15.4 external coexistence handling"]
+    pub fn esp_coex_ieee802154_extcoex_tx_stage();
+}
+extern "C" {
+    #[doc = " @brief Enter the RX stage for 802.15.4 external coexistence handling"]
+    pub fn esp_coex_ieee802154_extcoex_rx_stage();
+}
+extern "C" {
+    #[doc = " @brief Enable the 802.15.4 status for coexistence"]
+    pub fn esp_coex_ieee802154_status_enable();
+}
+extern "C" {
+    #[doc = " @brief Disable the 802.15.4 status for coexistence"]
+    pub fn esp_coex_ieee802154_status_disable();
+}
+extern "C" {
+    #[doc = " @brief Configure the 802.15.4 force Rx state\n @param enable true to enable, false to disable"]
+    pub fn esp_coex_ieee802154_force_rx_enable(enable: bool);
+}
 extern "C" {
     #[doc = " @brief     Set up an individual TWT agreement (NegotiationType=0) or change TWT parameters of the existing TWT agreement\n            - TWT Wake Interval = TWT Wake Interval Mantissa * (2 ^ TWT Wake Interval Exponent), unit: us\n            - e.g. TWT Wake Interval Mantissa = 512,  TWT Wake Interval Exponent = 12, then TWT Wake Interval is 2097.152 ms\n                   Nominal Minimum Wake Duration = 255, then TWT Wake Duration is 65.28 ms\n\n @attention  Support at most 8 TWT agreements, otherwise ESP_ERR_WIFI_TWT_FULL will be returned.\n             Support sleep time up to (1 << 35) us.\n\n @param[in,out]   setup_config pointer to itwt setup config structure.\n\n @return\n    - ESP_OK: succeed\n    - ESP_ERR_WIFI_NOT_INIT: WiFi is not initialized by esp_wifi_init\n    - ESP_ERR_WIFI_NOT_STARTED: WiFi is not started by esp_wifi_start\n    - ESP_ERR_WIFI_CONN: WiFi internal error, station or soft-AP control block wrong\n    - ESP_ERR_WIFI_NOT_CONNECT: The station is in disconnect status\n    - ESP_ERR_WIFI_TWT_FULL: no available flow id\n    - ESP_ERR_INVALID_ARG: invalid argument"]
     pub fn esp_wifi_sta_itwt_setup(setup_config: *mut wifi_itwt_setup_config_t) -> esp_err_t;
