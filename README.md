@@ -17,6 +17,10 @@ rust-lld: error: relocation refers to a symbol in a discarded section: .L0
 You can strip the `.eh_frame` segment from these binaries like this, to make it work:
 `riscv32-esp-elf-objcopy --remove-section=.eh_frame esp-wifi-sys-esp32c61/libs/libphy.a`
 
+(This seems to be fixed now, the above step wasn't needed for the last update.)
+
+Make sure to NOT use a `libclang` version later than 21! It will generate structs containing just a single field `pub _address: u8`.
+
 
 ## License
 
