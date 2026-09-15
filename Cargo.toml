@@ -9,6 +9,7 @@ members = [
     "esp-wifi-sys-esp32h2",
     "esp-wifi-sys-esp32s2",
     "esp-wifi-sys-esp32s3",
+    "esp-wifi-sys-esp32s31",
     "xtask",
 ]
 resolver = "2"
