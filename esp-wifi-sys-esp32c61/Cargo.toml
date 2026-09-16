@@ -2,7 +2,7 @@
 name        = "esp-wifi-sys-esp32c61"
 version     = "0.3.0"
 edition     = "2021"
-description = "Bindings to Espressif's WiFi and Bluetooth low-level drivers for ESP32-C6"
+description = "Bindings to Espressif's WiFi and Bluetooth low-level drivers for ESP32-C61"
 repository  = "https://github.com/esp-rs/esp-wifi-sys"
 license     = "MIT OR Apache-2.0"
 
