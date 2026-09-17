@@ -17,6 +17,8 @@ fn main() {
         "smartconfig",
         "wapi",
         "wpa_supplicant",
+        // mbedTLS crypto the supplicant's WPA3-Personal (SAE) is built on
+        "mbedcrypto",
         "printf",
         "regulatory",
     ];
