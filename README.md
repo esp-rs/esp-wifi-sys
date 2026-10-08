@@ -6,6 +6,16 @@ If you are looking for `esp-wifi` see [esp-radio in esp-hal](https://github.com/
 
 The headers and libraries are prepared in [esp-wireless-drivers-3rdparty](https://github.com/esp-rs/esp-wireless-drivers-3rdparty).
 
+## Features
+
+Only the static libraries needed by the enabled features are linked. `libphy` and `libprintf` (and `librtc` on ESP32) are always linked.
+
+- `wifi`: the Wi-Fi driver libraries
+- `bt`: the Bluetooth controller libraries
+- `ieee802154`: the libraries needed by the IEEE 802.15.4 driver (ESP32-C5, ESP32-C6, ESP32-H2, ESP32-S31)
+
+Each crate only provides the features its chip supports. `libcoexist` is linked when any of them is enabled.
+
 Depending on the `lld` version used by the toolchain you might see linker errors like this after copying the libs:
 
 ```

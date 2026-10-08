@@ -19,5 +19,8 @@ default = []
 # Enable log output from binary blobs - requires nightly
 sys-logs = []
 
+# Link the Wi-Fi driver libraries
+wifi = []
+
 [package.metadata.docs.rs]
 features = []

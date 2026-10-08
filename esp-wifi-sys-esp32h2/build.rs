@@ -4,9 +4,18 @@ fn main() {
     // Put the linker script somewhere the linker can find it
     let out = PathBuf::from(env::var_os("OUT_DIR").unwrap());
 
-    let libs = ["ble_app", "btbb", "coexist", "phy", "printf"];
+    let bt = env::var_os("CARGO_FEATURE_BT").is_some();
+    let ieee802154 = env::var_os("CARGO_FEATURE_IEEE802154").is_some();
 
-    for lib in libs {
+    let libs = [
+        ("ble_app", bt),
+        ("btbb", bt || ieee802154),
+        ("coexist", bt || ieee802154),
+        ("phy", true),
+        ("printf", true),
+    ];
+
+    for (lib, _) in libs.into_iter().filter(|(_, enabled)| *enabled) {
         std::fs::copy(
             format!("libs/lib{}.a", lib),
             out.join(format!("lib{}.a", lib)),
