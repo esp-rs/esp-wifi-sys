@@ -19,5 +19,10 @@ default = []
 # Enable log output from binary blobs - requires nightly
 sys-logs = []
 
+# Link the Bluetooth controller libraries
+bt = []
+# Link the libraries needed by the IEEE 802.15.4 driver
+ieee802154 = []
+
 [package.metadata.docs.rs]
 features = []

@@ -19,5 +19,10 @@ default = []
 # Enable log output from binary blobs - requires nightly
 sys-logs = []
 
+# Link the Wi-Fi driver libraries
+wifi = []
+# Link the Bluetooth controller libraries
+bt = []
+
 [package.metadata.docs.rs]
 features = []
