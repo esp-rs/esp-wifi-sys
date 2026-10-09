@@ -1,0 +1,28 @@
+[package]
+name        = "esp-wifi-sys-esp32h4"
+version     = "0.3.0"
+edition     = "2021"
+description = "Bindings to Espressif's Bluetooth low-level drivers for ESP32-H4"
+repository  = "https://github.com/esp-rs/esp-wifi-sys"
+license     = "MIT OR Apache-2.0"
+
+keywords   = ["bluetooth", "esp", "no-std"]
+categories = ["embedded", "hardware-support", "no-std"]
+
+[dependencies]
+log   = { version = "0.4.25", optional = true }
+defmt = { version = "1.0.1", optional = true }
+
+[features]
+default = []
+
+# Enable log output from binary blobs - requires nightly
+sys-logs = []
+
+# Link the Bluetooth controller libraries
+bt = []
+# Link the libraries needed by the IEEE 802.15.4 driver
+ieee802154 = []
+
+[package.metadata.docs.rs]
+features = []
