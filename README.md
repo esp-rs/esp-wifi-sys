@@ -12,7 +12,7 @@ Only the static libraries needed by the enabled features are linked. `libphy` an
 
 - `wifi`: the Wi-Fi driver libraries
 - `bt`: the Bluetooth controller libraries
-- `ieee802154`: the libraries needed by the IEEE 802.15.4 driver (ESP32-C5, ESP32-C6, ESP32-H2, ESP32-S31)
+- `ieee802154`: the libraries needed by the IEEE 802.15.4 driver (ESP32-C5, ESP32-C6, ESP32-H2, ESP32-H4, ESP32-S31)
 
 Each crate only provides the features its chip supports. `libcoexist` is linked when any of them is enabled.
 
