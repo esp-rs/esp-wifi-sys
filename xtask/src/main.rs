@@ -50,6 +50,7 @@ fn main() -> Result<()> {
         ("esp32c5", "riscv32-esp-elf", Arch::RiscV),
         ("esp32c61", "riscv32-esp-elf", Arch::RiscV),
         ("esp32s31", "riscv32-esp-elf", Arch::RiscV),
+        ("esp32h4", "riscv32-esp-elf", Arch::RiscV),
     ];
 
     for (chip, tool, arch) in chips {
