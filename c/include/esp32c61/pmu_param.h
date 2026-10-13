@@ -16,8 +16,6 @@
 extern "C" {
 #endif
 
-//TODO: [ESP32C61] IDF-9250
-
 #define HP_CALI_DBIAS_DEFAULT   26
 #define LP_CALI_DBIAS_DEFAULT   25
 #define HP_CALI_DBIAS_SLP_1V1   22
@@ -328,13 +326,15 @@ typedef struct {
 #define PMU_SLEEP_DIGITAL_LSLP_CONFIG_DEFAULT(sleep_flags, clk_flags) { \
     .syscntl = {                                                        \
         .dig_pad_slp_sel = ((sleep_flags) & PMU_SLEEP_PD_TOP) ? 0 : 1,  \
+        .dig_pause_wdt = ((sleep_flags) & RTC_SLEEP_USE_RTC_WDT) ? 0 : 1, \
     },                                                                  \
-    .icg_func = clk_flags                                               \
+    .icg_func = (uint32_t)(clk_flags)                                   \
 }
 
 #define PMU_SLEEP_DIGITAL_DSLP_CONFIG_DEFAULT(sleep_flags, clk_flags) { \
     .syscntl = {                                                        \
         .dig_pad_slp_sel = 1,                                           \
+        .dig_pause_wdt = ((sleep_flags) & RTC_SLEEP_USE_RTC_WDT) ? 0 : 1, \
     },                                                                  \
     .icg_func = 0                                                       \
 }

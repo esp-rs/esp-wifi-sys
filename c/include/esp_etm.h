@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2022 Espressif Systems (Shanghai) CO LTD
+ * SPDX-FileCopyrightText: 2022-2024 Espressif Systems (Shanghai) CO LTD
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -8,6 +8,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include "esp_err.h"
+#include "hal/etm_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,7 +33,12 @@ typedef struct esp_etm_task_t *esp_etm_task_handle_t;
  * @brief ETM channel configuration
  */
 typedef struct {
-
+    etm_clock_source_t clk_src; /*!< Clock source for the ETM channel */
+    /// Extra configuration flags for ETM channel
+    struct etm_chan_flags {
+        uint32_t allow_pd : 1; /*!< If set, driver allows the power domain to be powered off when system enters sleep mode.
+                                    This can save power, but at the expense of more RAM being consumed to save register context. */
+    } flags; /*!< ETM channel flags */
 } esp_etm_channel_config_t;
 
 /**
