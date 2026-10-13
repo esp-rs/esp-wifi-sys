@@ -88,30 +88,12 @@ fn generate_bindings_for_chip(
     let bindings = Builder::default()
         .clang_args([
             &format!("-DCONFIG_IDF_TARGET_{}", chip.to_uppercase()),
+            // Don't shadow `c/include` with header copies: they go stale on ESP-IDF
+            // updates and break the ABI (e.g. wrong `ESP_WIFI_MAX_CONN_NUM`).
             &format!(
                 "-I{}",
                 c_path
-                    .join("headers")
-                    .display()
-                    .to_string()
-                    .replace("\\", "/")
-                    .replace("//?/C:", "")
-            ),
-            &format!(
-                "-I{}",
-                c_path
-                    .join("headers")
-                    .join(chip)
-                    .display()
-                    .to_string()
-                    .replace("\\", "/")
-                    .replace("//?/C:", "")
-            ),
-            &format!(
-                "-I{}",
-                c_path
-                    .join("headers")
-                    .join("local")
+                    .join("include")
                     .display()
                     .to_string()
                     .replace("\\", "/")
@@ -121,6 +103,7 @@ fn generate_bindings_for_chip(
                 "-I{}",
                 c_path
                     .join("include")
+                    .join("local")
                     .display()
                     .to_string()
                     .replace("\\", "/")

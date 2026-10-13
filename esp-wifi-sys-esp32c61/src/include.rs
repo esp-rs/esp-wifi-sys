@@ -1368,7 +1368,7 @@ pub const ESP_DPP_MAX_KEY_LEN: u32 = 128;
 pub const FLOW_ID_ALL: u32 = 8;
 pub const BTWT_ID_ALL: u32 = 32;
 pub const BSS_MAX_COLOR: u32 = 63;
-pub const ESP_WIFI_MAX_CONN_NUM: u32 = 10;
+pub const ESP_WIFI_MAX_CONN_NUM: u32 = 15;
 pub const ESP_WIFI_CRYPTO_VERSION: u32 = 1;
 pub const ESP_ERR_WIFI_NOT_INIT: u32 = 12289;
 pub const ESP_ERR_WIFI_NOT_STARTED: u32 = 12290;
@@ -8642,7 +8642,7 @@ impl esp_wifi_btwt_info_t {
 #[derive(Copy, Clone)]
 pub struct wifi_sta_list_t {
     #[doc = "< station list"]
-    pub sta: [wifi_sta_info_t; 10usize],
+    pub sta: [wifi_sta_info_t; 15usize],
     #[doc = "< number of stations in the list (other entries are invalid)"]
     pub num: crate::c_types::c_int,
 }
