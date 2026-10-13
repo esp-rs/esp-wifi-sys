@@ -1,4 +1,4 @@
-# esp-wifi-sys-esp32c61
+# esp-wifi-sys-esp32s31
 
 Low-level unsafe bindings for the binary blobs required by the Wi-Fi/Bluetooth LE radio.
 
