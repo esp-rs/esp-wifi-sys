@@ -86,17 +86,17 @@ fn main() -> Result<()> {
         .map(|name| gen::load(name, &drivers))
         .collect::<Result<Vec<_>>>()?;
 
-    write_file(
+    write_text(
         &workspace.join("Cargo.toml"),
-        gen::workspace_toml(&fs::read_to_string(workspace.join("Cargo.toml"))?, &chips)?,
+        &gen::workspace_toml(&fs::read_to_string(workspace.join("Cargo.toml"))?, &chips)?,
     )?;
-    write_file(
+    write_text(
         &workspace.join("README.md"),
-        gen::root_readme(&fs::read_to_string(workspace.join("README.md"))?, &chips)?,
+        &gen::root_readme(&fs::read_to_string(workspace.join("README.md"))?, &chips)?,
     )?;
-    let include_h_changed = write_file(
+    let include_h_changed = write_text(
         &workspace.join("c/include/include.h"),
-        gen::include_h(
+        &gen::include_h(
             &fs::read_to_string(workspace.join("c/include/include.h"))?,
             &chips,
         )?,
@@ -105,15 +105,15 @@ fn main() -> Result<()> {
     for chip in &chips {
         let dir = workspace.join(chip.crate_name());
         let current = fs::read_to_string(dir.join("Cargo.toml")).ok();
-        write_file(
+        write_text(
             &dir.join("Cargo.toml"),
-            gen::cargo_toml(chip, current.as_deref()),
+            &gen::cargo_toml(chip, current.as_deref()),
         )?;
-        write_file(&dir.join("build.rs"), gen::build_rs(chip)?)?;
-        write_file(&dir.join(".cargo/config.toml"), gen::cargo_config(chip))?;
-        write_file(&dir.join("README.md"), gen::readme(chip))?;
+        write_text(&dir.join("build.rs"), &gen::build_rs(chip)?)?;
+        write_text(&dir.join(".cargo/config.toml"), &gen::cargo_config(chip))?;
+        write_text(&dir.join("README.md"), &gen::readme(chip))?;
         for (file, content) in gen::STATICS {
-            write_file(&dir.join(file), content)?;
+            write_text(&dir.join(file), content)?;
         }
     }
 
@@ -191,6 +191,19 @@ fn write_file(path: &Path, content: impl AsRef<[u8]>) -> Result<bool> {
     Ok(true)
 }
 
+/// Like `write_file`, but uses the newline style of the file already at `path`, so a CRLF
+/// checkout (`core.autocrlf=true`) isn't rewritten to LF.
+fn write_text(path: &Path, content: &str) -> Result<bool> {
+    let crlf = fs::read_to_string(path).is_ok_and(|old| old.contains("\r\n"));
+    let content = content.replace("\r\n", "\n");
+    let content = if crlf {
+        content.replace('\n', "\r\n")
+    } else {
+        content
+    };
+    write_file(path, content)
+}
+
 /// Mirrors `from` into `to`, leaving `ignore`d paths alone. Returns whether anything changed.
 fn sync_dir(from: &Path, to: &Path, ignore: impl Fn(&Path) -> bool) -> Result<bool> {
     let mut changed = false;
@@ -239,6 +252,13 @@ fn files_in(dir: &Path) -> Vec<PathBuf> {
     out
 }
 
+/// `path` with forward slashes and without the `\\?\` prefix `canonicalize` adds on Windows. The
+/// drive letter stays, so paths on drives other than `C:` still resolve.
+fn clang_path(path: &Path) -> String {
+    let path = path.display().to_string().replace('\\', "/");
+    path.strip_prefix("//?/").unwrap_or(&path).to_string()
+}
+
 fn generate_bindings_for_chip(
     chip: &str,
     arch: Arch,
@@ -258,51 +278,11 @@ fn generate_bindings_for_chip(
             &format!("-DCONFIG_IDF_TARGET_{}", chip.to_uppercase()),
             // Don't shadow `c/include` with header copies: they go stale on ESP-IDF
             // updates and break the ABI (e.g. wrong `ESP_WIFI_MAX_CONN_NUM`).
-            &format!(
-                "-I{}",
-                c_path
-                    .join("include")
-                    .display()
-                    .to_string()
-                    .replace("\\", "/")
-                    .replace("//?/C:", "")
-            ),
-            &format!(
-                "-I{}",
-                c_path
-                    .join("include")
-                    .join("local")
-                    .display()
-                    .to_string()
-                    .replace("\\", "/")
-                    .replace("//?/C:", "")
-            ),
-            &format!(
-                "-I{}",
-                include_path
-                    .display()
-                    .to_string()
-                    .replace("\\", "/")
-                    .replace("//?/C:", "")
-            ),
-            &format!(
-                "-I{}",
-                c_path
-                    .join("include")
-                    .join(chip)
-                    .display()
-                    .to_string()
-                    .replace("\\", "/")
-                    .replace("//?/C:", "")
-            ),
-            &format!(
-                "--sysroot={}",
-                sysroot_path
-                    .display()
-                    .to_string()
-                    .replace("\\", "/")
-                    .replace("//?/C:", "")
-            ),
+            &format!("-I{}", clang_path(&c_path.join("include"))),
+            &format!("-I{}", clang_path(&c_path.join("include").join("local"))),
+            &format!("-I{}", clang_path(&include_path)),
+            &format!("-I{}", clang_path(&c_path.join("include").join(chip))),
+            &format!("--sysroot={}", clang_path(&sysroot_path)),
             &format!(
                 "--target={}",
                 if arch == Arch::Xtensa {

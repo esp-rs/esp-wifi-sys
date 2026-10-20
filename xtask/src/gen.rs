@@ -326,19 +326,23 @@ pub(crate) fn build_rs(chip: &Chip) -> Result<String> {
 /// The workspace `Cargo.toml` with `members` set to the chip crates and `xtask`. Any other member
 /// is dropped.
 pub(crate) fn workspace_toml(current: &str, chips: &[Chip]) -> Result<String> {
-    let (before, rest) = current
-        .split_once("members = [\n")
+    let lines: Vec<&str> = current.lines().collect();
+    let start = lines
+        .iter()
+        .position(|line| line.trim() == "members = [")
         .ok_or_else(|| anyhow!("Cargo.toml has no `members = [` block"))?;
-    let (_, after) = rest
-        .split_once("]\n")
+    let end = lines[start..]
+        .iter()
+        .position(|line| line.trim() == "]")
+        .map(|i| start + i)
         .ok_or_else(|| anyhow!("Cargo.toml has an unclosed `members = [` block"))?;
-    let mut out = format!("{before}members = [\n");
+    let mut out: Vec<String> = lines[..=start].iter().map(|l| l.to_string()).collect();
     for chip in chips {
-        out.push_str(&format!("    \"{}\",\n", chip.crate_name()));
+        out.push(format!("    \"{}\",", chip.crate_name()));
     }
-    out.push_str("    \"xtask\",\n]\n");
-    out.push_str(after);
-    Ok(out)
+    out.push("    \"xtask\",".to_string());
+    out.extend(lines[end..].iter().map(|l| l.to_string()));
+    Ok(out.join("\n") + "\n")
 }
 
 pub(crate) fn cargo_config(chip: &Chip) -> String {
