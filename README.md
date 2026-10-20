@@ -16,6 +16,19 @@ Only the static libraries needed by the enabled features are linked. `libphy` an
 
 Each crate only provides the features its chip supports. `libcoexist` is linked when any of them is enabled.
 
+## Updating the drivers and adding chips
+
+`cargo xtask [chips]` syncs this repository from `../esp-wireless-drivers-3rdparty` (or `--drivers <path>`):
+
+- each crate's `Cargo.toml`, `build.rs`, `.cargo/config.toml`, `README.md` and `src/`, derived from `xtask/templates/` plus the chip's target and radios (`include/<chip>/sdkconfig.h`) and archives (`libs/<chip>/`). The crate version is kept from the existing `Cargo.toml`
+- the headers in `c/include/` and libraries in `esp-wifi-sys-<chip>/libs/`
+- the `#if` above `esp_bt.h` and `esp_coex_i154.h` in `c/include/include.h`, the workspace `members` in `Cargo.toml`, and the `ieee802154` chip list in this README
+- `src/include.rs` for each selected chip, unless `--skip-bindings` is passed. If the shared headers in `c/include/` changed, it warns about the chips whose bindings it didn't regenerate
+
+To add a chip, add it to esp-wireless-drivers-3rdparty first, then run `cargo xtask <chip>`. That creates `esp-wifi-sys-<chip>`.
+
+The libraries each crate links come from `LIBS` in `xtask/src/gen.rs`, filtered to the archives present in that crate's `libs/`. `libbredr_app.a` is ignored because esp-radio doesn't link it.
+
 Depending on the `lld` version used by the toolchain you might see linker errors like this after copying the libs:
 
 ```

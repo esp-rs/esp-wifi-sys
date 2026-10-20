@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2024 Espressif Systems (Shanghai) CO LTD
+ * SPDX-FileCopyrightText: 2024-2025 Espressif Systems (Shanghai) CO LTD
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -23,6 +23,12 @@ __attribute__((always_inline))
 static inline void modem_lpcon_ll_enable_test_clk(modem_lpcon_dev_t *hw, bool en)
 {
     hw->test_conf.clk_en = en;
+}
+
+__attribute__((always_inline))
+static inline bool modem_lpcon_ll_test_clk_is_enabled(modem_lpcon_dev_t *hw)
+{
+    return hw->test_conf.clk_en;
 }
 
 __attribute__((always_inline))
@@ -146,7 +152,7 @@ static inline void modem_lpcon_ll_set_clk_modem_aon_force(modem_lpcon_dev_t *hw,
 }
 
 __attribute__((always_inline))
-static inline void modem_lpcon_ll_select_modem_32k_clock_source(modem_lpcon_dev_t *hw, uint32_t src)
+static inline void modem_lpcon_ll_select_modem_32k_clock_source(modem_lpcon_dev_t *hw, modem_clock_32k_clk_src_t src)
 {
     hw->modem_32k_clk_conf.clk_modem_32k_sel = src;
 }
@@ -161,6 +167,12 @@ __attribute__((always_inline))
 static inline void modem_lpcon_ll_enable_coex_clock(modem_lpcon_dev_t *hw, bool en)
 {
     hw->clk_conf.clk_coex_en = en;
+}
+
+__attribute__((always_inline))
+static inline bool modem_lpcon_ll_coex_clock_is_enabled(modem_lpcon_dev_t *hw)
+{
+    return hw->clk_conf.clk_coex_en;
 }
 
 __attribute__((always_inline))
@@ -267,12 +279,6 @@ __attribute__((always_inline))
 static inline void modem_lpcon_ll_set_pwr_tick_target(modem_lpcon_dev_t *hw, uint32_t val)
 {
     hw->tick_conf.modem_pwr_tick_target = val;
-}
-
-__attribute__((always_inline))
-static inline uint32_t modem_lpcon_ll_get_date(modem_lpcon_dev_t *hw)
-{
-    return hw->date.val;
 }
 
 __attribute__((always_inline))
