@@ -2045,6 +2045,11 @@ pub const SOC_USB_OTG_PERIPH_NUM: u32 = 1;
 pub const SOC_USB_FSLS_PHY_NUM: u32 = 1;
 pub const SOC_ASRC_SUPPORTED: u32 = 1;
 pub const ESP_CAL_DATA_CHECK_FAIL: u32 = 1;
+pub const SOC_EXT_OSC_SLOW_GPIO_NUM: u32 = 5;
+pub const SOC_CLK_RC_FAST_FREQ_APPROX: u32 = 20000000;
+pub const SOC_CLK_RC_SLOW_FREQ_APPROX: u32 = 600000;
+pub const SOC_CLK_XTAL32K_FREQ_APPROX: u32 = 32768;
+pub const SOC_CLK_OSC_SLOW_FREQ_APPROX: u32 = 32768;
 pub const UC_BT_CTRL_SLEEP_ENABLE: u32 = 0;
 pub const UC_BT_CTRL_TASK_STACK_SIZE: u32 = 4096;
 pub const UC_HCI_UART_EN: u32 = 0;
@@ -10823,6 +10828,378 @@ extern "C" {
     #[doc = " @brief Wait for frequency hardware hop to complete\n"]
     pub fn phy_wait_freq_hw_hop_done();
 }
+#[doc = "< Internal 20MHz RC oscillator"]
+pub const soc_root_clk_t_SOC_ROOT_CLK_INT_RC_FAST: soc_root_clk_t = 0;
+#[doc = "< Internal 600kHz RC oscillator"]
+pub const soc_root_clk_t_SOC_ROOT_CLK_INT_RC_SLOW: soc_root_clk_t = 1;
+#[doc = "< External 32MHz crystal"]
+pub const soc_root_clk_t_SOC_ROOT_CLK_EXT_XTAL: soc_root_clk_t = 2;
+#[doc = "< External 32kHz crystal"]
+pub const soc_root_clk_t_SOC_ROOT_CLK_EXT_XTAL32K: soc_root_clk_t = 3;
+#[doc = "< External slow clock signal at pin5"]
+pub const soc_root_clk_t_SOC_ROOT_CLK_EXT_OSC_SLOW: soc_root_clk_t = 4;
+#[doc = " @brief Root clock"]
+pub type soc_root_clk_t = crate::c_types::c_uint;
+#[doc = "< BBPLL_CLK is the output of the PLL generator circuit"]
+pub const soc_root_clk_circuit_t_SOC_ROOT_CIRCUIT_CLK_BBPLL: soc_root_clk_circuit_t = 0;
+#[doc = "< XTAL_X2_CLK is the output of the XTAL_X2 generator circuit"]
+pub const soc_root_clk_circuit_t_SOC_ROOT_CIRCUIT_CLK_XTAL_X2: soc_root_clk_circuit_t = 1;
+#[doc = " @brief ROOT clock circuit, which requires explicitly enabling the targeting circuit to use"]
+pub type soc_root_clk_circuit_t = crate::c_types::c_uint;
+#[doc = "< Select XTAL_CLK as CPU_CLK source"]
+pub const soc_cpu_clk_src_t_SOC_CPU_CLK_SRC_XTAL: soc_cpu_clk_src_t = 0;
+#[doc = "< Select RC_FAST_CLK as CPU_CLK source"]
+pub const soc_cpu_clk_src_t_SOC_CPU_CLK_SRC_RC_FAST: soc_cpu_clk_src_t = 1;
+#[doc = "< Select XTAL_X2_CLK as CPU_CLK source (XTAL_X2_CLK is the other output of 32MHz crystal oscillator frequency multiplier, 64MHz)"]
+pub const soc_cpu_clk_src_t_SOC_CPU_CLK_SRC_XTAL_X2: soc_cpu_clk_src_t = 2;
+#[doc = "< Select PLL_CLK as CPU_CLK source (PLL_CLK is the output of 32MHz crystal oscillator frequency multiplier, 96MHz)"]
+pub const soc_cpu_clk_src_t_SOC_CPU_CLK_SRC_PLL: soc_cpu_clk_src_t = 3;
+#[doc = "< Invalid CPU_CLK source"]
+pub const soc_cpu_clk_src_t_SOC_CPU_CLK_SRC_INVALID: soc_cpu_clk_src_t = 4;
+#[doc = " @brief CPU_CLK mux inputs, which are the supported clock sources for the CPU_CLK\n @note Enum values are matched with the register field values on purpose"]
+pub type soc_cpu_clk_src_t = crate::c_types::c_uint;
+#[doc = "< Select RC_SLOW_D4_CLK as RTC_SLOW_CLK source"]
+pub const soc_rtc_slow_clk_src_t_SOC_RTC_SLOW_CLK_SRC_RC_SLOW_D4: soc_rtc_slow_clk_src_t = 0;
+#[doc = "< Select XTAL32K_CLK as RTC_SLOW_CLK source"]
+pub const soc_rtc_slow_clk_src_t_SOC_RTC_SLOW_CLK_SRC_XTAL32K: soc_rtc_slow_clk_src_t = 1;
+#[doc = "< Select OSC_SLOW_CLK (external slow clock) as RTC_SLOW_CLK source"]
+pub const soc_rtc_slow_clk_src_t_SOC_RTC_SLOW_CLK_SRC_OSC_SLOW: soc_rtc_slow_clk_src_t = 3;
+#[doc = "< Invalid RTC_SLOW_CLK source"]
+pub const soc_rtc_slow_clk_src_t_SOC_RTC_SLOW_CLK_SRC_INVALID: soc_rtc_slow_clk_src_t = 4;
+#[doc = "< RC_SLOW_D4_CLK is the default clock source for RTC_SLOW_CLK"]
+pub const soc_rtc_slow_clk_src_t_SOC_RTC_SLOW_CLK_SRC_DEFAULT: soc_rtc_slow_clk_src_t = 0;
+#[doc = " @brief RTC_SLOW_CLK mux inputs, which are the supported clock sources for the RTC_SLOW_CLK\n @note Enum values are matched with the register field values on purpose"]
+pub type soc_rtc_slow_clk_src_t = crate::c_types::c_uint;
+#[doc = "< Select RC_FAST_CLK as RTC_FAST_CLK source"]
+pub const soc_rtc_fast_clk_src_t_SOC_RTC_FAST_CLK_SRC_RC_FAST: soc_rtc_fast_clk_src_t = 0;
+#[doc = "< Select XTAL_D2_CLK as RTC_FAST_CLK source"]
+pub const soc_rtc_fast_clk_src_t_SOC_RTC_FAST_CLK_SRC_XTAL_D2: soc_rtc_fast_clk_src_t = 1;
+#[doc = "< Alias name for `SOC_RTC_FAST_CLK_SRC_XTAL_D2`"]
+pub const soc_rtc_fast_clk_src_t_SOC_RTC_FAST_CLK_SRC_XTAL_DIV: soc_rtc_fast_clk_src_t = 1;
+#[doc = "< Invalid RTC_FAST_CLK source"]
+pub const soc_rtc_fast_clk_src_t_SOC_RTC_FAST_CLK_SRC_INVALID: soc_rtc_fast_clk_src_t = 2;
+#[doc = "< XTAL_D2_CLK is the default clock source for RTC_FAST_CLK"]
+pub const soc_rtc_fast_clk_src_t_SOC_RTC_FAST_CLK_SRC_DEFAULT: soc_rtc_fast_clk_src_t = 1;
+#[doc = " @brief RTC_FAST_CLK mux inputs, which are the supported clock sources for the RTC_FAST_CLK\n @note Enum values are matched with the register field values on purpose"]
+pub type soc_rtc_fast_clk_src_t = crate::c_types::c_uint;
+#[doc = "< 32MHz XTAL"]
+pub const soc_xtal_freq_t_SOC_XTAL_FREQ_32M: soc_xtal_freq_t = 32;
+#[doc = " @brief Possible main XTAL frequency options on the target\n @note Enum values equal to the frequency value in MHz\n @note Not all frequency values listed here are supported in IDF. Please check SOC_XTAL_SUPPORT_XXX in soc_caps.h for\n       the supported ones."]
+pub type soc_xtal_freq_t = crate::c_types::c_uint;
+#[doc = "< CPU_CLK can be sourced from XTAL, PLL, RC_FAST, or XTAL_X2 by configuring soc_cpu_clk_src_t"]
+pub const soc_module_clk_t_SOC_MOD_CLK_CPU: soc_module_clk_t = 1;
+#[doc = "< RTC_FAST_CLK can be sourced from XTAL_D2 or RC_FAST by configuring soc_rtc_fast_clk_src_t"]
+pub const soc_module_clk_t_SOC_MOD_CLK_RTC_FAST: soc_module_clk_t = 2;
+#[doc = "< RTC_SLOW_CLK can be sourced from RC_SLOW_D4, XTAL32K, or OSC_SLOW by configuring soc_rtc_slow_clk_src_t"]
+pub const soc_module_clk_t_SOC_MOD_CLK_RTC_SLOW: soc_module_clk_t = 3;
+#[doc = "< XTAL_X2_F32M_CLK is derived from XTAL_X2 (clock gating + fixed divider of 2), it has a fixed frequency of 32MHz"]
+pub const soc_module_clk_t_SOC_MOD_CLK_XTAL_X2_F32M: soc_module_clk_t = 4;
+#[doc = "< PLL_F48M_CLK is derived from PLL (clock gating + fixed divider of 2), it has a fixed frequency of 48MHz"]
+pub const soc_module_clk_t_SOC_MOD_CLK_PLL_F48M: soc_module_clk_t = 5;
+#[doc = "< XTAL_X2_F64M_CLK is derived from XTAL_X2 (clock gating), it has a fixed frequency of 64MHz"]
+pub const soc_module_clk_t_SOC_MOD_CLK_XTAL_X2_F64M: soc_module_clk_t = 6;
+#[doc = "< PLL_F96M_CLK is derived from PLL (clock gating), it has a fixed frequency of 96MHz"]
+pub const soc_module_clk_t_SOC_MOD_CLK_PLL_F96M: soc_module_clk_t = 7;
+#[doc = "< XTAL32K_CLK comes from the external 32kHz crystal, passing a clock gating to the peripherals"]
+pub const soc_module_clk_t_SOC_MOD_CLK_XTAL32K: soc_module_clk_t = 8;
+#[doc = "< RC_FAST_CLK comes from the internal 20MHz rc oscillator, passing a clock gating to the peripherals"]
+pub const soc_module_clk_t_SOC_MOD_CLK_RC_FAST: soc_module_clk_t = 9;
+#[doc = "< XTAL_CLK comes from the external 32MHz crystal"]
+pub const soc_module_clk_t_SOC_MOD_CLK_XTAL: soc_module_clk_t = 10;
+#[doc = "< Indication of the end of the available module clock sources"]
+pub const soc_module_clk_t_SOC_MOD_CLK_INVALID: soc_module_clk_t = 11;
+#[doc = " @brief Supported clock sources for modules (CPU, peripherals, RTC, etc.)\n\n @note enum starts from 1, to save 0 for special purpose"]
+pub type soc_module_clk_t = crate::c_types::c_uint;
+#[doc = "< SYSTIMER source clock is XTAL"]
+pub const soc_periph_systimer_clk_src_t_SYSTIMER_CLK_SRC_XTAL: soc_periph_systimer_clk_src_t = 10;
+#[doc = "< SYSTIMER source clock is RC_FAST"]
+pub const soc_periph_systimer_clk_src_t_SYSTIMER_CLK_SRC_RC_FAST: soc_periph_systimer_clk_src_t = 9;
+#[doc = "< SYSTIMER source clock default choice is XTAL"]
+pub const soc_periph_systimer_clk_src_t_SYSTIMER_CLK_SRC_DEFAULT: soc_periph_systimer_clk_src_t =
+    10;
+#[doc = " @brief Type of SYSTIMER clock source"]
+pub type soc_periph_systimer_clk_src_t = crate::c_types::c_uint;
+#[doc = "< Select PLL_F48M as the source clock"]
+pub const soc_periph_gptimer_clk_src_t_GPTIMER_CLK_SRC_PLL_F48M: soc_periph_gptimer_clk_src_t = 5;
+#[doc = "< Select RC_FAST as the source clock"]
+pub const soc_periph_gptimer_clk_src_t_GPTIMER_CLK_SRC_RC_FAST: soc_periph_gptimer_clk_src_t = 9;
+#[doc = "< Select XTAL as the source clock"]
+pub const soc_periph_gptimer_clk_src_t_GPTIMER_CLK_SRC_XTAL: soc_periph_gptimer_clk_src_t = 10;
+#[doc = "< Select PLL_F48M as the default choice"]
+pub const soc_periph_gptimer_clk_src_t_GPTIMER_CLK_SRC_DEFAULT: soc_periph_gptimer_clk_src_t = 5;
+#[doc = " @brief Type of GPTimer clock source"]
+pub type soc_periph_gptimer_clk_src_t = crate::c_types::c_uint;
+#[doc = " @brief Type of ETM clock source"]
+pub type soc_periph_etm_clk_src_t = crate::c_types::c_int;
+#[doc = "< Select RC_FAST as the source clock"]
+pub const soc_periph_rmt_clk_src_t_RMT_CLK_SRC_RC_FAST: soc_periph_rmt_clk_src_t = 9;
+#[doc = "< Select XTAL as the source clock"]
+pub const soc_periph_rmt_clk_src_t_RMT_CLK_SRC_XTAL: soc_periph_rmt_clk_src_t = 10;
+#[doc = "< Select XTAL as the default choice"]
+pub const soc_periph_rmt_clk_src_t_RMT_CLK_SRC_DEFAULT: soc_periph_rmt_clk_src_t = 10;
+#[doc = " @brief Type of RMT clock source"]
+pub type soc_periph_rmt_clk_src_t = crate::c_types::c_uint;
+#[doc = "< Select XTAL as the source clock"]
+pub const soc_periph_pcnt_clk_src_t_PCNT_CLK_SRC_XTAL: soc_periph_pcnt_clk_src_t = 10;
+#[doc = "< Select RC_FAST as the source clock"]
+pub const soc_periph_pcnt_clk_src_t_PCNT_CLK_SRC_RC_FAST: soc_periph_pcnt_clk_src_t = 9;
+#[doc = "< Select XTAL as the default choice"]
+pub const soc_periph_pcnt_clk_src_t_PCNT_CLK_SRC_DEFAULT: soc_periph_pcnt_clk_src_t = 10;
+#[doc = " @brief Type of PCNT clock source"]
+pub type soc_periph_pcnt_clk_src_t = crate::c_types::c_uint;
+#[doc = "< Select XTAL as the source clock"]
+pub const soc_periph_temperature_sensor_clk_src_t_TEMPERATURE_SENSOR_CLK_SRC_XTAL:
+    soc_periph_temperature_sensor_clk_src_t = 10;
+#[doc = "< Select RC_FAST as the source clock"]
+pub const soc_periph_temperature_sensor_clk_src_t_TEMPERATURE_SENSOR_CLK_SRC_RC_FAST:
+    soc_periph_temperature_sensor_clk_src_t = 9;
+#[doc = "< Select XTAL as the default choice"]
+pub const soc_periph_temperature_sensor_clk_src_t_TEMPERATURE_SENSOR_CLK_SRC_DEFAULT:
+    soc_periph_temperature_sensor_clk_src_t = 10;
+#[doc = " @brief Type of Temp Sensor clock source"]
+pub type soc_periph_temperature_sensor_clk_src_t = crate::c_types::c_uint;
+#[doc = "< UART source clock is PLL_F48M"]
+pub const soc_periph_uart_clk_src_legacy_t_UART_SCLK_PLL_F48M: soc_periph_uart_clk_src_legacy_t = 5;
+#[doc = "< UART source clock is RC_FAST"]
+pub const soc_periph_uart_clk_src_legacy_t_UART_SCLK_RTC: soc_periph_uart_clk_src_legacy_t = 9;
+#[doc = "< UART source clock is XTAL"]
+pub const soc_periph_uart_clk_src_legacy_t_UART_SCLK_XTAL: soc_periph_uart_clk_src_legacy_t = 10;
+#[doc = "< UART source clock default choice is PLL_F48M"]
+pub const soc_periph_uart_clk_src_legacy_t_UART_SCLK_DEFAULT: soc_periph_uart_clk_src_legacy_t = 5;
+#[doc = " @brief Type of UART clock source, reserved for the legacy UART driver"]
+pub type soc_periph_uart_clk_src_legacy_t = crate::c_types::c_uint;
+#[doc = "< Select PLL_F48M as SPI source clock"]
+pub const soc_periph_spi_clk_src_t_SPI_CLK_SRC_DEFAULT: soc_periph_spi_clk_src_t = 5;
+#[doc = "< Select XTAL as SPI source clock"]
+pub const soc_periph_spi_clk_src_t_SPI_CLK_SRC_XTAL: soc_periph_spi_clk_src_t = 10;
+#[doc = "< Select PLL_48M as SPI source clock"]
+pub const soc_periph_spi_clk_src_t_SPI_CLK_SRC_PLL_F48M: soc_periph_spi_clk_src_t = 5;
+#[doc = "< Select RC_FAST as SPI source clock"]
+pub const soc_periph_spi_clk_src_t_SPI_CLK_SRC_RC_FAST: soc_periph_spi_clk_src_t = 9;
+#[doc = " @brief Type of SPI clock source."]
+pub type soc_periph_spi_clk_src_t = crate::c_types::c_uint;
+#[doc = "< Select XTAL as the source clock"]
+pub const soc_periph_mwdt_clk_src_t_MWDT_CLK_SRC_XTAL: soc_periph_mwdt_clk_src_t = 10;
+#[doc = "< Select PLL fixed 48MHz as the source clock"]
+pub const soc_periph_mwdt_clk_src_t_MWDT_CLK_SRC_PLL_F48M: soc_periph_mwdt_clk_src_t = 5;
+#[doc = "< Select RTC fast as the source clock"]
+pub const soc_periph_mwdt_clk_src_t_MWDT_CLK_SRC_RC_FAST: soc_periph_mwdt_clk_src_t = 9;
+#[doc = "< Select XTAL as the default clock choice"]
+pub const soc_periph_mwdt_clk_src_t_MWDT_CLK_SRC_DEFAULT: soc_periph_mwdt_clk_src_t = 10;
+#[doc = " @brief MWDT clock source"]
+pub type soc_periph_mwdt_clk_src_t = crate::c_types::c_uint;
+#[doc = "< Select XTAL as the source clock"]
+pub const soc_periph_flash_clk_src_t_FLASH_CLK_SRC_XTAL: soc_periph_flash_clk_src_t = 10;
+#[doc = "< Select RC_FAST as the source clock"]
+pub const soc_periph_flash_clk_src_t_FLASH_CLK_SRC_RC_FAST: soc_periph_flash_clk_src_t = 9;
+#[doc = "< Select XTAL_X2_F64M as the source clock"]
+pub const soc_periph_flash_clk_src_t_FLASH_CLK_SRC_REF_F64M: soc_periph_flash_clk_src_t = 6;
+#[doc = "< Select PLL_F48M as the source clock"]
+pub const soc_periph_flash_clk_src_t_FLASH_CLK_SRC_PLL_F48M: soc_periph_flash_clk_src_t = 5;
+#[doc = "< Select XTAL_X2_F64M as the default clock choice"]
+pub const soc_periph_flash_clk_src_t_FLASH_CLK_SRC_DEFAULT: soc_periph_flash_clk_src_t = 6;
+#[doc = "< Select XTAL as ROM default clock source"]
+pub const soc_periph_flash_clk_src_t_FLASH_CLK_SRC_ROM_DEFAULT: soc_periph_flash_clk_src_t = 10;
+#[doc = " @brief FLASH MSPI controller clock source"]
+pub type soc_periph_flash_clk_src_t = crate::c_types::c_uint;
+#[doc = "< 8MHz clock for modem (clk8M)"]
+pub const soc_clkout_sig_id_t_CLKOUT_SIG_MODEM_8M: soc_clkout_sig_id_t = 1;
+#[doc = "< 16MHz clock for modem (clk16)"]
+pub const soc_clkout_sig_id_t_CLKOUT_SIG_MODEM_16M: soc_clkout_sig_id_t = 2;
+#[doc = "< 32MHz clock for modem (clk32)"]
+pub const soc_clkout_sig_id_t_CLKOUT_SIG_MODEM_32M: soc_clkout_sig_id_t = 3;
+#[doc = "< 32MHz main crystal oscillator clock"]
+pub const soc_clkout_sig_id_t_CLKOUT_SIG_XTAL: soc_clkout_sig_id_t = 5;
+#[doc = "< 16MHz RTC fast clock from LP system"]
+pub const soc_clkout_sig_id_t_CLKOUT_SIG_RTC_FAST: soc_clkout_sig_id_t = 6;
+#[doc = "< 32MHz timergroup0 function clock (default is xtal)"]
+pub const soc_clkout_sig_id_t_CLKOUT_SIG_TIMERGROUP0: soc_clkout_sig_id_t = 12;
+#[doc = "< 32MHz I2S APB clock"]
+pub const soc_clkout_sig_id_t_CLKOUT_SIG_I2S_APB: soc_clkout_sig_id_t = 15;
+#[doc = "< 32MHz CPU debug mode clock"]
+pub const soc_clkout_sig_id_t_CLKOUT_SIG_CPU: soc_clkout_sig_id_t = 16;
+#[doc = "< 32MHz REGDMA AHB clock"]
+pub const soc_clkout_sig_id_t_CLKOUT_SIG_AHB: soc_clkout_sig_id_t = 17;
+#[doc = "< 32KHz external crystal clock"]
+pub const soc_clkout_sig_id_t_CLKOUT_SIG_XTAL32K: soc_clkout_sig_id_t = 21;
+#[doc = "< 32KHz external slow clock input"]
+pub const soc_clkout_sig_id_t_CLKOUT_SIG_EXT32K: soc_clkout_sig_id_t = 22;
+#[doc = "< 8MHz FOSC clock (RTC fast clock)"]
+pub const soc_clkout_sig_id_t_CLKOUT_SIG_RC_FAST: soc_clkout_sig_id_t = 23;
+#[doc = "< 600KHz SOSC clock (RTC slow clock)"]
+pub const soc_clkout_sig_id_t_CLKOUT_SIG_RC_SLOW: soc_clkout_sig_id_t = 25;
+pub const soc_clkout_sig_id_t_CLKOUT_SIG_INVALID: soc_clkout_sig_id_t = 255;
+#[doc = "CLOCK OUTPUT///////////////////////////////////////////////////////////\n**\n* @brief Clock output signal ID\n*/"]
+pub type soc_clkout_sig_id_t = crate::c_types::c_uint;
+#[doc = "< Select to calculate frequency of RTC_SLOW_CLK"]
+pub const soc_clk_freq_calculation_src_t_CLK_CAL_RTC_SLOW: soc_clk_freq_calculation_src_t = -1;
+#[doc = "< Select to calculate frequency of RC_SLOW_CLK"]
+pub const soc_clk_freq_calculation_src_t_CLK_CAL_RC_SLOW: soc_clk_freq_calculation_src_t = 0;
+#[doc = "< Select to calculate frequency of XTAL32K_CLK"]
+pub const soc_clk_freq_calculation_src_t_CLK_CAL_32K_XTAL: soc_clk_freq_calculation_src_t = 1;
+#[doc = "< Select to calculate frequency of OSC_SLOW_CLK (external slow clock)"]
+pub const soc_clk_freq_calculation_src_t_CLK_CAL_32K_OSC_SLOW: soc_clk_freq_calculation_src_t = 2;
+#[doc = "< Select to calculate frequency of RC_FAST_CLK"]
+pub const soc_clk_freq_calculation_src_t_CLK_CAL_RC_FAST: soc_clk_freq_calculation_src_t = 3;
+#[doc = "< Select to calculate frequency of CPU_CLK"]
+pub const soc_clk_freq_calculation_src_t_CLK_CAL_CPU: soc_clk_freq_calculation_src_t = 4;
+#[doc = "< Select to calculate frequency of AHB_CLK"]
+pub const soc_clk_freq_calculation_src_t_CLK_CAL_AHB: soc_clk_freq_calculation_src_t = 5;
+#[doc = "< Select to calculate frequency of APB_CLK"]
+pub const soc_clk_freq_calculation_src_t_CLK_CAL_APB: soc_clk_freq_calculation_src_t = 6;
+#[doc = "< Select to calculate frequency of SEC_CLK"]
+pub const soc_clk_freq_calculation_src_t_CLK_CAL_SEC: soc_clk_freq_calculation_src_t = 7;
+#[doc = "< Select to calculate frequency of MSPI_CLK"]
+pub const soc_clk_freq_calculation_src_t_CLK_CAL_MSPI: soc_clk_freq_calculation_src_t = 8;
+#[doc = "< Select to calculate frequency of IOMUX_CLK"]
+pub const soc_clk_freq_calculation_src_t_CLK_CAL_IOMUX: soc_clk_freq_calculation_src_t = 9;
+#[doc = "< Select to calculate frequency of PARLIO_RX_CLK"]
+pub const soc_clk_freq_calculation_src_t_CLK_CAL_PARLIO_RX: soc_clk_freq_calculation_src_t = 10;
+#[doc = "< Select to calculate frequency of PARLIO_TX_CLK"]
+pub const soc_clk_freq_calculation_src_t_CLK_CAL_PARLIO_TX: soc_clk_freq_calculation_src_t = 11;
+#[doc = "< Select to calculate frequency of GPSPI3_MST_CLK"]
+pub const soc_clk_freq_calculation_src_t_CLK_CAL_GPSPI3_MST: soc_clk_freq_calculation_src_t = 12;
+#[doc = "< Select to calculate frequency of GPSPI2_MST_CLK"]
+pub const soc_clk_freq_calculation_src_t_CLK_CAL_GPSPI2_MST: soc_clk_freq_calculation_src_t = 13;
+#[doc = "< Select to calculate frequency of an external clock from an IO"]
+pub const soc_clk_freq_calculation_src_t_CLK_CAL_EXT_IO: soc_clk_freq_calculation_src_t = 14;
+#[doc = "CLOCK FREQUENCY CALCULATION////////////////////////////////////////////////////\n**\n* @brief Clock frequency calculation source selection\n*/"]
+pub type soc_clk_freq_calculation_src_t = crate::c_types::c_int;
+#[doc = "< Select XTAL as the source clock"]
+pub const soc_periph_i2c_clk_src_t_I2C_CLK_SRC_XTAL: soc_periph_i2c_clk_src_t = 10;
+#[doc = "< Select RC_FAST as the source clock"]
+pub const soc_periph_i2c_clk_src_t_I2C_CLK_SRC_RC_FAST: soc_periph_i2c_clk_src_t = 9;
+#[doc = "< Select XTAL as the default clock choice"]
+pub const soc_periph_i2c_clk_src_t_I2C_CLK_SRC_DEFAULT: soc_periph_i2c_clk_src_t = 10;
+#[doc = " @brief Type of I2C clock source."]
+pub type soc_periph_i2c_clk_src_t = crate::c_types::c_uint;
+#[doc = "< LEDC source clock will be automatically selected based on the giving resolution and duty parameter when init the timer"]
+pub const soc_periph_ledc_clk_src_legacy_t_LEDC_AUTO_CLK: soc_periph_ledc_clk_src_legacy_t = 0;
+#[doc = "< Select PLL_F96M clock as the source clock"]
+pub const soc_periph_ledc_clk_src_legacy_t_LEDC_USE_PLL_DIV_CLK: soc_periph_ledc_clk_src_legacy_t =
+    7;
+#[doc = "< Select RC_FAST as the source clock"]
+pub const soc_periph_ledc_clk_src_legacy_t_LEDC_USE_RC_FAST_CLK: soc_periph_ledc_clk_src_legacy_t =
+    9;
+#[doc = "< Select XTAL as the source clock"]
+pub const soc_periph_ledc_clk_src_legacy_t_LEDC_USE_XTAL_CLK: soc_periph_ledc_clk_src_legacy_t = 10;
+#[doc = " @brief Type of LEDC clock source, reserved for the legacy LEDC driver"]
+pub type soc_periph_ledc_clk_src_legacy_t = crate::c_types::c_uint;
+#[doc = "< Select PLL_F96M as the source clock"]
+pub const soc_periph_mcpwm_timer_clk_src_t_MCPWM_TIMER_CLK_SRC_PLL96M:
+    soc_periph_mcpwm_timer_clk_src_t = 7;
+#[doc = "< Select RC_FAST as the source clock"]
+pub const soc_periph_mcpwm_timer_clk_src_t_MCPWM_TIMER_CLK_SRC_RC_FAST:
+    soc_periph_mcpwm_timer_clk_src_t = 9;
+#[doc = "< Select XTAL as the source clock"]
+pub const soc_periph_mcpwm_timer_clk_src_t_MCPWM_TIMER_CLK_SRC_XTAL:
+    soc_periph_mcpwm_timer_clk_src_t = 10;
+#[doc = "< Select PLL_F96M as the default clock choice"]
+pub const soc_periph_mcpwm_timer_clk_src_t_MCPWM_TIMER_CLK_SRC_DEFAULT:
+    soc_periph_mcpwm_timer_clk_src_t = 7;
+#[doc = " @brief Type of MCPWM timer clock source"]
+pub type soc_periph_mcpwm_timer_clk_src_t = crate::c_types::c_uint;
+#[doc = "< Select PLL_F96M as the source clock"]
+pub const soc_periph_mcpwm_capture_clk_src_t_MCPWM_CAPTURE_CLK_SRC_PLL96M:
+    soc_periph_mcpwm_capture_clk_src_t = 7;
+#[doc = "< Select RC_FAST as the source clock"]
+pub const soc_periph_mcpwm_capture_clk_src_t_MCPWM_CAPTURE_CLK_SRC_RC_FAST:
+    soc_periph_mcpwm_capture_clk_src_t = 9;
+#[doc = "< Select XTAL as the source clock"]
+pub const soc_periph_mcpwm_capture_clk_src_t_MCPWM_CAPTURE_CLK_SRC_XTAL:
+    soc_periph_mcpwm_capture_clk_src_t = 10;
+#[doc = "< Select PLL_F96M as the default clock choice"]
+pub const soc_periph_mcpwm_capture_clk_src_t_MCPWM_CAPTURE_CLK_SRC_DEFAULT:
+    soc_periph_mcpwm_capture_clk_src_t = 7;
+#[doc = " @brief Type of MCPWM capture clock source"]
+pub type soc_periph_mcpwm_capture_clk_src_t = crate::c_types::c_uint;
+#[doc = "< Select PLL_F96M as the source clock"]
+pub const soc_periph_mcpwm_carrier_clk_src_t_MCPWM_CARRIER_CLK_SRC_PLL96M:
+    soc_periph_mcpwm_carrier_clk_src_t = 7;
+#[doc = "< Select RC_FAST as the source clock"]
+pub const soc_periph_mcpwm_carrier_clk_src_t_MCPWM_CARRIER_CLK_SRC_RC_FAST:
+    soc_periph_mcpwm_carrier_clk_src_t = 9;
+#[doc = "< Select XTAL as the source clock"]
+pub const soc_periph_mcpwm_carrier_clk_src_t_MCPWM_CARRIER_CLK_SRC_XTAL:
+    soc_periph_mcpwm_carrier_clk_src_t = 10;
+#[doc = "< Select PLL_F96M as the default clock choice"]
+pub const soc_periph_mcpwm_carrier_clk_src_t_MCPWM_CARRIER_CLK_SRC_DEFAULT:
+    soc_periph_mcpwm_carrier_clk_src_t = 7;
+#[doc = " @brief Type of MCPWM carrier clock source"]
+pub type soc_periph_mcpwm_carrier_clk_src_t = crate::c_types::c_uint;
+#[doc = "< Select PLL_F96M as the default source clock"]
+pub const soc_periph_i2s_clk_src_t_I2S_CLK_SRC_DEFAULT: soc_periph_i2s_clk_src_t = 7;
+#[doc = "< Select PLL_F96M as the source clock"]
+pub const soc_periph_i2s_clk_src_t_I2S_CLK_SRC_PLL_96M: soc_periph_i2s_clk_src_t = 7;
+#[doc = "< Select XTAL_X2_F64M as the source clock"]
+pub const soc_periph_i2s_clk_src_t_I2S_CLK_SRC_XTAL_X2: soc_periph_i2s_clk_src_t = 6;
+#[doc = "< Select XTAL as the source clock"]
+pub const soc_periph_i2s_clk_src_t_I2S_CLK_SRC_XTAL: soc_periph_i2s_clk_src_t = 10;
+#[doc = "< Select external clock as source clock"]
+pub const soc_periph_i2s_clk_src_t_I2S_CLK_SRC_EXTERNAL: soc_periph_i2s_clk_src_t = -1;
+#[doc = " @brief I2S clock source enum"]
+pub type soc_periph_i2s_clk_src_t = crate::c_types::c_int;
+#[doc = "< Select XTAL clock as the source clock"]
+pub const soc_periph_sdm_clk_src_t_SDM_CLK_SRC_XTAL: soc_periph_sdm_clk_src_t = 10;
+#[doc = "< Select PLL_F48M clock as the source clock"]
+pub const soc_periph_sdm_clk_src_t_SDM_CLK_SRC_PLL_F48M: soc_periph_sdm_clk_src_t = 5;
+#[doc = "< Select PLL_F48M clock as the default clock choice"]
+pub const soc_periph_sdm_clk_src_t_SDM_CLK_SRC_DEFAULT: soc_periph_sdm_clk_src_t = 5;
+#[doc = " @brief Sigma Delta Modulator clock source"]
+pub type soc_periph_sdm_clk_src_t = crate::c_types::c_uint;
+#[doc = "< Select XTAL clock as the source clock"]
+pub const soc_periph_glitch_filter_clk_src_t_GLITCH_FILTER_CLK_SRC_XTAL:
+    soc_periph_glitch_filter_clk_src_t = 10;
+#[doc = "< Select PLL_F48M clock as the source clock"]
+pub const soc_periph_glitch_filter_clk_src_t_GLITCH_FILTER_CLK_SRC_PLL_F48M:
+    soc_periph_glitch_filter_clk_src_t = 5;
+#[doc = "< Select PLL_F48M clock as the default clock choice"]
+pub const soc_periph_glitch_filter_clk_src_t_GLITCH_FILTER_CLK_SRC_DEFAULT:
+    soc_periph_glitch_filter_clk_src_t = 5;
+#[doc = " @brief Glitch filter clock source"]
+pub type soc_periph_glitch_filter_clk_src_t = crate::c_types::c_uint;
+#[doc = "< Select XTAL clock as the source clock"]
+pub const soc_periph_ana_cmpr_clk_src_t_ANA_CMPR_CLK_SRC_XTAL: soc_periph_ana_cmpr_clk_src_t = 10;
+#[doc = "< Select RC_FAST as the source clock"]
+pub const soc_periph_ana_cmpr_clk_src_t_ANA_CMPR_CLK_SRC_RC_FAST: soc_periph_ana_cmpr_clk_src_t = 9;
+#[doc = "< Select PLL_F48M as the source clock"]
+pub const soc_periph_ana_cmpr_clk_src_t_ANA_CMPR_CLK_SRC_PLL_F48M: soc_periph_ana_cmpr_clk_src_t =
+    5;
+#[doc = "< Select PLL_F48M as the default clock choice"]
+pub const soc_periph_ana_cmpr_clk_src_t_ANA_CMPR_CLK_SRC_DEFAULT: soc_periph_ana_cmpr_clk_src_t = 5;
+#[doc = " @brief Type of Analog Comparator clock source"]
+pub type soc_periph_ana_cmpr_clk_src_t = crate::c_types::c_uint;
+#[doc = "< Select XTAL as the source clock"]
+pub const soc_periph_twai_clk_src_t_TWAI_CLK_SRC_XTAL: soc_periph_twai_clk_src_t = 10;
+#[doc = "< Select PLL_96M as the source clock"]
+pub const soc_periph_twai_clk_src_t_TWAI_CLK_SRC_PLL_F96M: soc_periph_twai_clk_src_t = 7;
+#[doc = "< Select PLL_96M as the default clock choice"]
+pub const soc_periph_twai_clk_src_t_TWAI_CLK_SRC_DEFAULT: soc_periph_twai_clk_src_t = 7;
+#[doc = " @brief TWAI clock source"]
+pub type soc_periph_twai_clk_src_t = crate::c_types::c_uint;
+#[doc = "< Select XTAL as the source clock"]
+pub const soc_periph_parlio_clk_src_t_PARLIO_CLK_SRC_XTAL: soc_periph_parlio_clk_src_t = 10;
+#[doc = "< Select RC_FAST as the source clock"]
+pub const soc_periph_parlio_clk_src_t_PARLIO_CLK_SRC_RC_FAST: soc_periph_parlio_clk_src_t = 9;
+#[doc = "< Select PLL_F96M as the source clock"]
+pub const soc_periph_parlio_clk_src_t_PARLIO_CLK_SRC_PLL_F96M: soc_periph_parlio_clk_src_t = 7;
+#[doc = "< Select EXTERNAL clock as the source clock"]
+pub const soc_periph_parlio_clk_src_t_PARLIO_CLK_SRC_EXTERNAL: soc_periph_parlio_clk_src_t = -1;
+#[doc = "< Select PLL_F96M as the default clock choice"]
+pub const soc_periph_parlio_clk_src_t_PARLIO_CLK_SRC_DEFAULT: soc_periph_parlio_clk_src_t = 7;
+#[doc = " @brief PARLIO clock source"]
+pub type soc_periph_parlio_clk_src_t = crate::c_types::c_int;
+#[doc = "< Select XTAL as the source clock"]
+pub const soc_periph_adc_digi_clk_src_t_ADC_DIGI_CLK_SRC_XTAL: soc_periph_adc_digi_clk_src_t = 10;
+#[doc = "< Select RC_FAST as the source clock"]
+pub const soc_periph_adc_digi_clk_src_t_ADC_DIGI_CLK_SRC_RC_FAST: soc_periph_adc_digi_clk_src_t = 9;
+#[doc = "< Select XTAL as the default clock choice"]
+pub const soc_periph_adc_digi_clk_src_t_ADC_DIGI_CLK_SRC_DEFAULT: soc_periph_adc_digi_clk_src_t =
+    10;
+#[doc = " @brief ADC digital controller clock source"]
+pub type soc_periph_adc_digi_clk_src_t = crate::c_types::c_uint;
+#[doc = " @brief ETM clock source\n @note User should select the clock source based on the power and resolution requirement"]
+pub type etm_clock_source_t = soc_periph_etm_clk_src_t;
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct esp_etm_channel_t {
@@ -10847,7 +11224,43 @@ pub type esp_etm_task_handle_t = *mut esp_etm_task_t;
 #[doc = " @brief ETM channel configuration"]
 #[repr(C)]
 #[derive(Copy, Clone)]
-pub struct esp_etm_channel_config_t {}
+pub struct esp_etm_channel_config_t {
+    #[doc = "< Clock source for the ETM channel"]
+    pub clk_src: etm_clock_source_t,
+    #[doc = "< ETM channel flags"]
+    pub flags: esp_etm_channel_config_t_etm_chan_flags,
+}
+#[doc = " Extra configuration flags for ETM channel"]
+#[repr(C)]
+#[repr(align(4))]
+#[derive(Copy, Clone)]
+pub struct esp_etm_channel_config_t_etm_chan_flags {
+    pub _bitfield_align_1: [u8; 0],
+    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 1usize]>,
+    pub __bindgen_padding_0: [u8; 3usize],
+}
+impl esp_etm_channel_config_t_etm_chan_flags {
+    #[inline]
+    pub fn allow_pd(&self) -> u32 {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(0usize, 1u8) as u32) }
+    }
+    #[inline]
+    pub fn set_allow_pd(&mut self, val: u32) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(0usize, 1u8, val as u64)
+        }
+    }
+    #[inline]
+    pub fn new_bitfield_1(allow_pd: u32) -> __BindgenBitfieldUnit<[u8; 1usize]> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 1usize]> = Default::default();
+        __bindgen_bitfield_unit.set(0usize, 1u8, {
+            let allow_pd: u32 = unsafe { ::core::mem::transmute(allow_pd) };
+            allow_pd as u64
+        });
+        __bindgen_bitfield_unit
+    }
+}
 extern "C" {
     #[doc = " @brief Allocate an ETM channel\n\n @note The channel can later be freed by `esp_etm_del_channel`\n\n @param[in] config ETM channel configuration\n @param[out] ret_chan Returned ETM channel handle\n @return\n      - ESP_OK: Allocate ETM channel successfully\n      - ESP_ERR_INVALID_ARG: Allocate ETM channel failed because of invalid argument\n      - ESP_ERR_NO_MEM: Allocate ETM channel failed because of out of memory\n      - ESP_ERR_NOT_FOUND: Allocate ETM channel failed because all channels are used up and no more free one\n      - ESP_FAIL: Allocate ETM channel failed because of other reasons"]
     pub fn esp_etm_new_channel(
